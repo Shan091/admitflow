@@ -69,7 +69,7 @@ mandatory linear interview.
   unsupported eligibility, and job-outcome promises out of recommendations.
 - [ ] Implement a multi-turn question policy that uses existing attributed facts, asks only useful
   next questions, reflects understanding for correction, and preserves path switching/resume.
-- [ ] Current slice: require a complementary signal before recommending from broad interests;
+- [x] Current slice: require a complementary signal before recommending from broad interests;
   when context is thin, ask one tailored follow-up and preserve the known-course fast path.
 - [ ] Define and test coverage for contradictory/corrected preferences, mixed interests, constraints,
   parent/student conflict, unknown/out-of-catalog requests, sensitive disclosures, provider/RAG

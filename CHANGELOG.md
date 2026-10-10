@@ -7,6 +7,8 @@
   follow-up with validated activity/level tap replies; known-course lookup remains a direct path.
 - **Validation:** Focused domain/admissions tests passed (49 tests). `bash scripts/verify.sh` passed
   Ruff lint/format, strict mypy, and all 89 tests after formatting; `git diff --check` passed.
+  Pushed as `fb57f78fd495d9ec1c2c828fa21ac220097777e4`; GitHub Actions `verify` run
+  `38088864278` passed.
 - **Reason:** A broad interest such as “I like design” should lead to useful exploration rather than
   an immediate course list, while learners who already know their course should not be forced
   through extra questions.
