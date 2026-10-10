@@ -4,14 +4,15 @@ from types import SimpleNamespace
 import pytest
 
 from admitflow.adapters.sqlite import Repository
-from admitflow.adapters.telegram import callback_handler, start_command
+from admitflow.adapters.telegram import callback_handler, start_command, text_handler
 from admitflow.adapters.vector_store import VectorStore
 from admitflow.services.admissions import AdmissionsService
 from admitflow.services.retrieval import RetrievalService
 
 
 class FakeMessage:
-    def __init__(self) -> None:
+    def __init__(self, text: str | None = None) -> None:
+        self.text = text
         self.sent: list[tuple[str, object]] = []
 
     async def reply_text(self, text: str, reply_markup: object = None) -> None:
@@ -78,3 +79,33 @@ async def test_course_callback_updates_lead_and_persists_exchange(tmp_path: Path
     assert lead["state"] == "awaiting_grade12"
     assert len(repository.list_messages(int(lead["id"]))) == 2
     assert "Have you completed Grade 12?" in message.sent[0][0]
+
+
+@pytest.mark.asyncio
+async def test_qualification_sends_test_payment_link_when_enabled(tmp_path: Path) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("42", "sample")
+    admissions.select_course(lead_id, "foundations-computing")
+    admissions.answer_grade12(lead_id, True)
+
+    class FakePayments:
+        async def create_for_qualified_lead(self, requested_lead_id: int) -> tuple[str, int]:
+            assert requested_lead_id == lead_id
+            return "https://rzp.io/i/test123", 50000
+
+    context.application.bot_data["payment_service"] = FakePayments()
+    message = FakeMessage("75")
+    update = SimpleNamespace(
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=102,
+    )
+
+    await text_handler(update, context)
+
+    assert "Razorpay test-mode" in message.sent[0][0]
+    assert "₹500" in message.sent[0][0]
+    assert "https://rzp.io/i/test123" in message.sent[0][0]
+    stored_messages = repository.list_messages(lead_id)
+    assert stored_messages[-1]["direction"] == "outbound"
+    assert "https://rzp.io/i/test123" in stored_messages[-1]["body"]
