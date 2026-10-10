@@ -21,7 +21,8 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
 - **Human review/limitations:** The UI disclosure warns that messages are stored locally, are sent
   to OpenAI only after consent, and must be fictional. Translations, minors/guardian privacy review,
   adversarial multilingual evaluations, and production privacy review remain outstanding.
-- **Push/CI:** Pending; record the exact pushed SHA and matching workflow result after publishing.
+- **Push/CI:** Pushed as `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`; matching GitHub Actions CI run
+  [38087034051](https://github.com/Shan091/admitflow/actions/runs/38087034051) passed.
 
 ## 2026-10-11 — interest-led discovery first slice
 

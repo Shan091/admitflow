@@ -8,14 +8,16 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `53e78e44809c8c9714d70c13b08c07582bacfdad`
+- **Verified implementation commit SHA:** `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
   test payment were verified during earlier milestones; the user confirmed the live bot flow. The
-  adaptive discovery changes in this SHA were validated locally with fake integrations; the new
-  adaptive paths have not been rehearsed live. The Telegram demo bot is
+  consent-gated adaptive discovery changes in this SHA passed automated CI and synthetic OpenAI
+  smoke checks, but have not been rehearsed live or deployed to the running tunnel. The Telegram
+  demo bot is
   [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
-  account and bot token for the live conversation; OpenAI API key for FAQ retrieval; optional
+  account and bot token for the live conversation; OpenAI API key for consented discovery and FAQ
+  retrieval; optional
   Razorpay test API keys and webhook secret for the test payment. Do not include credential values.
 
 ## Participants
@@ -33,8 +35,9 @@
   `OPENAI_EMBEDDING_MODEL`, `DATABASE_PATH`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`,
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
-- **Demo walkthrough:** In Telegram, send `/start`, pick a known course/field/explore/browse path,
-  choose field, level, and activity prompts, then inspect a catalog-grounded recommendation. The
+- **Demo walkthrough:** In Telegram, send `/start`, read the OpenAI processing notice, and either
+  consent to free-text discovery or continue with buttons. After consent, name a known course or
+  describe interest/activity/level in your own words; inspect the bounded catalog recommendation. The
   learner may pause and `/resume`. Supported sample undergraduate options continue to code-based
   qualification and require an explicit tap before a test payment link. Other course levels are
   handed to staff for eligibility confirmation. Staff can inspect attributed facts and pending
@@ -42,17 +45,18 @@
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
-- **Checks performed and results:** `bash scripts/verify.sh` passed locally for the adaptive
-  discovery implementation (Ruff lint, format, strict mypy, and 63 pytest tests); `git diff --check`
-  passed. GitHub Actions run
-  [38085663111](https://github.com/Shan091/admitflow/actions/runs/38085663111) passed for the
-  verified implementation SHA above.
+- **Checks performed and results:** On `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`,
+  `bash scripts/verify.sh` passed locally (Ruff lint, format, strict mypy, and 71 pytest tests);
+  `git diff --check` passed. GitHub Actions run
+  [38087034051](https://github.com/Shan091/admitflow/actions/runs/38087034051) passed for this SHA.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.
   Razorpay test mode reports the existing ₹500 Payment Link as paid; AdmitFlow recorded one
   signature-verified webhook event and the staff dashboard shows `paid`. No applicant content was
-  used in the OpenAI checks.
+  used in the OpenAI checks. A separate synthetic extraction smoke across English, Hindi,
+  Malayalam, and Hinglish plus known-course, out-of-catalog, and injection cases used 12,308 input
+  and 992 output tokens; see `AI_USAGE.md`. No applicant text was used.
 - **Known limitations:** Single fictional tenant, seeded FAQ corpus, one environment-configured
   staff account, incomplete localized response copy, incomplete eligibility rules for non-UG
   offerings, no automatic retention expiry, uploads, production hosting, refunds, or production

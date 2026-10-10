@@ -59,18 +59,19 @@ committed.
 See `tasks/features/conversational-intake.md`. Preserve the existing demo boundary: fictional
 courses, no scores, student-first attribution, and truthful staff handoff.
 
-- [ ] Expand the seed catalog to 28+ complete sample courses, at least five per agreed field; test
+- [x] Expand the seed catalog to 28+ complete sample courses, at least five per agreed field; test
   unique IDs, all levels, complete facts, and recommendation provenance.
-- [ ] Add explicit OpenAI processing consent and a tap-only fallback; prove no route, extraction, or
+- [x] Add explicit OpenAI processing consent and a tap-only fallback; prove no route, extraction, or
   embedding call occurs before consent or after opt-out.
-- [ ] Extract only current-turn, catalog-allowlisted discovery facts with a strict schema and
+- [x] Extract only current-turn, catalog-allowlisted discovery facts with a strict schema and
   stateless API request; validate model output before any persistence or response.
-- [ ] Replace the mandatory field/level/activity sequence with deterministic next-question choice
+- [x] Replace the mandatory field/level/activity sequence with deterministic next-question choice
   based on already-known facts; support known-course natural-language entry and unsure learners.
-- [ ] Add fake-API tests for consent, multilingual extraction fixtures, injection/unknown values,
-  handoff, dynamic turn selection, and failure fallback.
-- [ ] Run `bash scripts/verify.sh`, review privacy/claims, and commit/push only this slice's files;
-  record the exact pushed SHA and matching GitHub Actions result.
+- [x] Add fake-API tests for consent, catalog allowlisting, injection instructions, known-course
+  entry, corrections, handoff, dynamic responses, and extraction failure; run synthetic live
+  language checks in English, Hindi, Malayalam, and Hinglish.
+- [x] Run `bash scripts/verify.sh` (71 tests), review privacy/claims, commit and push this slice as
+  `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`; GitHub Actions CI run `38087034051` passed.
 
 ## FAQ embeddings and vector retrieval
 

@@ -16,7 +16,9 @@
   was made by the tests. A separate live smoke test with seven synthetic prompts checked English,
   Hindi, Malayalam, and Hinglish activity extraction, exact known-course lookup, out-of-catalog
   medicine, and an instruction-injection attempt. All returned the expected bounded catalog output
-  (12,308 input and 992 output tokens total). Push and matching GitHub Actions result are pending.
+  (12,308 input and 992 output tokens total). Pushed to `main` as
+  `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`; matching GitHub Actions run
+  [38087034051](https://github.com/Shan091/admitflow/actions/runs/38087034051) passed.
 - **Limitations:** No fluent-speaker language review, broad adversarial extraction evaluation,
   real-catalog validation, non-undergraduate eligibility engine, retention expiry, or production
   privacy/legal review is included in this slice.
