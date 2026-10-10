@@ -49,8 +49,8 @@ acceptance criteria pass and the corresponding milestone is committed.
 - [x] Run `bash scripts/verify.sh`, review the diff, commit and push, and record the exact pushed SHA
   plus GitHub Actions test result.
 
-  Verified 32 tests locally and GitHub Actions run 38076330518 passed on
-  `5c04b5982e7d97d0fccf75236605b9e466f8c9e0`.
+  Verified 32 tests locally and GitHub Actions run 38076997956 passed on
+  `182c27689544f21a6536146db870a553b03e14a5` (including the `/api/v1/webhooks/razorpay` alias).
 
 ## Final verification and submission
 

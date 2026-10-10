@@ -9,7 +9,9 @@
   would otherwise miss the registered route.
 - **Files:** `src/admitflow/dashboard/payment_routes.py`, `tests/test_app.py`, and `README.md`.
 - **Validation:** `bash scripts/verify.sh` passed with 32 tests; `git diff --check` passed. No
-  live webhook or API request was made. GitHub Actions is pending push.
+  live webhook or API request was made. GitHub Actions passed for pushed SHA
+  `182c27689544f21a6536146db870a553b03e14a5`:
+  https://github.com/Shan091/admitflow/actions/runs/38076997956
 - **Limitations:** Razorpay webhook signature verification still requires the webhook secret saved
   in Razorpay Dashboard and configured as `RAZORPAY_WEBHOOK_SECRET` locally.
 
