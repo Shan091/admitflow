@@ -12,15 +12,32 @@ from admitflow.domain.discovery import recommend_courses
         (
             "tech/data",
             "vocational_certificate",
-            {"digital-literacy-certificate", "digital-security-certificate"},
+            {
+                "digital-literacy-certificate",
+                "digital-security-certificate",
+                "it-support-certificate",
+            },
         ),
         ("tech/data", "diploma", {"data-analytics-diploma", "web-development-diploma"}),
-        ("tech/data", "undergraduate", {"foundations-computing", "software-systems-bachelors"}),
+        (
+            "tech/data",
+            "undergraduate",
+            {
+                "foundations-computing",
+                "software-systems-bachelors",
+                "information-systems-bachelors",
+            },
+        ),
         ("tech/data", "postgraduate", {"data-science-masters", "applied-data-systems-masters"}),
         (
             "business/accounting",
             "vocational_certificate",
-            {"business-analytics", "bookkeeping-certificate", "entrepreneurship-certificate"},
+            {
+                "business-analytics",
+                "bookkeeping-certificate",
+                "entrepreneurship-certificate",
+                "project-coordination-certificate",
+            },
         ),
         (
             "business/accounting",
@@ -32,7 +49,11 @@ from admitflow.domain.discovery import recommend_courses
             "undergraduate",
             {"business-management-bachelors", "business-operations-bachelors"},
         ),
-        ("business/accounting", "postgraduate", {"business-strategy-masters"}),
+        (
+            "business/accounting",
+            "postgraduate",
+            {"business-strategy-masters", "enterprise-operations-masters"},
+        ),
         (
             "design/media",
             "vocational_certificate",
@@ -42,23 +63,39 @@ from admitflow.domain.discovery import recommend_courses
                 "visual-communication-certificate",
             },
         ),
-        ("design/media", "diploma", {"digital-design-diploma", "user-experience-design-diploma"}),
+        (
+            "design/media",
+            "diploma",
+            {"digital-design-diploma", "user-experience-design-diploma", "motion-design-diploma"},
+        ),
         (
             "design/media",
             "undergraduate",
             {"digital-product-design-bachelors", "digital-media-production-bachelors"},
         ),
-        ("design/media", "postgraduate", {"design-media-masters"}),
+        (
+            "design/media",
+            "postgraduate",
+            {"design-media-masters", "accessible-communication-design-masters"},
+        ),
         (
             "hospitality/tourism",
             "vocational_certificate",
             {"guest-services-certificate", "sustainable-tourism-certificate"},
         ),
-        ("hospitality/tourism", "diploma", {"hospitality-diploma", "event-operations-diploma"}),
+        (
+            "hospitality/tourism",
+            "diploma",
+            {"hospitality-diploma", "event-operations-diploma", "heritage-tourism-diploma"},
+        ),
         (
             "hospitality/tourism",
             "undergraduate",
-            {"tourism-undergraduate", "hospitality-management-bachelors"},
+            {
+                "tourism-undergraduate",
+                "hospitality-management-bachelors",
+                "hospitality-events-bachelors",
+            },
         ),
         (
             "hospitality/tourism",
@@ -74,6 +111,7 @@ from admitflow.domain.discovery import recommend_courses
                 "retail-customer-service-certificate",
                 "textile-craft-certificate",
                 "customer-service-practice-certificate",
+                "repair-reuse-certificate",
             },
         ),
         (
@@ -83,6 +121,7 @@ from admitflow.domain.discovery import recommend_courses
                 "event-setup-diploma",
                 "retail-merchandising-diploma",
                 "event-operations-diploma-advanced",
+                "inventory-operations-diploma",
             },
         ),
         ("vocational-skills", "undergraduate", set()),

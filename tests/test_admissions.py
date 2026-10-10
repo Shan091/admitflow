@@ -1735,7 +1735,7 @@ def test_student_field_choice_preserves_level_and_activity_preferences(tmp_path:
     assert facts["education_level_student"] == "undergraduate"
     assert facts["activity_terms_student"] == "making visuals"
     assert facts["interest_activity_student"] == "making visuals"
-    assert "Did I get that right" in reply.text or "What would you like to learn" in reply.text
+    assert "Did I get that right" in reply.text or "What would you most like to learn" in reply.text
 
 
 def test_parent_course_suggestion_requires_student_confirmation(tmp_path: Path) -> None:
@@ -1869,6 +1869,61 @@ async def test_fixed_catalog_evaluation_matrix_returns_expected_complete_course(
             "vocational_certificate",
             "practice customer service routines",
             "customer-service-practice-certificate",
+        ),
+        (
+            "tech/data",
+            "vocational_certificate",
+            "troubleshoot common device issues",
+            "it-support-certificate",
+        ),
+        (
+            "tech/data",
+            "undergraduate",
+            "study information systems",
+            "information-systems-bachelors",
+        ),
+        (
+            "business/accounting",
+            "vocational_certificate",
+            "coordinate project work",
+            "project-coordination-certificate",
+        ),
+        (
+            "business/accounting",
+            "postgraduate",
+            "analyze enterprise operations",
+            "enterprise-operations-masters",
+        ),
+        ("design/media", "diploma", "create motion graphics", "motion-design-diploma"),
+        (
+            "design/media",
+            "postgraduate",
+            "design accessible communication",
+            "accessible-communication-design-masters",
+        ),
+        (
+            "hospitality/tourism",
+            "diploma",
+            "interpret local heritage",
+            "heritage-tourism-diploma",
+        ),
+        (
+            "hospitality/tourism",
+            "undergraduate",
+            "coordinate hospitality events",
+            "hospitality-events-bachelors",
+        ),
+        (
+            "vocational-skills",
+            "vocational_certificate",
+            "repair and reuse materials",
+            "repair-reuse-certificate",
+        ),
+        (
+            "vocational-skills",
+            "diploma",
+            "manage stock and inventory",
+            "inventory-operations-diploma",
         ),
     ],
 )

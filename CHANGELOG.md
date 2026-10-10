@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-11 — expand the fictional course catalog to 50 offerings
+
+- **Change:** Added ten complete fictional offerings, two in each agreed field: IT support and
+  information systems; project coordination and enterprise operations; motion design and accessible
+  communication design; heritage tourism and hospitality events; repair/reuse and stock/inventory
+  operations. Every course has an explicit level, field, interests, activities, prerequisites,
+  medium, language-support tags, goals, sample application fee, and fictional description.
+- **Validation:** Updated the full 20-cell field/level matrix and verified each new course through
+  its distinct catalog-owned learning goal. Catalog checks confirm 50 unique, complete offerings
+  with ten per field. `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 160
+  tests. No live or paid API calls were made.
+- **Reason:** Give learners more distinct institution-course examples to compare while keeping every
+  answer tied to explicitly seeded fictional offerings and continuing to abstain outside catalog
+  support.
+
 ## 2026-10-11 — verify the full field/level recommendation matrix
 
 - **Change:** Added a fixed expected-match fixture for every combination of the five sample fields

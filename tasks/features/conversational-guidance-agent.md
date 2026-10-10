@@ -35,7 +35,7 @@ human escalation, and operational requirements are verified.
 
 - `/start` already opens with an exploratory question and shortcuts; it no longer lists courses as
   the first response.
-- The seed now contains 40 fictional course offerings, eight in each of five fields, spanning four
+- The seed now contains 50 fictional course offerings, ten in each of five fields, spanning four
   education levels. This does not imply that every field offers every level.
 - Discovery extraction currently records course, field, education level, interest, activity,
   uncertainty, and correction. The extractor sees the current message and the allowlisted catalog.

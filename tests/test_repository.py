@@ -36,7 +36,7 @@ def test_catalog_has_broad_fictional_options_with_complete_sample_facts(
     repository = make_repository(tmp_path)
     courses = repository.list_courses(repository.tenant_id)
 
-    assert len(courses) == 40
+    assert len(courses) == 50
     assert len({course.id for course in courses}) == len(courses)
     assert {course.education_level for course in courses} == {
         "vocational_certificate",
@@ -52,7 +52,7 @@ def test_catalog_has_broad_fictional_options_with_complete_sample_facts(
         "hospitality/tourism",
         "vocational-skills",
     }
-    assert all(sum(course.field == field for course in courses) >= 8 for field in by_field)
+    assert all(sum(course.field == field for course in courses) == 10 for field in by_field)
     assert all(
         set(course.language_support)
         <= {
