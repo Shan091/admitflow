@@ -72,8 +72,8 @@ courses, no scores, student-first attribution, and truthful staff handoff.
   language checks in English, Hindi, Malayalam, and Hinglish.
 - [x] Run `bash scripts/verify.sh` (71 tests), review privacy/claims, commit and push this slice as
   `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`; GitHub Actions CI run `38087034051` passed.
-- [x] Verify opt-out still works while collecting marks; full gate passed with 73 tests. Follow-up
-  push and CI result are pending.
+- [x] Verify opt-out still works while collecting marks; full gate passed with 73 tests. Pushed as
+  `a2c3582cbf36945841a9c5f7ae58f885038c7de4`; CI run `38087386606` passed.
 
 ## FAQ embeddings and vector retrieval
 
