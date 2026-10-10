@@ -38,9 +38,10 @@ routing and semantic FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
 
 For payments, create Razorpay **test mode** API keys and configure `RAZORPAY_KEY_ID` (must start
 with `rzp_test_`), `RAZORPAY_KEY_SECRET`, and `RAZORPAY_WEBHOOK_SECRET`. Register
-`POST /webhooks/razorpay` in the Razorpay test dashboard for the `payment_link.paid` event. Local
-webhook delivery needs a public HTTPS tunnel; payment creation and signature handling have fake
-automated tests and do not spend credits or create network calls during CI. Do not use live keys.
+`POST /api/v1/webhooks/razorpay` (also accepted at `/webhooks/razorpay`) in the Razorpay test
+dashboard for the `payment_link.paid` event. Local webhook delivery needs a public HTTPS tunnel;
+payment creation and signature handling have fake automated tests and do not spend credits or
+create network calls during CI. Do not use live keys.
 
 ## Tests and checks
 

@@ -90,7 +90,7 @@ def test_razorpay_webhook_endpoint_checks_signature_and_accepts_test_event(tmp_p
         headers = {"X-Razorpay-Event-Id": "evt-1", "X-Razorpay-Signature": "wrong"}
         assert client.post("/webhooks/razorpay", content=body, headers=headers).status_code == 401
         headers["X-Razorpay-Signature"] = signature
-        response = client.post("/webhooks/razorpay", content=body, headers=headers)
+        response = client.post("/api/v1/webhooks/razorpay", content=body, headers=headers)
         assert response.status_code == 200
         assert response.json() == {"status": "ignored"}
 

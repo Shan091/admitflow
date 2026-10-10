@@ -16,6 +16,8 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   Telegram, or OpenAI API was called.
 - **Corrections:** TestClient follows redirects unless explicitly disabled; auth tests were updated
   to inspect actual 303 responses. The payment adapter rejects non-test `rzp_live_` key IDs.
+- **Follow-up:** Added and verified the `/api/v1/webhooks/razorpay` route alias for the supplied
+  ngrok URL; the full gate still passes with 32 tests. The Razorpay webhook secret is not yet set.
 
 ## 2026-10-10 — project scaffold and demo slice
 

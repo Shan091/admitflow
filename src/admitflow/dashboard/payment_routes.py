@@ -6,6 +6,7 @@ router = APIRouter()
 
 
 @router.post("/webhooks/razorpay")
+@router.post("/api/v1/webhooks/razorpay")
 async def razorpay_webhook(request: Request) -> dict[str, str]:
     payment_service = getattr(request.app.state, "payment_service", None)
     if payment_service is None:

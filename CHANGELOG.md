@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — accept the supplied ngrok webhook path
+
+- **Time:** 00:14 IST
+- **Change:** Added `/api/v1/webhooks/razorpay` as an alias for the existing signed Razorpay
+  webhook handler, matching the user's ngrok URL; documented both accepted paths.
+- **Why:** The application had no `/api/v1` prefix or proxy rewrite, so the supplied endpoint path
+  would otherwise miss the registered route.
+- **Files:** `src/admitflow/dashboard/payment_routes.py`, `tests/test_app.py`, and `README.md`.
+- **Validation:** `bash scripts/verify.sh` passed with 32 tests; `git diff --check` passed. No
+  live webhook or API request was made. GitHub Actions is pending push.
+- **Limitations:** Razorpay webhook signature verification still requires the webhook secret saved
+  in Razorpay Dashboard and configured as `RAZORPAY_WEBHOOK_SECRET` locally.
+
 ## 2026-10-11 — verified payment handoff and failure handling
 
 - **Time:** 00:04 IST
