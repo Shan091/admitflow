@@ -7,7 +7,7 @@
   seeded eligibility rules in code, answers institution FAQs with fail-closed vector search,
   and supports staff login plus Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** To be updated after the data-reset milestone is pushed.
+- **Verified implementation commit SHA:** `77de766e1056c187c982344978fe7200fd2eb742`
 - **Working demo:** Local `/health` and the public HTTPS tunnel returned 200. The Telegram
   webhook is registered and healthy; the user confirmed the live bot flow. The authenticated
   staff dashboard reports FAQ retrieval ready and shows the verified Razorpay test payment as
@@ -39,8 +39,9 @@
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
 - **Checks performed and results:** `bash scripts/verify.sh` passed locally (Ruff lint, formatting,
-  strict mypy, and 42 pytest tests); `git diff --check` passed. GitHub Actions result for the data-
-  reset commit will be recorded after the push.
+  strict mypy, and 42 pytest tests); `git diff --check` passed. GitHub Actions run
+  [38082903212](https://github.com/Shan091/admitflow/actions/runs/38082903212) passed for the
+  verified implementation SHA above.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.

@@ -14,7 +14,8 @@
   pytest tests. `git diff --check` passed. Automated reset checks use temporary SQLite data.
 - **Limitations:** Reset affects this app's database only; it cannot delete provider-side Telegram
   or Razorpay records. It is permanent and cannot be undone.
-- **Push/CI:** To be recorded after the reset milestone is pushed and its Actions result is checked.
+- **Push/CI:** Pushed to `main` as `77de766e1056c187c982344978fe7200fd2eb742`; GitHub Actions CI
+  run [38082903212](https://github.com/Shan091/admitflow/actions/runs/38082903212) passed.
 
 ## 2026-10-11 — Telegram payment confirmation and status lookup
 

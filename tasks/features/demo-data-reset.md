@@ -14,7 +14,8 @@ course and FAQ catalog afterward.
 - [x] The dashboard confirms successful reset; failed confirmation/authentication does not delete.
 - [x] Automated tests verify records removed, seeded content retained, and unauthorized/invalid
   requests rejected without data loss.
-- [ ] GitHub Actions passes for the reset commit.
+- [x] GitHub Actions run `38082903212` passed for commit
+  `77de766e1056c187c982344978fe7200fd2eb742`.
 
 ## Dependencies and decisions
 
