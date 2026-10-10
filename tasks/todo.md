@@ -5,10 +5,12 @@ acceptance criteria pass and the corresponding milestone is committed.
 
 ## Repository presentation
 
-- [ ] Restructure the README as a readable project landing page with a concise pitch, feature
+- [x] Restructure the README as a readable project landing page with a concise pitch, feature
   summary, architecture and demo-flow visuals, setup, verification, docs navigation, and honest
   limitations. Preserve all setup and safety requirements; validate links/code snippets and run
-  `bash scripts/verify.sh` before recording and committing the change.
+  `bash scripts/verify.sh` before recording and committing the change. Local gate passed (172
+  tests), all 10 relative README links and the logo path resolve; pushed as
+  `2dc2cb2dfae32fa8122f0cc7e9e9e15618f0dfb6`; GitHub Actions CI run `38096776690` passed.
 
 ## Foundation and repository
 
