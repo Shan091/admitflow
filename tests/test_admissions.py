@@ -1334,6 +1334,97 @@ async def test_fixed_catalog_evaluation_matrix_returns_expected_complete_course(
     assert any(data == f"course:{expected_course}" for _, data in result.buttons)
 
 
+@pytest.mark.parametrize(
+    ("field", "level", "goal", "expected_course"),
+    [
+        (
+            "tech/data",
+            "vocational_certificate",
+            "practice digital security basics",
+            "digital-security-certificate",
+        ),
+        (
+            "tech/data",
+            "postgraduate",
+            "design applied data systems",
+            "applied-data-systems-masters",
+        ),
+        (
+            "business/accounting",
+            "diploma",
+            "manage small enterprise finances",
+            "small-enterprise-finance-diploma",
+        ),
+        (
+            "business/accounting",
+            "undergraduate",
+            "study business operations",
+            "business-operations-bachelors",
+        ),
+        (
+            "design/media",
+            "vocational_certificate",
+            "practice visual communication",
+            "visual-communication-certificate",
+        ),
+        ("design/media", "diploma", "design user experiences", "user-experience-design-diploma"),
+        (
+            "design/media",
+            "undergraduate",
+            "produce digital media",
+            "digital-media-production-bachelors",
+        ),
+        (
+            "hospitality/tourism",
+            "vocational_certificate",
+            "practice sustainable tourism",
+            "sustainable-tourism-certificate",
+        ),
+        (
+            "hospitality/tourism",
+            "postgraduate",
+            "study hospitality strategy",
+            "hospitality-strategy-masters",
+        ),
+        (
+            "vocational-skills",
+            "diploma",
+            "learn retail merchandising",
+            "retail-merchandising-diploma",
+        ),
+        (
+            "vocational-skills",
+            "diploma",
+            "coordinate advanced event operations",
+            "event-operations-diploma-advanced",
+        ),
+        (
+            "vocational-skills",
+            "vocational_certificate",
+            "practice customer service routines",
+            "customer-service-practice-certificate",
+        ),
+    ],
+)
+def test_added_catalog_course_is_retrievable_from_its_explicit_goal(
+    tmp_path: Path, field: str, level: str, goal: str, expected_course: str
+) -> None:
+    from admitflow.domain.discovery import recommend_courses
+
+    repository = Repository(tmp_path / f"{expected_course}.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    matches = recommend_courses(
+        repository.list_courses(repository.tenant_id),
+        interests={field},
+        activities=set(),
+        learning_goals={goal},
+        level=level,
+    )
+
+    assert [match.course.id for match in matches] == [expected_course]
+
+
 def test_unknown_field_creates_handoff_instead_of_inventing_course(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()

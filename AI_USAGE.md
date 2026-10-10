@@ -3,6 +3,18 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — broaden the sample course catalog
+
+- **Task:** Add 12 complete fictional offerings so the existing five catalog fields each contain
+  eight examples, with all four agreed education levels represented.
+- **Assistance:** Codex drafted sample catalog records and tests that verify completeness,
+  idempotent seeding, supported language-support tags, and retrieval of each added offering from
+  its explicit sample learning goal. No real institution data or student data was used.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 117 tests;
+  `git diff --check` passed. CI is pending. No live or paid API call was made.
+- **Human review:** Confirm the catalog remains fictional; the new records do not create eligibility
+  rules for non-undergraduate programs, job guarantees, or regulated-program claims.
+
 ## 2026-10-11 — compare catalog-recorded language support
 
 - **Task:** Let broad course matches surface a learner's optional language-support preference

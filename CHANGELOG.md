@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-11 — expand fictional course catalog to 40 offerings
+
+- **Change:** Add 12 complete fictional offerings, bringing the catalog to exactly 40 with eight
+  per agreed field and examples across certificate/vocational, diploma, undergraduate, and
+  postgraduate levels. New offerings are non-regulated sample subjects; their prerequisites, fees,
+  language-support labels, and learning goals remain catalog-owned. No job or outcome claims were
+  added.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 117 tests.
+  The suite checks exact catalog size, field/level spread, unique IDs, completeness, idempotent
+  seeding, support-label validity, and exact recommendation retrieval for each added offering.
+  `git diff --check` passed; CI is pending. Automated tests use fictional data and fake APIs only.
+- **Delivery:** Commit and push details will be recorded after delivery.
+- **Reason:** Give undecided learners more realistic sample options while preserving the existing
+  code-owned catalog matching and fictional-demo boundary.
+
 ## 2026-10-11 — add optional catalog-grounded language support preference
 
 - **Change:** For a broad set of more than three matching sample courses, offer one optional

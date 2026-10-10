@@ -12,9 +12,9 @@ prediction, or guarantee of admission or employment.
 
 ## Settled boundaries
 
-- The fictional demo catalog is sample data. Expand to at least 28 complete offerings: at least
-  five in each agreed field and coverage of certificate/vocational, diploma, undergraduate, and
-  postgraduate levels.
+- The fictional demo catalog is sample data. The initial expansion target of 28 offerings has
+  since been superseded by the current 40-offering catalog, with at least eight per agreed field
+  and examples across certificate/vocational, diploma, undergraduate, and postgraduate levels.
 - Use conversation-only exploration: no numerical aptitude/readiness-to-fit score or personality
   label.
 - OpenAI-assisted text processing is enabled by default for this hackathon demo. At `/start`, clearly
