@@ -14,9 +14,10 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/formatting, strict mypy, and 41 tests;
   `git diff --check` passed. Tests used a fake Telegram bot and local database. No live API or
   notification was triggered.
-- **Human review:** Confirm the next-step wording suits the hackathon demo. The notification is
-  best-effort; if delivery fails, the student can ask “Has my payment gone through?” in Telegram
-  and read the persisted status.
+- **Human direction:** The user requested a success message with a clear staff follow-up/course
+  access next step. Copy says an admissions team member will reach out, while clarifying that the
+  demo does not enable access automatically. Delivery is best-effort; if it fails, the student can
+  ask “Has my payment gone through?” in Telegram and read the persisted status.
 
 ## 2026-10-11 — live FAQ retrieval calibration
 

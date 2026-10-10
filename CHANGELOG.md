@@ -6,8 +6,8 @@
   confirmation describing the next step. Add a student-facing status query backed by the stored
   payment state, and link a Razorpay Payment Link back to its Telegram user for notification.
 - **Why:** Students need confirmation after checkout and a truthful next action. The demo does not
-  automatically provision course access, so the message says staff can review the application and
-  share the steps.
+  automatically provision course access, so the message says an admissions team member will reach
+  out with instructions without implying access is already enabled.
 - **Files:** `src/admitflow/`, `tests/`, `README.md`, `SPEC.md`, `docs/DECISIONS.md`, `tasks/`, and
   `AI_USAGE.md`.
 - **Validation:** `bash scripts/verify.sh` passed: Ruff lint and format checks, strict mypy, and
@@ -16,7 +16,8 @@
 - **Limitations:** If Telegram delivery fails after payment is recorded, the webhook remains
   accepted; the student can ask the bot “Has my payment gone through?” to read the saved status.
   Course access is a staff follow-up and is not provisioned by the demo.
-- **Push/CI:** To be recorded after this milestone is pushed and its Actions result is confirmed.
+- **Push/CI:** Pushed to `main` as `88aca11d187040292b48675d1fe9a04594bbbcae`; GitHub Actions CI
+  run [38081876118](https://github.com/Shan091/admitflow/actions/runs/38081876118) passed.
 
 ## 2026-10-11 — live calibration of seeded FAQ retrieval
 

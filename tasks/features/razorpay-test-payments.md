@@ -38,6 +38,8 @@ Payment Link for the selected course's application fee and show staff the verifi
 - [x] Full quality gate: `bash scripts/verify.sh` (32 passed)
 - [x] Full quality gate after Telegram confirmation/status addition: `bash scripts/verify.sh`
   (41 passed); `git diff --check` passed.
+- [x] GitHub Actions CI run `38081876118` passed for commit
+  `88aca11d187040292b48675d1fe9a04594bbbcae`.
 
 ## Risks and limitations
 
