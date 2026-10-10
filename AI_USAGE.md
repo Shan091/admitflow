@@ -11,7 +11,8 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   field replacement category-scoped, made level/field taps speaker-aware, and added persistence for
   resumable adaptive-signal prompts plus parent/learner regression tests.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 126 tests;
-  `git diff --check` passed. Commit and CI are pending.
+  `git diff --check` passed. Commit `dcaabdea9f7e4b2b931552212f892d2ecfb02e93` was pushed, and
+  GitHub Actions `CI` run `38093609621` passed.
 - **Human review:** No external facts or student outcomes were introduced; all recommendations
   remain bound to the fictional sample catalog.
 

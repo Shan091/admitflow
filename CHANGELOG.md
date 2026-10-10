@@ -10,7 +10,8 @@
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 126 tests;
   `git diff --check` passed. New tests verify the context-aware field follow-up, student fact
   preservation, parent/student isolation, and existing Telegram recommendation flow.
-- **Delivery:** Implementation commit and CI pending.
+- **Delivery:** Pushed as `dcaabdea9f7e4b2b931552212f892d2ecfb02e93`; GitHub Actions `CI` run
+  [38093609621](https://github.com/Shan091/admitflow/actions/runs/38093609621) passed.
 - **Reason:** Keep the known-field shortcut while letting unsure and mixed-context learners follow
   the same multi-turn policy without making a parent's suggestion become the student's choice.
 
