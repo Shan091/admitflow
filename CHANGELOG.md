@@ -15,7 +15,9 @@
   `tasks/features/adaptive-course-discovery.md`, and `tasks/todo.md`.
 - **Validation:** `bash scripts/verify.sh` passed with 63 tests (Ruff, format, strict mypy, pytest);
   `git diff --check` passed. Tests use temporary SQLite files and fake APIs; no paid or external API
-  request was made. The exact pushed SHA and GitHub Actions run will be appended after the push.
+  request was made. Pushed to `main` as
+  `53e78e44809c8c9714d70c13b08c07582bacfdad`; GitHub Actions CI run
+  [38085663111](https://github.com/Shan091/admitflow/actions/runs/38085663111) passed for that SHA.
 - **Limitations:** Most user-facing replies are still English despite saving a language preference;
   non-undergraduate eligibility is sent to staff for confirmation; automatic admissions-cycle
   expiry is not implemented and its exact interval remains open. The fictional catalog is not a real

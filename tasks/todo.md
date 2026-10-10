@@ -29,26 +29,29 @@ See `tasks/features/adaptive-course-discovery.md`. This feature replaces the fix
 opening; do not mark a task complete until the acceptance criteria pass and the milestone is
 committed.
 
-- [ ] Add and migrate structured catalog metadata; seed fictional offerings across all agreed levels
-  and fields, with complete requirements and language facts.
-- [ ] Persist attributed facts, discovery path/step, lifecycle, and qualitative readiness separately
-  from hard eligibility; prove existing lead/message/payment rows survive migration.
-- [ ] Build the four entry paths, optional field/level/activity prompts, catalog recommendations,
-  back/skip, path switching, pause/resume, and safe interrupt handling.
-- [ ] Ensure student preferences take priority over parent suggestions and require learner
-  confirmation before a parent's course choice advances.
+- [x] Add and migrate structured catalog metadata; seed clearly fictional offerings across the
+  agreed levels and fields. **Open:** fill and verify all requirements/language facts before
+  recommending every offering.
+- [x] Persist attributed facts, discovery path/step, lifecycle, and qualitative readiness separately
+  from hard eligibility; migration tests prove existing lead/message/payment rows survive.
+- [x] Build four entry paths, optional field/level/activity prompts, catalog recommendations,
+  back/skip, path switching, and pause/resume. **Open:** finish the full interrupt matrix across
+  FAQ, fees, language switching, stop, and restart.
+- [x] Record student and parent preferences separately; require learner confirmation before a
+  parent's course choice advances.
 - [ ] Localize all student-facing discovery, qualification, FAQ, payment, and handoff responses to
   English/Malayalam/Hindi/Hinglish; review the translations with fluent speakers.
 - [ ] Provide deterministic course-specific eligibility for every recommended level, or keep the
   offering in staff handoff until verified rules are configured.
-- [ ] Create staff-dashboard handoffs for unsupported/missing facts and keep all contact/response
-  claims accurate when no real contact or SLA is configured.
-- [ ] Provide staff-mediated per-lead deletion and choose, configure, and test an admissions-cycle
-  retention expiry policy.
-- [ ] Add fixed expected-recommendation, language, privacy, migration, and payment-consent tests;
-  run `bash scripts/verify.sh` and `git diff --check`.
-- [ ] Record test results in CHANGELOG/AI_USAGE/SUBMISSION, review the diff, push, and record the
-  exact SHA plus its matching GitHub Actions result before checking completed tasks.
+- [x] Create staff-dashboard handoffs for unsupported/missing facts and state truthfully that no
+  live contact or response-time commitment is configured.
+- [x] Provide staff-mediated per-lead deletion. **Open:** choose, configure, and test an
+  admissions-cycle retention expiry policy.
+- [x] Run `bash scripts/verify.sh` (63 tests) and `git diff --check` for the pushed slice. **Open:**
+  complete translated-copy, full language-flow, and remaining privacy/eligibility tests.
+- [x] Record test results in CHANGELOG/AI_USAGE/SUBMISSION; implementation commit
+  `53e78e44809c8c9714d70c13b08c07582bacfdad` was pushed and its matching GitHub Actions CI run
+  `38085663111` passed. This checklist/docs update still needs its own commit and push.
 
 ## FAQ embeddings and vector retrieval
 

@@ -15,7 +15,9 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   code was copied.
 - **Checks:** `bash scripts/verify.sh` passed (Ruff lint, format, strict mypy, and 63 pytest tests);
   `git diff --check` passed. Automated tests used fake integrations and temporary SQLite data. No
-  live OpenAI, Telegram, Razorpay, or other network request was made.
+  live OpenAI, Telegram, Razorpay, or other network request was made. The implementation was pushed
+  as `53e78e44809c8c9714d70c13b08c07582bacfdad`; matching GitHub Actions run
+  [38085663111](https://github.com/Shan091/admitflow/actions/runs/38085663111) passed.
 - **Human direction/review:** The human selected conversation-only discovery, student-first
   parent handling, four language preferences, a fictional broad Kerala course catalog, and no
   invented staff contact/response time. Human review of translated copy and the final bot flow

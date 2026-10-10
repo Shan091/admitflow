@@ -8,11 +8,12 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `77de766e1056c187c982344978fe7200fd2eb742`
-- **Working demo:** Local `/health` and the public HTTPS tunnel returned 200. The Telegram
-  webhook is registered and healthy; the user confirmed the live bot flow. The authenticated
-  staff dashboard reports FAQ retrieval ready and shows the verified Razorpay test payment as
-  paid. The Telegram demo bot is [@crea34bot](https://t.me/crea34bot).
+- **Verified implementation commit SHA:** `53e78e44809c8c9714d70c13b08c07582bacfdad`
+- **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
+  test payment were verified during earlier milestones; the user confirmed the live bot flow. The
+  adaptive discovery changes in this SHA were validated locally with fake integrations; the new
+  adaptive paths have not been rehearsed live. The Telegram demo bot is
+  [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
   account and bot token for the live conversation; OpenAI API key for FAQ retrieval; optional
   Razorpay test API keys and webhook secret for the test payment. Do not include credential values.
@@ -41,9 +42,10 @@
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
-- **Checks performed and results:** `bash scripts/verify.sh` passed locally (Ruff lint, formatting,
-  strict mypy, and 42 pytest tests); `git diff --check` passed. GitHub Actions run
-  [38082903212](https://github.com/Shan091/admitflow/actions/runs/38082903212) passed for the
+- **Checks performed and results:** `bash scripts/verify.sh` passed locally for the adaptive
+  discovery implementation (Ruff lint, format, strict mypy, and 63 pytest tests); `git diff --check`
+  passed. GitHub Actions run
+  [38085663111](https://github.com/Shan091/admitflow/actions/runs/38085663111) passed for the
   verified implementation SHA above.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
