@@ -83,6 +83,16 @@ mandatory linear interview.
   in correction/confirmation fingerprints and transparent recommendation reasons. Full gate passed
   (96 tests); pushed as `bdacf0b1cb1d6fd7c91e72e2530ac8ceaadfa77e`; GitHub Actions CI run
   `38090277836` passed.
+- [x] Add optional course-language support exploration. Ask only when a broad, otherwise
+  comparable candidate set has materially different catalog-recorded support languages (the current
+  seed's teaching medium is English for every course); explain that distinction without
+  predicting ability or outcomes, and let the learner choose, leave it open, or skip. Keep the
+  preference speaker-attributed, allowlisted to course records, correction-safe, resumable, and in
+  recommendation explanations. **Verified:** fake-API extraction, no prompt for known-course or
+  uniform-language matches, skip/correction/resume, stale confirmation invalidation, empty-match
+  recovery, parent attribution, and bounded language claims. `bash scripts/verify.sh` passed
+  Ruff lint/format, strict mypy, and 105 tests; pushed as
+  `aed4f92f65eab558f3c06ef3fc42e5694e9a0f72`; GitHub Actions `CI` run `38091126893` passed.
 - [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
   retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
 

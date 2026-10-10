@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-10-11 — add optional catalog-grounded language support preference
+
+- **Change:** For a broad set of more than three matching sample courses, offer one optional
+  language-support question only when the candidates share a teaching medium but list different
+  support. A goal question already used for the same fact set suppresses this extra prompt. The
+  learner may leave language open; a chosen exact catalog label filters results and becomes part of
+  correction/confirmation fingerprints. Recommendations disclose the listed teaching medium and
+  support separately. No language ability or outcome is inferred. Unsupported language-medium
+  requests receive the existing factual boundary and staff handoff.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 105 tests;
+  `git diff --check` passed. Tests use fictional catalog data and fake OpenAI responses only; no
+  live or paid API call was made.
+- **Delivery:** Feature commit `91005085048517c4c0ea86b8d1f520d3606571dc` and follow-up
+  attribution-test commit `aed4f92f65eab558f3c06ef3fc42e5694e9a0f72` were pushed. GitHub Actions
+  `CI` run [38091126893](https://github.com/Shan091/admitflow/actions/runs/38091126893) passed for
+  the 105-test tree; the implementation commit's run [38091066242](https://github.com/Shan091/admitflow/actions/runs/38091066242)
+  also passed.
+- **Reason:** Let learners weigh recorded language support as one course trade-off while preserving
+  a direct path for students who already know their course.
+
 ## 2026-10-11 — add optional catalog-grounded study goals
 
 - **Change:** Add sample learning-goal tags to the 28 fictional courses and an additive SQLite

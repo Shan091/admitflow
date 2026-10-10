@@ -3,6 +3,25 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — compare catalog-recorded language support
+
+- **Task:** Let broad course matches surface a learner's optional language-support preference
+  without treating language proficiency as a diagnosis or inventing course services.
+- **Assistance:** Codex added an allowlisted support-preference field to stateless structured
+  extraction, a one-question policy that shares the optional narrowing turn with study goals,
+  student-attributed persistence, preference filtering/explanations, stale-confirmation handling,
+  resume/skip behavior, and a no-match recovery that can reopen language. The UI distinguishes
+  catalog-listed teaching medium from discussion support.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 105 tests;
+  `git diff --check` passed. All API tests are fake and all course/dialogue data are fictional. No
+  live OpenAI request, applicant data, or API credits were used. Feature commit
+  `91005085048517c4c0ea86b8d1f520d3606571dc` is pushed and its GitHub Actions run `38091066242`
+  passed. Follow-up parent-attribution test commit `aed4f92f65eab558f3c06ef3fc42e5694e9a0f72` is
+  pushed and its 105-test GitHub Actions run `38091126893` passed.
+- **Human review:** Language support is represented only by sample catalog labels; it does not
+  establish a student's proficiency or any actual accommodation. No consent session was added;
+  OpenAI processing remains disclosed and on by default with the existing opt-out.
+
 ## 2026-10-11 — optional study-goal signal for broad course matches
 
 - **Task:** Make course exploration adapt when several offerings match, without expanding into job
