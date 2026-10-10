@@ -66,10 +66,11 @@ mandatory linear interview.
   direct. Validate stale recommendation callbacks, Telegram dispatch, and pause/resume. Full local
   gate passed (168 tests); pushed as `6d66e2744b19607c78d49012f8a32982114f4732`; GitHub Actions CI
   run `38095745687` passed.
-- [ ] Split guided recommendation continuation callbacks from direct known-course selection.
+- [x] Split guided recommendation continuation callbacks from direct known-course selection.
   Revalidate the current confirmed signature and top-three match at the moment Continue is tapped;
   stale guided continuation must not select a course or enter qualification. Preserve direct known-
-  course behavior and verify Telegram dispatch.
+  course behavior and verify Telegram dispatch. Full local gate passed (172 tests); pushed as
+  `5d33787eec9aa64bf5b79e36f517847779c68646`; GitHub Actions CI run `38096405684` passed.
 - [x] Handle unrelated or non-informative free-text turns without replaying the same pending
   discovery poll. Acknowledge the message, preserve saved facts/pending state, and offer relevant
   next actions; verify on the text-handler path with deterministic extraction fixtures. Full local

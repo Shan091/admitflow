@@ -8,7 +8,7 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `7a02b9cf6b977d8534336056fe54c50266975fb6`
+- **Verified implementation commit SHA:** `5d33787eec9aa64bf5b79e36f517847779c68646`
 - **Sample course catalog:** 50 clearly fictional, complete offerings across the five agreed
   fields, ten per field. The catalog does not offer every education level in every field.
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
@@ -56,10 +56,12 @@
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
 - **Checks performed and results:** The current implementation commit
-  `7a02b9cf6b977d8534336056fe54c50266975fb6` passed `bash scripts/verify.sh` (Ruff lint/format,
+  `5d33787eec9aa64bf5b79e36f517847779c68646` passed `bash scripts/verify.sh` (Ruff lint/format,
   strict mypy, and 172 pytest tests), `git diff --check`, and GitHub Actions CI run
-  [38096233572](https://github.com/Shan091/admitflow/actions/runs/38096233572). No live or paid API
-  calls were made for the unrelated-message recovery slice. The preceding course detail commit
+  [38096405684](https://github.com/Shan091/admitflow/actions/runs/38096405684). No live or paid API
+  calls were made for the stale guided-continuation slice. The preceding unrelated-message recovery
+  commit `7a02b9cf6b977d8534336056fe54c50266975fb6` also passed the same full local gate and
+  [CI run 38096233572](https://github.com/Shan091/admitflow/actions/runs/38096233572). The preceding course detail commit
   `6d66e2744b19607c78d49012f8a32982114f4732` passed `bash scripts/verify.sh` (Ruff lint/format,
   strict mypy, and 168 pytest tests), `git diff --check`, and GitHub Actions CI run
   [38095745687](https://github.com/Shan091/admitflow/actions/runs/38095745687). No live or paid API

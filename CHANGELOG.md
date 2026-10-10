@@ -12,6 +12,8 @@
   calls were made.
 - **Reason:** A recommendation detail page can outlive the preferences and comparison that produced
   it; explicit continuation must be checked against current state too.
+- **Delivery:** Pushed as `5d33787eec9aa64bf5b79e36f517847779c68646`; GitHub Actions `CI` run
+  [38096405684](https://github.com/Shan091/admitflow/actions/runs/38096405684) passed.
 
 ## 2026-10-11 — handle unrelated text without repeating a guidance poll
 
