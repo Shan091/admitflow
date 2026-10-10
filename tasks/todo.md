@@ -76,6 +76,11 @@ acceptance criteria pass and the corresponding milestone is committed.
 
 ## Final verification and submission
 
+- [ ] Add a staff-only “delete all demo data” action with a server-verified confirmation phrase
+  and session-bound CSRF token. Delete leads, conversations, payments, and webhook history while
+  preserving seeded course/FAQ content; test success and rejection paths.
+- [ ] Run the full verification gate, document actual results, commit/push, and record the exact
+  GitHub Actions result for the reset milestone.
 - [x] Send a one-time, truthful Telegram confirmation after a verified paid webhook; add a
   payment-status lookup backed only by persisted Razorpay state and cover the flows with tests.
 - [x] Run the full verification gate, update feature/docs/logs, commit and push the milestone, and

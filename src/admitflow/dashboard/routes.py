@@ -9,10 +9,17 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
-from admitflow.dashboard.auth import SESSION_COOKIE, SESSION_MAX_AGE, create_session, verify_session
+from admitflow.dashboard.auth import (
+    SESSION_COOKIE,
+    SESSION_MAX_AGE,
+    create_delete_demo_data_token,
+    create_session,
+    verify_session,
+)
 
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+DELETE_DEMO_DATA_CONFIRMATION = "DELETE ALL DEMO DATA"
 
 
 def _repository(request: Request) -> Any:
@@ -89,6 +96,9 @@ def leads_page(request: Request) -> Response:
     if not _staff_authenticated(request):
         return RedirectResponse("/login", status_code=303)
     repository = _repository(request)
+    settings = request.app.state.settings
+    session_cookie = request.cookies.get(SESSION_COOKIE, "")
+    csrf_token = create_delete_demo_data_token(session_cookie, settings.staff_session_secret)
     response = templates.TemplateResponse(
         request=request,
         name="leads.html",
@@ -96,10 +106,36 @@ def leads_page(request: Request) -> Response:
             "leads": repository.list_leads(repository.tenant_id),
             "rag_ready": request.app.state.rag_ready,
             "staff_authenticated": True,
+            "delete_demo_data_csrf_token": csrf_token,
+            "reset_complete": request.query_params.get("reset") == "complete",
+            "reset_rejected": request.query_params.get("reset") == "not-deleted",
         },
     )
     response.headers["Cache-Control"] = "no-store"
     return response
+
+
+@router.post("/admin/delete-all-demo-data")
+async def delete_all_demo_data(request: Request) -> RedirectResponse:
+    if not _staff_authenticated(request):
+        return RedirectResponse("/login", status_code=303)
+    settings = request.app.state.settings
+    session_cookie = request.cookies.get(SESSION_COOKIE, "")
+    if not session_cookie or not settings.staff_session_secret:
+        return RedirectResponse("/login", status_code=303)
+    try:
+        fields = parse_qs((await request.body()).decode("utf-8"))
+    except UnicodeDecodeError:
+        fields = {}
+    confirmation = fields.get("confirmation", [""])[0]
+    csrf_token = fields.get("csrf_token", [""])[0]
+    expected_token = create_delete_demo_data_token(session_cookie, settings.staff_session_secret)
+    confirmation_matches = hmac.compare_digest(confirmation, DELETE_DEMO_DATA_CONFIRMATION)
+    token_matches = hmac.compare_digest(csrf_token, expected_token)
+    if not confirmation_matches or not token_matches:
+        return RedirectResponse("/?reset=not-deleted", status_code=303)
+    _repository(request).delete_all_demo_data()
+    return RedirectResponse("/?reset=complete", status_code=303)
 
 
 @router.get("/leads/{lead_id}", response_class=HTMLResponse)

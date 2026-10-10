@@ -42,6 +42,11 @@ prints them:
 uv run python scripts/manage_telegram_webhook.py https://YOUR-PUBLIC-HOST
 ```
 
+Staff can use **Delete all demo data** at the bottom of the authenticated dashboard to reset the
+local demo. It requires typing `DELETE ALL DEMO DATA` and deletes leads, conversations, payment
+records, and Razorpay webhook history from SQLite. Seeded fictional courses and FAQs remain so the
+demo can continue. This does not delete external records held by Telegram or Razorpay.
+
 Telegram webhooks require HTTPS, and Telegram does not allow webhook delivery and `getUpdates`
 polling simultaneously. The helper checks Telegram's reported webhook URL after registration.
 To remove the hook, run `uv run python scripts/manage_telegram_webhook.py --delete`. This project

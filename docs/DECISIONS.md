@@ -31,6 +31,9 @@ Record consequential choices here. Each entry is short; update it when evidence 
 8. **Staff dashboard access.** Protect dashboard routes with one environment-configured staff
    username/password and a signed, HTTP-only, SameSite=Lax session cookie. No self-registration,
    roles, or production identity provider in the hackathon demo. Missing credentials fail closed.
+9. **Demo data reset.** Provide a staff-only dashboard reset for lead, conversation, payment, and
+   webhook-event records, protected by a session-bound CSRF token and typed confirmation. Keep
+   fictional courses and FAQs so the demo can be run again; provider-side records are unaffected.
 
 ## References
 

@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 import json
+import re
+import sqlite3
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -42,6 +44,7 @@ def test_health_and_dashboard_require_staff_login(tmp_path: Path) -> None:
         assert dashboard.status_code == 200
         assert "fictional demo" in dashboard.text
         assert "No leads yet" in dashboard.text
+        assert "Delete all demo data" in dashboard.text
 
         repository = app.state.repository
         lead_id = repository.upsert_lead(repository.tenant_id, "42", "sample")
@@ -55,6 +58,115 @@ def test_health_and_dashboard_require_staff_login(tmp_path: Path) -> None:
         assert "Application fee payment" in detail.text
         assert client.post("/logout", follow_redirects=False).status_code == 303
         assert client.get(f"/leads/{lead_id}", follow_redirects=False).status_code == 303
+
+
+def test_staff_can_delete_demo_records_with_confirmation_and_csrf(
+    tmp_path: Path,
+) -> None:
+    database_path = tmp_path / "demo.sqlite3"
+    settings = Settings(
+        telegram_bot_token=None,
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=database_path,
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+        staff_username="demo-staff",
+        staff_password="local-pass",
+        staff_session_secret="test-session-secret-long-enough",
+    )
+    app = create_app(settings)
+
+    with TestClient(app) as client:
+        repository = app.state.repository
+        lead_id = repository.upsert_lead(repository.tenant_id, "42", "sample")
+        repository.update_lead(lead_id, selected_course_id="foundations-computing", eligible=True)
+        repository.add_message(lead_id, "inbound", "/start", 808)
+        payment, created = repository.get_or_create_payment_intent(
+            repository.tenant_id, lead_id, "AF-reset-test"
+        )
+        assert created and payment is not None
+        repository.save_payment_link(payment["id"], "plink_reset_test", "https://rzp.io/reset")
+        paid_event = {
+            "payload": {
+                "payment_link": {
+                    "entity": {
+                        "id": "plink_reset_test",
+                        "reference_id": "AF-reset-test",
+                        "status": "paid",
+                        "amount": 50000,
+                        "amount_paid": 50000,
+                        "currency": "INR",
+                    }
+                }
+            }
+        }
+        assert repository.apply_razorpay_paid_event("evt-reset-test", paid_event) == "applied"
+        course_count_before = len(repository.list_courses(repository.tenant_id))
+        with sqlite3.connect(database_path) as connection:
+            faq_count_before = connection.execute(
+                "SELECT COUNT(*) FROM knowledge_chunks"
+            ).fetchone()[0]
+
+        reset_path = "/admin/delete-all-demo-data"
+        anonymous = client.post(
+            reset_path,
+            data={"confirmation": "DELETE ALL DEMO DATA", "csrf_token": "anything"},
+            follow_redirects=False,
+        )
+        assert anonymous.status_code == 303
+        assert anonymous.headers["location"] == "/login"
+        assert len(repository.list_leads(repository.tenant_id)) == 1
+
+        client.post(
+            "/login",
+            data={"username": "demo-staff", "password": "local-pass"},
+            follow_redirects=False,
+        )
+        dashboard = client.get("/")
+        match = re.search(r'name="csrf_token" value="([^"]+)"', dashboard.text)
+        assert match is not None
+        csrf_token = match.group(1)
+
+        wrong_phrase = client.post(
+            reset_path,
+            data={"confirmation": "DELETE DATA", "csrf_token": csrf_token},
+            follow_redirects=False,
+        )
+        assert wrong_phrase.headers["location"] == "/?reset=not-deleted"
+        assert len(repository.list_leads(repository.tenant_id)) == 1
+        missing_token = client.post(
+            reset_path,
+            data={"confirmation": "DELETE ALL DEMO DATA"},
+            follow_redirects=False,
+        )
+        assert missing_token.headers["location"] == "/?reset=not-deleted"
+        assert len(repository.list_leads(repository.tenant_id)) == 1
+
+        deleted = client.post(
+            reset_path,
+            data={"confirmation": "DELETE ALL DEMO DATA", "csrf_token": csrf_token},
+            follow_redirects=False,
+        )
+        assert deleted.status_code == 303
+        assert deleted.headers["location"] == "/?reset=complete"
+        dashboard_after_reset = client.get(deleted.headers["location"])
+        assert dashboard_after_reset.status_code == 200
+        assert "Demo records deleted" in dashboard_after_reset.text
+        assert repository.list_leads(repository.tenant_id) == []
+        assert repository.list_messages(lead_id) == []
+        assert repository.get_payment_for_lead(repository.tenant_id, lead_id) is None
+        assert len(repository.list_courses(repository.tenant_id)) == course_count_before
+        with sqlite3.connect(database_path) as connection:
+            faq_count_after = connection.execute(
+                "SELECT COUNT(*) FROM knowledge_chunks"
+            ).fetchone()[0]
+            event_count = connection.execute(
+                "SELECT COUNT(*) FROM razorpay_webhook_events"
+            ).fetchone()[0]
+        assert faq_count_after == faq_count_before
+        assert event_count == 0
 
 
 def test_dashboard_fails_closed_without_staff_configuration(tmp_path: Path) -> None:

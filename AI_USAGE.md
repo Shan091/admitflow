@@ -3,14 +3,27 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — staff demo-data reset
+
+- **Task:** Add a deliberate staff-only action to clear demo/student records so the Telegram and
+  payment flow can be reset for another rehearsal.
+- **Assistance:** Codex traced staff-session and SQLite ownership, added a reset route/form with a
+  session-bound CSRF token and typed confirmation, and covered clearing records while retaining
+  the fictional catalog and FAQs.
+- **Checks:** Targeted `uv run pytest tests/test_app.py tests/test_repository.py -q` passed 12
+  tests. `bash scripts/verify.sh` passed Ruff lint/formatting, strict mypy, and 42 tests;
+  `git diff --check` passed. Reset tests used a temporary SQLite database.
+- **Human review:** The dashboard explains that app-local records are cleared but Telegram and
+  Razorpay provider-side records are not. The reset cannot be undone.
+
 ## 2026-10-11 — Telegram payment confirmation and status lookup
 
 - **Task:** Notify a student after Razorpay confirms a test payment and let them query their
   persisted payment status.
 - **Assistance:** Codex traced the signed webhook flow, added the one-time Telegram confirmation,
   read-only payment status response, repository lookup, tests, and documentation. The confirmation
-  states that staff can review the application and share course access steps; it also clarifies that
-  the demo does not provision access automatically.
+  says an admissions team member will reach out with course access instructions; it clarifies that
+  the demo does not enable access automatically.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/formatting, strict mypy, and 41 tests;
   `git diff --check` passed. Tests used a fake Telegram bot and local database. No live API or
   notification was triggered.

@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Leads</h2>
+{% if reset_complete %}<p role="status" class="success">Demo records deleted. Seeded courses and FAQs are still available.</p>{% endif %}
+{% if reset_rejected %}<p role="alert" class="notice">Nothing was deleted. The confirmation phrase or form token was invalid.</p>{% endif %}
 {% if leads %}
 <table>
   <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Eligible</th><th>Updated</th></tr></thead>
@@ -17,4 +19,17 @@
   </tbody>
 </table>
 {% else %}<p>No leads yet. Start a conversation with the configured Telegram bot.</p>{% endif %}
+
+<details class="danger-zone">
+  <summary>Delete all demo data</summary>
+  <p>This permanently deletes every lead, conversation, payment record, and Razorpay webhook event
+    from this app. Fictional courses and FAQs remain, so the demo keeps working. This does not
+    delete records held by Telegram or Razorpay.</p>
+  <form method="post" action="/admin/delete-all-demo-data">
+    <input type="hidden" name="csrf_token" value="{{ delete_demo_data_csrf_token }}">
+    <label for="confirmation">Type <code>DELETE ALL DEMO DATA</code> to confirm</label>
+    <input id="confirmation" name="confirmation" required autocomplete="off" spellcheck="false">
+    <button class="danger-button" type="submit">Delete all demo data</button>
+  </form>
+</details>
 {% endblock %}

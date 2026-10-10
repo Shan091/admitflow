@@ -20,7 +20,8 @@ admissions system and uses a clearly fictional institution and seeded data.
 - **Knowledge:** OpenAI `text-embedding-3-small` embeds seeded FAQ questions with curated search
   phrasings; NumPy cosine search selects relevant chunks; uncertain retrieval fails closed.
 - **Staff view:** A local FastAPI dashboard with environment-configured staff login shows leads,
-  conversation history, and payment status.
+  conversation history, and payment status; staff can reset demo/student transaction records while
+  preserving the fictional seed catalog.
 - **Money boundary:** Application-fee answers come from structured course data; unknown tuition or
   hostel charges and refunds receive a safe response. No model calculates or negotiates fees.
   Qualified demo users can receive a Razorpay test-mode Payment Link using the server-owned
@@ -44,4 +45,4 @@ admissions system and uses a clearly fictional institution and seeded data.
 - **Hackathon:** Foundation, Telegram qualification, authenticated local dashboard, seeded
   embedding retrieval, Razorpay test-mode application fee links and verified payment status.
 - **Deferred:** Live-mode payments, file uploads/PDF parsing, WhatsApp, workers, multi-tenant
-  onboarding, deployment, notification systems, and production privacy controls.
+  onboarding, deployment, and production privacy controls.

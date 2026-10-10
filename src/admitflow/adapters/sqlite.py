@@ -368,6 +368,14 @@ class Repository:
             ).fetchone()
         return str(row["telegram_user_id"]) if row else None
 
+    def delete_all_demo_data(self) -> None:
+        """Clear student, conversation, and payment records while preserving seeded knowledge."""
+        with self._connect() as connection:
+            connection.execute("DELETE FROM payments")
+            connection.execute("DELETE FROM razorpay_webhook_events")
+            connection.execute("DELETE FROM messages")
+            connection.execute("DELETE FROM leads")
+
     def apply_razorpay_paid_event(self, event_id: str, event: dict[str, Any]) -> str:
         """Apply a validated event once, only when link, reference, and full amount match."""
         payload = event.get("payload")

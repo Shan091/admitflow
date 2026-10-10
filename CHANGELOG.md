@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-10-11 — staff demo-data reset
+
+- **Change:** Added a staff-only dashboard reset form requiring the exact phrase
+  `DELETE ALL DEMO DATA` and a CSRF token bound to the staff session. It deletes local leads,
+  conversations, payments, and Razorpay webhook-event history while retaining fictional course and
+  FAQ seeds. The dashboard reports success or explains that no records were deleted.
+- **Why:** Allow staff to reset the hackathon demo before another end-to-end rehearsal without
+  losing the content the bot needs.
+- **Files:** `src/admitflow/`, `tests/test_app.py`, `README.md`, `SPEC.md`, `docs/DECISIONS.md`,
+  `tasks/`, `AI_USAGE.md`, and `SUBMISSION.md`.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format checks, strict mypy, and 42
+  pytest tests. `git diff --check` passed. Automated reset checks use temporary SQLite data.
+- **Limitations:** Reset affects this app's database only; it cannot delete provider-side Telegram
+  or Razorpay records. It is permanent and cannot be undone.
+- **Push/CI:** To be recorded after the reset milestone is pushed and its Actions result is checked.
+
 ## 2026-10-11 — Telegram payment confirmation and status lookup
 
 - **Change:** After a signature-verified Razorpay paid event is applied, send one Telegram

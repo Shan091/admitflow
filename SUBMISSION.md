@@ -7,7 +7,7 @@
   seeded eligibility rules in code, answers institution FAQs with fail-closed vector search,
   and supports staff login plus Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `88aca11d187040292b48675d1fe9a04594bbbcae`
+- **Verified implementation commit SHA:** To be updated after the data-reset milestone is pushed.
 - **Working demo:** Local `/health` and the public HTTPS tunnel returned 200. The Telegram
   webhook is registered and healthy; the user confirmed the live bot flow. The authenticated
   staff dashboard reports FAQ retrieval ready and shows the verified Razorpay test payment as
@@ -34,13 +34,13 @@
 - **Demo walkthrough:** In Telegram, send `/start`, select a course, answer the qualification
   prompts, and ask a seeded FAQ. Complete the Razorpay test link to trigger a one-time success
   message; ask “Has my payment gone through?” to check stored status. Staff can log in to the
-  dashboard and review the paid lead. See `README.md` for the full setup. The notification is
-  fake-bot tested; the existing live test payment was completed before this code change, so the new
-  live notification has not yet been rehearsed.
+  dashboard and review the paid lead. The staff dashboard also has a confirmed local-data reset.
+  See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
+  payment was completed before this code change, so the new live notification has not yet been
+  rehearsed.
 - **Checks performed and results:** `bash scripts/verify.sh` passed locally (Ruff lint, formatting,
-  strict mypy, and 41 pytest tests); `git diff --check` passed. GitHub Actions run
-  [38081876118](https://github.com/Shan091/admitflow/actions/runs/38081876118) passed for the
-  verified implementation SHA above.
+  strict mypy, and 42 pytest tests); `git diff --check` passed. GitHub Actions result for the data-
+  reset commit will be recorded after the push.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.
@@ -52,7 +52,8 @@
   links work only with Razorpay test keys and payment status requires a reachable webhook. Demo chat
   identifiers and messages are stored locally; use fictional test inputs only. Payment confirmation
   delivery is best-effort, and course access is not enabled automatically; a live rehearsal of the
-  new confirmation requires another eligible Telegram demo account and test payment.
+  new confirmation requires another eligible Telegram demo account and test payment. Reset clears
+  local app records only; Telegram/Razorpay provider-side records are unaffected.
 - **Libraries and APIs:** FastAPI, python-telegram-bot, OpenAI API (`gpt-6-luna`,
   `text-embedding-3-small`), Razorpay Payment Links test API, SQLite, NumPy; see
   `docs/DECISIONS.md`.

@@ -47,3 +47,9 @@ def verify_session(
         and isinstance(payload.get("expires"), int)
         and payload["expires"] > current_time
     )
+
+
+def create_delete_demo_data_token(session_cookie: str, secret: str) -> str:
+    """Bind the destructive form token to the authenticated staff session."""
+    message = f"delete-demo-data:{session_cookie}".encode()
+    return hmac.new(secret.encode(), message, hashlib.sha256).hexdigest()
