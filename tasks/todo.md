@@ -51,7 +51,8 @@ committed.
   complete translated-copy, full language-flow, and remaining privacy/eligibility tests.
 - [x] Record test results in CHANGELOG/AI_USAGE/SUBMISSION; implementation commit
   `53e78e44809c8c9714d70c13b08c07582bacfdad` was pushed and its matching GitHub Actions CI run
-  `38085663111` passed. This checklist/docs update still needs its own commit and push.
+  `38085663111` passed. The checklist and submission-record update was pushed as
+  `9315a93f9c2557d3c00008a775458397b8554837`; its GitHub Actions run `38085770102` passed.
 
 ## FAQ embeddings and vector retrieval
 
