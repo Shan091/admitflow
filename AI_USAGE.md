@@ -12,7 +12,8 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   so language corrections reach discovery, tests, and decision/feature documentation. Existing
   behavior was confirmed: processing disclosure plus opt-out, with no affirmative consent prompt.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 123 tests. No live or
-  paid API calls were made. Commit and CI are pending.
+  paid API calls were made. Commit `7c57d2df1e6f05a400b7690869b5706a2c35fc41` was pushed, and
+  GitHub Actions `CI` run `38092799672` passed.
 - **Human review:** The user clarified that no consent session or user consent prompt is needed;
   the implementation keeps the processing disclosure and opt-out behavior.
 

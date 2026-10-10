@@ -12,7 +12,8 @@
   Tests cover single-category replacement, preservation of other categories, exact retractions,
   speaker attribution, stale confirmation invalidation, ambiguity, and schema allowlisting. No live
   or paid API calls were made.
-- **Delivery:** Implementation commit and CI pending.
+- **Delivery:** Pushed as `7c57d2df1e6f05a400b7690869b5706a2c35fc41`; GitHub Actions `CI` run
+  [38092799672](https://github.com/Shan091/admitflow/actions/runs/38092799672) passed.
 - **Reason:** Keep conversational preferences accurate when a learner changes one part of their
   guidance profile without silently erasing other relevant facts.
 
