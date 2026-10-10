@@ -11,8 +11,9 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   `payment_pending` and `under_review` respectively, and documented the lifecycle/readiness
   boundaries, pending staff handoff semantics, and stages not implemented by the hackathon demo.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 117 tests;
-  `git diff --check` passed. CI is pending. Tests use local SQLite, fake HTTP, and signed synthetic
-  webhook data; no live or paid API call was made.
+  `git diff --check` passed. Commit `67472c5b4fb2d6a538dfe141c663779ee93d053f` was pushed, and
+  GitHub Actions `CI` run `38091855872` passed. Tests use local SQLite, fake HTTP, and signed
+  synthetic webhook data; no live or paid API call was made.
 - **Human review:** No new external claims were added; sample paid status remains distinct from
   admission and enrollment.
 

@@ -8,7 +8,7 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `c540d11c4c0c26ff3bcb6df2e3e783e05476b3b3`
+- **Verified implementation commit SHA:** `67472c5b4fb2d6a538dfe141c663779ee93d053f`
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
   test payment were verified during earlier milestones; the user confirmed the live bot flow. The
   adaptive language-support preference in this SHA passed local tests and CI, including a
@@ -55,7 +55,10 @@
   40-course catalog commit `c540d11c4c0c26ff3bcb6df2e3e783e05476b3b3` also passed
   `bash scripts/verify.sh` (Ruff lint/format, strict mypy, and 117 pytest tests), `git diff --check`,
   and GitHub Actions `CI` run
-  [38091492125](https://github.com/Shan091/admitflow/actions/runs/38091492125).
+  [38091492125](https://github.com/Shan091/admitflow/actions/runs/38091492125). The lifecycle
+  projection follow-up `67472c5b4fb2d6a538dfe141c663779ee93d053f` passed the same local gate with
+  117 tests and `git diff --check`; GitHub Actions run
+  [38091855872](https://github.com/Shan091/admitflow/actions/runs/38091855872) passed.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.

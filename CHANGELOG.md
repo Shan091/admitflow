@@ -10,8 +10,9 @@
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 117 tests;
   `git diff --check` passed. New assertions cover successful/retried and failed link creation,
   invalid/mismatched/partial webhook events, valid payment, duplicate event, and lifecycle/readiness
-  separation. CI is pending.
-- **Delivery:** Commit and push details will be recorded after delivery.
+  separation. GitHub Actions `CI` passed for the pushed implementation commit.
+- **Delivery:** Pushed as `67472c5b4fb2d6a538dfe141c663779ee93d053f`; GitHub Actions `CI` run
+  [38091855872](https://github.com/Shan091/admitflow/actions/runs/38091855872) passed.
 - **Reason:** Keep the lifecycle dashboard truthful to verified progress and the v1 event-based
   stage semantics without letting a payment or conversational tone claim enrollment.
 

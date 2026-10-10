@@ -100,6 +100,13 @@ mandatory linear interview.
   and expected retrieval for every new course; `bash scripts/verify.sh` passed (117 tests), and
   `git diff --check` passed. Pushed as `c540d11c4c0c26ff3bcb6df2e3e783e05476b3b3`; GitHub Actions
   `CI` run `38091492125` passed.
+- [x] Align implemented lifecycle-stage transitions with the relevant v1 lifecycle, keeping
+  discovery, hard qualification, soft readiness, payment, and staff review distinct. A test link
+  advances to `payment_pending` only after valid persistence; only a verified matching paid event
+  advances to `under_review`. Failed, invalid, mismatched, partial, and duplicate events are covered
+  by assertions. The v1 mapping and deferred stages are documented. `bash scripts/verify.sh` passed
+  (117 tests) and `git diff --check` passed. Pushed as
+  `67472c5b4fb2d6a538dfe141c663779ee93d053f`; GitHub Actions `CI` run `38091855872` passed.
 - [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
   retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
 
