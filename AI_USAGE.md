@@ -13,8 +13,9 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   used for that fact set. No new consent step was added; the existing processing notice and opt-out
   remain the behavior for OpenAI text handling.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 165 tests;
-  `git diff --check` passed. No live or paid API calls were made. Commit/push and matching CI are
-  pending.
+  `git diff --check` passed. Commit `a252c2ff438f4027181d32ecb41514325e6e4da7` was pushed, and
+  GitHub Actions `CI` run [38095320062](https://github.com/Shan091/admitflow/actions/runs/38095320062)
+  passed. No live or paid API calls were made.
 - **Human review:** Catalog formats are fictional example metadata; no real provider schedule,
   availability, or accessibility was verified.
 

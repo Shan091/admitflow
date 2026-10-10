@@ -12,7 +12,8 @@
   tests. New integration coverage checks format prompt choices, pause/resume, online filtering and
   explanations, and leaving format open; migration and extraction validation are also covered.
   `git diff --check` passed. No live or paid API calls were made.
-- **Delivery:** Pending commit, push, and matching GitHub Actions CI.
+- **Delivery:** Pushed as `a252c2ff438f4027181d32ecb41514325e6e4da7`; GitHub Actions `CI` run
+  [38095320062](https://github.com/Shan091/admitflow/actions/runs/38095320062) passed.
 - **Reason:** Let learners who do not know a course name express whether listed delivery format
   matters, without turning the conversation into a mandatory questionnaire or promising details
   absent from the fictional catalog.
