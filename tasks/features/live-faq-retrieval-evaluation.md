@@ -27,7 +27,8 @@ out-of-scope questions using live OpenAI embeddings, without building a document
 - [x] Run the evaluator with configured live credentials and capture only aggregate/sample scores;
   27/27 passed with the recorded thresholds.
 - [x] `bash scripts/verify.sh` passed (37 tests); `git diff --check` passed.
-- [ ] Record the exact pushed SHA and matching GitHub Actions result.
+- [x] Record pushed SHA `e19bd2be7f8e401a3bfa21e9e4ddd97f01dfeedf` and passing GitHub Actions run
+  `38081259866`.
 
 ## Risks and limitations
 

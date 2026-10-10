@@ -21,7 +21,9 @@
   webhook path, zero pending updates, and no delivery error.
 - **Limitations:** This is a small hand-written calibration set, not a production quality
   guarantee. Thresholds remain provisional and should be checked against actual demo phrasing.
-- **Push/CI:** Pending commit and matching GitHub Actions result.
+- **Push/CI:** Pushed to `main` as `e19bd2be7f8e401a3bfa21e9e4ddd97f01dfeedf`;
+  GitHub Actions CI run `38081259866` passed:
+  https://github.com/Shan091/admitflow/actions/runs/38081259866
 
 ## 2026-10-11 — Telegram webhook transport
 

@@ -46,7 +46,8 @@ acceptance criteria pass and the corresponding milestone is committed.
   instead of returning an unrelated application fee or entering FAQ retrieval.
 - [x] Record actual cases, scores, API usage, and the decision in the feature brief, `CHANGELOG.md`,
   and `AI_USAGE.md`; rerun `bash scripts/verify.sh` and `git diff --check`.
-- [ ] Commit and push the verified milestone; confirm the GitHub Actions result for that exact SHA.
+- [x] Commit and push the verified milestone; confirm GitHub Actions passed for
+  `e19bd2be7f8e401a3bfa21e9e4ddd97f01dfeedf` (run `38081259866`).
 
 ## Staff login
 
