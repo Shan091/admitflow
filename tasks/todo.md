@@ -78,6 +78,11 @@ mandatory linear interview.
 - [ ] Define and test coverage for contradictory/corrected preferences, mixed interests, constraints,
   parent/student conflict, unknown/out-of-catalog requests, sensitive disclosures, provider/RAG
   failures, language switching, deletion, and concurrent/duplicate updates.
+- [ ] Make preference corrections category/value scoped: preserve every non-corrected attributed
+  fact, accept retractions only for exact catalog-supported values already stored for that speaker,
+  update the student-level mirror consistently, and invalidate stale recommendation confirmations.
+  Verify add/change/retract across fields, interests, level, activities, goals, language support, and
+  parent versus learner profiles.
 - [x] Add a catalog-grounded optional study-goal signal for broad/ambiguous interest matches:
   persist only explicit goals, ask at most one useful follow-up, allow skip/resume, and include goals
   in correction/confirmation fingerprints and transparent recommendation reasons. Full gate passed

@@ -3,6 +3,19 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — make preference corrections category-scoped
+
+- **Task:** Preserve unaffected student/parent guidance facts while supporting corrections and
+  exact withdrawals of previously saved preferences.
+- **Assistance:** Codex added typed catalog-bounded retractions, category-level replacement on
+  explicit correction, ambiguous-correction recovery, stale-confirmation invalidation, tests, and
+  decision/feature documentation. Existing behavior was confirmed: processing disclosure plus
+  opt-out, with no affirmative consent prompt.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 122 tests. No live or
+  paid API calls were made. Commit and CI are pending.
+- **Human review:** The user clarified that no consent session or user consent prompt is needed;
+  the implementation keeps the processing disclosure and opt-out behavior.
+
 ## 2026-10-11 — align lifecycle stages with payment events
 
 - **Task:** Keep the v1 lifecycle projection consistent with actual persisted qualification and

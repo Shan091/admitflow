@@ -23,6 +23,16 @@ class Course:
 
 
 @dataclass(frozen=True, slots=True)
+class RetractedPreference:
+    """One exact catalog-bounded learner preference the current turn withdraws."""
+
+    category: Literal[
+        "field", "education_level", "interest", "activity", "learning_goal", "language_support"
+    ]
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
 class DiscoveryTurn:
     """Catalog-bounded interpretation of one chat message."""
 
@@ -38,6 +48,7 @@ class DiscoveryTurn:
     correct_previous: bool
     learning_goals: tuple[str, ...] = ()
     language_support_preference: str | None = None
+    retracted_preferences: tuple[RetractedPreference, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

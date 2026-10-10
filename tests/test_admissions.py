@@ -5,7 +5,7 @@ import pytest
 
 from admitflow.adapters.sqlite import Repository
 from admitflow.adapters.vector_store import VectorStore
-from admitflow.domain.models import Course, DiscoveryTurn
+from admitflow.domain.models import Course, DiscoveryTurn, RetractedPreference
 from admitflow.services.admissions import AdmissionsService, Reply
 from admitflow.services.retrieval import RetrievalService
 
@@ -945,6 +945,259 @@ async def test_preference_correction_requires_confirmation_even_if_facts_return_
 
     assert "Did I get that right" in reconfirm.text
     assert "Digital Design Diploma" not in reconfirm.text
+
+
+@pytest.mark.asyncio
+async def test_ambiguous_correction_asks_what_to_change_instead_of_reconfirming_old_facts(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            "discovery",
+            None,
+            ("design/media",),
+            None,
+            ("design",),
+            ("making visuals",),
+            False,
+            False,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    reflection = await service.free_text(lead_id, "I like design and making visuals", None)
+    reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
+    token = next(
+        data.removeprefix("guidance:revise:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:revise:")
+    )
+    await service.revise_guidance(lead_id, token)
+    interpreter.turn = DiscoveryTurn("discovery", None, (), None, (), (), False, True)
+
+    reply = await service.free_text(lead_id, "I changed my mind about that", None)
+
+    assert "What should I change or add" in reply.text
+    assert "Did I get that right" not in reply.text
+    assert any(data == "path:browse" for _, data in reply.buttons)
+
+
+@pytest.mark.asyncio
+async def test_correction_of_one_fact_preserves_other_explicit_preferences(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            "discovery",
+            None,
+            ("design/media",),
+            "diploma",
+            ("design",),
+            ("making visuals",),
+            False,
+            False,
+            ("create visual work",),
+            "Malayalam discussion support",
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    await service.free_text(lead_id, "I like design and making visuals", None)
+    interpreter.turn = DiscoveryTurn("discovery", None, (), "undergraduate", (), (), False, True)
+    corrected = await service.free_text(
+        lead_id, "Actually, I am considering undergraduate study instead of a diploma", None
+    )
+    facts = {fact["fact_key"]: fact["fact_value"] for fact in repository.list_facts(lead_id)}
+
+    assert facts["education_level_student"] == "undergraduate"
+    assert facts["interest_fields_student"] == "design/media"
+    assert facts["interest_terms_student"] == "design"
+    assert facts["activity_terms_student"] == "making visuals"
+    assert facts["learning_goals_student"] == "create visual work"
+    assert facts["language_support_preference_student"] == "Malayalam discussion support"
+    assert "undergraduate" in corrected.text
+    assert "interested in design" in corrected.text
+
+
+@pytest.mark.asyncio
+async def test_correction_can_retract_exact_values_without_erasing_other_choices(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            "discovery",
+            None,
+            ("tech/data", "design/media"),
+            "diploma",
+            ("data", "design"),
+            ("making charts", "making visuals"),
+            False,
+            False,
+            ("analyze data", "create visual work"),
+            "Malayalam discussion support",
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    await service.free_text(lead_id, "I like data and design", None)
+
+    interpreter.turn = DiscoveryTurn(
+        intent="discovery",
+        course_id=None,
+        fields=(),
+        education_level=None,
+        interests=(),
+        activities=(),
+        unsure=False,
+        correct_previous=True,
+        retracted_preferences=(
+            RetractedPreference("field", "tech/data"),
+            RetractedPreference("interest", "data"),
+            RetractedPreference("activity", "making charts"),
+            RetractedPreference("learning_goal", "analyze data"),
+        ),
+    )
+    await service.free_text(lead_id, "I don't want to consider data anymore", None)
+    facts = {fact["fact_key"]: fact["fact_value"] for fact in repository.list_facts(lead_id)}
+
+    assert facts["interest_fields_student"] == "design/media"
+    assert facts["interest_field_student"] == "design/media"
+    assert facts["interest_terms_student"] == "design"
+    assert facts["activity_terms_student"] == "making visuals"
+    assert facts["learning_goals_student"] == "create visual work"
+    assert facts["education_level_student"] == "diploma"
+    assert facts["language_support_preference_student"] == "Malayalam discussion support"
+
+
+@pytest.mark.asyncio
+async def test_parent_correction_only_retracts_parent_attributed_facts(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("discovery", None, ("design/media",), None, ("design",), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    await service.free_text(lead_id, "I like design", None)
+    service.choose_speaker(lead_id, "parent")
+    interpreter.turn = DiscoveryTurn(
+        "discovery", None, ("business/accounting",), None, ("business",), (), False, False
+    )
+    await service.free_text(lead_id, "My child may like business", None)
+    interpreter.turn = DiscoveryTurn(
+        "discovery",
+        None,
+        (),
+        None,
+        (),
+        (),
+        False,
+        True,
+        retracted_preferences=(
+            RetractedPreference("field", "business/accounting"),
+            RetractedPreference("interest", "business"),
+        ),
+    )
+    await service.free_text(lead_id, "Actually, disregard my business suggestion", None)
+    facts = {
+        (fact["fact_key"], fact["speaker"]): fact["fact_value"]
+        for fact in repository.list_facts(lead_id)
+    }
+
+    assert facts[("interest_field_student", "student")] == "design/media"
+    assert facts[("interest_terms_student", "student")] == "design"
+    assert ("interest_fields_parent", "parent") not in facts
+    assert ("interest_terms_parent", "parent") not in facts
+
+
+@pytest.mark.asyncio
+async def test_ambiguous_parent_correction_preserves_student_confirmation(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            "discovery",
+            None,
+            ("design/media",),
+            None,
+            ("design",),
+            ("making visuals",),
+            False,
+            False,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    reflection = await service.free_text(lead_id, "I like design and making visuals", None)
+    reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+    await service.confirm_guidance(lead_id, token)
+    signature_before = next(
+        fact["fact_value"]
+        for fact in repository.list_facts(lead_id)
+        if fact["fact_key"] == "guidance_confirmed_signature"
+    )
+    service.choose_speaker(lead_id, "parent")
+    interpreter.turn = DiscoveryTurn(
+        "discovery", None, ("business/accounting",), None, ("business",), (), False, False
+    )
+    await service.free_text(lead_id, "My child may like business", None)
+    interpreter.turn = DiscoveryTurn("discovery", None, (), None, (), (), False, True)
+
+    reply = await service.free_text(lead_id, "Actually, I changed my mind", None)
+
+    signature_after = next(
+        fact["fact_value"]
+        for fact in repository.list_facts(lead_id)
+        if fact["fact_key"] == "guidance_confirmed_signature"
+    )
+    assert "What should I change or add" in reply.text
+    assert signature_after == signature_before
 
 
 @pytest.mark.asyncio

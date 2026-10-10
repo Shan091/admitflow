@@ -62,6 +62,11 @@ human escalation, and operational requirements are verified.
 - Course matching uses direct overlap with seeded interests and activities. It has a first
   deterministic sufficiency/confirmation policy, but that policy still needs evaluation against a
   human-reviewed golden set; there is no validated general-career evidence corpus.
+- A student correction turn now preserves preferences it does not mention. It can retract only
+  exact catalog-allowlisted values for the active speaker; student additions, retractions, and
+  replacements invalidate old recommendation confirmations. Parent-only notes remain attributed
+  separately and do not rewrite the learner's recommendation signature. This is still not a general
+  fact-provenance or conflict-resolution system and needs broader dialogue evaluation.
 
 ## v1 lifecycle mapping
 
@@ -159,6 +164,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 - Before a material recommendation, the system reflects its understanding and requires a clear
   confirmation; typed corrections or stale tap replies cannot surface recommendations from old
   facts, while unrelated valid facts remain intact.
+- Correcting or withdrawing one preference preserves other explicit facts and the other speaker's
+  profile. A retraction must match a stored, catalog-allowlisted fact for the current speaker;
+  arbitrary model text cannot delete or overwrite unrelated facts.
 - A recommendation is based on complete catalog records, includes provenance/fit reasons and real
   trade-offs, and does not imply admission, employment, earnings, or that one option is objectively
   best.

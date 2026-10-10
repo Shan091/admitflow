@@ -14,6 +14,7 @@ from admitflow.domain.models import Course
 async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -> None:
     assert "learning_goals" in _DiscoveryPayload.model_json_schema()["required"]
     assert "language_support_preference" in _DiscoveryPayload.model_json_schema()["required"]
+    assert "retracted_preferences" in _DiscoveryPayload.model_json_schema()["required"]
     adapter = OpenAIAdapter("test-key", "test-model", "test-embedding")
     parsed = _DiscoveryPayload(
         intent="discovery",
@@ -26,6 +27,15 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
         language_support_preference="Malayalam discussion support",
         unsure=False,
         correct_previous=False,
+        retracted_preferences=[
+            {"category": "field", "value": "Tech/Data"},
+            {"category": "field", "value": "medicine"},
+            {"category": "interest", "value": "unseeded interest"},
+            {"category": "activity", "value": "making charts"},
+            {"category": "learning_goal", "value": "analyze data"},
+            {"category": "language_support", "value": "Malayalam discussion support"},
+            {"category": "education_level", "value": "diploma"},
+        ],
     )
     parse = AsyncMock(return_value=SimpleNamespace(output_parsed=parsed, usage=None))
     adapter.client = SimpleNamespace(responses=SimpleNamespace(parse=parse))  # type: ignore[assignment]
@@ -53,6 +63,13 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
     assert result.activities == ("making charts",)
     assert result.learning_goals == ("analyze data",)
     assert result.language_support_preference == "Malayalam discussion support"
+    assert [(item.category, item.value) for item in result.retracted_preferences] == [
+        ("field", "tech/data"),
+        ("activity", "making charts"),
+        ("learning_goal", "analyze data"),
+        ("language_support", "Malayalam discussion support"),
+        ("education_level", "diploma"),
+    ]
     call = parse.await_args.kwargs
     assert call["store"] is False
     assert call["text_format"] is _DiscoveryPayload
@@ -63,6 +80,7 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
     assert "telegram_user_id" not in call["input"]
     assert "transcript" not in call["input"]
     assert "untrusted data" in call["instructions"]
+    assert "do not reset the profile" in call["instructions"]
 
     unsupported = parsed.model_copy(
         update={"language_support_preference": "unlisted language coaching"}

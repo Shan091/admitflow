@@ -6,7 +6,14 @@ from typing import Literal
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
-from admitflow.domain.models import Course, DiscoveryTurn
+from admitflow.domain.models import Course, DiscoveryTurn, RetractedPreference
+
+
+class _RetractedPreferencePayload(BaseModel):
+    category: Literal[
+        "field", "education_level", "interest", "activity", "learning_goal", "language_support"
+    ]
+    value: str = Field(description="The exact catalog value the learner explicitly withdrew.")
 
 
 class _DiscoveryPayload(BaseModel):
@@ -40,6 +47,12 @@ class _DiscoveryPayload(BaseModel):
     )
     correct_previous: bool = Field(
         description="Whether the user explicitly corrects/replaces a previous course preference."
+    )
+    retracted_preferences: list[_RetractedPreferencePayload] = Field(
+        description=(
+            "Exact previously stated catalog preferences explicitly withdrawn in this message. "
+            "Include only the affected category and value; never clear another category or value."
+        )
     )
 
 
@@ -118,7 +131,10 @@ class OpenAIAdapter:
                 "eligibility, career outcome, or job prospects. Only record interests, activities, "
                 "and study goals the user explicitly states; a goal must exactly match the "
                 "supplied course goal vocabulary. If they correct an earlier preference, set "
-                "correct_previous true. Do not infer job outcomes or occupations. "
+                "correct_previous true, but do not reset the profile: list only the exact prior "
+                "catalog values they explicitly withdraw in retracted_preferences. Do not clear "
+                "values merely because the current message does not repeat them. Do not infer job "
+                "outcomes or occupations. "
                 "Only record an exact language-support label when the user explicitly prefers it. "
                 "Teaching medium and discussion support are different facts; never infer language "
                 "proficiency. "
@@ -150,6 +166,14 @@ class OpenAIAdapter:
             "postgraduate",
             "any",
         }
+        valid_retraction_values = {
+            "field": {value.casefold(): value for value in field_values},
+            "education_level": {value.casefold(): value for value in levels},
+            "interest": {value.casefold(): value for value in interest_values},
+            "activity": {value.casefold(): value for value in activity_values},
+            "learning_goal": {value.casefold(): value for value in goal_values},
+            "language_support": {value.casefold(): value for value in support_values},
+        }
         return DiscoveryTurn(
             intent=extracted.intent,
             course_id=extracted.course_id if extracted.course_id in course_ids else None,
@@ -178,6 +202,12 @@ class OpenAIAdapter:
                 valid_support.get(extracted.language_support_preference.casefold())
                 if extracted.language_support_preference
                 else None
+            ),
+            retracted_preferences=tuple(
+                RetractedPreference(item.category, canonical)
+                for item in extracted.retracted_preferences
+                if (canonical := valid_retraction_values[item.category].get(item.value.casefold()))
+                is not None
             ),
         )
 

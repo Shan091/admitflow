@@ -94,6 +94,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     enrollment, rejection, waitlist, and cold-lead stages unclaimed until those workflows exist.
     Numeric System-1 readiness scoring is not part of the hackathon demo.
 
+21. **Preference corrections are scoped and explicit.** Do not reset a learner's whole profile
+    because one message corrects one fact. Replace scalar values when a replacement is explicit;
+    retract list values only when the current turn names the exact stored catalog value and
+    category. Preserve unmentioned facts and other-speaker facts, and invalidate the prior match
+    confirmation whenever preferences are corrected.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

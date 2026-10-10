@@ -11,7 +11,7 @@ from admitflow.domain.discovery import (
     has_sufficient_guidance_context,
     recommend_courses,
 )
-from admitflow.domain.models import Course, DiscoveryTurn
+from admitflow.domain.models import Course, DiscoveryTurn, RetractedPreference
 from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.domain.qualification import assess_eligibility
 from admitflow.services.contracts import DiscoveryInterpreter, IntentRouter
@@ -271,6 +271,76 @@ class AdmissionsService:
             None,
         )
         return str(fact["fact_value"]) if fact else None
+
+    def _retract_discovery_preferences(
+        self,
+        lead_id: int,
+        speaker: str,
+        retracted: tuple[RetractedPreference, ...],
+        courses: list[Course],
+    ) -> None:
+        """Remove only exact, stored, catalog-valid preferences withdrawn this turn."""
+        allowed_values: dict[str, set[str]] = {
+            "field": {course.field for course in courses},
+            "education_level": {
+                "vocational_certificate",
+                "diploma",
+                "undergraduate",
+                "postgraduate",
+                "any",
+            },
+            "interest": {item for course in courses for item in course.interests},
+            "activity": {item for course in courses for item in course.activities},
+            "learning_goal": {item for course in courses for item in course.learning_goals},
+            "language_support": {item for course in courses for item in course.language_support},
+        }
+        pipe_facts = {
+            "field": f"interest_fields_{speaker}",
+            "interest": f"interest_terms_{speaker}",
+            "activity": f"activity_terms_{speaker}",
+            "learning_goal": f"learning_goals_{speaker}",
+        }
+        singleton_facts = {
+            "education_level": f"education_level_{speaker}",
+            "language_support": f"language_support_preference_{speaker}",
+        }
+        for preference in retracted:
+            category = preference.category
+            value = preference.value
+            if category not in allowed_values or value not in allowed_values[category]:
+                continue
+            facts = {
+                str(item["fact_key"]): str(item["fact_value"])
+                for item in self.repository.list_facts(lead_id)
+            }
+            if category in pipe_facts:
+                fact_key = pipe_facts[category]
+                stored = facts.get(fact_key, "")
+                if category == "field" and not stored:
+                    stored = facts.get(f"interest_field_{speaker}", "")
+                values = [item for item in stored.split("|") if item]
+                if value not in values:
+                    continue
+                remaining = [item for item in values if item != value]
+                if remaining:
+                    self.repository.save_fact(lead_id, fact_key, "|".join(remaining), speaker)
+                else:
+                    self.repository.delete_fact(lead_id, fact_key)
+                if category == "field":
+                    if len(remaining) == 1:
+                        self.repository.save_fact(
+                            lead_id, f"interest_field_{speaker}", remaining[0], speaker
+                        )
+                    else:
+                        self.repository.delete_fact(lead_id, f"interest_field_{speaker}")
+                elif category == "activity" and facts.get(f"interest_activity_{speaker}") == value:
+                    self.repository.delete_fact(lead_id, f"interest_activity_{speaker}")
+            elif category in singleton_facts:
+                fact_key = singleton_facts[category]
+                if facts.get(fact_key) == value:
+                    self.repository.delete_fact(lead_id, fact_key)
+                    if category == "education_level" and speaker == "student":
+                        self.repository.update_lead(lead_id, education_level=None)
 
     def _student_guidance_context(
         self, lead_id: int
@@ -1077,19 +1147,9 @@ class AdmissionsService:
             )
 
         if turn.correct_previous:
-            for key in (
-                "interest_field",
-                "interest_fields",
-                "education_level",
-                "interest_terms",
-                "activity_terms",
-                "interest_activity",
-                "learning_goals",
-                "language_support_preference",
-            ):
-                self.repository.delete_fact(lead_id, f"{key}_{speaker}")
-            if speaker == "student":
-                self.repository.update_lead(lead_id, education_level=None)
+            self._retract_discovery_preferences(
+                lead_id, speaker, turn.retracted_preferences, courses
+            )
         if speaker == "student" and (
             turn.correct_previous
             or turn.fields
@@ -1098,17 +1158,55 @@ class AdmissionsService:
             or turn.activities
             or turn.learning_goals
             or turn.language_support_preference
+            or turn.retracted_preferences
         ):
             self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
+        has_new_or_retracted_preference = bool(
+            turn.fields
+            or turn.education_level
+            or turn.interests
+            or turn.activities
+            or turn.learning_goals
+            or turn.language_support_preference
+            or turn.retracted_preferences
+        )
+        speaker_suffix = f"_{speaker}"
+        has_saved_preferences = any(
+            str(fact["fact_key"]).endswith(speaker_suffix)
+            and str(fact["fact_key"]).startswith(
+                (
+                    "interest_field_",
+                    "interest_fields_",
+                    "education_level_",
+                    "interest_terms_",
+                    "activity_terms_",
+                    "interest_activity_",
+                    "learning_goals_",
+                    "language_support_preference_",
+                )
+            )
+            for fact in self.repository.list_facts(lead_id)
+        )
+        if turn.correct_previous and has_saved_preferences and not has_new_or_retracted_preference:
+            if speaker == "student":
+                self._clear_guidance_confirmation(lead_id)
+                self.repository.update_lead(
+                    lead_id, discovery_step="guidance_revision", lifecycle_stage="discovering"
+                )
+            return self._guidance_revision_prompt()
         if turn.fields:
             fields_key = f"interest_fields_{speaker}"
-            existing_fields = next(
-                (
-                    f["fact_value"]
-                    for f in self.repository.list_facts(lead_id)
-                    if f["fact_key"] == fields_key
-                ),
-                "",
+            existing_fields = (
+                ""
+                if turn.correct_previous
+                else next(
+                    (
+                        f["fact_value"]
+                        for f in self.repository.list_facts(lead_id)
+                        if f["fact_key"] == fields_key
+                    ),
+                    "",
+                )
             )
             merged_fields = dict.fromkeys(
                 [*(item for item in existing_fields.split("|") if item), *turn.fields]
@@ -1126,15 +1224,23 @@ class AdmissionsService:
             )
             if speaker == "student":
                 self.repository.update_lead(lead_id, education_level=turn.education_level)
+        elif turn.education_level == "any" and turn.correct_previous:
+            self.repository.delete_fact(lead_id, f"education_level_{speaker}")
+            if speaker == "student":
+                self.repository.update_lead(lead_id, education_level=None)
         if turn.interests:
             interests_key = f"interest_terms_{speaker}"
-            existing_interests = next(
-                (
-                    f["fact_value"]
-                    for f in self.repository.list_facts(lead_id)
-                    if f["fact_key"] == interests_key
-                ),
-                "",
+            existing_interests = (
+                ""
+                if turn.correct_previous
+                else next(
+                    (
+                        f["fact_value"]
+                        for f in self.repository.list_facts(lead_id)
+                        if f["fact_key"] == interests_key
+                    ),
+                    "",
+                )
             )
             self.repository.save_fact(
                 lead_id,
@@ -1148,13 +1254,17 @@ class AdmissionsService:
             )
         if turn.activities:
             activities_key = f"activity_terms_{speaker}"
-            existing_activities = next(
-                (
-                    f["fact_value"]
-                    for f in self.repository.list_facts(lead_id)
-                    if f["fact_key"] == activities_key
-                ),
-                "",
+            existing_activities = (
+                ""
+                if turn.correct_previous
+                else next(
+                    (
+                        f["fact_value"]
+                        for f in self.repository.list_facts(lead_id)
+                        if f["fact_key"] == activities_key
+                    ),
+                    "",
+                )
             )
             self.repository.save_fact(
                 lead_id,
@@ -1171,13 +1281,17 @@ class AdmissionsService:
             )
         if turn.learning_goals:
             goals_key = f"learning_goals_{speaker}"
-            existing_goals = next(
-                (
-                    f["fact_value"]
-                    for f in self.repository.list_facts(lead_id)
-                    if f["fact_key"] == goals_key
-                ),
-                "",
+            existing_goals = (
+                ""
+                if turn.correct_previous
+                else next(
+                    (
+                        f["fact_value"]
+                        for f in self.repository.list_facts(lead_id)
+                        if f["fact_key"] == goals_key
+                    ),
+                    "",
+                )
             )
             allowed_goals = {goal for course in courses for goal in course.learning_goals}
             merged_goals = dict.fromkeys(
@@ -1206,6 +1320,7 @@ class AdmissionsService:
             or turn.education_level
             or turn.learning_goals
             or turn.language_support_preference
+            or turn.retracted_preferences
         ):
             return Reply(
                 "I've recorded those as the parent's preferences. The learner's own interests "
