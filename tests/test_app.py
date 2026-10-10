@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from admitflow.config import Settings
+from admitflow.config import Settings, get_settings
 from admitflow.main import create_app
 
 
@@ -34,3 +34,21 @@ def test_health_and_dashboard_render_without_credentials(tmp_path: Path) -> None
         assert detail.status_code == 200
         assert "Foundations of Computing" in detail.text
         assert "/start" in detail.text
+
+
+def test_settings_read_tokens_paths_and_rag_thresholds_from_environment(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "custom.sqlite3"))
+    monkeypatch.setenv("RAG_MIN_SIMILARITY", "0.8")
+    monkeypatch.setenv("RAG_MIN_MARGIN", "0.1")
+
+    settings = get_settings()
+
+    assert settings.telegram_bot_token == "test-token"
+    assert settings.openai_api_key == "test-key"
+    assert settings.database_path == tmp_path / "custom.sqlite3"
+    assert settings.rag_min_similarity == 0.8
+    assert settings.rag_min_margin == 0.1

@@ -17,9 +17,24 @@
   made; credentials were not configured in this environment.
 - **Limitations:** Seed data is fictional; no live bot or OpenAI integration smoke test has been
   run, the FAQ corpus is fixed, the dashboard is local and unauthenticated, local chat identifiers
-  and messages have no retention controls, and GitHub Actions has
-  not run on the as-yet-unpushed commit. Thresholds remain provisional until live examples are
-  calibrated.
+  and messages have no retention controls. Similarity thresholds remain provisional until live
+  examples are calibrated.
+
+## 2026-10-10 — smoke check and verified task status
+
+- **Time:** 23:52 IST
+- **Change:** Added environment-setting coverage, marked locally verified core/Telegram/vector
+  tasks complete, and kept live Telegram/OpenAI setup and threshold calibration open.
+- **Why:** Make the task board reflect evidence already gathered while separating deterministic
+  local checks from real API and demo checks.
+- **Files:** `tests/test_app.py`, `tasks/todo.md`, and `tasks/features/`.
+- **Validation:** Latest local `bash scripts/verify.sh` passed with 25 pytest tests; locked
+  dependencies and `git diff --check` passed. A local Uvicorn process returned `GET /health`
+  `200` with `{"status":"ok"}` and dashboard `GET /` `200`. GitHub Actions passed on implementation
+  SHA `634579532c8b77ae9f0f8c6da86cb137f9f095d8` (24 tests). A follow-up workflow for the newer
+  test/checklist commit will be checked after pushing it.
+- **Limitations:** Live Telegram and OpenAI calls remain untested because credentials are not
+  configured; threshold calibration, real demo rehearsal, and final participant details remain open.
 
 ## 2026-10-10
 
