@@ -100,6 +100,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     category. Preserve unmentioned facts and other-speaker facts, and invalidate the prior match
     confirmation whenever preferences are corrected.
 
+22. **Tap choices use the same adaptive student profile.** A student field tap replaces only the
+    field choice; keep separate level, activity, goal, and support facts, then choose the next
+    question from the resulting profile. Parent field/level taps are parent-attributed suggestions
+    and must not mutate the student's lead mirror, profile, lifecycle step, or recommendation
+    confirmation.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

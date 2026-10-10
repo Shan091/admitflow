@@ -82,6 +82,9 @@ mandatory linear interview.
 - [ ] Define and test coverage for contradictory/corrected preferences, mixed interests, constraints,
   parent/student conflict, unknown/out-of-catalog requests, sensitive disclosures, provider/RAG
   failures, language switching, deletion, and concurrent/duplicate updates.
+- [ ] Unify tap-selected fields with the adaptive question policy; preserve useful level/activity
+  facts when the student switches field, and keep parent field/level suggestions from overwriting
+  the student's profile, clearing learner activity, or advancing the learner's pending step.
 - [x] Make preference corrections category/value scoped: preserve every non-corrected attributed
   fact, accept retractions only for exact catalog-supported values already stored for that speaker,
   update the student-level mirror consistently, and invalidate stale recommendation confirmations.

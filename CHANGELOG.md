@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-11 — unify tap field choices with adaptive discovery
+
+- **Change:** A learner's field tap now enters the shared guidance policy, which asks for a
+  complementary signal only when the current profile needs one. Changing the selected field
+  replaces that field fact while preserving the learner's level, activities, and other explicit
+  facts. Parent field/level suggestions no longer change the learner's lead mirror or pending step.
+  Adaptive signal questions now persist a resumable discovery step.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 126 tests;
+  `git diff --check` passed. New tests verify the context-aware field follow-up, student fact
+  preservation, parent/student isolation, and existing Telegram recommendation flow.
+- **Delivery:** Implementation commit and CI pending.
+- **Reason:** Keep the known-field shortcut while letting unsure and mixed-context learners follow
+  the same multi-turn policy without making a parent's suggestion become the student's choice.
+
 ## 2026-10-11 — restore the guided-exploration prompt on resume
 
 - **Change:** Preserve `explore` as its own discovery step when showing field choices. Resume now

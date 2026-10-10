@@ -1523,7 +1523,10 @@ async def test_known_field_recommends_only_complete_catalog_courses_and_persists
     }
     service.begin_path(lead_id, "field")
     level_reply = service.recommend_field(lead_id, "tech/data")
-    assert any(data == "level:any" for _, data in level_reply.buttons)
+    assert "What would you like to do or learn more about" in level_reply.text
+    assert any(data.startswith("guidance:activity:") for _, data in level_reply.buttons)
+    assert any(data == "guidance:level:undergraduate" for _, data in level_reply.buttons)
+    assert not any(data.startswith("level:") for _, data in level_reply.buttons)
     reflection = service.choose_level(lead_id, "any")
     reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
     assert "open to all listed study levels" in reflection.text
@@ -1550,7 +1553,7 @@ def test_discovery_pause_and_resume_restore_the_pending_question(tmp_path: Path)
     )
     lead_id, _ = service.start("123", "student")
     service.begin_path(lead_id, "explore")
-    service.recommend_field(lead_id, "tech/data")
+    pending = service.recommend_field(lead_id, "tech/data")
     service.pause_discovery(lead_id)
     paused = repository.get_lead(lead_id)
 
@@ -1558,6 +1561,7 @@ def test_discovery_pause_and_resume_restore_the_pending_question(tmp_path: Path)
 
     assert paused is not None and paused["lifecycle_stage"] == "paused"
     assert "study level" in resumed.text
+    assert resumed == pending
     assert repository.get_lead(lead_id)["lifecycle_stage"] == "discovering"  # type: ignore[index]
 
 
@@ -1626,6 +1630,76 @@ def test_parent_preference_is_attributed_and_waits_for_student_interest(tmp_path
         for fact in facts
     )
     assert student_reply.buttons
+
+
+def test_parent_field_and_level_choices_do_not_mutate_student_profile(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    repository.update_lead(lead_id, education_level="undergraduate", discovery_step="level")
+    repository.save_fact(lead_id, "interest_field_student", "design/media", "student")
+    repository.save_fact(lead_id, "education_level_student", "undergraduate", "student")
+    repository.save_fact(lead_id, "interest_activity_student", "making visuals", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making visuals", "student")
+    service.choose_speaker(lead_id, "parent")
+
+    level_reply = service.choose_level(lead_id, "postgraduate")
+    lead = repository.get_lead(lead_id)
+    facts = {fact["fact_key"]: fact["fact_value"] for fact in repository.list_facts(lead_id)}
+    assert "parent's preferred study level" in level_reply.text
+    assert lead is not None and lead["education_level"] == "undergraduate"
+    assert lead["discovery_step"] == "level"
+    assert facts["education_level_parent"] == "postgraduate"
+    assert facts["education_level_student"] == "undergraduate"
+    assert facts["activity_terms_student"] == "making visuals"
+    assert facts["interest_activity_student"] == "making visuals"
+
+    field_reply = service.recommend_field(lead_id, "business/accounting")
+    lead = repository.get_lead(lead_id)
+    facts = {fact["fact_key"]: fact["fact_value"] for fact in repository.list_facts(lead_id)}
+    assert "parent's preference" in field_reply.text
+    assert lead is not None and lead["education_level"] == "undergraduate"
+    assert lead["discovery_step"] == "level"
+    assert facts["interest_field_parent"] == "business/accounting"
+    assert facts["interest_field_student"] == "design/media"
+    assert facts["activity_terms_student"] == "making visuals"
+    assert facts["interest_activity_student"] == "making visuals"
+
+
+def test_student_field_choice_preserves_level_and_activity_preferences(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    repository.update_lead(lead_id, education_level="undergraduate", discovery_step="field")
+    repository.save_fact(lead_id, "interest_field_student", "design/media", "student")
+    repository.save_fact(lead_id, "interest_fields_student", "design/media", "student")
+    repository.save_fact(lead_id, "education_level_student", "undergraduate", "student")
+    repository.save_fact(lead_id, "interest_activity_student", "making visuals", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making visuals", "student")
+
+    reply = service.recommend_field(lead_id, "tech/data")
+
+    lead = repository.get_lead(lead_id)
+    facts = {fact["fact_key"]: fact["fact_value"] for fact in repository.list_facts(lead_id)}
+    assert lead is not None and lead["education_level"] == "undergraduate"
+    assert facts["interest_field_student"] == "tech/data"
+    assert facts["interest_fields_student"] == "tech/data"
+    assert facts["education_level_student"] == "undergraduate"
+    assert facts["activity_terms_student"] == "making visuals"
+    assert facts["interest_activity_student"] == "making visuals"
+    assert "Did I get that right" in reply.text or "What would you like to learn" in reply.text
 
 
 def test_parent_course_suggestion_requires_student_confirmation(tmp_path: Path) -> None:

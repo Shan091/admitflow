@@ -217,12 +217,18 @@ async def test_exploration_callbacks_recommend_and_language_choice_persists(tmp_
     update.callback_query = SimpleNamespace(answer=answer_field, data="field:tech/data")
     update.update_id = 111
     await callback_handler(update, context)
-    assert "study level" in message.sent[-1][0]
+    assert "What would you like to do or learn more about" in message.sent[-1][0]
+    activity_choice = next(
+        button.callback_data
+        for row in message.sent[-1][1].inline_keyboard
+        for button in row
+        if button.callback_data and button.callback_data.startswith("guidance:activity:")
+    )
 
-    async def answer_level() -> None:
+    async def answer_activity() -> None:
         return None
 
-    update.callback_query = SimpleNamespace(answer=answer_level, data="level:any")
+    update.callback_query = SimpleNamespace(answer=answer_activity, data=activity_choice)
     update.update_id = 112
     await callback_handler(update, context)
     assert "What would you most like to learn" in message.sent[-1][0]

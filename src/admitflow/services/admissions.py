@@ -581,18 +581,10 @@ class AdmissionsService:
             None,
         )
         speaker = str(speaker_fact["fact_value"]) if speaker_fact else "student"
-        existing_field = next(
-            (
-                fact
-                for fact in self.repository.list_facts(lead_id)
-                if fact["fact_key"] == f"interest_field_{speaker}"
-            ),
-            None,
-        )
-        if existing_field is None or existing_field["fact_value"] != selected:
-            self.repository.delete_fact(lead_id, "interest_activity_student")
-            self.repository.delete_fact(lead_id, f"education_level_{speaker}")
-            self.repository.update_lead(lead_id, education_level=None)
+        existing_field = self._fact_value(lead_id, f"interest_field_{speaker}")
+        if existing_field != selected and speaker == "student":
+            self._clear_guidance_confirmation(lead_id)
+        self.repository.save_fact(lead_id, f"interest_fields_{speaker}", selected, speaker)
         self.repository.save_fact(lead_id, f"interest_field_{speaker}", selected, speaker)
         if speaker == "parent":
             return Reply(
@@ -601,8 +593,8 @@ class AdmissionsService:
                 "recommend courses.",
                 (("Learner sharing now", "speaker:student"),),
             )
-        self.repository.update_lead(lead_id, discovery_step="level")
-        return self._level_choices(lead_id)
+        self.repository.update_lead(lead_id, discovery_step="guidance_signal")
+        return self._present_guidance(lead_id)
 
     def _level_choices(self, lead_id: int) -> Reply:
         self.repository.update_lead(lead_id, discovery_step="level")
@@ -624,29 +616,26 @@ class AdmissionsService:
         valid_levels = {"vocational_certificate", "diploma", "undergraduate", "postgraduate", "any"}
         if level not in valid_levels:
             return Reply("Please choose one of the listed sample education levels.")
-        lead_before = self.repository.get_lead(lead_id)
-        previous_level = (
-            str(lead_before["education_level"])
-            if lead_before and lead_before["education_level"]
-            else None
-        )
-        selected_level = None if level == "any" else level
-        if previous_level != selected_level:
-            self.repository.delete_fact(lead_id, "interest_activity_student")
-        self.repository.update_lead(
-            lead_id,
-            education_level=selected_level,
-            discovery_step="activity",
-        )
         active = next(
             (
-                fact
+                fact["fact_value"]
                 for fact in self.repository.list_facts(lead_id)
                 if fact["fact_key"] == "active_speaker"
             ),
-            None,
+            "student",
         )
-        speaker = str(active["fact_value"]) if active else "student"
+        speaker = str(active)
+        selected_level = None if level == "any" else level
+        if speaker == "student":
+            lead = self.repository.get_lead(lead_id)
+            current_level = (
+                str(lead["education_level"]) if lead and lead["education_level"] else None
+            )
+            if current_level != selected_level:
+                self._clear_guidance_confirmation(lead_id)
+            self.repository.update_lead(
+                lead_id, education_level=selected_level, discovery_step="guidance_signal"
+            )
         self.repository.save_fact(lead_id, f"education_level_{speaker}", level, speaker)
         if speaker == "parent":
             return Reply(
@@ -654,7 +643,6 @@ class AdmissionsService:
                 "preference should guide course recommendations; ask them to share or confirm it.",
                 (("Learner sharing now", "speaker:student"),),
             )
-        self.repository.update_lead(lead_id, discovery_step="results")
         return self._present_guidance(lead_id)
 
     def _activity_choices(self, lead_id: int) -> Reply:
@@ -753,6 +741,8 @@ class AdmissionsService:
             return self._level_choices(lead_id)
         if step == "activity":
             return self._activity_choices(lead_id)
+        if step == "guidance_signal":
+            return self._present_guidance(lead_id)
         if step == "results":
             fact = next(
                 (
@@ -1380,6 +1370,7 @@ class AdmissionsService:
                 learning_goals=goals,
             ):
                 self.repository.delete_fact(lead_id, "guidance_pending_signature")
+                self.repository.update_lead(lead_id, discovery_step="guidance_signal")
                 if interests:
                     candidate_courses = recommend_courses(
                         courses, interests=interests, activities=set(), limit=10
@@ -1502,6 +1493,7 @@ class AdmissionsService:
                 signature,
             )
         self.repository.delete_fact(lead_id, "guidance_pending_signature")
+        self.repository.update_lead(lead_id, discovery_step="guidance_signal")
         return Reply(
             "I have not got enough detail to suggest a course yet. What topic or activity would "
             "you like to explore? You can mention a study level too.",

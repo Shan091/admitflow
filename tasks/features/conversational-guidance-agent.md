@@ -67,10 +67,13 @@ human escalation, and operational requirements are verified.
   replacements invalidate old recommendation confirmations. Parent-only notes remain attributed
   separately and do not rewrite the learner's recommendation signature. This is still not a general
   fact-provenance or conflict-resolution system and needs broader dialogue evaluation.
-- Field and guided-exploration entry paths already expose their intended field choices. However,
-  the shared helper overwrites the `explore` step as `field`, and resume changes the exploration
-  prompt to a field-only question. Correcting this is a focused entry-path/resume fix, not the
-  broader multi-turn policy gap described below.
+- Field and guided-exploration entry paths expose their intended field choices. A prior step-state
+  bug that changed `explore` to `field` and replaced its prompt on resume was fixed and verified in
+  the current demo.
+- The tap-based known-field handler still asks a fixed level question even when another signal
+  would be more useful. Parent field/level taps also previously mutated learner-level state. The
+  current slice routes student field choices into the shared adaptive policy, preserves independent
+  profile facts when the field changes, and keeps parent suggestions separate.
 
 ## v1 lifecycle mapping
 

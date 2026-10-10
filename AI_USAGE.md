@@ -3,6 +3,18 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — unify tap field selection with adaptive guidance
+
+- **Task:** Remove the fixed level-first tap sequence, preserve student facts during field changes,
+  and isolate parent suggestions from learner state.
+- **Assistance:** Codex routed student field selections through the shared guidance policy, made
+  field replacement category-scoped, made level/field taps speaker-aware, and added persistence for
+  resumable adaptive-signal prompts plus parent/learner regression tests.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 126 tests;
+  `git diff --check` passed. Commit and CI are pending.
+- **Human review:** No external facts or student outcomes were introduced; all recommendations
+  remain bound to the fictional sample catalog.
+
 ## 2026-10-11 — preserve guided-exploration state on resume
 
 - **Task:** Keep guided exploration distinct from known-field selection when pausing and resuming.
