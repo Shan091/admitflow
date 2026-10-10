@@ -164,10 +164,11 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 - A learner can answer in natural language over multiple turns. The next question uses the learner's
   existing facts and asks only for information that can change the next recommendation or action.
 - For broad candidates, ask at most one optional narrowing question per current fact set: a
-  catalog-grounded goal question when goals differ, otherwise a language-support preference when
-  candidates share one teaching medium but differ in recorded support. Skip optional prompts when a
-  course is known, the relevant preference is already stated, or the candidate set does not differ.
-  The learner may leave language open. Never infer language proficiency or claim unrecorded
+  catalog-grounded goal question when goals differ; otherwise a language-support preference when
+  candidates share a teaching medium but differ in recorded support; otherwise study format when
+  the explicit sample-catalog modes differ. Skip optional prompts when a course is known, the
+  relevant preference is already stated, or the candidate set does not differ. The learner may
+  leave any preference open. Never infer language proficiency, schedule, access, or unrecorded
   teaching/support services.
 - A known-course learner can jump directly to that offering; ambiguous/unlisted names are clarified
   without inventing a match.
@@ -202,6 +203,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 - Verify language-support extraction allowlisting and preference behavior, including no prompt for
   known-course/uniform candidates, skip/resume/correction, stale-button invalidation, and recovery
   when no complete candidate matches a stated support preference.
+- Verify study-format extraction and catalog allowlisting, adaptive prompt policy, skip/resume,
+  stale-button invalidation, preference filtering/explanations, parent attribution, and honest
+  widening when a selected format leaves no complete match.
 - Evaluate fixed fictional dialogues in English, Hindi, Malayalam, and Hinglish; test code-switching,
   short/empty answers, spelling variation, ambiguity, contradictions, prompt injection, parent-child
   disagreement, and unsupported/regulated interests.

@@ -11,7 +11,13 @@ from admitflow.domain.models import Course, DiscoveryTurn, RetractedPreference
 
 class _RetractedPreferencePayload(BaseModel):
     category: Literal[
-        "field", "education_level", "interest", "activity", "learning_goal", "language_support"
+        "field",
+        "education_level",
+        "interest",
+        "activity",
+        "learning_goal",
+        "language_support",
+        "delivery_mode",
     ]
     value: str = Field(description="The exact catalog value the learner explicitly withdrew.")
 
@@ -40,6 +46,12 @@ class _DiscoveryPayload(BaseModel):
         description=(
             "One exact catalog language-support label explicitly preferred, or null. "
             "Do not infer language proficiency or confuse discussion support with teaching medium."
+        )
+    )
+    delivery_mode_preference: str | None = Field(
+        description=(
+            "One exact listed course delivery mode the user explicitly prefers, or null. "
+            "Do not infer it from where they live, work, or study."
         )
     )
     unsure: bool = Field(
@@ -104,6 +116,9 @@ class OpenAIAdapter:
         activity_values = sorted({item for course in courses for item in course.activities})
         goal_values = sorted({item for course in courses for item in course.learning_goals})
         support_values = sorted({item for course in courses for item in course.language_support})
+        delivery_mode_values = sorted(
+            {item for course in courses for item in course.delivery_modes}
+        )
         request = {
             "current_user_message": text,
             "catalog_course_ids_and_names": course_options,
@@ -119,6 +134,7 @@ class OpenAIAdapter:
             "allowed_activity_terms": activity_values,
             "allowed_learning_goals": goal_values,
             "allowed_language_supports": support_values,
+            "allowed_delivery_modes": delivery_mode_values,
         }
         response = await self.client.responses.parse(
             model=self.decisions_model,
@@ -138,6 +154,9 @@ class OpenAIAdapter:
                 "Only record an exact language-support label when the user explicitly prefers it. "
                 "Teaching medium and discussion support are different facts; never infer language "
                 "proficiency. "
+                "Only record a delivery mode from the allowed catalog values when the user "
+                "explicitly prefers that course format. Do not infer a preference from personal "
+                "circumstances. "
                 "Classify unrelated career/profession requests outside the institution catalog as "
                 "out_of_scope. Do not generate user-facing advice or a recommendation."
             ),
@@ -159,6 +178,7 @@ class OpenAIAdapter:
         valid_activities = {value.casefold(): value for value in activity_values}
         valid_goals = {value.casefold(): value for value in goal_values}
         valid_support = {value.casefold(): value for value in support_values}
+        valid_delivery_modes = {value.casefold(): value for value in delivery_mode_values}
         levels = {
             "vocational_certificate",
             "diploma",
@@ -173,6 +193,7 @@ class OpenAIAdapter:
             "activity": {value.casefold(): value for value in activity_values},
             "learning_goal": {value.casefold(): value for value in goal_values},
             "language_support": {value.casefold(): value for value in support_values},
+            "delivery_mode": {value.casefold(): value for value in delivery_mode_values},
         }
         return DiscoveryTurn(
             intent=extracted.intent,
@@ -201,6 +222,11 @@ class OpenAIAdapter:
             language_support_preference=(
                 valid_support.get(extracted.language_support_preference.casefold())
                 if extracted.language_support_preference
+                else None
+            ),
+            delivery_mode_preference=(
+                valid_delivery_modes.get(extracted.delivery_mode_preference.casefold())
+                if extracted.delivery_mode_preference
                 else None
             ),
             retracted_preferences=tuple(

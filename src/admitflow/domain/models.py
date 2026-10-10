@@ -18,6 +18,7 @@ class Course:
     activities: tuple[str, ...] = ()
     prerequisites: tuple[str, ...] = ()
     medium: str = "English"
+    delivery_modes: tuple[str, ...] = ()
     language_support: tuple[str, ...] = ()
     learning_goals: tuple[str, ...] = ()
 
@@ -27,7 +28,13 @@ class RetractedPreference:
     """One exact catalog-bounded learner preference the current turn withdraws."""
 
     category: Literal[
-        "field", "education_level", "interest", "activity", "learning_goal", "language_support"
+        "field",
+        "education_level",
+        "interest",
+        "activity",
+        "learning_goal",
+        "language_support",
+        "delivery_mode",
     ]
     value: str
 
@@ -48,6 +55,7 @@ class DiscoveryTurn:
     correct_previous: bool
     learning_goals: tuple[str, ...] = ()
     language_support_preference: str | None = None
+    delivery_mode_preference: str | None = None
     retracted_preferences: tuple[RetractedPreference, ...] = ()
 
 

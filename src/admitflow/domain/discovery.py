@@ -36,6 +36,7 @@ def recommend_courses(
     activities: set[str],
     learning_goals: set[str] | None = None,
     language_support_preference: str | None = None,
+    delivery_mode_preference: str | None = None,
     level: str | None = None,
     limit: int = 3,
 ) -> list[CourseMatch]:
@@ -46,6 +47,7 @@ def recommend_courses(
     normalized_activities = _normalize(activities)
     normalized_goals = _normalize(learning_goals or set())
     normalized_support = " ".join((language_support_preference or "").casefold().split())
+    normalized_delivery_mode = " ".join((delivery_mode_preference or "").casefold().split())
     matches: list[CourseMatch] = []
     for course in courses:
         if not _is_complete(course) or (level and course.education_level != level):
@@ -54,11 +56,14 @@ def recommend_courses(
         activity_hits = normalized_activities & _normalize(set(course.activities))
         course_goals = _normalize(set(course.learning_goals))
         course_support = _normalize(set(course.language_support))
+        course_delivery_modes = _normalize(set(course.delivery_modes))
         goal_hits = normalized_goals & course_goals
         field_hit = _normalize({course.field}) & normalized_interests
         if normalized_goals and not goal_hits:
             continue
         if normalized_support and normalized_support not in course_support:
+            continue
+        if normalized_delivery_mode and normalized_delivery_mode not in course_delivery_modes:
             continue
         if not interest_hits and not activity_hits and not field_hit:
             continue
@@ -70,6 +75,11 @@ def recommend_courses(
             + (
                 [f"Lists language support: {language_support_preference}"]
                 if normalized_support
+                else []
+            )
+            + (
+                [f"Lists study format: {(delivery_mode_preference or '').replace('_', ' ')}"]
+                if normalized_delivery_mode
                 else []
             )
         )
@@ -92,4 +102,5 @@ def _is_complete(course: Course) -> bool:
         and course.activities
         and course.prerequisites
         and course.medium.strip()
+        and course.delivery_modes
     )

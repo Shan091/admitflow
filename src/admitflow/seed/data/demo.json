@@ -14,6 +14,7 @@
       "activities": ["building simple apps", "working with numbers", "solving puzzles"],
       "prerequisites": ["Completed Grade 12 or equivalent"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["English support sessions"],
       "learning_goals": ["build practical skills", "create digital products", "analyze data"]
     },
@@ -29,6 +30,7 @@
       "activities": ["organizing information", "working with numbers", "planning budgets"],
       "prerequisites": ["Basic reading and numeracy; no prior accounting course required"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["English support sessions"],
       "learning_goals": ["analyze data", "understand business"]
     },
@@ -44,6 +46,7 @@
       "activities": ["making visuals", "telling stories", "editing media"],
       "prerequisites": ["Basic digital access and interest in creative work"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["create visual work", "communicate ideas", "build practical skills"]
     },
@@ -59,6 +62,7 @@
       "activities": ["helping guests", "planning events", "coordinating tasks"],
       "prerequisites": ["Completed Grade 10 or equivalent"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["support people", "coordinate events and services"]
     },
@@ -74,6 +78,7 @@
       "activities": ["working with numbers", "organizing information", "checking details"],
       "prerequisites": ["Basic numeracy"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Hindi discussion support"],
       "learning_goals": ["understand business", "practice workplace organization", "build practical skills"]
     },
@@ -89,6 +94,7 @@
       "activities": ["working with numbers", "finding patterns", "making charts"],
       "prerequisites": ["Completed Grade 12 or equivalent; basic computer use"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["English support sessions"],
       "learning_goals": ["analyze data", "build practical skills"]
     },
@@ -104,6 +110,7 @@
       "activities": ["making visuals", "prototyping", "solving design problems"],
       "prerequisites": ["Completed Grade 12 or equivalent; no portfolio required for this demo"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["create digital products", "create visual work"]
     },
@@ -119,6 +126,7 @@
       "activities": ["planning projects", "working with numbers", "presenting ideas"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["English support sessions"],
       "learning_goals": ["understand business", "plan projects and budgets", "communicate ideas"]
     },
@@ -134,6 +142,7 @@
       "activities": ["planning trips", "helping guests", "telling stories"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["explore culture and tourism", "support people", "communicate ideas"]
     },
@@ -149,6 +158,7 @@
       "activities": ["finding patterns", "reading research", "explaining evidence"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["English support sessions"],
       "learning_goals": ["analyze data", "explore research and evidence", "communicate ideas"]
     },
@@ -164,6 +174,7 @@
       "activities": ["making visuals", "editing media", "explaining ideas"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample portfolio review and 50% minimum"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["create visual work", "explore research and evidence", "communicate ideas"]
     },
@@ -179,6 +190,7 @@
       "activities": ["hands-on practice", "helping guests", "following checklists"],
       "prerequisites": ["Basic reading; practical course orientation"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["build practical skills", "support people", "practice workplace organization"]
     },
@@ -194,6 +206,7 @@
       "activities": ["organizing information", "making charts", "practicing on a computer"],
       "prerequisites": ["Basic reading and numeracy; no prior programming required"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["build practical skills", "analyze data", "practice workplace organization"]
     },
@@ -209,6 +222,7 @@
       "activities": ["building simple apps", "testing ideas", "solving puzzles"],
       "prerequisites": ["Completed Grade 12 or equivalent; basic computer use"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["English support sessions"],
       "learning_goals": ["create digital products", "build practical skills"]
     },
@@ -224,6 +238,7 @@
       "activities": ["building simple apps", "planning projects", "testing ideas"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["English support sessions"],
       "learning_goals": ["create digital products", "plan projects and budgets", "build practical skills"]
     },
@@ -239,6 +254,7 @@
       "activities": ["planning budgets", "presenting ideas", "organizing information"],
       "prerequisites": ["Basic reading and numeracy; no business experience required"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["understand business", "plan projects and budgets", "communicate ideas"]
     },
@@ -254,6 +270,7 @@
       "activities": ["talking with people", "finding patterns", "presenting ideas"],
       "prerequisites": ["Completed Grade 12 or equivalent; no prior marketing course required"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["Hindi discussion support"],
       "learning_goals": ["understand business", "communicate ideas", "explore research and evidence"]
     },
@@ -269,6 +286,7 @@
       "activities": ["reading research", "planning projects", "explaining evidence"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["English support sessions"],
       "learning_goals": ["understand business", "plan projects and budgets", "explore research and evidence"]
     },
@@ -284,6 +302,7 @@
       "activities": ["making visuals", "telling stories", "editing media"],
       "prerequisites": ["Interest in creative work; basic digital access for sample exercises"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["create visual work", "communicate ideas", "build practical skills"]
     },
@@ -299,6 +318,7 @@
       "activities": ["prototyping", "making visuals", "solving design problems"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%; no portfolio required for this demo"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["create digital products", "create visual work", "communicate ideas"]
     },
@@ -314,6 +334,7 @@
       "activities": ["helping guests", "talking with people", "coordinating tasks"],
       "prerequisites": ["Basic reading; practical course orientation"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["support people", "communicate ideas", "build practical skills"]
     },
@@ -329,6 +350,7 @@
       "activities": ["planning events", "coordinating tasks", "following checklists"],
       "prerequisites": ["Completed Grade 10 or equivalent; no previous event experience required"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Hindi discussion support"],
       "learning_goals": ["coordinate events and services", "practice workplace organization", "support people"]
     },
@@ -344,6 +366,7 @@
       "activities": ["helping guests", "planning events", "planning projects"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["support people", "coordinate events and services", "plan projects and budgets"]
     },
@@ -359,6 +382,7 @@
       "activities": ["planning trips", "reading research", "explaining evidence"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["explore culture and tourism", "explore research and evidence", "plan projects and budgets"]
     },
@@ -374,6 +398,7 @@
       "activities": ["organizing information", "coordinating tasks", "checking details"],
       "prerequisites": ["Basic reading and numeracy; introductory computer practice provided"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["practice workplace organization", "coordinate events and services", "build practical skills"]
     },
@@ -389,6 +414,7 @@
       "activities": ["talking with people", "organizing information", "following checklists"],
       "prerequisites": ["Basic reading; role-play orientation is included in this sample"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Hindi discussion support", "Malayalam discussion support"],
       "learning_goals": ["support people", "communicate ideas", "understand business"]
     },
@@ -404,6 +430,7 @@
       "activities": ["hands-on practice", "making visuals", "solving design problems"],
       "prerequisites": ["Interest in hands-on creative work; no prior craft training required"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["create visual work", "build practical skills"]
     },
@@ -419,6 +446,7 @@
       "activities": ["hands-on practice", "coordinating tasks", "following checklists"],
       "prerequisites": ["Completed Grade 10 or equivalent; practical course orientation"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["coordinate events and services", "practice workplace organization", "build practical skills"]
     },
@@ -434,6 +462,7 @@
       "activities": ["following checklists", "solving puzzles", "practicing on a computer"],
       "prerequisites": ["Basic reading and computer use; no prior security training required"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["practice digital security basics", "build practical skills"]
     },
@@ -449,6 +478,7 @@
       "activities": ["finding patterns", "reading research", "planning projects"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["English support sessions"],
       "learning_goals": ["design applied data systems", "analyze data"]
     },
@@ -464,6 +494,7 @@
       "activities": ["planning budgets", "checking details", "organizing information"],
       "prerequisites": ["Completed Grade 10 or equivalent; basic numeracy"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Hindi discussion support"],
       "learning_goals": ["manage small enterprise finances", "understand business"]
     },
@@ -479,6 +510,7 @@
       "activities": ["planning projects", "coordinating tasks", "working with numbers"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["English support sessions"],
       "learning_goals": ["study business operations", "understand business"]
     },
@@ -494,6 +526,7 @@
       "activities": ["making visuals", "explaining ideas", "solving design problems"],
       "prerequisites": ["Interest in creative work; basic digital access for sample exercises"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["practice visual communication", "create visual work"]
     },
@@ -509,6 +542,7 @@
       "activities": ["prototyping", "talking with people", "solving design problems"],
       "prerequisites": ["Completed Grade 10 or equivalent; no portfolio required for this demo"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["design user experiences", "create digital products"]
     },
@@ -524,6 +558,7 @@
       "activities": ["editing media", "telling stories", "planning projects"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%; no portfolio required for this demo"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["produce digital media", "communicate ideas"]
     },
@@ -539,6 +574,7 @@
       "activities": ["planning trips", "telling stories", "helping guests"],
       "prerequisites": ["Basic reading; no previous tourism study required"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["practice sustainable tourism", "explore culture and tourism"]
     },
@@ -554,6 +590,7 @@
       "activities": ["reading research", "planning projects", "explaining evidence"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["English support sessions"],
       "learning_goals": ["study hospitality strategy", "explore research and evidence"]
     },
@@ -569,6 +606,7 @@
       "activities": ["organizing information", "making visuals", "following checklists"],
       "prerequisites": ["Completed Grade 10 or equivalent; no previous retail course required"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Hindi discussion support"],
       "learning_goals": ["learn retail merchandising", "practice workplace organization"]
     },
@@ -584,6 +622,7 @@
       "activities": ["coordinating tasks", "planning events", "following checklists"],
       "prerequisites": ["Completed Grade 10 or equivalent; practical course orientation"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["coordinate advanced event operations", "coordinate events and services"]
     },
@@ -599,6 +638,7 @@
       "activities": ["talking with people", "solving puzzles", "following checklists"],
       "prerequisites": ["Basic reading; role-play orientation is included in this sample"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Hindi discussion support", "Malayalam discussion support"],
       "learning_goals": ["practice customer service routines", "support people"]
     },
@@ -614,6 +654,7 @@
       "activities": ["checking devices", "following checklists", "explaining steps"],
       "prerequisites": ["Basic reading; introductory device practice is included in this sample"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["troubleshoot common device issues", "build practical skills", "practice workplace organization"]
     },
@@ -629,6 +670,7 @@
       "activities": ["mapping workflows", "organizing information", "planning projects"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["English support sessions"],
       "learning_goals": ["study information systems", "design applied data systems", "communicate ideas"]
     },
@@ -644,6 +686,7 @@
       "activities": ["coordinating tasks", "planning schedules", "following checklists"],
       "prerequisites": ["Basic reading; no previous project course required for this sample"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["coordinate project work", "practice workplace organization", "communicate ideas"]
     },
@@ -659,6 +702,7 @@
       "activities": ["reading research", "mapping workflows", "explaining evidence"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["English support sessions"],
       "learning_goals": ["analyze enterprise operations", "study business operations", "explore research and evidence"]
     },
@@ -674,6 +718,7 @@
       "activities": ["storyboarding", "editing clips", "making visuals"],
       "prerequisites": ["Completed Grade 10 or equivalent; no portfolio required for this sample"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["create motion graphics", "create visual work", "communicate ideas"]
     },
@@ -689,6 +734,7 @@
       "activities": ["testing visual clarity", "reading research", "explaining ideas"],
       "prerequisites": ["Completed a relevant bachelor's degree; sample minimum overall marks 50%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["design accessible communication", "create visual work", "explore research and evidence"]
     },
@@ -704,6 +750,7 @@
       "activities": ["telling stories", "planning trips", "helping visitors"],
       "prerequisites": ["Completed Grade 10 or equivalent; no previous tourism study required"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["interpret local heritage", "explore culture and tourism", "communicate ideas"]
     },
@@ -719,6 +766,7 @@
       "activities": ["planning events", "coordinating tasks", "helping guests"],
       "prerequisites": ["Completed Grade 12 or equivalent; sample minimum overall marks 45%"],
       "medium": "English",
+      "delivery_modes": ["hybrid"],
       "language_support": ["English support sessions", "Malayalam discussion support"],
       "learning_goals": ["coordinate hospitality events", "support people", "understand business"]
     },
@@ -734,6 +782,7 @@
       "activities": ["hands-on practice", "sorting materials", "following safety checklists"],
       "prerequisites": ["Basic reading; supervised introductory practice is included in this sample"],
       "medium": "English",
+      "delivery_modes": ["in_person"],
       "language_support": ["Malayalam discussion support"],
       "learning_goals": ["repair and reuse materials", "build practical skills", "practice workplace organization"]
     },
@@ -749,6 +798,7 @@
       "activities": ["organizing stock records", "checking details", "following checklists"],
       "prerequisites": ["Completed Grade 10 or equivalent; basic reading and numeracy"],
       "medium": "English",
+      "delivery_modes": ["online"],
       "language_support": ["Hindi discussion support"],
       "learning_goals": ["manage stock and inventory", "understand business", "practice workplace organization"]
     }

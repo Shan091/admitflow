@@ -142,6 +142,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply = await admissions.choose_guidance_language_support(
             lead_id, None if support_slug == "open" else support_slug
         )
+    elif data.startswith("guidance:mode:"):
+        mode_slug = data.removeprefix("guidance:mode:")
+        reply = await admissions.choose_guidance_delivery_mode(
+            lead_id, None if mode_slug == "open" else mode_slug
+        )
     elif data.startswith("guidance:activity:"):
         reply = await admissions.choose_guidance_signal(
             lead_id, activity_slug=data.removeprefix("guidance:activity:")

@@ -3,6 +3,21 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — add adaptive course delivery-format exploration
+
+- **Task:** Add delivery-format preferences to the multi-turn, institution-course guidance flow.
+- **Assistance:** Codex added in-person/online/hybrid tags to the fictional catalog, a SQLite
+  migration, catalog-validated structured extraction, optional Telegram choices, resume and
+  confirmation-signature handling, recommendation filtering/explanations, and no-match widening.
+  Optional mode exploration is skipped when another optional narrowing question has already been
+  used for that fact set. No new consent step was added; the existing processing notice and opt-out
+  remain the behavior for OpenAI text handling.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 165 tests;
+  `git diff --check` passed. No live or paid API calls were made. Commit/push and matching CI are
+  pending.
+- **Human review:** Catalog formats are fictional example metadata; no real provider schedule,
+  availability, or accessibility was verified.
+
 ## 2026-10-11 — expand the fictional course catalog
 
 - **Task:** Give learners additional institution-course examples while preserving catalog-only

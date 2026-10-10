@@ -45,6 +45,7 @@ class Repository:
                     activities TEXT NOT NULL DEFAULT '[]',
                     prerequisites TEXT NOT NULL DEFAULT '[]',
                     medium TEXT NOT NULL DEFAULT 'English',
+                    delivery_modes TEXT NOT NULL DEFAULT '[]',
                     language_support TEXT NOT NULL DEFAULT '[]'
                 );
                 CREATE TABLE IF NOT EXISTS leads (
@@ -130,6 +131,7 @@ class Repository:
                 "activities": "TEXT NOT NULL DEFAULT '[]'",
                 "prerequisites": "TEXT NOT NULL DEFAULT '[]'",
                 "medium": "TEXT NOT NULL DEFAULT 'English'",
+                "delivery_modes": "TEXT NOT NULL DEFAULT '[]'",
                 "language_support": "TEXT NOT NULL DEFAULT '[]'",
                 "learning_goals": "TEXT NOT NULL DEFAULT '[]'",
             }
@@ -178,8 +180,8 @@ class Repository:
                     """INSERT INTO courses
                     (id, tenant_id, name, description, minimum_marks_percent, application_fee_paise,
                      education_level, field, interests, activities, prerequisites, medium,
-                     language_support, learning_goals)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     delivery_modes, language_support, learning_goals)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(id) DO UPDATE SET
                     tenant_id=excluded.tenant_id, name=excluded.name,
                     description=excluded.description,
@@ -188,6 +190,7 @@ class Repository:
                     education_level=excluded.education_level, field=excluded.field,
                     interests=excluded.interests, activities=excluded.activities,
                     prerequisites=excluded.prerequisites, medium=excluded.medium,
+                    delivery_modes=excluded.delivery_modes,
                     language_support=excluded.language_support,
                     learning_goals=excluded.learning_goals""",
                     (
@@ -203,6 +206,7 @@ class Repository:
                         json.dumps(course["activities"], ensure_ascii=False),
                         json.dumps(course["prerequisites"], ensure_ascii=False),
                         course["medium"],
+                        json.dumps(course["delivery_modes"], ensure_ascii=False),
                         json.dumps(course["language_support"], ensure_ascii=False),
                         json.dumps(course["learning_goals"], ensure_ascii=False),
                     ),
@@ -279,6 +283,7 @@ class Repository:
                 activities=tuple(json.loads(row["activities"])),
                 prerequisites=tuple(json.loads(row["prerequisites"])),
                 medium=str(row["medium"]),
+                delivery_modes=tuple(json.loads(row["delivery_modes"])),
                 language_support=tuple(json.loads(row["language_support"])),
                 learning_goals=tuple(json.loads(row["learning_goals"])),
             )

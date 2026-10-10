@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-10-11 — add adaptive study-format exploration
+
+- **Change:** Added fictional catalog delivery modes (in-person, online, hybrid), migrated existing
+  SQLite course tables with an empty default, and exposed a format question only for broad matches
+  with differing modes when no other optional narrowing question was used for that fact set. The
+  preference is catalog-allowlisted, speaker-attributed, resumable, included in confirmation
+  fingerprints and recommendation reasons, and has a truthful widen path when no complete course
+  matches. Display copy identifies modes as sample catalog labels, not schedule/access promises.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint, Ruff format, strict mypy, and all 165
+  tests. New integration coverage checks format prompt choices, pause/resume, online filtering and
+  explanations, and leaving format open; migration and extraction validation are also covered.
+  `git diff --check` passed. No live or paid API calls were made.
+- **Delivery:** Pending commit, push, and matching GitHub Actions CI.
+- **Reason:** Let learners who do not know a course name express whether listed delivery format
+  matters, without turning the conversation into a mandatory questionnaire or promising details
+  absent from the fictional catalog.
+
 ## 2026-10-11 — expand the fictional course catalog to 50 offerings
 
 - **Change:** Added ten complete fictional offerings, two in each agreed field: IT support and

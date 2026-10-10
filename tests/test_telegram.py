@@ -1,3 +1,4 @@
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -184,6 +185,50 @@ async def test_language_support_callback_records_catalog_option(tmp_path: Path) 
     assert any(
         fact["fact_key"] == "language_support_preference_student"
         and fact["fact_value"] == "Malayalam discussion support"
+        for fact in repository.list_facts(lead_id)
+    )
+
+
+@pytest.mark.asyncio
+async def test_delivery_mode_open_callback_keeps_format_unspecified(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("42", "sample")
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+            )
+            for course in original_courses
+        ],
+    )
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+    prompt = admissions._present_guidance(lead_id)
+    assert "different study formats" in prompt.text
+    message = FakeMessage()
+
+    async def answer() -> None:
+        return None
+
+    update = SimpleNamespace(
+        callback_query=SimpleNamespace(answer=answer, data="guidance:mode:open"),
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=146,
+    )
+
+    await callback_handler(update, context)
+
+    assert "Did I get that right" in message.sent[-1][0]
+    assert not any(
+        fact["fact_key"] == "delivery_mode_preference_student"
         for fact in repository.list_facts(lead_id)
     )
 

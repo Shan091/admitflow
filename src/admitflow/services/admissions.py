@@ -216,12 +216,122 @@ class AdmissionsService:
         )
         return await self._handle_discovery_turn(lead_id, turn, "")
 
+    async def choose_guidance_delivery_mode(self, lead_id: int, mode_slug: str | None) -> Reply:
+        """Apply a delivery-format option shown for the current matching sample courses."""
+        speaker = self._fact_value(lead_id, "active_speaker") or "student"
+        if mode_slug is None:
+            if speaker != "student" and self._fact_value(
+                lead_id, "delivery_mode_preference_student"
+            ):
+                return Reply(
+                    "I kept the learner's stated study-format preference. Please ask the learner "
+                    "whether to keep it or leave format open.",
+                    (("Learner sharing now", "speaker:student"),),
+                )
+            interests, activities, level, goals, language_support = self._student_guidance_context(
+                lead_id
+            )
+            fact_key = f"delivery_mode_preference_{speaker}"
+            previous_mode = self._fact_value(lead_id, fact_key)
+            lead = self.repository.get_lead(lead_id)
+            if previous_mode is None:
+                base_signature = _guidance_signature(
+                    interests, activities, level, goals, language_support
+                )
+                if (
+                    lead is None
+                    or lead["discovery_step"] != "guidance_delivery_mode"
+                    or self._fact_value(lead_id, "guidance_delivery_mode_prompted_signature")
+                    != base_signature
+                ):
+                    return self._present_guidance(lead_id)
+            else:
+                confirmed_signature = _guidance_signature(
+                    interests, activities, level, goals, language_support, previous_mode
+                )
+                if (
+                    lead is None
+                    or lead["discovery_step"] != "results"
+                    or self._fact_value(lead_id, "guidance_confirmed_signature")
+                    != confirmed_signature
+                ):
+                    return self._present_guidance(lead_id)
+            previous_signature = _guidance_signature(
+                interests, activities, level, goals, language_support, previous_mode
+            )
+            base_signature = _guidance_signature(
+                interests, activities, level, goals, language_support
+            )
+            confirmed = self._fact_value(lead_id, "guidance_confirmed_signature")
+            self.repository.delete_fact(lead_id, fact_key)
+            self.repository.save_fact(
+                lead_id, "guidance_delivery_mode_prompted_signature", base_signature, "student"
+            )
+            if speaker == "student" and confirmed == previous_signature:
+                self.repository.save_fact(
+                    lead_id, "guidance_confirmed_signature", base_signature, "student"
+                )
+            self.repository.update_lead(lead_id, discovery_step="guidance_confirmation")
+            return self._present_guidance(lead_id)
+
+        lead = self.repository.get_lead(lead_id)
+        if lead is None or lead["discovery_step"] != "guidance_delivery_mode":
+            return self._present_guidance(lead_id)
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        expected_signature = _guidance_signature(
+            interests, activities, level, goals, language_support
+        )
+        if (
+            self._fact_value(lead_id, "guidance_delivery_mode_prompted_signature")
+            != expected_signature
+        ):
+            return self._present_guidance(lead_id)
+        courses = self.repository.list_courses(self.tenant_id)
+        current_candidates = recommend_courses(
+            courses,
+            interests=interests,
+            activities=activities,
+            learning_goals=goals,
+            language_support_preference=language_support,
+            level=None if level == "any" else level,
+            limit=100,
+        )
+        modes = {
+            mode
+            for match in current_candidates
+            for mode in match.course.delivery_modes
+            if _delivery_mode_slug(mode) == mode_slug
+        }
+        if not modes:
+            return Reply("That format is not listed for these sample matches. Please choose again.")
+        turn = DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=(),
+            education_level=None,
+            interests=(),
+            activities=(),
+            unsure=False,
+            correct_previous=False,
+            delivery_mode_preference=next(iter(modes)),
+        )
+        return await self._handle_discovery_turn(lead_id, turn, "")
+
     async def confirm_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
         """Accept only the currently pending summary, never a stale Telegram button."""
         interests, activities, level, goals, language_support = self._student_guidance_context(
             lead_id
         )
-        signature = _guidance_signature(interests, activities, level, goals, language_support)
+        signature = _guidance_signature(
+            interests,
+            activities,
+            level,
+            goals,
+            language_support,
+            self._student_delivery_mode(lead_id),
+        )
         pending = self._fact_value(lead_id, "guidance_pending_signature")
         if not pending:
             return Reply("That confirmation has expired. Your current course path is unchanged.")
@@ -245,7 +355,14 @@ class AdmissionsService:
         interests, activities, level, goals, language_support = self._student_guidance_context(
             lead_id
         )
-        signature = _guidance_signature(interests, activities, level, goals, language_support)
+        signature = _guidance_signature(
+            interests,
+            activities,
+            level,
+            goals,
+            language_support,
+            self._student_delivery_mode(lead_id),
+        )
         pending = self._fact_value(lead_id, "guidance_pending_signature")
         if not pending:
             return Reply("That change prompt has expired. Your current course path is unchanged.")
@@ -299,6 +416,7 @@ class AdmissionsService:
             "activity": {item for course in courses for item in course.activities},
             "learning_goal": {item for course in courses for item in course.learning_goals},
             "language_support": {item for course in courses for item in course.language_support},
+            "delivery_mode": {item for course in courses for item in course.delivery_modes},
         }
         pipe_facts = {
             "field": f"interest_fields_{speaker}",
@@ -309,6 +427,7 @@ class AdmissionsService:
         singleton_facts = {
             "education_level": f"education_level_{speaker}",
             "language_support": f"language_support_preference_{speaker}",
+            "delivery_mode": f"delivery_mode_preference_{speaker}",
         }
         for preference in retracted:
             category = preference.category
@@ -370,6 +489,9 @@ class AdmissionsService:
         language_support = facts.get("language_support_preference_student") or None
         return interests, activities, level, goals, language_support
 
+    def _student_delivery_mode(self, lead_id: int) -> str | None:
+        return self._fact_value(lead_id, "delivery_mode_preference_student") or None
+
     def _guidance_reflection(
         self,
         lead_id: int,
@@ -379,6 +501,7 @@ class AdmissionsService:
         goals: set[str],
         language_support: str | None,
         signature: str,
+        delivery_mode: str | None = None,
     ) -> Reply:
         self.repository.save_fact(lead_id, "guidance_pending_signature", signature, "student")
         self.repository.update_lead(
@@ -397,6 +520,8 @@ class AdmissionsService:
             details.append("your study level is still open")
         if language_support:
             details.append(f"you prefer courses listing {language_support}")
+        if delivery_mode:
+            details.append(f"you prefer courses listing {delivery_mode.replace('_', ' ')} study")
         token = _guidance_token(signature)
         return Reply(
             f"Before I show options, I heard that {'; '.join(details)}. Did I get that right?",
@@ -811,12 +936,15 @@ class AdmissionsService:
                 self.repository.delete_fact(lead_id, "guidance_pending_signature")
                 self.repository.update_lead(lead_id, discovery_step="explore")
                 return self._field_choices(lead_id, _EXPLORE_CHOICES_PROMPT, "explore")
-            signature = _guidance_signature(*context)
-            return self._guidance_reflection(lead_id, *context, signature)
+            delivery_mode = self._student_delivery_mode(lead_id)
+            signature = _guidance_signature(*context, delivery_mode)
+            return self._guidance_reflection(lead_id, *context, signature, delivery_mode)
         if step == "guidance_goal":
             return self._guidance_goal_prompt(lead_id)
         if step == "guidance_language_support":
             return self._guidance_language_support_prompt(lead_id)
+        if step == "guidance_delivery_mode":
+            return self._guidance_delivery_mode_prompt(lead_id)
         if step == "guidance_revision":
             return self._guidance_revision_prompt()
         if step == "course":
@@ -1196,6 +1324,7 @@ class AdmissionsService:
             or turn.activities
             or turn.learning_goals
             or turn.language_support_preference
+            or turn.delivery_mode_preference
             or turn.retracted_preferences
         ):
             self.repository.delete_fact(lead_id, f"guidance_unsure_count_{speaker}")
@@ -1207,6 +1336,7 @@ class AdmissionsService:
             or turn.activities
             or turn.learning_goals
             or turn.language_support_preference
+            or turn.delivery_mode_preference
             or turn.retracted_preferences
         ):
             self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
@@ -1217,6 +1347,7 @@ class AdmissionsService:
             or turn.activities
             or turn.learning_goals
             or turn.language_support_preference
+            or turn.delivery_mode_preference
             or turn.retracted_preferences
         )
         speaker_suffix = f"_{speaker}"
@@ -1232,6 +1363,7 @@ class AdmissionsService:
                     "interest_activity_",
                     "learning_goals_",
                     "language_support_preference_",
+                    "delivery_mode_preference_",
                 )
             )
             for fact in self.repository.list_facts(lead_id)
@@ -1362,6 +1494,15 @@ class AdmissionsService:
                     turn.language_support_preference,
                     speaker,
                 )
+        if turn.delivery_mode_preference:
+            allowed_modes = {mode for course in courses for mode in course.delivery_modes}
+            if turn.delivery_mode_preference in allowed_modes:
+                self.repository.save_fact(
+                    lead_id,
+                    f"delivery_mode_preference_{speaker}",
+                    turn.delivery_mode_preference,
+                    speaker,
+                )
         if speaker == "parent" and (
             turn.fields
             or turn.interests
@@ -1369,6 +1510,7 @@ class AdmissionsService:
             or turn.education_level
             or turn.learning_goals
             or turn.language_support_preference
+            or turn.delivery_mode_preference
             or turn.retracted_preferences
         ):
             return Reply(
@@ -1419,6 +1561,7 @@ class AdmissionsService:
                 or turn.activities
                 or turn.learning_goals
                 or turn.language_support_preference
+                or turn.delivery_mode_preference
             )
         ):
             return self._guidance_revision_prompt()
@@ -1429,6 +1572,7 @@ class AdmissionsService:
         interests, activities, level, goals, language_support = self._student_guidance_context(
             lead_id
         )
+        delivery_mode = self._student_delivery_mode(lead_id)
         if interests or activities:
             if not has_sufficient_guidance_context(
                 interests=interests,
@@ -1493,8 +1637,12 @@ class AdmissionsService:
                 )
                 base_signature = _guidance_signature(interests, activities, level)
                 asked_signature = self._fact_value(lead_id, "guidance_goal_prompted_signature")
+                mode_was_asked = (
+                    self._fact_value(lead_id, "guidance_delivery_mode_prompted_signature")
+                    == base_signature
+                )
                 needs_goal = len(candidates) > 3 and len(goal_options) > 1
-                if needs_goal and asked_signature != base_signature:
+                if needs_goal and asked_signature != base_signature and not mode_was_asked:
                     self.repository.save_fact(
                         lead_id,
                         "guidance_goal_prompted_signature",
@@ -1538,7 +1686,56 @@ class AdmissionsService:
                     )
                     self.repository.update_lead(lead_id, discovery_step="guidance_language_support")
                     return self._language_support_question(candidates, support_options)
-            signature = _guidance_signature(interests, activities, level, goals, language_support)
+            if not delivery_mode:
+                candidates = recommend_courses(
+                    courses,
+                    interests=interests,
+                    activities=activities,
+                    learning_goals=goals,
+                    language_support_preference=language_support,
+                    level=None if level == "any" else level,
+                    limit=100,
+                )
+                modes = tuple(
+                    mode
+                    for mode in ("in_person", "online", "hybrid")
+                    if any(mode in match.course.delivery_modes for match in candidates)
+                )
+                base_signature = _guidance_signature(
+                    interests, activities, level, goals, language_support
+                )
+                asked_signature = self._fact_value(
+                    lead_id, "guidance_delivery_mode_prompted_signature"
+                )
+                goal_was_asked = self._fact_value(
+                    lead_id, "guidance_goal_prompted_signature"
+                ) == _guidance_signature(interests, activities, level)
+                language_was_asked = self._fact_value(
+                    lead_id, "guidance_language_prompted_signature"
+                ) == _guidance_signature(interests, activities, level, goals)
+                mode_was_asked = (
+                    self._fact_value(lead_id, "guidance_delivery_mode_prompted_signature")
+                    == base_signature
+                )
+                if (
+                    len(candidates) > 3
+                    and len(modes) > 1
+                    and asked_signature != base_signature
+                    and not goal_was_asked
+                    and not mode_was_asked
+                    and not language_was_asked
+                ):
+                    self.repository.save_fact(
+                        lead_id,
+                        "guidance_delivery_mode_prompted_signature",
+                        base_signature,
+                        "student",
+                    )
+                    self.repository.update_lead(lead_id, discovery_step="guidance_delivery_mode")
+                    return self._delivery_mode_question(modes)
+            signature = _guidance_signature(
+                interests, activities, level, goals, language_support, delivery_mode
+            )
             confirmed = self._fact_value(lead_id, "guidance_confirmed_signature")
             if confirmed == signature:
                 return self._guidance_recommendation_reply(
@@ -1549,6 +1746,7 @@ class AdmissionsService:
                     level,
                     goals,
                     language_support,
+                    delivery_mode,
                 )
             return self._guidance_reflection(
                 lead_id,
@@ -1558,6 +1756,7 @@ class AdmissionsService:
                 goals,
                 language_support,
                 signature,
+                delivery_mode,
             )
         self.repository.delete_fact(lead_id, "guidance_pending_signature")
         self.repository.update_lead(lead_id, discovery_step="guidance_signal")
@@ -1614,6 +1813,52 @@ class AdmissionsService:
             return self._present_guidance(lead_id)
         return self._language_support_question(candidates, support_options)
 
+    def _guidance_delivery_mode_prompt(self, lead_id: int) -> Reply:
+        courses = self.repository.list_courses(self.tenant_id)
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        if self._student_delivery_mode(lead_id):
+            return self._present_guidance(lead_id)
+        expected_signature = _guidance_signature(
+            interests, activities, level, goals, language_support
+        )
+        if (
+            self._fact_value(lead_id, "guidance_delivery_mode_prompted_signature")
+            != expected_signature
+        ):
+            return self._present_guidance(lead_id)
+        candidates = recommend_courses(
+            courses,
+            interests=interests,
+            activities=activities,
+            learning_goals=goals,
+            language_support_preference=language_support,
+            level=None if level == "any" else level,
+            limit=100,
+        )
+        modes = tuple(
+            mode
+            for mode in ("in_person", "online", "hybrid")
+            if any(mode in match.course.delivery_modes for match in candidates)
+        )
+        if len(candidates) <= 3 or len(modes) <= 1:
+            return self._present_guidance(lead_id)
+        return self._delivery_mode_question(modes)
+
+    @staticmethod
+    def _delivery_mode_question(modes: tuple[str, ...]) -> Reply:
+        labels = {"in_person": "In person", "online": "Online", "hybrid": "Hybrid"}
+        buttons = tuple(
+            (labels[mode], f"guidance:mode:{mode}") for mode in modes[:3] if mode in labels
+        ) + (("Leave format open", "guidance:mode:open"),)
+        return Reply(
+            "The sample catalog lists different study formats for these courses. Does in-person, "
+            "online, or hybrid study matter to you, or should I leave format open? These are "
+            "sample catalog labels, not a promise about a specific schedule or access needs.",
+            buttons,
+        )
+
     @staticmethod
     def _language_support_question(
         candidates: list[CourseMatch], support_options: tuple[str, ...]
@@ -1656,6 +1901,7 @@ class AdmissionsService:
         level: str | None,
         goals: set[str],
         language_support: str | None,
+        delivery_mode: str | None = None,
     ) -> Reply:
         matches = recommend_courses(
             courses,
@@ -1663,10 +1909,22 @@ class AdmissionsService:
             activities=activities,
             learning_goals=goals,
             language_support_preference=language_support,
+            delivery_mode_preference=delivery_mode,
             level=None if level == "any" else level,
             limit=3,
         )
         if not matches:
+            if delivery_mode:
+                return Reply(
+                    "No complete matching sample course lists "
+                    f"{delivery_mode.replace('_', ' ')} study. Would you like to leave format "
+                    "open and see other matches, browse the catalog, or ask staff?",
+                    (
+                        ("Leave format open", "guidance:mode:open"),
+                        ("Browse sample courses", "path:browse"),
+                        ("Ask staff", "handoff:request"),
+                    ),
+                )
             if language_support:
                 return Reply(
                     "No complete matching sample course lists "
@@ -1689,6 +1947,8 @@ class AdmissionsService:
             f"{', '.join(match.reasons)}. Teaching medium listed: {match.course.medium}; "
             f"language support listed: "
             f"{', '.join(match.course.language_support) or 'not specified'}. "
+            f"Study format listed: "
+            f"{', '.join(match.course.delivery_modes).replace('_', ' ') or 'not specified'}. "
             f"Sample entry: {'; '.join(match.course.prerequisites)}."
             for match in matches
         )
@@ -1706,6 +1966,7 @@ def _guidance_signature(
     level: str | None,
     learning_goals: set[str] | None = None,
     language_support_preference: str | None = None,
+    delivery_mode_preference: str | None = None,
 ) -> str:
     context = {
         "interests": sorted(item.casefold() for item in interests),
@@ -1714,6 +1975,9 @@ def _guidance_signature(
         "learning_goals": sorted(item.casefold() for item in learning_goals or set()),
         "language_support_preference": (
             language_support_preference.casefold() if language_support_preference else None
+        ),
+        "delivery_mode_preference": (
+            delivery_mode_preference.casefold() if delivery_mode_preference else None
         ),
     }
     return hashlib.sha256(json.dumps(context, sort_keys=True).encode("utf-8")).hexdigest()
@@ -1899,6 +2163,10 @@ def _goal_slug(goal: str) -> str:
 
 def _language_support_slug(support: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", support.casefold()).strip("-")
+
+
+def _delivery_mode_slug(mode: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", mode.casefold()).strip("_")
 
 
 def _activity_label(activity: str) -> str:

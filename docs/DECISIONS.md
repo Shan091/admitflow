@@ -111,6 +111,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     remain unsure, stop asking the same open question and offer browse, pause, or staff handoff;
     never recommend before the learner shares a relevant preference.
 
+24. **Study format is an optional catalog-backed trade-off.** Ask only when a broad comparable set
+    has more than one recorded delivery mode and no other optional narrowing prompt was used for
+    that fact set. A learner may leave it open; an explicit preference filters recommendations and
+    appears as a catalog-grounded reason. Do not imply a specific schedule, accessibility, or
+    availability. Widen honestly when no complete sample course matches.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

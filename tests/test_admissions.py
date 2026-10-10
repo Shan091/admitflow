@@ -503,6 +503,108 @@ async def test_language_support_question_can_be_skipped_without_repeating(tmp_pa
 
 
 @pytest.mark.asyncio
+async def test_delivery_mode_is_optional_resumable_and_filters_recommendations(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+            )
+            for course in original_courses
+        ],
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+
+    prompt = service._present_guidance(lead_id)
+
+    assert "different study formats" in prompt.text
+    assert {data for _, data in prompt.buttons if data.startswith("guidance:mode:")} == {
+        "guidance:mode:in_person",
+        "guidance:mode:online",
+        "guidance:mode:hybrid",
+        "guidance:mode:open",
+    }
+    service.pause_discovery(lead_id)
+    resumed = service.resume_discovery(lead_id)
+    assert resumed == prompt
+
+    reflection = await service.choose_guidance_delivery_mode(lead_id, "online")
+    assert "online study" in reflection.text
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+    results = await service.confirm_guidance(lead_id, token)
+
+    assert "matching fictional sample courses" in results.text
+    assert "Study format listed: online" in results.text
+    assert "Study format listed: in person" not in results.text
+    assert any(
+        fact["fact_key"] == "delivery_mode_preference_student" and fact["fact_value"] == "online"
+        for fact in repository.list_facts(lead_id)
+    )
+
+
+@pytest.mark.asyncio
+async def test_delivery_mode_can_be_left_open_and_is_not_repeated(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+            )
+            for course in original_courses
+        ],
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+    prompt = service._present_guidance(lead_id)
+    assert "different study formats" in prompt.text
+
+    skipped = await service.choose_guidance_delivery_mode(lead_id, None)
+
+    assert "Did I get that right" in skipped.text
+    assert not any(
+        fact["fact_key"] == "delivery_mode_preference_student"
+        for fact in repository.list_facts(lead_id)
+    )
+    assert "different study formats" not in skipped.text
+
+
+@pytest.mark.asyncio
 async def test_uniform_support_candidates_do_not_get_language_prompt(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

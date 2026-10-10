@@ -69,6 +69,7 @@ def _course(
     level: str = "diploma",
     activities: tuple[str, ...] = ("making charts",),
     learning_goals: tuple[str, ...] = (),
+    delivery_modes: tuple[str, ...] = ("in_person",),
 ) -> Course:
     return Course(
         id=course_id,
@@ -83,6 +84,7 @@ def _course(
         activities=activities,
         prerequisites=("basic reading",),
         medium="English",
+        delivery_modes=delivery_modes,
         language_support=("Malayalam discussion support",),
         learning_goals=learning_goals,
     )
@@ -143,6 +145,37 @@ def test_explicit_language_support_preference_filters_and_explains_matches() -> 
 
     assert [match.course.id for match in matches] == ["malayalam-support"]
     assert "Lists language support: Malayalam discussion support" in matches[0].reasons
+
+
+def test_explicit_delivery_mode_preference_filters_and_explains_course_matches() -> None:
+    courses = [
+        _course("in-person", ("technology",), delivery_modes=("in_person",)),
+        _course("online", ("technology",), delivery_modes=("online",)),
+        _course("hybrid", ("technology",), delivery_modes=("hybrid",)),
+    ]
+
+    matches = recommend_courses(
+        courses,
+        interests={"technology"},
+        activities=set(),
+        delivery_mode_preference="online",
+    )
+
+    assert [match.course.id for match in matches] == ["online"]
+    assert "Lists study format: online" in matches[0].reasons
+
+
+def test_delivery_mode_without_a_complete_catalog_match_abstains() -> None:
+    courses = [_course("in-person", ("technology",), delivery_modes=("in_person",))]
+
+    matches = recommend_courses(
+        courses,
+        interests={"technology"},
+        activities=set(),
+        delivery_mode_preference="online",
+    )
+
+    assert matches == []
 
 
 def test_recommendations_filter_by_level_and_exclude_incomplete_catalog_items() -> None:
