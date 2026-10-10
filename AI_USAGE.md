@@ -9,7 +9,8 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
 - **Assistance:** Codex added a catalog-grounded first activity/field prompt, a different low-pressure
   recovery on repeated uncertainty, persisted prompt state for resume, and a turn-sequence test.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 127 tests;
-  `git diff --check` passed. Commit and CI are pending.
+  `git diff --check` passed. Commit `06d83aa26ed8cdd7c0435290a43bfd50434de9cd` was pushed, and
+  GitHub Actions `CI` run `38093875063` passed.
 - **Human review:** The flow does not score or label the learner and does not recommend without a
   learner-stated preference.
 

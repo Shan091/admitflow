@@ -9,7 +9,8 @@
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 127 tests;
   `git diff --check` passed. The new sequence test covers first/second uncertainty and resume at
   both stages.
-- **Delivery:** Implementation commit and CI pending.
+- **Delivery:** Pushed as `06d83aa26ed8cdd7c0435290a43bfd50434de9cd`; GitHub Actions `CI` run
+  [38093875063](https://github.com/Shan091/admitflow/actions/runs/38093875063) passed.
 - **Reason:** Give undecided learners a supportive way forward without making them repeat an open
   question or surfacing a course match before enough context exists.
 
