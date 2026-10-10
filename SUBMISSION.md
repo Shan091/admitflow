@@ -6,7 +6,7 @@
 - **Short description:** A Telegram admissions assistant that remembers inquiries, checks
   seeded eligibility rules in code, and answers institution FAQs with fail-closed vector search.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Final implementation commit SHA:** `634579532c8b77ae9f0f8c6da86cb137f9f095d8` (code milestone)
+- **Final implementation commit SHA:** `41c0b4cd389ce2457e887b26d415a29296e90bec`
 - **Working demo:** Local dashboard and `/health` run without credentials. Live Telegram bot
   username and walkthrough are pending bot-token setup and a real rehearsal.
 - **Demo access requirements:** Telegram account; local `.env` with a bot token and OpenAI API key
@@ -30,8 +30,8 @@
 - **Checks performed and results:** `uv sync --locked --python 3.12` and
   `uv lock --check --python 3.12` passed. Latest local `bash scripts/verify.sh` passed (Ruff lint,
   formatting, strict mypy, and 25 pytest tests); a local Uvicorn smoke check returned `/health`
-  `200` and dashboard `200`; `git diff --check` passed. GitHub Actions passed on code commit
-  `634579532c8b77ae9f0f8c6da86cb137f9f095d8` (24 tests); follow-up check is pending push.
+  `200` and dashboard `200`; `git diff --check` passed. GitHub Actions passed on build commit
+  `41c0b4cd389ce2457e887b26d415a29296e90bec` (25 tests).
 - **Live integration checks:** Not run; `OPENAI_API_KEY` and `TELEGRAM_BOT_TOKEN` are not configured
   in this environment. Automated tests use local SQLite and fake embeddings; no API credits spent.
 - **Known limitations:** Single fictional tenant, seeded FAQ corpus, local dashboard, no payments,

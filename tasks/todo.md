@@ -31,5 +31,5 @@ acceptance criteria pass and the corresponding milestone is committed.
 
 - [x] Run `bash scripts/verify.sh`; record actual output and results in `CHANGELOG.md` and `SUBMISSION.md`.
 - [x] Review diff, claims, credentials, and AI usage record; ensure no real applicant data is seeded.
-- [ ] Confirm GitHub Actions result for the pushed commit SHA and update submission record.
+- [x] Confirm GitHub Actions result for the pushed build commit and record its exact SHA/results.
 - [ ] Rehearse demo, record limitations and demo access steps, and finalize submission metadata.

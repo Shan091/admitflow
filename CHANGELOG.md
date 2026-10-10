@@ -22,7 +22,7 @@
 
 ## 2026-10-10 — smoke check and verified task status
 
-- **Time:** 23:52 IST
+- **Time:** 23:54 IST
 - **Change:** Added environment-setting coverage, marked locally verified core/Telegram/vector
   tasks complete, and kept live Telegram/OpenAI setup and threshold calibration open.
 - **Why:** Make the task board reflect evidence already gathered while separating deterministic
@@ -31,8 +31,8 @@
 - **Validation:** Latest local `bash scripts/verify.sh` passed with 25 pytest tests; locked
   dependencies and `git diff --check` passed. A local Uvicorn process returned `GET /health`
   `200` with `{"status":"ok"}` and dashboard `GET /` `200`. GitHub Actions passed on implementation
-  SHA `634579532c8b77ae9f0f8c6da86cb137f9f095d8` (24 tests). A follow-up workflow for the newer
-  test/checklist commit will be checked after pushing it.
+  SHA `634579532c8b77ae9f0f8c6da86cb137f9f095d8` (24 tests) and follow-up build SHA
+  `41c0b4cd389ce2457e887b26d415a29296e90bec` (25 tests).
 - **Limitations:** Live Telegram and OpenAI calls remain untested because credentials are not
   configured; threshold calibration, real demo rehearsal, and final participant details remain open.
 
