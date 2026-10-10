@@ -11,6 +11,8 @@
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests.
   Regression coverage includes `other`, `out_of_scope`, and empty `discovery` extractions plus the
   Telegram text-handler path. No live or paid API calls were made.
+- **Delivery:** Pushed as `7a02b9cf6b977d8534336056fe54c50266975fb6`; GitHub Actions `CI` run
+  [38096233572](https://github.com/Shan091/admitflow/actions/runs/38096233572) passed.
 - **Reason:** A conversational interruption should be acknowledged without treating it as a poll
   answer or making the learner see the same confirmation prompt again.
 

@@ -13,7 +13,9 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   Tests cover `other`, `out_of_scope`, and empty `discovery` model results, including Telegram text
   handling.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests.
-  No live or paid API calls were made.
+  Commit `7a02b9cf6b977d8534336056fe54c50266975fb6` was pushed, and GitHub Actions `CI` run
+  [38096233572](https://github.com/Shan091/admitflow/actions/runs/38096233572) passed. No live or
+  paid API calls were made.
 - **Human review:** This keeps AdmitFlow focused on course guidance rather than answering unrelated
   creative requests, while no longer repeating the in-progress course question.
 
