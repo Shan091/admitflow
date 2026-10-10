@@ -3,6 +3,15 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — preserve guided-exploration state on resume
+
+- **Task:** Keep guided exploration distinct from known-field selection when pausing and resuming.
+- **Assistance:** Codex traced the field-choice/resume path, found that the shared helper overwrote
+  the `explore` step, and added explicit step preservation plus a turn-sequence regression test.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 124 tests;
+  `git diff --check` passed. Commit and CI are pending.
+- **Human review:** No claims or course facts changed; the demo remains fictional.
+
 ## 2026-10-11 — make preference corrections category-scoped
 
 - **Task:** Preserve unaffected student/parent guidance facts while supporting corrections and

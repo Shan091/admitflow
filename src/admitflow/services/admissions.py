@@ -17,6 +17,12 @@ from admitflow.domain.qualification import assess_eligibility
 from admitflow.services.contracts import DiscoveryInterpreter, IntentRouter
 from admitflow.services.retrieval import RetrievalService
 
+_FIELD_CHOICES_PROMPT = "Which field interests you most?"
+_EXPLORE_CHOICES_PROMPT = (
+    "What kinds of topics or activities sound interesting? Pick one to start; "
+    "you can skip or change it."
+)
+
 
 @dataclass(frozen=True, slots=True)
 class Reply:
@@ -521,13 +527,9 @@ class AdmissionsService:
                 tuple((course.name, f"course:{course.id}") for course in courses),
             )
         if path == "field":
-            return self._field_choices(lead_id, "Which field interests you most?")
+            return self._field_choices(lead_id, _FIELD_CHOICES_PROMPT, "field")
         if path == "explore":
-            return self._field_choices(
-                lead_id,
-                "What kinds of topics or activities sound interesting? Pick one to start; "
-                "you can skip or change it.",
-            )
+            return self._field_choices(lead_id, _EXPLORE_CHOICES_PROMPT, "explore")
         return self.browse(lead_id)
 
     def choose_speaker(self, lead_id: int, speaker: str) -> Reply:
@@ -550,8 +552,8 @@ class AdmissionsService:
         self.repository.save_fact(lead_id, "active_speaker", "student", "student")
         return self.select_course(lead_id, course_id)
 
-    def _field_choices(self, lead_id: int, prompt: str) -> Reply:
-        self.repository.update_lead(lead_id, discovery_step="field")
+    def _field_choices(self, lead_id: int, prompt: str, step: str = "field") -> Reply:
+        self.repository.update_lead(lead_id, discovery_step=step)
         courses = self.repository.list_courses(self.tenant_id)
         fields = sorted({course.field for course in courses if course.field})
         buttons = tuple(
@@ -743,8 +745,10 @@ class AdmissionsService:
             return Reply("Send /start to begin a new demo conversation.")
         step = str(lead.get("discovery_step") or "")
         self.repository.update_lead(lead_id, lifecycle_stage="discovering")
-        if step in {"field", "explore"}:
-            return self._field_choices(lead_id, "Let's continue. Which field interests you?")
+        if step == "field":
+            return self._field_choices(lead_id, _FIELD_CHOICES_PROMPT, "field")
+        if step == "explore":
+            return self._field_choices(lead_id, _EXPLORE_CHOICES_PROMPT, "explore")
         if step == "level":
             return self._level_choices(lead_id)
         if step == "activity":
@@ -769,9 +773,7 @@ class AdmissionsService:
             ):
                 self.repository.delete_fact(lead_id, "guidance_pending_signature")
                 self.repository.update_lead(lead_id, discovery_step="explore")
-                return self._field_choices(
-                    lead_id, "Let's continue. What field or topic would you like to explore?"
-                )
+                return self._field_choices(lead_id, _EXPLORE_CHOICES_PROMPT, "explore")
             signature = _guidance_signature(*context)
             return self._guidance_reflection(lead_id, *context, signature)
         if step == "guidance_goal":

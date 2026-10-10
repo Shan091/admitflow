@@ -67,6 +67,10 @@ human escalation, and operational requirements are verified.
   replacements invalidate old recommendation confirmations. Parent-only notes remain attributed
   separately and do not rewrite the learner's recommendation signature. This is still not a general
   fact-provenance or conflict-resolution system and needs broader dialogue evaluation.
+- Field and guided-exploration entry paths already expose their intended field choices. However,
+  the shared helper overwrites the `explore` step as `field`, and resume changes the exploration
+  prompt to a field-only question. Correcting this is a focused entry-path/resume fix, not the
+  broader multi-turn policy gap described below.
 
 ## v1 lifecycle mapping
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-11 — restore the guided-exploration prompt on resume
+
+- **Change:** Preserve `explore` as its own discovery step when showing field choices. Resume now
+  returns the same open exploration question and choice set instead of replacing it with a
+  field-only prompt. Known-field selection and back-to-field keep their separate state.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 124 tests;
+  `git diff --check` passed. New coverage asserts the field choices, browse/pause actions, and exact
+  exploration prompt/options after resume.
+- **Delivery:** Implementation commit and CI pending.
+- **Reason:** Learners who are unsure can return to the question that fits their chosen exploration
+  path after pausing, without being pushed into a different flow.
+
 ## 2026-10-11 — preserve unrelated preferences during corrections
 
 - **Change:** A correction now replaces values only in categories it explicitly restates, preserves

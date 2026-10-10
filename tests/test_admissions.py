@@ -1561,6 +1561,42 @@ def test_discovery_pause_and_resume_restore_the_pending_question(tmp_path: Path)
     assert repository.get_lead(lead_id)["lifecycle_stage"] == "discovering"  # type: ignore[index]
 
 
+def test_field_and_explore_paths_keep_their_choices_and_resume_prompt(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    expected_fields = {
+        "field:tech/data",
+        "field:business/accounting",
+        "field:design/media",
+        "field:hospitality/tourism",
+        "field:vocational-skills",
+    }
+    expected_actions = {"path:browse", "discovery:pause"}
+
+    field_reply = service.begin_path(lead_id, "field")
+    assert field_reply.text == "Which field interests you most?"
+    assert {data for _, data in field_reply.buttons} == expected_fields | expected_actions
+    assert {data for _, data in service.back_to_field(lead_id).buttons} == (
+        expected_fields | expected_actions
+    )
+
+    explore_reply = service.begin_path(lead_id, "explore")
+    assert "What kinds of topics or activities sound interesting?" in explore_reply.text
+    assert {data for _, data in explore_reply.buttons} == expected_fields | expected_actions
+    service.pause_discovery(lead_id)
+    resumed = service.resume_discovery(lead_id)
+    assert resumed.text == explore_reply.text
+    assert resumed.buttons == explore_reply.buttons
+    assert repository.get_lead(lead_id)["discovery_step"] == "explore"  # type: ignore[index]
+
+
 def test_parent_preference_is_attributed_and_waits_for_student_interest(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
