@@ -9,7 +9,9 @@
   changing the code-computed eligibility result.
 - **Files:** `tests/test_telegram.py`, `tests/test_payments.py`.
 - **Validation:** `bash scripts/verify.sh` passed with Ruff, formatting, strict mypy, and 32 pytest
-  tests; `git diff --check` passed. No live API call was made. GitHub Actions is pending push.
+  tests; `git diff --check` passed. No live API call was made. GitHub Actions passed for pushed SHA
+  `5c04b5982e7d97d0fccf75236605b9e466f8c9e0`:
+  https://github.com/Shan091/admitflow/actions/runs/38076330518
 - **Limitations:** Razorpay test credentials and a public webhook URL are still needed to rehearse
   the payment flow end to end.
 
@@ -25,9 +27,9 @@
 - **Files:** `src/admitflow/`, `tests/test_app.py`, `tests/test_payments.py`, `.env.example`,
   `README.md`, `SPEC.md`, `SUBMISSION.md`, `docs/DECISIONS.md`, `tasks/`, `AI_USAGE.md`,
   `pyproject.toml`, and `uv.lock`.
-- **Validation:** `uv sync --locked --python 3.12` passed; `bash scripts/verify.sh` passed (Ruff,
-  formatting, strict mypy, and 30 pytest tests); `git diff --check` passed. No live Razorpay,
-  Telegram, or OpenAI request was made. GitHub Actions result is pending the push.
+- **Validation:** `uv sync --locked --python 3.12` passed; latest `bash scripts/verify.sh` passed
+  (Ruff, formatting, strict mypy, and 32 pytest tests); `git diff --check` passed. No live
+  Razorpay, Telegram, or OpenAI request was made.
 - **Limitations:** Payment links require all three Razorpay test credentials and a public webhook
   URL for status updates; payment creation cannot be retried automatically after an ambiguous API
   failure. Staff login is one local demo account, not production identity management.
