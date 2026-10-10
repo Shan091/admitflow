@@ -123,6 +123,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     continuation sets the selected course. Known-course selection stays direct. Stale detail/list
     callbacks must revalidate the current confirmed learner facts and ranked matches.
 
+26. **Non-informative turns are interruptions, not answers to the pending prompt.** If text adds
+    no explicit preference, correction, or uncertainty and is not a routed FAQ/course/staff action,
+    acknowledge the request without replaying the same discovery poll. Preserve facts and pending
+    state, and offer relevant next actions. When processing the message cannot be classified or
+    handled, do not invent a preference.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

@@ -344,11 +344,7 @@ class AdmissionsService:
         ):
             self.repository.save_fact(lead_id, "guidance_confirmed_signature", signature, "student")
             self.repository.delete_fact(lead_id, "guidance_pending_signature")
-        return await self._handle_discovery_turn(
-            lead_id,
-            DiscoveryTurn("discovery", None, (), None, (), (), False, False),
-            "",
-        )
+        return self._present_guidance(lead_id)
 
     async def revise_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
         """Keep the learner's facts but ask what they want to correct or add."""
@@ -367,11 +363,7 @@ class AdmissionsService:
         if not pending:
             return Reply("That change prompt has expired. Your current course path is unchanged.")
         if pending != signature or confirmation_token != _guidance_token(signature):
-            return await self._handle_discovery_turn(
-                lead_id,
-                DiscoveryTurn("discovery", None, (), None, (), (), False, False),
-                "",
-            )
+            return self._present_guidance(lead_id)
         self.repository.delete_fact(lead_id, "guidance_pending_signature")
         self.repository.update_lead(lead_id, discovery_step="guidance_revision")
         return self._guidance_revision_prompt()
@@ -1379,12 +1371,7 @@ class AdmissionsService:
         if turn.intent == "staff_request":
             return self.handoff(lead_id, "Student requested a staff member.")
         if turn.intent == "out_of_scope":
-            return Reply(
-                "This demo explores courses offered in its fictional institution catalog. It "
-                "doesn't predict careers, jobs, or courses outside that catalog. I can show the "
-                "sample courses or flag your question for staff.",
-                (("Browse sample courses", "path:browse"), ("Ask staff", "handoff:request")),
-            )
+            return self._noninformative_turn_reply(lead_id, turn.intent)
         if turn.intent == "knowledge_question":
             result = await self.retrieval.answer(self.tenant_id, text)
             if result is None:
@@ -1408,6 +1395,8 @@ class AdmissionsService:
                 "Try its full name, choose a field, or browse.",
                 (("Choose a course", "path:course"), ("Browse courses", "path:browse")),
             )
+        if not _has_discovery_signal(turn):
+            return self._noninformative_turn_reply(lead_id, turn.intent)
 
         if turn.correct_previous:
             self._retract_discovery_preferences(
@@ -1662,6 +1651,66 @@ class AdmissionsService:
         ):
             return self._guidance_revision_prompt()
         return self._present_guidance(lead_id)
+
+    def _noninformative_turn_reply(self, lead_id: int, intent: str) -> Reply:
+        """Acknowledge a turn without replaying the question currently on screen."""
+        lead = self.repository.get_lead(lead_id)
+        pending = self._fact_value(lead_id, "guidance_pending_signature")
+        if (
+            lead
+            and lead["discovery_step"] == "guidance_confirmation"
+            and pending
+            and not self._pending_guidance_matches_current(lead_id, pending)
+        ):
+            pending = None
+        if lead and lead["discovery_step"] == "guidance_confirmation" and pending:
+            reason = (
+                "That request is outside this course-guidance demo. "
+                if intent in {"other", "out_of_scope"}
+                else "I couldn't use that message to update your course preferences. "
+            )
+            return Reply(
+                reason
+                + "I saved the details you shared. You can continue with those answers, change "
+                "them, or browse sample courses when you're ready.",
+                (
+                    (
+                        "Continue with my current answers",
+                        f"guidance:confirm:{_guidance_token(pending)}",
+                    ),
+                    ("Change or add answers", f"guidance:revise:{_guidance_token(pending)}"),
+                    ("Browse sample courses", "path:browse"),
+                ),
+            )
+        reason = (
+            "That request is outside this course-guidance demo. "
+            if intent in {"other", "out_of_scope"}
+            else "I couldn't find a course preference in that message. "
+        )
+        return Reply(
+            reason
+            + "I can help explore sample courses, answer confirmed admissions questions, or flag "
+            "something for staff. Your earlier answers are still saved.",
+            (
+                ("Browse sample courses", "path:browse"),
+                ("Choose a course-guidance path", "menu:start"),
+                ("Ask staff", "handoff:request"),
+            ),
+        )
+
+    def _pending_guidance_matches_current(self, lead_id: int, pending: str) -> bool:
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        signature = _guidance_signature(
+            interests,
+            activities,
+            level,
+            goals,
+            language_support,
+            self._student_delivery_mode(lead_id),
+        )
+        return pending == signature
 
     def _present_guidance(self, lead_id: int) -> Reply:
         courses = self.repository.list_courses(self.tenant_id)
@@ -2054,6 +2103,22 @@ class AdmissionsService:
             "like to explore?",
             tuple((match.course.name, f"guidance:course:{match.course.id}") for match in matches),
         )
+
+
+def _has_discovery_signal(turn: DiscoveryTurn) -> bool:
+    """Whether this turn adds a learner preference, correction, or explicit uncertainty."""
+    return bool(
+        turn.correct_previous
+        or turn.fields
+        or turn.education_level
+        or turn.interests
+        or turn.activities
+        or turn.learning_goals
+        or turn.language_support_preference
+        or turn.delivery_mode_preference
+        or turn.retracted_preferences
+        or turn.unsure
+    )
 
 
 def _guidance_signature(

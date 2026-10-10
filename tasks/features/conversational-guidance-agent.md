@@ -193,6 +193,10 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   code-verified; unsupported levels or missing data create a truthful handoff.
 - A learner can interrupt discovery to ask an FAQ/fee question, change language/path, pause, resume,
   request staff, or delete data without the bot becoming stuck in a questionnaire.
+- A message that adds no preference, correction, or explicit uncertainty does not silently get
+  treated as an answer to the current poll. Acknowledge unrelated/non-informative text, keep saved
+  facts and the pending step intact, and offer relevant actions without repeating the same question.
+  FAQ, fee, browse, and staff requests continue through their explicit interrupt routes.
 - After AI opt-out, typed content does not go to the discovery model, intent router, or embedder.
 - Failure of extraction, retrieval, database, messaging, or the model does not create partial facts,
   fabricate an answer, send duplicate payment actions, or strand the learner without an available
@@ -202,6 +206,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 
 - Add turn-sequence tests rather than testing only isolated extractions: vague opening, follow-up,
   correction, known-course shortcut, interest change, recommendation, interruption, and resume.
+- Test unrelated free text during each pending guidance state (including confirmation), zero-signal
+  model extractions across `other`/`out_of_scope`/`discovery`, and verify no repeated poll, lost
+  facts, or accidental state advance through Telegram text handling.
 - Verify study-goal extraction, metadata completeness, skip, correction, signature freshness, and
   expected-course ranking tests for the optional goal question.
 - Verify language-support extraction allowlisting and preference behavior, including no prompt for

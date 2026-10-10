@@ -7,6 +7,7 @@ import pytest
 from admitflow.adapters.sqlite import Repository
 from admitflow.adapters.telegram import callback_handler, keyboard, start_command, text_handler
 from admitflow.adapters.vector_store import VectorStore
+from admitflow.domain.models import Course, DiscoveryTurn
 from admitflow.services.admissions import AdmissionsService, Reply
 from admitflow.services.retrieval import RetrievalService
 
@@ -221,6 +222,58 @@ async def test_guided_course_detail_callback_does_not_enter_qualification(
         for row in message.sent[-1][1].inline_keyboard
         for button in row
     )
+
+
+@pytest.mark.asyncio
+async def test_unrelated_text_during_confirmation_gets_focused_recovery_not_same_prompt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+                delivery_modes=("in_person",),
+            )
+            for course in original_courses
+        ],
+    )
+    lead_id, _ = admissions.start("42", "sample")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+    repository.save_fact(lead_id, "education_level_student", "undergraduate", "student")
+    repository.update_lead(lead_id, education_level="undergraduate")
+    reflection = admissions._present_guidance(lead_id)
+
+    class FixedInterpreter:
+        async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
+            assert text == "no can you write me a story"
+            return DiscoveryTurn("other", None, (), None, (), (), False, False)
+
+    admissions.discovery_interpreter = FixedInterpreter()
+    message = FakeMessage("no can you write me a story")
+    update = SimpleNamespace(
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=152,
+    )
+    await text_handler(update, context)
+
+    response, markup = message.sent[-1]
+    assert "Did I get that right" in reflection.text
+    assert "Did I get that right" not in response
+    assert "outside this course-guidance demo" in response
+    assert repository.get_lead(lead_id)["discovery_step"] == "guidance_confirmation"
+    assert markup is not None
+    callbacks = {button.callback_data for row in markup.inline_keyboard for button in row}
+    assert any(str(callback).startswith("guidance:confirm:") for callback in callbacks)
+    assert any(str(callback).startswith("guidance:revise:") for callback in callbacks)
+    assert "path:browse" in callbacks
 
 
 @pytest.mark.asyncio

@@ -1,5 +1,6 @@
 from dataclasses import replace
 from pathlib import Path
+from typing import Literal
 
 import pytest
 
@@ -677,6 +678,73 @@ async def test_guided_match_opens_course_details_before_explicit_eligibility_ste
     next_step = service.select_course(lead_id, selected_detail_callback)
     assert "Have you completed Grade 12" in next_step.text
     assert repository.get_lead(lead_id)["selected_course_id"] == selected_detail_callback
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("intent", ["other", "discovery", "out_of_scope"])
+async def test_non_course_request_does_not_repeat_pending_guidance_confirmation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    intent: Literal["other", "discovery", "out_of_scope"],
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+                delivery_modes=("in_person",),
+            )
+            for course in original_courses
+        ],
+    )
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(intent, None, (), None, (), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+    repository.save_fact(lead_id, "education_level_student", "undergraduate", "student")
+    repository.update_lead(lead_id, education_level="undergraduate")
+    reflection = service._present_guidance(lead_id)
+    pending_signature = next(
+        fact["fact_value"]
+        for fact in repository.list_facts(lead_id)
+        if fact["fact_key"] == "guidance_pending_signature"
+    )
+
+    reply = await service.free_text(lead_id, "no can you write me a story", None)
+
+    assert "Did I get that right" not in reply.text
+    if intent in {"other", "out_of_scope"}:
+        assert "outside this course-guidance demo" in reply.text
+    else:
+        assert "couldn't use that message to update" in reply.text
+    assert "Did I get that right" in reflection.text
+    assert any(data.startswith("guidance:confirm:") for _, data in reply.buttons)
+    assert any(data.startswith("guidance:revise:") for _, data in reply.buttons)
+    assert any(data == "path:browse" for _, data in reply.buttons)
+    assert repository.get_lead(lead_id)["discovery_step"] == "guidance_confirmation"
+    assert (
+        next(
+            fact["fact_value"]
+            for fact in repository.list_facts(lead_id)
+            if fact["fact_key"] == "guidance_pending_signature"
+        )
+        == pending_signature
+    )
 
 
 @pytest.mark.asyncio

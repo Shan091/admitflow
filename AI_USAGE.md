@@ -3,6 +3,20 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — stop replaying a pending poll for unrelated messages
+
+- **Task:** Fix the guidance conversation behavior shown when an unrelated typed request repeated
+  the same recommendation-confirmation question.
+- **Assistance:** Codex traced the OpenAI structured extraction result into the admissions turn
+  handler, added a no-signal interruption response that preserves saved preferences and pending
+  confirmation, and corrected stale confirmation/revision callbacks to refresh from current state.
+  Tests cover `other`, `out_of_scope`, and empty `discovery` model results, including Telegram text
+  handling.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests.
+  No live or paid API calls were made.
+- **Human review:** This keeps AdmitFlow focused on course guidance rather than answering unrelated
+  creative requests, while no longer repeating the in-progress course question.
+
 ## 2026-10-11 — separate recommendation exploration from course selection
 
 - **Task:** Let learners inspect a matched course and compare options before entering qualification.

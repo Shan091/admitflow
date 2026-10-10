@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-11 — handle unrelated text without repeating a guidance poll
+
+- **Change:** A free-text turn with no preference, correction, or explicit uncertainty no longer
+  falls through to the same pending discovery question. Unrelated/out-of-scope requests receive a
+  focused scope response and relevant actions; non-informative messages get a clarification path.
+  Pending guidance confirmation and saved preferences remain intact. Stale confirm/revise buttons
+  now refresh current guidance directly rather than passing a synthetic empty turn through the
+  text interpreter.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests.
+  Regression coverage includes `other`, `out_of_scope`, and empty `discovery` extractions plus the
+  Telegram text-handler path. No live or paid API calls were made.
+- **Reason:** A conversational interruption should be acknowledged without treating it as a poll
+  answer or making the learner see the same confirmation prompt again.
+
 ## 2026-10-11 — inspect a recommendation before committing to a course
 
 - **Change:** Guided recommendation buttons now open catalog-verified fictional course details,
