@@ -1,3 +1,4 @@
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -389,6 +390,270 @@ async def test_broad_match_gets_optional_goal_question_and_goal_filters_results(
 
 
 @pytest.mark.asyncio
+async def test_broad_match_can_explore_catalog_language_support_and_resume(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level=None,
+            interests=("technology",),
+            activities=("working with numbers",),
+            unsure=False,
+            correct_previous=False,
+            learning_goals=("analyze data",),
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    prompt = await service.free_text(lead_id, "I want to analyze data", None)
+
+    assert "English as the teaching medium" in prompt.text
+    assert "Recorded language support differs" in prompt.text
+    support_callbacks = {
+        data for _, data in prompt.buttons if data.startswith("guidance:language:")
+    }
+    assert "guidance:language:english-support-sessions" in support_callbacks
+    assert "guidance:language:malayalam-discussion-support" in support_callbacks
+    service.pause_discovery(lead_id)
+    resumed = service.resume_discovery(lead_id)
+    assert resumed.text == prompt.text
+    assert resumed.buttons == prompt.buttons
+
+    reflection = await service.choose_guidance_language_support(
+        lead_id, "malayalam-discussion-support"
+    )
+    assert "you prefer courses listing Malayalam discussion support" in reflection.text
+    old_token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+
+    corrected = await service.choose_guidance_language_support(lead_id, "english-support-sessions")
+    new_token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in corrected.buttons
+        if data.startswith("guidance:confirm:")
+    )
+    assert new_token != old_token
+    stale = await service.confirm_guidance(lead_id, old_token)
+    assert "you prefer courses listing English support sessions" in stale.text
+    results = await service.confirm_guidance(lead_id, new_token)
+    assert "Lists language support: English support sessions" in results.text
+    assert "Teaching medium listed: English" in results.text
+    assert "language support listed: English support sessions" in results.text
+    assert "No complete matching sample course" not in results.text
+
+
+@pytest.mark.asyncio
+async def test_language_support_question_can_be_skipped_without_repeating(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level=None,
+            interests=("technology",),
+            activities=("working with numbers",),
+            unsure=False,
+            correct_previous=False,
+            learning_goals=("analyze data",),
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    prompt = await service.free_text(lead_id, "I want to analyze data", None)
+
+    skipped = await service.choose_guidance_language_support(lead_id, None)
+
+    assert "Did I get that right" in skipped.text
+    assert "Recorded language support differs" not in skipped.text
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in skipped.buttons
+        if data.startswith("guidance:confirm:")
+    )
+    results = await service.confirm_guidance(lead_id, token)
+    assert "matching fictional sample courses" in results.text
+    assert not any(
+        item["fact_key"] == "language_support_preference_student"
+        for item in repository.list_facts(lead_id)
+    )
+    assert any(data == "guidance:language:open" for _, data in prompt.buttons)
+
+
+@pytest.mark.asyncio
+async def test_uniform_support_candidates_do_not_get_language_prompt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(course, language_support=("English support sessions",))
+            for course in original_courses
+        ],
+    )
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level=None,
+            interests=("technology",),
+            activities=("working with numbers",),
+            unsure=False,
+            correct_previous=False,
+            learning_goals=("analyze data",),
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(lead_id, "I want to analyze data", None)
+
+    assert "Recorded language support differs" not in reply.text
+    assert not any(data.startswith("guidance:language:") for _, data in reply.buttons)
+
+
+@pytest.mark.asyncio
+async def test_language_preference_statement_is_extracted_not_routed_as_faq(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level=None,
+            interests=("technology",),
+            activities=("working with numbers",),
+            unsure=False,
+            correct_previous=False,
+            learning_goals=("analyze data",),
+            language_support_preference="Malayalam discussion support",
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(
+        lead_id, "I prefer Malayalam discussion support while studying data", None
+    )
+
+    assert interpreter.calls
+    assert "you prefer courses listing Malayalam discussion support" in reply.text
+    assert any(
+        item["fact_key"] == "language_support_preference_student"
+        and item["fact_value"] == "Malayalam discussion support"
+        for item in repository.list_facts(lead_id)
+    )
+
+
+@pytest.mark.asyncio
+async def test_unlisted_teaching_medium_request_gets_catalog_boundary_not_inference(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(lead_id, "I need Malayalam as the medium of instruction", None)
+
+    assert "does not confirm the medium or proficiency rules" in reply.text
+    assert not any(
+        fact["fact_key"] == "language_support_preference_student"
+        for fact in repository.list_facts(lead_id)
+    )
+
+
+@pytest.mark.asyncio
+async def test_no_language_support_match_can_be_relaxed_after_confirmation(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level=None,
+            interests=("technology",),
+            activities=("working with numbers",),
+            unsure=False,
+            correct_previous=False,
+            learning_goals=("analyze data",),
+            language_support_preference="Hindi discussion support",
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    reflection = await service.free_text(lead_id, "I want to analyze data", None)
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+
+    no_match = await service.confirm_guidance(lead_id, token)
+
+    assert "No complete matching sample course lists Hindi discussion support" in no_match.text
+    widened = await service.choose_guidance_language_support(lead_id, None)
+    assert "matching fictional sample courses" in widened.text
+    assert "Lists language support: Hindi discussion support" not in widened.text
+
+
+@pytest.mark.asyncio
 async def test_skipping_goal_question_does_not_ask_it_again(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
@@ -750,6 +1015,7 @@ async def test_natural_language_known_course_enters_existing_course_flow(tmp_pat
     reply = await service.free_text(lead_id, f"I already know I want {course.name}", None)
 
     assert "Grade 12" in reply.text
+    assert "Recorded language support differs" not in reply.text
     assert repository.get_lead(lead_id)["selected_course_id"] == course.id  # type: ignore[index]
     assert not any(
         fact["fact_key"].startswith(("interest_field", "interest_terms", "activity_terms"))

@@ -29,6 +29,12 @@ class _DiscoveryPayload(BaseModel):
     learning_goals: list[str] = Field(
         description="Exact catalog learning-goal labels the user explicitly wants to pursue."
     )
+    language_support_preference: str | None = Field(
+        description=(
+            "One exact catalog language-support label explicitly preferred, or null. "
+            "Do not infer language proficiency or confuse discussion support with teaching medium."
+        )
+    )
     unsure: bool = Field(
         description="Whether the user explicitly says they are unsure or exploring."
     )
@@ -84,6 +90,7 @@ class OpenAIAdapter:
         interest_values = sorted({item for course in courses for item in course.interests})
         activity_values = sorted({item for course in courses for item in course.activities})
         goal_values = sorted({item for course in courses for item in course.learning_goals})
+        support_values = sorted({item for course in courses for item in course.language_support})
         request = {
             "current_user_message": text,
             "catalog_course_ids_and_names": course_options,
@@ -98,6 +105,7 @@ class OpenAIAdapter:
             "allowed_interest_terms": interest_values,
             "allowed_activity_terms": activity_values,
             "allowed_learning_goals": goal_values,
+            "allowed_language_supports": support_values,
         }
         response = await self.client.responses.parse(
             model=self.decisions_model,
@@ -111,6 +119,9 @@ class OpenAIAdapter:
                 "and study goals the user explicitly states; a goal must exactly match the "
                 "supplied course goal vocabulary. If they correct an earlier preference, set "
                 "correct_previous true. Do not infer job outcomes or occupations. "
+                "Only record an exact language-support label when the user explicitly prefers it. "
+                "Teaching medium and discussion support are different facts; never infer language "
+                "proficiency. "
                 "Classify unrelated career/profession requests outside the institution catalog as "
                 "out_of_scope. Do not generate user-facing advice or a recommendation."
             ),
@@ -131,6 +142,7 @@ class OpenAIAdapter:
         valid_interests = {value.casefold(): value for value in interest_values}
         valid_activities = {value.casefold(): value for value in activity_values}
         valid_goals = {value.casefold(): value for value in goal_values}
+        valid_support = {value.casefold(): value for value in support_values}
         levels = {
             "vocational_certificate",
             "diploma",
@@ -161,6 +173,11 @@ class OpenAIAdapter:
                 value
                 for raw in extracted.learning_goals
                 if (value := valid_goals.get(raw.casefold())) is not None
+            ),
+            language_support_preference=(
+                valid_support.get(extracted.language_support_preference.casefold())
+                if extracted.language_support_preference
+                else None
             ),
         )
 

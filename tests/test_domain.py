@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from admitflow.domain.discovery import has_sufficient_guidance_context, recommend_courses
@@ -121,6 +123,26 @@ def test_explicit_study_goal_filters_and_explains_course_matches() -> None:
 
     assert [match.course.id for match in matches] == ["data"]
     assert "Supports your study goal: analyze data" in matches[0].reasons
+
+
+def test_explicit_language_support_preference_filters_and_explains_matches() -> None:
+    courses = [
+        _course("malayalam-support", ("technology",)),
+        replace(
+            _course("english-support", ("technology",)),
+            language_support=("English support sessions",),
+        ),
+    ]
+
+    matches = recommend_courses(
+        courses,
+        interests={"technology"},
+        activities={"making charts"},
+        language_support_preference="Malayalam discussion support",
+    )
+
+    assert [match.course.id for match in matches] == ["malayalam-support"]
+    assert "Lists language support: Malayalam discussion support" in matches[0].reasons
 
 
 def test_recommendations_filter_by_level_and_exclude_incomplete_catalog_items() -> None:

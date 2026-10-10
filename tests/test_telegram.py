@@ -155,6 +155,40 @@ async def test_course_callback_updates_lead_and_persists_exchange(tmp_path: Path
 
 
 @pytest.mark.asyncio
+async def test_language_support_callback_records_catalog_option(tmp_path: Path) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("42", "sample")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "working with numbers", "student")
+    repository.save_fact(lead_id, "learning_goals_student", "analyze data", "student")
+    message = FakeMessage()
+    answered = False
+
+    async def answer() -> None:
+        nonlocal answered
+        answered = True
+
+    update = SimpleNamespace(
+        callback_query=SimpleNamespace(
+            answer=answer, data="guidance:language:malayalam-discussion-support"
+        ),
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=145,
+    )
+
+    await callback_handler(update, context)
+
+    assert answered
+    assert "you prefer courses listing Malayalam discussion support" in message.sent[-1][0]
+    assert any(
+        fact["fact_key"] == "language_support_preference_student"
+        and fact["fact_value"] == "Malayalam discussion support"
+        for fact in repository.list_facts(lead_id)
+    )
+
+
+@pytest.mark.asyncio
 async def test_exploration_callbacks_recommend_and_language_choice_persists(tmp_path: Path) -> None:
     repository, _, context = make_runtime(tmp_path)
     message = FakeMessage()

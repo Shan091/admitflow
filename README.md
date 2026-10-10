@@ -105,9 +105,11 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
 1. Register the Telegram webhook as described above, then send `/start` to the configured bot.
 2. Read the OpenAI processing notice and use fictional demo text only; no separate consent step is
    required. Free-text course discovery is enabled by default; describe a known course, interest,
-   activity, study goal, or study level, or use the shortcuts. Turn OpenAI processing off to
-   continue with buttons only; it can be turned back on. A learner can pause with the inline action
-   and resume with `/resume`.
+   activity, study goal, language-support preference, or study level, or use the shortcuts. A broad
+   match may get one optional question about catalog-listed goals or language support. The catalog
+   distinguishes English teaching medium from listed discussion support. Turn OpenAI processing off
+   to continue with buttons only; it can be turned back on. A learner can pause with the inline
+   action and resume with `/resume`.
 3. Select a course. Sample undergraduate options can continue through the code-computed eligibility
    check; other levels show sample prerequisites and create a staff handoff instead of using a
    Grade 12 rule that may not apply.

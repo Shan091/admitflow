@@ -35,6 +35,7 @@ def recommend_courses(
     interests: set[str],
     activities: set[str],
     learning_goals: set[str] | None = None,
+    language_support_preference: str | None = None,
     level: str | None = None,
     limit: int = 3,
 ) -> list[CourseMatch]:
@@ -44,6 +45,7 @@ def recommend_courses(
     normalized_interests = _normalize(interests)
     normalized_activities = _normalize(activities)
     normalized_goals = _normalize(learning_goals or set())
+    normalized_support = " ".join((language_support_preference or "").casefold().split())
     matches: list[CourseMatch] = []
     for course in courses:
         if not _is_complete(course) or (level and course.education_level != level):
@@ -51,9 +53,12 @@ def recommend_courses(
         interest_hits = normalized_interests & _normalize(set(course.interests))
         activity_hits = normalized_activities & _normalize(set(course.activities))
         course_goals = _normalize(set(course.learning_goals))
+        course_support = _normalize(set(course.language_support))
         goal_hits = normalized_goals & course_goals
         field_hit = _normalize({course.field}) & normalized_interests
         if normalized_goals and not goal_hits:
+            continue
+        if normalized_support and normalized_support not in course_support:
             continue
         if not interest_hits and not activity_hits and not field_hit:
             continue
@@ -62,6 +67,11 @@ def recommend_courses(
             + [f"Matches your interest in {item}" for item in sorted(field_hit)]
             + [f"Includes activities you chose: {item}" for item in sorted(activity_hits)]
             + [f"Supports your study goal: {item}" for item in sorted(goal_hits)]
+            + (
+                [f"Lists language support: {language_support_preference}"]
+                if normalized_support
+                else []
+            )
         )
         matches.append(CourseMatch(course, reasons))
     matches.sort(key=lambda item: (-len(item.reasons), item.course.name.casefold()))

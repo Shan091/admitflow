@@ -37,6 +37,7 @@ class DiscoveryTurn:
     unsure: bool
     correct_previous: bool
     learning_goals: tuple[str, ...] = ()
+    language_support_preference: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

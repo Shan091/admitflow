@@ -6,7 +6,11 @@ import re
 from dataclasses import dataclass
 
 from admitflow.adapters.sqlite import Repository
-from admitflow.domain.discovery import has_sufficient_guidance_context, recommend_courses
+from admitflow.domain.discovery import (
+    CourseMatch,
+    has_sufficient_guidance_context,
+    recommend_courses,
+)
 from admitflow.domain.models import Course, DiscoveryTurn
 from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.domain.qualification import assess_eligibility
@@ -137,10 +141,81 @@ class AdmissionsService:
         )
         return await self._handle_discovery_turn(lead_id, turn, "")
 
+    async def choose_guidance_language_support(
+        self, lead_id: int, support_slug: str | None
+    ) -> Reply:
+        """Apply a listed language-support preference, or continue with it left open."""
+        if support_slug is None:
+            speaker = self._fact_value(lead_id, "active_speaker") or "student"
+            if speaker != "student" and self._fact_value(
+                lead_id, "language_support_preference_student"
+            ):
+                return Reply(
+                    "I kept the learner's stated language-support preference. Please ask the "
+                    "learner to choose whether to keep or widen it.",
+                    (("Learner sharing now", "speaker:student"),),
+                )
+            _, _, _, _, previous_support = self._student_guidance_context(lead_id)
+            interests, activities, level, goals, _ = self._student_guidance_context(lead_id)
+            confirmed = self._fact_value(lead_id, "guidance_confirmed_signature")
+            previous_signature = _guidance_signature(
+                interests, activities, level, goals, previous_support
+            )
+            self.repository.delete_fact(lead_id, f"language_support_preference_{speaker}")
+            self.repository.save_fact(
+                lead_id,
+                "guidance_language_prompted_signature",
+                _guidance_signature(interests, activities, level, goals),
+                "student",
+            )
+            if speaker == "student" and confirmed == previous_signature:
+                self.repository.save_fact(
+                    lead_id,
+                    "guidance_confirmed_signature",
+                    _guidance_signature(interests, activities, level, goals),
+                    "student",
+                )
+            self.repository.update_lead(lead_id, discovery_step="guidance_confirmation")
+            return self._present_guidance(lead_id)
+        courses = self.repository.list_courses(self.tenant_id)
+        interests, activities, level, goals, _ = self._student_guidance_context(lead_id)
+        current_candidates = recommend_courses(
+            courses,
+            interests=interests,
+            activities=activities,
+            learning_goals=goals,
+            level=None if level == "any" else level,
+            limit=100,
+        )
+        supports = {
+            support
+            for match in current_candidates
+            for support in match.course.language_support
+            if _language_support_slug(support) == support_slug
+        }
+        if not supports:
+            return Reply(
+                "That support option is not listed in the sample catalog. Please choose again."
+            )
+        turn = DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=(),
+            education_level=None,
+            interests=(),
+            activities=(),
+            unsure=False,
+            correct_previous=False,
+            language_support_preference=next(iter(supports)),
+        )
+        return await self._handle_discovery_turn(lead_id, turn, "")
+
     async def confirm_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
         """Accept only the currently pending summary, never a stale Telegram button."""
-        interests, activities, level, goals = self._student_guidance_context(lead_id)
-        signature = _guidance_signature(interests, activities, level, goals)
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        signature = _guidance_signature(interests, activities, level, goals, language_support)
         pending = self._fact_value(lead_id, "guidance_pending_signature")
         if not pending:
             return Reply("That confirmation has expired. Your current course path is unchanged.")
@@ -161,8 +236,10 @@ class AdmissionsService:
 
     async def revise_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
         """Keep the learner's facts but ask what they want to correct or add."""
-        interests, activities, level, goals = self._student_guidance_context(lead_id)
-        signature = _guidance_signature(interests, activities, level, goals)
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        signature = _guidance_signature(interests, activities, level, goals, language_support)
         pending = self._fact_value(lead_id, "guidance_pending_signature")
         if not pending:
             return Reply("That change prompt has expired. Your current course path is unchanged.")
@@ -179,8 +256,8 @@ class AdmissionsService:
     @staticmethod
     def _guidance_revision_prompt() -> Reply:
         return Reply(
-            "What should I change or add? You can correct an interest, activity, study goal, or "
-            "study level, or mention another detail that matters to your choice.",
+            "What should I change or add? You can correct an interest, activity, study goal, "
+            "study level, or language-support preference, or mention another detail that matters.",
             (
                 ("Choose a field", "path:field"),
                 ("Browse sample courses", "path:browse"),
@@ -197,7 +274,7 @@ class AdmissionsService:
 
     def _student_guidance_context(
         self, lead_id: int
-    ) -> tuple[set[str], set[str], str | None, set[str]]:
+    ) -> tuple[set[str], set[str], str | None, set[str], str | None]:
         facts = {
             str(item["fact_key"]): str(item["fact_value"])
             for item in self.repository.list_facts(lead_id)
@@ -214,7 +291,8 @@ class AdmissionsService:
         goals = set(facts.get("learning_goals_student", "").split("|"))
         goals.discard("")
         level = facts.get("education_level_student") or None
-        return interests, activities, level, goals
+        language_support = facts.get("language_support_preference_student") or None
+        return interests, activities, level, goals, language_support
 
     def _guidance_reflection(
         self,
@@ -223,6 +301,7 @@ class AdmissionsService:
         activities: set[str],
         level: str | None,
         goals: set[str],
+        language_support: str | None,
         signature: str,
     ) -> Reply:
         self.repository.save_fact(lead_id, "guidance_pending_signature", signature, "student")
@@ -240,6 +319,8 @@ class AdmissionsService:
             details.append(f"you are considering the {level.replace('_', ' ')} level")
         else:
             details.append("your study level is still open")
+        if language_support:
+            details.append(f"you prefer courses listing {language_support}")
         token = _guidance_token(signature)
         return Reply(
             f"Before I show options, I heard that {'; '.join(details)}. Did I get that right?",
@@ -625,6 +706,8 @@ class AdmissionsService:
             return self._guidance_reflection(lead_id, *context, signature)
         if step == "guidance_goal":
             return self._guidance_goal_prompt(lead_id)
+        if step == "guidance_language_support":
+            return self._guidance_language_support_prompt(lead_id)
         if step == "guidance_revision":
             return self._guidance_revision_prompt()
         if step == "course":
@@ -1002,6 +1085,7 @@ class AdmissionsService:
                 "activity_terms",
                 "interest_activity",
                 "learning_goals",
+                "language_support_preference",
             ):
                 self.repository.delete_fact(lead_id, f"{key}_{speaker}")
             if speaker == "student":
@@ -1013,6 +1097,7 @@ class AdmissionsService:
             or turn.interests
             or turn.activities
             or turn.learning_goals
+            or turn.language_support_preference
         ):
             self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
         if turn.fields:
@@ -1103,19 +1188,31 @@ class AdmissionsService:
             )
             if merged_goals:
                 self.repository.save_fact(lead_id, goals_key, "|".join(merged_goals), speaker)
+        if turn.language_support_preference:
+            allowed_supports = {
+                support for course in courses for support in course.language_support
+            }
+            if turn.language_support_preference in allowed_supports:
+                self.repository.save_fact(
+                    lead_id,
+                    f"language_support_preference_{speaker}",
+                    turn.language_support_preference,
+                    speaker,
+                )
         if speaker == "parent" and (
             turn.fields
             or turn.interests
             or turn.activities
             or turn.education_level
             or turn.learning_goals
+            or turn.language_support_preference
         ):
             return Reply(
                 "I've recorded those as the parent's preferences. The learner's own interests "
                 "should guide recommendations; invite them to share or confirm their preferences.",
                 (("Learner sharing now", "speaker:student"),),
             )
-        current_interests, current_activities, _, current_goals = self._student_guidance_context(
+        current_interests, current_activities, _, current_goals, _ = self._student_guidance_context(
             lead_id
         )
         if turn.unsure and not (
@@ -1147,6 +1244,7 @@ class AdmissionsService:
                 or turn.interests
                 or turn.activities
                 or turn.learning_goals
+                or turn.language_support_preference
             )
         ):
             return self._guidance_revision_prompt()
@@ -1154,7 +1252,9 @@ class AdmissionsService:
 
     def _present_guidance(self, lead_id: int) -> Reply:
         courses = self.repository.list_courses(self.tenant_id)
-        interests, activities, level, goals = self._student_guidance_context(lead_id)
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
         if interests or activities:
             if not has_sufficient_guidance_context(
                 interests=interests,
@@ -1203,7 +1303,7 @@ class AdmissionsService:
                         for field in sorted({course.field for course in courses})
                     ),
                 )
-            if not goals:
+            if not goals and not language_support:
                 candidates = recommend_courses(
                     courses,
                     interests=interests,
@@ -1228,14 +1328,61 @@ class AdmissionsService:
                     )
                     self.repository.update_lead(lead_id, discovery_step="guidance_goal")
                     return self._goal_question_reply(goal_options)
-            signature = _guidance_signature(interests, activities, level, goals)
+            if not language_support:
+                candidates = recommend_courses(
+                    courses,
+                    interests=interests,
+                    activities=activities,
+                    learning_goals=goals,
+                    level=None if level == "any" else level,
+                    limit=100,
+                )
+                support_options = tuple(
+                    dict.fromkeys(
+                        support for match in candidates for support in match.course.language_support
+                    )
+                )
+                teaching_media = {match.course.medium for match in candidates}
+                base_signature = _guidance_signature(interests, activities, level, goals)
+                asked_signature = self._fact_value(lead_id, "guidance_language_prompted_signature")
+                goal_was_asked = self._fact_value(
+                    lead_id, "guidance_goal_prompted_signature"
+                ) == _guidance_signature(interests, activities, level)
+                if (
+                    len(candidates) > 3
+                    and len(teaching_media) == 1
+                    and len(support_options) > 1
+                    and asked_signature != base_signature
+                    and not goal_was_asked
+                ):
+                    self.repository.save_fact(
+                        lead_id,
+                        "guidance_language_prompted_signature",
+                        base_signature,
+                        "student",
+                    )
+                    self.repository.update_lead(lead_id, discovery_step="guidance_language_support")
+                    return self._language_support_question(candidates, support_options)
+            signature = _guidance_signature(interests, activities, level, goals, language_support)
             confirmed = self._fact_value(lead_id, "guidance_confirmed_signature")
             if confirmed == signature:
                 return self._guidance_recommendation_reply(
-                    lead_id, courses, interests, activities, level, goals
+                    lead_id,
+                    courses,
+                    interests,
+                    activities,
+                    level,
+                    goals,
+                    language_support,
                 )
             return self._guidance_reflection(
-                lead_id, interests, activities, level, goals, signature
+                lead_id,
+                interests,
+                activities,
+                level,
+                goals,
+                language_support,
+                signature,
             )
         self.repository.delete_fact(lead_id, "guidance_pending_signature")
         return Reply(
@@ -1246,7 +1393,7 @@ class AdmissionsService:
 
     def _guidance_goal_prompt(self, lead_id: int) -> Reply:
         courses = self.repository.list_courses(self.tenant_id)
-        interests, activities, level, goals = self._student_guidance_context(lead_id)
+        interests, activities, level, goals, _ = self._student_guidance_context(lead_id)
         if goals:
             return self._present_guidance(lead_id)
         candidates = recommend_courses(
@@ -1262,6 +1409,56 @@ class AdmissionsService:
         if len(candidates) <= 3 or len(goal_options) <= 1:
             return self._present_guidance(lead_id)
         return self._goal_question_reply(goal_options)
+
+    def _guidance_language_support_prompt(self, lead_id: int) -> Reply:
+        courses = self.repository.list_courses(self.tenant_id)
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        if language_support:
+            return self._present_guidance(lead_id)
+        candidates = recommend_courses(
+            courses,
+            interests=interests,
+            activities=activities,
+            learning_goals=goals,
+            level=None if level == "any" else level,
+            limit=100,
+        )
+        support_options = tuple(
+            dict.fromkeys(
+                support for match in candidates for support in match.course.language_support
+            )
+        )
+        if (
+            len(candidates) <= 3
+            or len({match.course.medium for match in candidates}) != 1
+            or len(support_options) <= 1
+        ):
+            return self._present_guidance(lead_id)
+        return self._language_support_question(candidates, support_options)
+
+    @staticmethod
+    def _language_support_question(
+        candidates: list[CourseMatch], support_options: tuple[str, ...]
+    ) -> Reply:
+        media = {match.course.medium for match in candidates}
+        prefix = (
+            f"The catalog lists {next(iter(media))} as the teaching medium for these courses. "
+            if len(media) == 1
+            else "The catalog lists different teaching media for these courses. "
+        )
+        buttons = tuple(
+            (support, f"guidance:language:{_language_support_slug(support)}")
+            for support in support_options[:3]
+        ) + (("Leave language open", "guidance:language:open"),)
+        return Reply(
+            prefix
+            + "Recorded language support differs. Would one listed support option matter to you, "
+            "or should I leave language open? This is your preference; I won't assume your "
+            "language ability.",
+            buttons,
+        )
 
     @staticmethod
     def _goal_question_reply(goal_options: tuple[str, ...]) -> Reply:
@@ -1282,16 +1479,29 @@ class AdmissionsService:
         activities: set[str],
         level: str | None,
         goals: set[str],
+        language_support: str | None,
     ) -> Reply:
         matches = recommend_courses(
             courses,
             interests=interests,
             activities=activities,
             learning_goals=goals,
+            language_support_preference=language_support,
             level=None if level == "any" else level,
             limit=3,
         )
         if not matches:
+            if language_support:
+                return Reply(
+                    "No complete matching sample course lists "
+                    f"{language_support}. Would you like to leave language open and see the "
+                    "other matches, or browse the catalog?",
+                    (
+                        ("Leave language open", "guidance:language:open"),
+                        ("Browse sample courses", "path:browse"),
+                        ("Ask staff", "handoff:request"),
+                    ),
+                )
             return self.handoff(
                 lead_id, "No complete sample course matched the learner's confirmed preferences."
             )
@@ -1300,7 +1510,10 @@ class AdmissionsService:
         )
         summaries = "\n".join(
             f"• {match.course.name} ({match.course.education_level.replace('_', ' ')}): "
-            f"{', '.join(match.reasons)}. Sample entry: {'; '.join(match.course.prerequisites)}."
+            f"{', '.join(match.reasons)}. Teaching medium listed: {match.course.medium}; "
+            f"language support listed: "
+            f"{', '.join(match.course.language_support) or 'not specified'}. "
+            f"Sample entry: {'; '.join(match.course.prerequisites)}."
             for match in matches
         )
         return Reply(
@@ -1316,12 +1529,16 @@ def _guidance_signature(
     activities: set[str],
     level: str | None,
     learning_goals: set[str] | None = None,
+    language_support_preference: str | None = None,
 ) -> str:
     context = {
         "interests": sorted(item.casefold() for item in interests),
         "activities": sorted(item.casefold() for item in activities),
         "level": level,
         "learning_goals": sorted(item.casefold() for item in learning_goals or set()),
+        "language_support_preference": (
+            language_support_preference.casefold() if language_support_preference else None
+        ),
     }
     return hashlib.sha256(json.dumps(context, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -1395,6 +1612,15 @@ def _is_refund_question(text: str) -> bool:
 
 def _is_language_concern(text: str) -> bool:
     normalized = re.sub(r"[^\w]+", " ", text.casefold())
+    medium_terms = {"english", "hindi", "malayalam", "hinglish"}
+    if any(
+        phrase in normalized for phrase in {"medium of instruction", "teaching medium", "taught in"}
+    ) or ("medium" in normalized.split() and bool(medium_terms & set(normalized.split()))):
+        return True
+    if normalized.startswith(
+        ("i want ", "i need ", "i prefer ", "i would like ", "i d like ", "my preference ")
+    ):
+        return False
     return any(
         term in normalized
         for term in {
@@ -1478,6 +1704,10 @@ def _activity_slug(activity: str) -> str:
 
 def _goal_slug(goal: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", goal.casefold()).strip("-")
+
+
+def _language_support_slug(support: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", support.casefold()).strip("-")
 
 
 def _activity_label(activity: str) -> str:

@@ -53,6 +53,11 @@ human escalation, and operational requirements are verified.
   question when a broad candidate set differs on those tags. It can be skipped or resumed and is
   evidence of only a small adaptive slice, not a complete goals/barriers exploration or production
   quality evaluation.
+- Course records also distinguish the teaching medium from discussion/language support. For a broad
+  match whose candidates have one teaching medium and materially different recorded support, the
+  service can offer one optional support preference, unless it already used the optional goal
+  question for that fact set. It filters only on a listed support label; it does not infer
+  proficiency or promise support outside the course record. A learner may leave it open.
 - Course matching uses direct overlap with seeded interests and activities. It has a first
   deterministic sufficiency/confirmation policy, but that policy still needs evaluation against a
   human-reviewed golden set; there is no validated general-career evidence corpus.
@@ -118,9 +123,12 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   known course, known field, exploration, and browsing/questions.
 - A learner can answer in natural language over multiple turns. The next question uses the learner's
   existing facts and asks only for information that can change the next recommendation or action.
-- For a broad match with materially different catalog learning goals, ask at most one optional
-  catalog-grounded goal question. Skip it when a course is known, the learner has already stated a
-  goal, or available matches do not differ on supported goal tags.
+- For broad candidates, ask at most one optional narrowing question per current fact set: a
+  catalog-grounded goal question when goals differ, otherwise a language-support preference when
+  candidates share one teaching medium but differ in recorded support. Skip optional prompts when a
+  course is known, the relevant preference is already stated, or the candidate set does not differ.
+  The learner may leave language open. Never infer language proficiency or claim unrecorded
+  teaching/support services.
 - A known-course learner can jump directly to that offering; ambiguous/unlisted names are clarified
   without inventing a match.
 - An unsure learner receives a short, low-pressure prompt anchored in things they enjoy, have tried,
@@ -144,8 +152,11 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 
 - Add turn-sequence tests rather than testing only isolated extractions: vague opening, follow-up,
   correction, known-course shortcut, interest change, recommendation, interruption, and resume.
-- Add study-goal extraction, metadata completeness, skip, correction, signature freshness, and
+- Verify study-goal extraction, metadata completeness, skip, correction, signature freshness, and
   expected-course ranking tests for the optional goal question.
+- Verify language-support extraction allowlisting and preference behavior, including no prompt for
+  known-course/uniform candidates, skip/resume/correction, stale-button invalidation, and recovery
+  when no complete candidate matches a stated support preference.
 - Evaluate fixed fictional dialogues in English, Hindi, Malayalam, and Hinglish; test code-switching,
   short/empty answers, spelling variation, ambiguity, contradictions, prompt injection, parent-child
   disagreement, and unsupported/regulated interests.

@@ -80,6 +80,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     different goals; skip it when it is not useful or the learner declines. A stated goal filters
     recommendations and appears as an explanation. Do not infer a job, occupation, or outcome.
 
+19. **Language support is a course-recorded trade-off.** Keep teaching medium distinct from listed
+    discussion support. Offer at most one optional language-support question on a broad match when
+    candidates share a teaching medium but list different support, unless another optional narrowing
+    question was already used for that fact set. A stated preference filters to courses that list it;
+    no-match recovery can reopen the set. Never infer proficiency or promise unlisted services.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings
