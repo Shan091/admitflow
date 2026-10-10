@@ -11,13 +11,18 @@ Record consequential choices here. Each entry is short; update it when evidence 
    small Protocol only where injection or a test double needs it. No speculative ports framework.
 4. **Eligibility and fees — code-owned.** Structured seed data and Python rules determine
    eligibility and prices; model output cannot change either.
-5. **Knowledge retrieval — OpenAI embeddings + SQLite vectors + NumPy cosine.** Embed seeded
-   FAQ question/answer chunks with `text-embedding-3-small`; no general upload/parser or vector DB.
-6. **Fail-closed retrieval and initial thresholds.** Begin at cosine `0.72` and top-result margin
-   `0.05`; calibrate against fixed demo cases. These are provisional, not guarantees. Abstain on
-   weak, ambiguous, or unavailable retrieval.
-7. **Fee routing and fee payment.** Route price questions to structured course data before RAG;
-   exclude amounts from free-form FAQ chunks. Qualified demo applicants may receive a Razorpay
+5. **Knowledge retrieval — OpenAI embeddings + SQLite vectors + NumPy cosine.** Embed each seeded
+   FAQ's canonical question plus a few curated search phrasings with `text-embedding-3-small`;
+   keep the answer as a separate stored value. Version the cached-vector key when this text profile
+   changes. No general upload/parser or vector DB.
+6. **Fail-closed retrieval and calibrated initial thresholds.** Use cosine `0.58` and top-result
+   margin `0.05`; a live fixed set passed 15 expected FAQ variants and abstained on 12 unsupported
+   questions. Its lowest expected score was `0.648`, and highest unsupported score was `0.491`.
+   These small synthetic cases are calibration evidence, not guarantees. Abstain on weak,
+   ambiguous, or unavailable retrieval.
+7. **Fee routing and fee payment.** Route application-fee questions to structured course data
+   before RAG; send unknown tuition/hostel charges and refund requests to an explicit safe response.
+   Exclude amounts from free-form FAQ chunks. Qualified demo applicants may receive a Razorpay
    Payment Link created in test mode from the server-owned course fee. Never accept a client amount
    or mark a payment paid from a browser redirect; accept only signature-verified webhooks. Live
    payments, refunds, uploads, and production finance workflows are deferred.

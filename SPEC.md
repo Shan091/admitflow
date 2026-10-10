@@ -17,13 +17,14 @@ admissions system and uses a clearly fictional institution and seeded data.
   courses and a no-pressure browse path.
 - **Qualification:** Structured answers are checked by Python against course rules.
 - **Memory:** SQLite persists the Telegram lead, selected course, qualification answers, and chat.
-- **Knowledge:** OpenAI `text-embedding-3-small` embeds seeded FAQ chunks; NumPy cosine search
-  selects relevant chunks; uncertain retrieval fails closed.
+- **Knowledge:** OpenAI `text-embedding-3-small` embeds seeded FAQ questions with curated search
+  phrasings; NumPy cosine search selects relevant chunks; uncertain retrieval fails closed.
 - **Staff view:** A local FastAPI dashboard with environment-configured staff login shows leads,
   conversation history, and payment status.
-- **Money boundary:** Fee answers come from structured course data; no model calculates or
-  negotiates fees. Qualified demo users can receive a Razorpay test-mode Payment Link using the
-  server-owned application fee; verified webhooks update payment status.
+- **Money boundary:** Application-fee answers come from structured course data; unknown tuition or
+  hostel charges and refunds receive a safe response. No model calculates or negotiates fees.
+  Qualified demo users can receive a Razorpay test-mode Payment Link using the server-owned
+  application fee; verified webhooks update payment status.
 
 ## Demo success criteria
 

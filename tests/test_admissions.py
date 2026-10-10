@@ -32,6 +32,47 @@ async def test_fee_question_uses_structured_course_price_before_router(tmp_path:
     assert "fictional demo amount" in reply.text
 
 
+@pytest.mark.asyncio
+async def test_hostel_fee_question_does_not_claim_application_fee(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(
+        lead_id, "Is hostel accommodation included in the course fee?", UnexpectedRouter()
+    )
+
+    assert "only confirms the application fee" in reply.text
+    assert "hostel/accommodation charges or inclusions are not confirmed" in reply.text
+    assert "₹" not in reply.text
+
+
+@pytest.mark.asyncio
+async def test_refund_question_does_not_claim_fee_or_call_router(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(
+        lead_id, "Can I get a refund for the application fee?", UnexpectedRouter()
+    )
+
+    assert "Refunds are not supported in this fictional demo" in reply.text
+    assert "₹" not in reply.text
+
+
 def test_qualification_flow_persists_result_and_rejects_malformed_marks(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()

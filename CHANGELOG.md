@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-10-11 — live calibration of seeded FAQ retrieval
+
+- **Time:** 01:14 IST
+- **Change:** Added a fixed set of curated FAQ search phrasings; embeddings now index question
+  text separately from answers and use a versioned cache key. Calibrated the minimum cosine score
+  to `0.58` and kept the top-result margin at `0.05`. Added explicit safe handling for tuition/
+  hostel charges and refund questions rather than misreporting the application fee.
+- **Why:** Live checks showed the old `0.72` threshold refused even exact seeded questions. A
+  question-only embedding representation plus curated aliases improved useful matches while
+  unsupported fee/refund topics remained outside the RAG path.
+- **Files:** `src/admitflow/`, `src/admitflow/seed/data/faqs.json`, `scripts/evaluate_faq_retrieval.py`,
+  `tests/`, `README.md`, `SPEC.md`, `docs/DECISIONS.md`, `tasks/`, and `AI_USAGE.md`.
+- **Validation:** Live `uv run python scripts/evaluate_faq_retrieval.py` passed all 27 synthetic
+  cases (15 expected source matches, 12 expected abstentions); the lowest accepted score was
+  `0.648` and the highest abstention score was `0.491`. The final 27-query API batch used 207 input
+  tokens; earlier calibration probes were also synthetic. `bash scripts/verify.sh` passed Ruff,
+  formatting, strict mypy, and all 37 tests. The local staff dashboard showed RAG ready and the
+  existing test payment as paid; local/public health returned 200. Telegram reports the correct
+  webhook path, zero pending updates, and no delivery error.
+- **Limitations:** This is a small hand-written calibration set, not a production quality
+  guarantee. Thresholds remain provisional and should be checked against actual demo phrasing.
+- **Push/CI:** Pending commit and matching GitHub Actions result.
+
 ## 2026-10-11 — Telegram webhook transport
 
 - **Change:** Replaced Telegram long-polling with a FastAPI webhook endpoint protected by

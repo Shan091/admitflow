@@ -67,6 +67,7 @@ class Repository:
                     tenant_id TEXT NOT NULL REFERENCES institutions(id),
                     title TEXT NOT NULL,
                     question TEXT NOT NULL,
+                    search_queries TEXT NOT NULL DEFAULT '[]',
                     answer TEXT NOT NULL,
                     source TEXT NOT NULL,
                     content_hash TEXT NOT NULL,
@@ -97,6 +98,14 @@ class Repository:
                 );
                 """
             )
+            chunk_columns = {
+                row["name"] for row in connection.execute("PRAGMA table_info(knowledge_chunks)")
+            }
+            if "search_queries" not in chunk_columns:
+                connection.execute(
+                    "ALTER TABLE knowledge_chunks ADD COLUMN "
+                    "search_queries TEXT NOT NULL DEFAULT '[]'"
+                )
 
     def seed_catalog(self) -> None:
         """Upsert clearly fictional catalog and FAQ content from package seed files."""
@@ -129,8 +138,13 @@ class Repository:
                     ),
                 )
             for faq in faqs:
+                search_queries = json.dumps(
+                    faq.get("search_queries", []), ensure_ascii=False, separators=(",", ":")
+                )
                 content_hash = hashlib.sha256(
-                    f"{faq['title']}\n{faq['question']}\n{faq['answer']}".encode()
+                    json.dumps(
+                        [faq["question"], faq.get("search_queries", [])], ensure_ascii=False
+                    ).encode()
                 ).hexdigest()
                 current = connection.execute(
                     "SELECT content_hash FROM knowledge_chunks WHERE tenant_id=? AND id=?",
@@ -139,11 +153,12 @@ class Repository:
                 changed = current is None or current["content_hash"] != content_hash
                 connection.execute(
                     """INSERT INTO knowledge_chunks
-                    (id, tenant_id, title, question, answer, source, content_hash,
+                    (id, tenant_id, title, question, search_queries, answer, source, content_hash,
                      embedding_model, embedding, embedding_dimension)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)
                     ON CONFLICT(tenant_id, id) DO UPDATE SET
                     title=excluded.title, question=excluded.question, answer=excluded.answer,
+                    search_queries=excluded.search_queries,
                     source=excluded.source, content_hash=excluded.content_hash,
                     embedding_model=CASE WHEN ? THEN NULL ELSE knowledge_chunks.embedding_model END,
                     embedding=CASE WHEN ? THEN NULL ELSE knowledge_chunks.embedding END,
@@ -154,6 +169,7 @@ class Repository:
                         catalog["tenant_id"],
                         faq["title"],
                         faq["question"],
+                        search_queries,
                         faq["answer"],
                         faq["source"],
                         content_hash,
@@ -383,7 +399,7 @@ class Repository:
     def get_unembedded_faqs(self, tenant_id: str, model: str) -> list[dict[str, str]]:
         with self._connect() as connection:
             rows = connection.execute(
-                """SELECT id, question, answer, title FROM knowledge_chunks
+                """SELECT id, question, search_queries FROM knowledge_chunks
                 WHERE tenant_id=? AND (embedding IS NULL OR embedding_model != ?)""",
                 (tenant_id, model),
             ).fetchall()

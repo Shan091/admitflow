@@ -33,7 +33,7 @@ def get_settings() -> Settings:
         openai_decisions_model=os.getenv("OPENAI_DECISIONS_MODEL", "gpt-6-luna"),
         openai_embedding_model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
         database_path=Path(os.getenv("DATABASE_PATH", "data/admitflow.sqlite3")),
-        rag_min_similarity=float(os.getenv("RAG_MIN_SIMILARITY", "0.72")),
+        rag_min_similarity=float(os.getenv("RAG_MIN_SIMILARITY", "0.58")),
         rag_min_margin=float(os.getenv("RAG_MIN_MARGIN", "0.05")),
         staff_username=os.getenv("STAFF_USERNAME") or None,
         staff_password=os.getenv("STAFF_PASSWORD") or None,

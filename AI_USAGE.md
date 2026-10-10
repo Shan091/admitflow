@@ -3,6 +3,25 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — live FAQ retrieval calibration
+
+- **Task:** Improve the fixed seeded FAQ retrieval using live OpenAI embeddings, calibrate the
+  abstention threshold, and add safe responses for unsupported fee categories and refunds.
+- **Assistance:** Codex reviewed the seeded corpus, added curated search phrasing fixtures and a
+  repeatable evaluator, versioned embedding cache entries, updated retrieval thresholds and
+  code-owned fee/refund policy, and documented the results. The human authorized using the
+  configured OpenAI credit balance and previously confirmed the bot/payment demo paths.
+- **Checks:** The live `uv run python scripts/evaluate_faq_retrieval.py` used only synthetic FAQ
+  phrases and passed 27/27 (15 expected answers, 12 abstentions); the final 27-query batch used
+  207 input tokens. `bash scripts/verify.sh` passed with Ruff, formatting, strict mypy, and 37
+  tests. Local staff login showed FAQ retrieval ready and the test payment as paid; local and
+  public health endpoints returned 200, and Telegram reported a healthy webhook. Additional
+  calibration requests also used only synthetic text; the final-batch count is not a total spend
+  figure.
+- **Human review/follow-up:** The selected `0.58`/`0.05` thresholds are backed by a small fixed
+  demo set, not broad user testing. Confirm common demo phrasing in the live bot before
+  submission; this is not a general FAQ ingestion system.
+
 ## 2026-10-11 — Telegram webhook transport
 
 - **Task:** Replace Telegram polling with secret-validated FastAPI webhook delivery and document

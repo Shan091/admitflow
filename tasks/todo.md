@@ -20,7 +20,8 @@ acceptance criteria pass and the corresponding milestone is committed.
 - [x] Test lead/message persistence and idempotent handling of duplicate Telegram updates.
 - [x] Test Telegram flow service behavior with fake updates; no live API in automated tests.
 - [x] Verify dashboard lead list/detail from the same SQLite records.
-- [ ] Complete and record a live Telegram walkthrough when a bot token is configured.
+- [x] Complete and record a live Telegram walkthrough; user confirmed the bot flow, and the
+  registered webhook remains healthy with no pending updates.
 
 ## FAQ embeddings and vector retrieval
 
@@ -28,8 +29,24 @@ acceptance criteria pass and the corresponding milestone is committed.
 - [x] Test embedding reuse/content invalidation, score threshold, margin, and fail-closed behavior.
 - [x] Test fee questions use structured prices before intent routing or FAQ retrieval.
 - [x] Verify fixed expected question-to-FAQ matches with fake vectors.
-- [ ] Calibrate similarity and margin thresholds using live embedding/query examples.
-- [ ] Run and separately record a live OpenAI embedding smoke check when a key is configured.
+- [x] Calibrate similarity and margin thresholds using live embedding/query examples; use the
+  recorded `0.58`/`0.05` values as provisional demo defaults.
+- [x] Run and separately record a live OpenAI embedding smoke check with fictional query examples.
+
+## Live FAQ retrieval calibration
+
+- [x] Add a repeatable evaluator with fixed, fictional FAQ paraphrases and out-of-scope questions;
+  report expected source, chosen source, top cosine score, margin, and pass/fail without printing
+  credentials or sending non-demo content to OpenAI.
+- [x] Add the evaluator and curated query phrasings; version cached vectors when their embedding
+  text profile changes.
+- [x] Run it against live `text-embedding-3-small` and the seeded SQLite vectors; measured `0.58`/
+  `0.05` cleanly separates the fixed expected and unsupported cases.
+- [x] Route unconfigured hostel/tuition charges and refund requests to safe, code-owned responses
+  instead of returning an unrelated application fee or entering FAQ retrieval.
+- [x] Record actual cases, scores, API usage, and the decision in the feature brief, `CHANGELOG.md`,
+  and `AI_USAGE.md`; rerun `bash scripts/verify.sh` and `git diff --check`.
+- [ ] Commit and push the verified milestone; confirm the GitHub Actions result for that exact SHA.
 
 ## Staff login
 

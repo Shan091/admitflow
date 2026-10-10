@@ -1,5 +1,6 @@
 """Seed indexing and fail-closed semantic FAQ retrieval."""
 
+import json
 import logging
 from typing import cast
 
@@ -8,6 +9,12 @@ from admitflow.adapters.vector_store import VectorStore
 from admitflow.services.contracts import Embedder
 
 logger = logging.getLogger(__name__)
+FAQ_EMBEDDING_PROFILE = "faq-query-aliases-v1"
+
+
+def embedding_index_key(api_model: str) -> str:
+    """Scope cached vectors to the API model and the text representation they embed."""
+    return f"{api_model}:{FAQ_EMBEDDING_PROFILE}"
 
 
 class RetrievalService:
@@ -33,7 +40,10 @@ class RetrievalService:
         pending = self.repository.get_unembedded_faqs(tenant_id, self.model)
         if not pending:
             return 0
-        texts = [f"{item['title']}\n{item['question']}\n{item['answer']}" for item in pending]
+        texts = [
+            "\n".join([str(item["question"]), *json.loads(str(item["search_queries"]))])
+            for item in pending
+        ]
         vectors = await self.embedder.embed(texts)
         if len(vectors) != len(pending):
             raise RuntimeError("Embedding response count did not match FAQ count")

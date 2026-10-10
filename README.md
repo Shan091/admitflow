@@ -68,6 +68,17 @@ bash scripts/verify.sh
 The gate runs Ruff lint and format checks, strict mypy, and pytest. Automated tests use fake
 Telegram updates, fake embeddings, and temporary SQLite databases; they do not call Telegram or
 OpenAI and do not spend API credits. Live API checks are manual and must be reported separately.
+
+To check the seeded FAQ retrieval with the live embedding API, configure `OPENAI_API_KEY` and run:
+
+```bash
+uv run python scripts/evaluate_faq_retrieval.py
+```
+
+This evaluates 27 fixed, fictional question variants against the seeded SQLite corpus, reports
+the expected/actual source, cosine score, margin, and API input-token usage, and exits nonzero if
+any expected match/refusal fails. The request uses only synthetic demo questions; OpenAI API usage
+is billable. The evaluator never reads applicant messages.
 CI runs on pushes and pull requests; its status applies to the exact commit shown by GitHub.
 
 ## Demo walkthrough

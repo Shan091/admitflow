@@ -8,6 +8,7 @@ class OpenAIAdapter:
         self.client = AsyncOpenAI(api_key=api_key)
         self.decisions_model = decisions_model
         self.embedding_model = embedding_model
+        self.total_embedding_prompt_tokens = 0
 
     async def route(self, text: str) -> str:
         response = await self.client.decisions.create(
@@ -40,6 +41,7 @@ class OpenAIAdapter:
             input=texts,
             encoding_format="float",
         )
+        self.total_embedding_prompt_tokens += response.usage.prompt_tokens
         return [item.embedding for item in response.data]
 
     async def close(self) -> None:

@@ -22,7 +22,7 @@ from admitflow.dashboard.routes import router as dashboard_router
 from admitflow.dashboard.telegram_routes import router as telegram_router
 from admitflow.services.admissions import AdmissionsService
 from admitflow.services.payments import PaymentService
-from admitflow.services.retrieval import RetrievalService
+from admitflow.services.retrieval import RetrievalService, embedding_index_key
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -46,11 +46,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             else None
         )
         vector_store = VectorStore(repository)
+        embedding_key = embedding_index_key(app_settings.openai_embedding_model)
         retrieval = RetrievalService(
             repository,
             vector_store,
             openai_adapter,
-            app_settings.openai_embedding_model,
+            embedding_key,
             app_settings.rag_min_similarity,
             app_settings.rag_min_margin,
         )
@@ -86,7 +87,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         app.state.repository = repository
         app.state.rag_ready = not repository.get_unembedded_faqs(
-            repository.tenant_id, app_settings.openai_embedding_model
+            repository.tenant_id, embedding_key
         )
         app.state.openai_adapter = openai_adapter
         app.state.admissions = admissions

@@ -10,8 +10,10 @@ from admitflow.services.retrieval import RetrievalService
 class FixedEmbedder:
     def __init__(self, vectors: list[list[float]]) -> None:
         self.vectors = vectors
+        self.texts: list[str] = []
 
     async def embed(self, texts: list[str]) -> list[list[float]]:
+        self.texts.extend(texts)
         return self.vectors[: len(texts)]
 
 
@@ -29,6 +31,10 @@ async def test_retrieval_indexes_seeded_faqs_and_returns_source(tmp_path: Path) 
     service = RetrievalService(repository, VectorStore(repository), embedder, "fake", 0.72, 0.05)
 
     assert await service.index_seeded_faqs(repository.tenant_id) == 4
+    indexed_text = "\n".join(embedder.texts)
+    assert "Is hostel accommodation available?" in indexed_text
+    assert "Can students stay in a hostel?" in indexed_text
+    assert "This fictional demo institution" not in indexed_text
     # First FAQ is the best match; other seeded vectors deliberately have lower scores.
     repository.save_embedding(
         repository.tenant_id, "class-format", "fake", b"\x00\x00\x00\x00\x00\x00\x80?", 2

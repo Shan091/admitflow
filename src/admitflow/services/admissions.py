@@ -125,7 +125,18 @@ class AdmissionsService:
         lead = self.repository.get_lead(lead_id)
         if lead and lead["state"] == "awaiting_marks":
             return self.answer_marks(lead_id, text)
+        if _is_refund_question(text):
+            return Reply(
+                "Refunds are not supported in this fictional demo. Please ask admissions "
+                "staff about the institution's actual refund policy."
+            )
         if _is_fee_question(text):
+            if _is_unconfigured_fee_category(text):
+                return Reply(
+                    "The sample data only confirms the application fee. Tuition and "
+                    "hostel/accommodation charges or inclusions are not confirmed; "
+                    "please ask admissions staff."
+                )
             course_id = (
                 str(lead["selected_course_id"]) if lead and lead["selected_course_id"] else ""
             )
@@ -195,3 +206,14 @@ def _is_fee_question(text: str) -> bool:
         "fees kitna",
     }
     return any(term in normalized for term in price_terms)
+
+
+def _is_unconfigured_fee_category(text: str) -> bool:
+    normalized = re.sub(r"[^\w]+", " ", text.casefold())
+    unconfigured_categories = {"hostel", "accommodation", "housing", "residence", "tuition"}
+    return any(term in normalized for term in unconfigured_categories)
+
+
+def _is_refund_question(text: str) -> bool:
+    normalized = re.sub(r"[^\w]+", " ", text.casefold())
+    return any(term in normalized for term in {"refund", "refundable", "chargeback"})

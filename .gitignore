@@ -6,5 +6,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 data/*.sqlite3
+data/*.sqlite3-*
 data/*.db
+data/*.db-*
 uv.lock.tmp
