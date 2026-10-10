@@ -3,6 +3,13 @@
 Update this checklist at the start of each work slice. A checkbox is complete only after its
 acceptance criteria pass and the corresponding milestone is committed.
 
+## Repository presentation
+
+- [ ] Restructure the README as a readable project landing page with a concise pitch, feature
+  summary, architecture and demo-flow visuals, setup, verification, docs navigation, and honest
+  limitations. Preserve all setup and safety requirements; validate links/code snippets and run
+  `bash scripts/verify.sh` before recording and committing the change.
+
 ## Foundation and repository
 
 - [x] Confirm feature scope, decisions, and dependency order against `SPEC.md` and `docs/DECISIONS.md`.

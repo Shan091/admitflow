@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — make the project README easier to scan
+
+- **Change:** Reorganized the README into a project landing page with a clear demo-only notice,
+  feature summary, Mermaid demo and architecture diagrams, quick-start/configuration table,
+  collapsible Telegram/payment setup, verification guidance, scope limitations, and documentation
+  links. Kept privacy, payment, and eligibility boundaries visible and aligned with `SPEC.md` and
+  `docs/DECISIONS.md`.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests;
+  `git diff --check` passed. A local check found all 10 relative README links. No runtime code or
+  live services changed.
+- **Reason:** Give hackathon reviewers and contributors a quick, honest overview without making
+  them parse a wall of setup and caveat text.
+
 ## 2026-10-11 — validate guided continuation at tap time
 
 - **Change:** Guided course details now use a `guidance:continue` action that rechecks the current

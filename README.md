@@ -1,133 +1,213 @@
-# AdmitFlow
+<div align="center">
+  <img src="src/admitflow/dashboard/static/brand/logo.svg" alt="AdmitFlow logo" width="104" />
+  <h1>AdmitFlow</h1>
+  <p><strong>Course guidance that listens before it recommends.</strong></p>
+  <p>A Telegram admissions assistant and staff dashboard, built for the DevDay Exchange Community Hackathon: Kochi.</p>
+  <p>
+    <a href="https://github.com/Shan091/admitflow/actions/workflows/ci.yml"><img src="https://github.com/Shan091/admitflow/actions/workflows/ci.yml/badge.svg" alt="CI status" /></a>
+    <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12" />
+    <img src="https://img.shields.io/badge/demo-fictional%20data-6B4EFF" alt="Fictional-data demo" />
+  </p>
+</div>
 
-AdmitFlow is a hackathon demo of an admissions assistant. In Telegram, a student can use
-OpenAI-assisted free-text discovery, name a known course, describe interests, explore through short
-prompts, or browse/ask a question. OpenAI processing is disclosed at the start and can be switched
-off or back on at any time; button-based exploration remains usable while it is off. Recommendations
-stay inside the fictional catalog, may ask one skippable study-goal question when it can narrow a
-broad set of matches, and use no aptitude score. Eligible undergraduate demo applicants can choose
-whether to request a Razorpay test-mode fee
-link. FAQ answers use seeded institution content, OpenAI embeddings, and local vector search. Staff
-can inspect leads, attributed discovery facts, and handoffs in a dashboard.
+---
 
-This is a demo using fictional sample data. Eligibility results are not real admission decisions.
-The language selector stores English, Malayalam, Hindi, or Hinglish preferences, but most current
-bot responses remain English; translated copy is incomplete and needs fluent-speaker review.
-Use fictional/demo answers only: Telegram user IDs, usernames, and chat messages are stored in the
-local SQLite database. At `/start`, the bot explains that typed messages are sent to OpenAI for
-processing, messages are stored locally, and only fictional demo data should be used. AI processing
-starts enabled; users can turn it off or back on in the chat. The extraction request uses only the
-current message and allowlisted fictional catalog vocabulary with API storage disabled; it does not
-include chat ID, name, or transcript. This is not a production privacy review. Configure staff
-credentials before viewing the dashboard. Razorpay is restricted to test-key IDs; payment state
-changes only after a verified webhook.
+> [!IMPORTANT]
+> **Hackathon demo only.** The institution, courses, requirements, and fees are fictional sample
+> data. Recommendations and eligibility are not real admission decisions. Use fictional inputs
+> only: Telegram identifiers and messages are stored locally, and typed text is sent to OpenAI
+> while AI processing is enabled. The bot explains this at `/start`; users can switch AI processing
+> off and continue with buttons.
 
-## Requirements
+## What it does
+
+AdmitFlow helps prospective learners explore courses offered by a fictional Kerala institution.
+It remembers stated interests, explains why sample courses match, and gives staff a small view of
+leads and handoffs.
+
+| Learner experience | Staff and system |
+| --- | --- |
+| Explore by known course, field, interests, or browsing | Authenticated dashboard for leads, attributed facts, and handoffs |
+| Get up to three catalog-grounded course matches | SQLite persistence for conversations and demo records |
+| Inspect sample requirements, study options, support, and fees before continuing | Code-owned undergraduate sample eligibility and fee values |
+| Ask seeded FAQs; uncertain or unavailable retrieval abstains | OpenAI embeddings with local SQLite storage and NumPy cosine search |
+| Optionally continue to a Razorpay **test-mode** application-fee link | Payment status changes only after a verified Razorpay webhook |
+
+### Demo flow
+
+```mermaid
+flowchart LR
+    S[Student in Telegram] --> D[Explore or browse]
+    D --> R[Catalog-grounded matches]
+    R --> I[Inspect and compare]
+    I -->|explicit continue| E[Sample eligibility or staff handoff]
+    E -->|eligible and requests fee| P[Razorpay test payment]
+    P -->|verified webhook| C[Payment status and confirmation]
+    S --> F[Seeded FAQ]
+    F -->|uncertain| A[Safe abstention]
+    D -. lead and messages .-> DB[(Local SQLite)]
+    E -. handoff .-> DB
+    DB --> W[Staff dashboard]
+```
+
+### How the boundaries work
+
+```mermaid
+flowchart TB
+    TG[Telegram webhook] --> API[FastAPI app]
+    WEB[Staff browser] --> API
+    RP[Razorpay webhook] --> API
+    API --> SVC[Admissions and payment services]
+    SVC <--> DB[(SQLite: catalog, leads, FAQs, vectors, payments)]
+    SVC -. optional current-message extraction .-> OAI[OpenAI API]
+    SVC -. seeded FAQ embeddings .-> OAI
+    SVC -->|cosine search and confidence checks| DB
+```
+
+OpenAI extraction receives the current message and fictional catalog vocabulary, not the learner's
+chat ID, name, or conversation transcript. Python owns recommendations, eligibility, and prices;
+OpenAI does not decide them. FAQ retrieval searches the seeded local corpus and fails closed when
+the result is weak, ambiguous, or unavailable.
+
+## Run it locally
+
+### Requirements
 
 - Python 3.12
-- `uv`
-- Telegram bot token and webhook secret for live Telegram interaction (optional for local
-  dashboard/tests)
-- OpenAI API key for Decisions API and embedding-backed FAQ answers (optional; RAG stays
-  unavailable without it)
-- Staff username, password, and session signing secret (required for dashboard access)
-- Razorpay test-mode API key ID, API secret, and webhook secret (optional; payments stay disabled
-  without the complete set)
+- [`uv`](https://docs.astral.sh/uv/)
+- Staff username, password, and session secret for dashboard access
+- Optional: Telegram bot credentials, OpenAI API key, and Razorpay **test-mode** credentials
 
-## Setup and run
+### Install and start
 
-```bash
+```powershell
 uv sync --python 3.12
-cp .env.example .env
-# Add credentials to .env locally; never commit it.
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+This leaves an existing `.env` untouched. Edit `.env` locally. Set strong demo values for
+`STAFF_USERNAME`, `STAFF_PASSWORD`, and
+`STAFF_SESSION_SECRET`. Never commit `.env` or paste its secrets into issues or chat. Then start
+the app:
+
+```powershell
 uv run uvicorn admitflow.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000/welcome` for the public landing page. `/` redirects to staff login,
-then opens the authenticated dashboard; `/health` reports health status. Configure both
-`TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` to enable Telegram webhook handling. Generate a
-webhook secret locally with `python -c "import secrets; print(secrets.token_urlsafe(32))"`; keep
-the secret private. After starting the app on a public HTTPS host or tunnel, register the webhook
-using the helper script. It reads the bot token and webhook secret from your local `.env` and never
-prints them:
+- Public landing page: <http://127.0.0.1:8000/welcome>
+- Staff login/dashboard: <http://127.0.0.1:8000/>
+- Health check: <http://127.0.0.1:8000/health>
+
+Without Telegram credentials, the local dashboard and tests can still run. Without an OpenAI key,
+free-text AI discovery and FAQ retrieval remain unavailable; button-based exploration still works.
+Payments remain disabled unless all Razorpay test credentials are configured.
+
+### Configuration at a glance
+
+| Variables | Needed for | Notes |
+| --- | --- | --- |
+| `STAFF_USERNAME`, `STAFF_PASSWORD`, `STAFF_SESSION_SECRET` | Staff dashboard | Required; keep local and use non-default demo values. |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` | Telegram bot | Both are needed for the authenticated webhook. |
+| `OPENAI_API_KEY` | Free-text discovery and FAQ retrieval | Optional; API usage can incur charges. |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Demo payments | Optional; test-mode keys only, with key ID starting `rzp_test_`. |
+| `DATABASE_PATH` | SQLite location | Defaults to `data/admitflow.sqlite3`. |
+
+See [`.env.example`](.env.example) for the full list, including model and retrieval settings.
+
+<details>
+<summary><strong>Connect Telegram</strong></summary>
+
+Telegram webhooks require a public HTTPS URL. Set `TELEGRAM_BOT_TOKEN` and
+`TELEGRAM_WEBHOOK_SECRET` in `.env`, run the app on a public HTTPS host or tunnel, then register
+the hook with the helper (it reads secrets from `.env` and does not print them):
 
 ```powershell
 uv run python scripts/manage_telegram_webhook.py https://YOUR-PUBLIC-HOST
 ```
 
-Staff can delete one lead from its detail page or use **Delete all demo data** at the bottom of the
-authenticated dashboard to reset the
-local demo. It requires typing `DELETE ALL DEMO DATA` and deletes leads, conversations, payment
-records, and Razorpay webhook history from SQLite. Seeded fictional courses and FAQs remain so the
-demo can continue. This does not delete external records held by Telegram or Razorpay.
+The webhook endpoint is `/api/v1/webhooks/telegram`. To remove the hook:
 
-Telegram webhooks require HTTPS, and Telegram does not allow webhook delivery and `getUpdates`
-polling simultaneously. The helper checks Telegram's reported webhook URL after registration.
-To remove the hook, run `uv run python scripts/manage_telegram_webhook.py --delete`. This project
-currently runs webhook mode only. Configure `OPENAI_API_KEY` to enable AI discovery and semantic
-FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
-`STAFF_SESSION_SECRET` in `.env` to log in. Generate the session secret locally with
-`python -c "import secrets; print(secrets.token_urlsafe(48))"`; never commit `.env`.
+```powershell
+uv run python scripts/manage_telegram_webhook.py --delete
+```
 
-For payments, create Razorpay **test mode** API keys and configure `RAZORPAY_KEY_ID` (must start
-with `rzp_test_`), `RAZORPAY_KEY_SECRET`, and `RAZORPAY_WEBHOOK_SECRET`. Register
-`POST /api/v1/webhooks/razorpay` (also accepted at `/webhooks/razorpay`) in the Razorpay test
-dashboard for the `payment_link.paid` event. Local webhook delivery needs a public HTTPS tunnel;
-payment creation and signature handling have fake automated tests and do not spend credits or
-create network calls during CI. Do not use live keys.
+Telegram does not deliver webhooks while `getUpdates` polling is active; this project uses webhook
+mode only. The helper checks Telegram's reported webhook URL after registration.
 
-## Tests and checks
+</details>
 
-Run the same quality gate used by GitHub Actions before pushing:
+<details>
+<summary><strong>Enable Razorpay test payments</strong></summary>
+
+Configure `RAZORPAY_KEY_ID` (must begin with `rzp_test_`), `RAZORPAY_KEY_SECRET`, and
+`RAZORPAY_WEBHOOK_SECRET`. In the Razorpay test dashboard, register
+`POST /api/v1/webhooks/razorpay` for `payment_link.paid`. Local webhook delivery also needs a
+public HTTPS tunnel.
+
+Only an eligible demo applicant who explicitly continues receives a link. The server supplies the
+sample fee; a browser redirect cannot mark payment paid. A valid signed webhook updates local status.
+Do not use live keys. Automated payment tests use fakes and do not contact Razorpay.
+
+</details>
+
+## Verify and evaluate
+
+Run the same local quality gate as CI before committing:
 
 ```bash
 bash scripts/verify.sh
 ```
 
-The gate runs Ruff lint and format checks, strict mypy, and pytest. Automated tests use fake
-Telegram updates, fake embeddings, and temporary SQLite databases; they do not call Telegram or
-OpenAI and do not spend API credits. Live API checks are manual and must be reported separately.
+It runs Ruff lint/format checks, strict mypy, and pytest. Automated tests use fake Telegram updates,
+fake embeddings, and temporary databases; they do not call Telegram or OpenAI or spend API credits.
+CI runs on pushes and pull requests, and each result applies to its exact commit.
 
-To check the seeded FAQ retrieval with the live embedding API, configure `OPENAI_API_KEY` and run:
+To evaluate the seeded FAQ corpus with the live embedding API, set `OPENAI_API_KEY` and run:
 
 ```bash
 uv run python scripts/evaluate_faq_retrieval.py
 ```
 
-This evaluates 27 fixed, fictional question variants against the seeded SQLite corpus, reports
-the expected/actual source, cosine score, margin, and API input-token usage, and exits nonzero if
-any expected match/refusal fails. The request uses only synthetic demo questions; OpenAI API usage
-is billable. The evaluator never reads applicant messages.
-CI runs on pushes and pull requests; its status applies to the exact commit shown by GitHub.
+This sends only 27 fixed fictional query variants to OpenAI, checks expected matches and refusals,
+and reports token usage. API usage is billable; applicant messages are never read by the evaluator.
 
 ## Demo walkthrough
 
-1. Register the Telegram webhook as described above, then send `/start` to the configured bot.
-2. Read the OpenAI processing notice and use fictional demo text only; no separate consent step is
-   required. Free-text course discovery is enabled by default; describe a known course, interest,
-   activity, study goal, language-support preference, or study level, or use the shortcuts. A broad
-   match may get one optional question about catalog-listed goals or language support. The catalog
-   distinguishes English teaching medium from listed discussion support. Turn OpenAI processing off
-   to continue with buttons only; it can be turned back on. A learner can pause with the inline
-   action and resume with `/resume`.
-3. Select a course. Sample undergraduate options can continue through the code-computed eligibility
-   check; other levels show sample prerequisites and create a staff handoff instead of using a
-   Grade 12 rule that may not apply.
-4. Ask a seeded FAQ question; if retrieval is unavailable or uncertain, the bot says so.
-5. Open the local dashboard, log in, and view the same lead, attributed facts, and any pending
-   handoff. Staff can delete an individual lead or reset all local demo records.
-6. If Razorpay test credentials and a reachable webhook are configured, meet the sample rules and
-   tap **Continue to demo fee** before a link is created. The verified `payment_link.paid` webhook
-   marks the payment paid and sends one confirmation. If delivery fails, ask “Has my payment gone
-   through?” to check the stored status. The dashboard records the next staff-review step; no live
-   contact or response time is configured, and course access is not provisioned automatically.
+1. Register the Telegram webhook and send `/start` to the bot.
+2. Read the demo-data and OpenAI notice. Explore by naming a course, activity, interest, goal, or
+   study level—or choose a button. Turn AI processing off to keep exploring with buttons only.
+3. Review the matches, inspect a course's sample details, then compare again or explicitly continue.
+4. Try a seeded FAQ; uncertain or unavailable retrieval should produce an abstention.
+5. Sign into the staff dashboard to review the lead and any handoff. Staff can delete one lead or
+   reset all local demo records; fictional courses and FAQs remain seeded.
+6. With Razorpay test credentials configured, complete the sample eligibility path, request the
+   demo fee link, and deliver the signed test webhook.
 
-The language menu is available at each bot turn and saves the selected preference, but most current
-replies remain in English. Do not present the four language selector options as complete translated
-support yet.
+No live staff contact, response time, or automatic course access is configured. Payment
+confirmation means the demo dashboard records a verified paid status; it is not enrollment.
 
-## Current status
+## Scope and limitations
 
-Check `tasks/todo.md` for completion state. `CHANGELOG.md` and `SUBMISSION.md` contain only
-checks actually performed. Live payments, document uploads, deployment, and a production WhatsApp
-integration are out of scope for this demo.
+- Fictional single-institution catalog and seeded FAQs; no general document ingestion.
+- Sample undergraduate eligibility is code-checked. Other education levels go to staff for
+  eligibility confirmation until verified course-specific rules exist.
+- English, Malayalam, Hindi, and Hinglish can be selected, but most bot copy is still English;
+  translations need fluent-speaker review.
+- One environment-configured staff account; no staff roles or production identity provider.
+- Local demo reset does not erase records held by Telegram or Razorpay. Automatic retention expiry,
+  production privacy review, live payments, refunds, uploads, and WhatsApp are out of scope.
+
+## Project map
+
+| Path | What you'll find |
+| --- | --- |
+| [`SPEC.md`](SPEC.md) | Mission, hackathon capability map, success criteria, roadmap |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Product and architecture decisions |
+| [`tasks/todo.md`](tasks/todo.md) | Implementation checklist and remaining work |
+| [`tasks/features/`](tasks/features/) | Feature briefs and acceptance criteria |
+| [`docs/BUILD_CYCLE.md`](docs/BUILD_CYCLE.md) | Feature delivery and verification loop |
+| [`SUBMISSION.md`](SUBMISSION.md) | Hackathon submission details and verified checks |
+| [`CHANGELOG.md`](CHANGELOG.md) · [`AI_USAGE.md`](AI_USAGE.md) | Delivery history and AI-assisted work log |
+
+Questions about what is complete? Start with the checklist. For setup or demo status, see the
+[submission notes](SUBMISSION.md).

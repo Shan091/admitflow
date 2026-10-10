@@ -3,6 +3,17 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — improve repository readability
+
+- **Task:** Make the GitHub project landing page more attractive and easier to scan.
+- **Assistance:** Codex reorganized `README.md` around the demo experience, architecture, setup,
+  configuration, verification, limitations, and project-document links. No application code or
+  credentials were changed.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests;
+  `git diff --check` passed; a local script confirmed all 10 relative README links exist.
+- **Human review:** The README labels the institution/data as fictional and keeps current language,
+  eligibility, payment, privacy, and staff-follow-up limitations visible.
+
 ## 2026-10-11 — validate guided course continuation against current state
 
 - **Task:** Prevent an old course-detail Continue button from selecting a match after the learner
