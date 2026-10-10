@@ -588,6 +588,50 @@ async def test_language_preference_statement_is_extracted_not_routed_as_faq(
 
 
 @pytest.mark.asyncio
+async def test_parent_language_preference_is_attributed_but_not_used_for_student(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=(),
+            education_level=None,
+            interests=(),
+            activities=(),
+            unsure=False,
+            correct_previous=False,
+            language_support_preference="Malayalam discussion support",
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    service.choose_speaker(lead_id, "parent")
+
+    reply = await service.free_text(
+        lead_id, "I prefer Malayalam discussion support for my child", None
+    )
+
+    facts = repository.list_facts(lead_id)
+    assert "parent's preferences" in reply.text
+    assert any(
+        fact["fact_key"] == "language_support_preference_parent"
+        and fact["fact_value"] == "Malayalam discussion support"
+        and fact["speaker"] == "parent"
+        for fact in facts
+    )
+    assert not any(fact["fact_key"] == "language_support_preference_student" for fact in facts)
+
+
+@pytest.mark.asyncio
 async def test_unlisted_teaching_medium_request_gets_catalog_boundary_not_inference(
     tmp_path: Path,
 ) -> None:
