@@ -76,7 +76,7 @@ acceptance criteria pass and the corresponding milestone is committed.
 
 ## Final verification and submission
 
-- [ ] Send a one-time, truthful Telegram confirmation after a verified paid webhook; add a
+- [x] Send a one-time, truthful Telegram confirmation after a verified paid webhook; add a
   payment-status lookup backed only by persisted Razorpay state and cover the flows with tests.
 - [ ] Run the full verification gate, update feature/docs/logs, commit and push the milestone, and
   record the matching GitHub Actions result.

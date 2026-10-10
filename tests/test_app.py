@@ -161,8 +161,8 @@ def test_paid_webhook_sends_one_telegram_confirmation_with_next_step(tmp_path: P
         chat_id, message = bot.sent[0]
         assert chat_id == 42
         assert "Payment successful" in message
-        assert "share course access steps" in message
-        assert "not provisioned automatically" in message
+        assert "reach out soon with course access instructions" in message
+        assert "not automatically enabled" in message
 
         duplicate = client.post("/api/v1/webhooks/razorpay", content=body, headers=headers)
         assert duplicate.json() == {"status": "duplicate"}

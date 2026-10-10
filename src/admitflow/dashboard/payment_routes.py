@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 PAYMENT_SUCCESS_MESSAGE = (
     "✅ Payment successful! Your demo application fee is confirmed and your application is "
-    "recorded. Next, admissions staff can review it and share course access steps. "
-    "Course access is not provisioned automatically in this demo."
+    "recorded. Next, an admissions team member will reach out soon with course access "
+    "instructions. Course access is not automatically enabled in this demo."
 )
 
 

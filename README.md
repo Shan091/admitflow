@@ -91,7 +91,8 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
    link. The verified `payment_link.paid` webhook marks the payment as paid and sends one
    Telegram confirmation with the next step. If Telegram delivery fails, the student can ask “Has
    my payment gone through?” to check the stored status. Course access is not provisioned
-   automatically; staff can review the application in the dashboard and share the next steps.
+   automatically; an admissions team member will review the application and contact the student
+   with access instructions.
 
 ## Current status
 

@@ -7,7 +7,7 @@
   seeded eligibility rules in code, answers institution FAQs with fail-closed vector search,
   and supports staff login plus Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** To be updated after the payment-notification milestone is pushed.
+- **Verified implementation commit SHA:** `a780d737202863d7dd115b5fdb4a584ab1265089`
 - **Working demo:** Local `/health` and the public HTTPS tunnel returned 200. The Telegram
   webhook is registered and healthy; the user confirmed the live bot flow. The authenticated
   staff dashboard reports FAQ retrieval ready and shows the verified Razorpay test payment as
@@ -32,12 +32,14 @@
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
 - **Demo walkthrough:** In Telegram, send `/start`, select a course, answer the qualification
-  prompts, and ask a seeded FAQ. Complete the Razorpay test link to see the one-time success message;
-  ask “Has my payment gone through?” to check stored status. Staff can log in to the dashboard and
-  review the paid lead. See `README.md` for the full setup.
+  prompts, and ask a seeded FAQ. Complete the Razorpay test link to trigger a one-time success
+  message; ask “Has my payment gone through?” to check stored status. Staff can log in to the
+  dashboard and review the paid lead. See `README.md` for the full setup. The new notification
+  behavior is fake-bot tested; the live test payment was completed before this code change.
 - **Checks performed and results:** `bash scripts/verify.sh` passed locally (Ruff lint, formatting,
-  strict mypy, and 41 pytest tests); `git diff --check` passed. GitHub Actions result for the new
-  payment-notification commit will be added after the push.
+  strict mypy, and 41 pytest tests); `git diff --check` passed. GitHub Actions run
+  [38081779987](https://github.com/Shan091/admitflow/actions/runs/38081779987) for the verified
+  implementation SHA is currently in progress; update this record when it completes.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.
