@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-10-11 — adaptive course discovery first slice
+
+- **Time:** 02:23 IST
+- **Change:** Added a fictional catalog spanning the requested education levels and fields; additive
+  SQLite migrations for course attributes, attributed discovery facts, lifecycle/readiness, language,
+  and handoff state; four Telegram entry paths; field/level/activity prompts with skip/back/pause/
+  resume; explainable catalog matching; parent/student preference attribution; dashboard handoffs;
+  staff-mediated individual deletion; and explicit student consent before creating a test payment
+  link. Corrected payment confirmation copy so it no longer promises an unconfigured staff contact.
+- **Why:** Turn the existing course-first hackathon bot into the first working slice of the agreed
+  interest-led admissions guide while keeping eligibility, prices, and course facts code-owned.
+- **Files:** `src/admitflow/`, `tests/`, `README.md`, `SPEC.md`, `SUBMISSION.md`, `docs/DECISIONS.md`,
+  `tasks/features/adaptive-course-discovery.md`, and `tasks/todo.md`.
+- **Validation:** `bash scripts/verify.sh` passed with 63 tests (Ruff, format, strict mypy, pytest);
+  `git diff --check` passed. Tests use temporary SQLite files and fake APIs; no paid or external API
+  request was made. The exact pushed SHA and GitHub Actions run will be appended after the push.
+- **Limitations:** Most user-facing replies are still English despite saving a language preference;
+  non-undergraduate eligibility is sent to staff for confirmation; automatic admissions-cycle
+  expiry is not implemented and its exact interval remains open. The fictional catalog is not a real
+  institution offer. No counsellor contact or response-time SLA is configured.
+
 ## 2026-10-11 — staff demo-data reset
 
 - **Change:** Added a staff-only dashboard reset form requiring the exact phrase

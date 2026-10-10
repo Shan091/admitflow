@@ -51,6 +51,9 @@ async def test_start_command_creates_lead_and_sends_course_options(tmp_path: Pat
     assert len(repository.list_messages(int(leads[0]["id"]))) == 2
     assert "fictional sample information" in message.sent[0][0]
     assert message.sent[0][1] is not None
+    assert (
+        "Help me explore" in message.sent[0][0] or "What would be most useful" in message.sent[0][0]
+    )
 
 
 @pytest.mark.asyncio
@@ -82,6 +85,64 @@ async def test_course_callback_updates_lead_and_persists_exchange(tmp_path: Path
 
 
 @pytest.mark.asyncio
+async def test_exploration_callbacks_recommend_and_language_choice_persists(tmp_path: Path) -> None:
+    repository, _, context = make_runtime(tmp_path)
+    message = FakeMessage()
+    answered = False
+
+    async def answer() -> None:
+        nonlocal answered
+        answered = True
+
+    user = SimpleNamespace(id=42, username="sample")
+    update = SimpleNamespace(
+        callback_query=SimpleNamespace(answer=answer, data="path:explore"),
+        effective_user=user,
+        effective_message=message,
+        update_id=110,
+    )
+
+    await callback_handler(update, context)
+    assert answered
+    assert "topics or activities" in message.sent[-1][0]
+    assert repository.list_leads(repository.tenant_id)[0]["lifecycle_stage"] == "discovering"
+
+    async def answer_field() -> None:
+        return None
+
+    update.callback_query = SimpleNamespace(answer=answer_field, data="field:tech/data")
+    update.update_id = 111
+    await callback_handler(update, context)
+    assert "study level" in message.sent[-1][0]
+
+    async def answer_level() -> None:
+        return None
+
+    update.callback_query = SimpleNamespace(answer=answer_level, data="level:any")
+    update.update_id = 112
+    await callback_handler(update, context)
+    assert "activity sounds most interesting" in message.sent[-1][0]
+
+    async def answer_skip_activity() -> None:
+        return None
+
+    update.callback_query = SimpleNamespace(answer=answer_skip_activity, data="activity:skip")
+    update.update_id = 113
+    await callback_handler(update, context)
+    assert "Here are sample options" in message.sent[-1][0]
+
+    async def answer_language() -> None:
+        return None
+
+    update.callback_query = SimpleNamespace(answer=answer_language, data="language:ml")
+    update.update_id = 114
+    await callback_handler(update, context)
+    lead = repository.list_leads(repository.tenant_id)[0]
+    assert lead["preferred_language"] == "ml"
+    assert message.sent[-1][0]
+
+
+@pytest.mark.asyncio
 async def test_qualification_sends_test_payment_link_when_enabled(tmp_path: Path) -> None:
     repository, admissions, context = make_runtime(tmp_path)
     lead_id, _ = admissions.start("42", "sample")
@@ -103,9 +164,25 @@ async def test_qualification_sends_test_payment_link_when_enabled(tmp_path: Path
 
     await text_handler(update, context)
 
-    assert "Razorpay test-mode" in message.sent[0][0]
-    assert "₹500" in message.sent[0][0]
-    assert "https://rzp.io/i/test123" in message.sent[0][0]
+    assert "Would you like to continue" in message.sent[0][0]
+    assert "https://rzp.io/i/test123" not in message.sent[0][0]
+
+    async def answer_payment() -> None:
+        return None
+
+    payment_message = FakeMessage()
+    payment_update = SimpleNamespace(
+        callback_query=SimpleNamespace(answer=answer_payment, data="payment:yes"),
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=payment_message,
+        update_id=104,
+    )
+    await callback_handler(payment_update, context)
+
+    assert "Razorpay test-mode" in payment_message.sent[0][0]
+    assert "₹500" in payment_message.sent[0][0]
+    assert "https://rzp.io/i/test123" in payment_message.sent[0][0]
+    assert repository.get_lead(lead_id)["readiness_status"] == "ready_to_apply"  # type: ignore[index]
     stored_messages = repository.list_messages(lead_id)
     assert stored_messages[-1]["direction"] == "outbound"
     assert "https://rzp.io/i/test123" in stored_messages[-1]["body"]

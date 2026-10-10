@@ -56,6 +56,7 @@ def test_health_and_dashboard_require_staff_login(tmp_path: Path) -> None:
         assert "Foundations of Computing" in detail.text
         assert "/start" in detail.text
         assert "Application fee payment" in detail.text
+        assert "Delete this lead's local data" in detail.text
         assert client.post("/logout", follow_redirects=False).status_code == 303
         assert client.get(f"/leads/{lead_id}", follow_redirects=False).status_code == 303
 
@@ -169,6 +170,61 @@ def test_staff_can_delete_demo_records_with_confirmation_and_csrf(
         assert event_count == 0
 
 
+def test_staff_can_delete_one_lead_with_session_bound_token(tmp_path: Path) -> None:
+    settings = Settings(
+        telegram_bot_token=None,
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=tmp_path / "demo.sqlite3",
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+        staff_username="demo-staff",
+        staff_password="local-pass",
+        staff_session_secret="test-session-secret-long-enough",
+    )
+    app = create_app(settings)
+
+    with TestClient(app) as client:
+        repository = app.state.repository
+        lead_id = repository.upsert_lead(repository.tenant_id, "42", "sample")
+        repository.add_message(lead_id, "inbound", "hello", 909)
+        repository.save_fact(lead_id, "interest_field", "tech/data", "student")
+        other_id = repository.upsert_lead(repository.tenant_id, "43", "other")
+        client.post("/login", data={"username": "demo-staff", "password": "local-pass"})
+
+        detail = client.get(f"/leads/{lead_id}")
+        match = re.search(r'name="csrf_token" value="([^"]+)"', detail.text)
+        assert match is not None
+        delete_path = f"/admin/leads/{lead_id}/delete"
+        rejected = client.post(
+            delete_path,
+            data={"csrf_token": "invalid", "confirmation": "DELETE LEAD"},
+            follow_redirects=False,
+        )
+        assert rejected.headers["location"] == f"/leads/{lead_id}?delete=not-deleted"
+        assert repository.get_lead(lead_id) is not None
+        wrong_phrase = client.post(
+            delete_path,
+            data={"csrf_token": match.group(1), "confirmation": "DELETE DATA"},
+            follow_redirects=False,
+        )
+        assert wrong_phrase.headers["location"] == f"/leads/{lead_id}?delete=not-deleted"
+        assert repository.get_lead(lead_id) is not None
+
+        deleted = client.post(
+            delete_path,
+            data={"csrf_token": match.group(1), "confirmation": "DELETE LEAD"},
+            follow_redirects=False,
+        )
+        assert deleted.status_code == 303
+        assert deleted.headers["location"] == "/?delete=complete"
+        assert repository.get_lead(lead_id) is None
+        assert repository.list_messages(lead_id) == []
+        assert repository.list_facts(lead_id) == []
+        assert repository.get_lead(other_id) is not None
+
+
 def test_dashboard_fails_closed_without_staff_configuration(tmp_path: Path) -> None:
     settings = Settings(
         telegram_bot_token=None,
@@ -272,9 +328,9 @@ def test_paid_webhook_sends_one_telegram_confirmation_with_next_step(tmp_path: P
         assert len(bot.sent) == 1
         chat_id, message = bot.sent[0]
         assert chat_id == 42
-        assert "Payment successful" in message
-        assert "reach out soon with course access instructions" in message
-        assert "not automatically enabled" in message
+        assert "Razorpay test payment received" in message
+        assert "live follow-up contact and a response time are not configured" in message
+        assert "Course access is not enabled automatically" in message
 
         duplicate = client.post("/api/v1/webhooks/razorpay", content=body, headers=headers)
         assert duplicate.json() == {"status": "duplicate"}

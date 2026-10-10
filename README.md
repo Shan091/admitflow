@@ -1,11 +1,15 @@
 # AdmitFlow
 
-AdmitFlow is a hackathon demo of an admissions assistant. A student can explore a fictional
-institution's courses in Telegram, answer eligibility questions evaluated by code, and ask
-questions answered from seeded institution FAQs using OpenAI embeddings and local vector search.
-Staff can inspect saved leads and conversations in a local read-only dashboard.
+AdmitFlow is a hackathon demo of an admissions assistant. In Telegram, a student can choose a
+known course or field, explore sample options through short prompts, or browse/ask a question.
+Catalog-only recommendations use explicit field, education-level, and activity choices; there is
+no aptitude score. Eligible undergraduate demo applicants can choose whether to request a Razorpay
+test-mode fee link. FAQ answers use seeded institution content, OpenAI embeddings, and local vector
+search. Staff can inspect leads, attributed discovery facts, and handoffs in a dashboard.
 
 This is a demo using fictional sample data. Eligibility results are not real admission decisions.
+The language selector stores English, Malayalam, Hindi, or Hinglish preferences, but most current
+bot responses remain English; translated copy is incomplete and needs fluent-speaker review.
 Use fictional/demo answers only: Telegram user IDs, usernames, and chat messages are stored in the
 local SQLite database. Configure staff credentials before viewing the dashboard. Razorpay is
 restricted to test-key IDs; payment state changes only after a verified webhook.
@@ -42,7 +46,8 @@ prints them:
 uv run python scripts/manage_telegram_webhook.py https://YOUR-PUBLIC-HOST
 ```
 
-Staff can use **Delete all demo data** at the bottom of the authenticated dashboard to reset the
+Staff can delete one lead from its detail page or use **Delete all demo data** at the bottom of the
+authenticated dashboard to reset the
 local demo. It requires typing `DELETE ALL DEMO DATA` and deletes leads, conversations, payment
 records, and Razorpay webhook history from SQLite. Seeded fictional courses and FAQs remain so the
 demo can continue. This does not delete external records held by Telegram or Razorpay.
@@ -89,15 +94,24 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
 ## Demo walkthrough
 
 1. Register the Telegram webhook as described above, then send `/start` to the configured bot.
-2. Choose a seeded course, answer the two qualification prompts, and view the code-computed result.
-3. Ask a seeded FAQ question; if retrieval is unavailable or uncertain, the bot says so.
-4. Open the local dashboard, log in, and view the same lead and conversation.
-5. If Razorpay test credentials and a reachable webhook are configured, complete the demo fee
-   link. The verified `payment_link.paid` webhook marks the payment as paid and sends one
-   Telegram confirmation with the next step. If Telegram delivery fails, the student can ask “Has
-   my payment gone through?” to check the stored status. Course access is not provisioned
-   automatically; an admissions team member will review the application and contact the student
-   with access instructions.
+2. Choose a known course, known field, guided exploration, or browse. Exploration asks about study
+   level and activities one at a time; either answer can be skipped. A learner can pause with the
+   inline action and resume with `/resume`.
+3. Select a course. Sample undergraduate options can continue through the code-computed eligibility
+   check; other levels show sample prerequisites and create a staff handoff instead of using a
+   Grade 12 rule that may not apply.
+4. Ask a seeded FAQ question; if retrieval is unavailable or uncertain, the bot says so.
+5. Open the local dashboard, log in, and view the same lead, attributed facts, and any pending
+   handoff. Staff can delete an individual lead or reset all local demo records.
+6. If Razorpay test credentials and a reachable webhook are configured, meet the sample rules and
+   tap **Continue to demo fee** before a link is created. The verified `payment_link.paid` webhook
+   marks the payment paid and sends one confirmation. If delivery fails, ask “Has my payment gone
+   through?” to check the stored status. The dashboard records the next staff-review step; no live
+   contact or response time is configured, and course access is not provisioned automatically.
+
+The language menu is available at each bot turn and saves the selected preference, but most current
+replies remain in English. Do not present the four language selector options as complete translated
+support yet.
 
 ## Current status
 

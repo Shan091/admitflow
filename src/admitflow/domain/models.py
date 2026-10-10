@@ -12,6 +12,13 @@ class Course:
     description: str
     minimum_marks_percent: float
     application_fee_paise: int
+    education_level: str = "undergraduate"
+    field: str = ""
+    interests: tuple[str, ...] = ()
+    activities: tuple[str, ...] = ()
+    prerequisites: tuple[str, ...] = ()
+    medium: str = "English"
+    language_support: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

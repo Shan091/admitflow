@@ -37,16 +37,20 @@ def build_telegram_application(
     application.bot_data["intent_router"] = intent_router
     application.bot_data["payment_service"] = payment_service
     application.add_handler(CommandHandler("start", start_command))
+    application.add_handler(CommandHandler("resume", resume_command))
     application.add_handler(CallbackQueryHandler(callback_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
     return application
 
 
 def keyboard(reply: Reply) -> InlineKeyboardMarkup | None:
-    if not reply.buttons:
+    buttons = list(reply.buttons)
+    if not any(data == "language:menu" for _, data in buttons):
+        buttons.append(("🌐 Change language", "language:menu"))
+    if not buttons:
         return None
     return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(label, callback_data=data)] for label, data in reply.buttons]
+        [[InlineKeyboardButton(label, callback_data=data)] for label, data in buttons]
     )
 
 
@@ -80,7 +84,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    repository, admissions, _, _ = _services(context)
+    repository, admissions, _, payment_service = _services(context)
     query = update.callback_query
     user = update.effective_user
     if query is None or user is None:
@@ -89,7 +93,31 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     data = query.data or ""
     repository.add_message(lead_id, "inbound", data, update.update_id)
-    if data == "browse":
+    if data.startswith("path:"):
+        reply = admissions.begin_path(lead_id, data.removeprefix("path:"))
+    elif data.startswith("speaker:"):
+        reply = admissions.choose_speaker(lead_id, data.removeprefix("speaker:"))
+    elif data.startswith("course:confirm:"):
+        reply = admissions.confirm_parent_course(lead_id, data.removeprefix("course:confirm:"))
+    elif data.startswith("field:"):
+        reply = admissions.recommend_field(lead_id, data.removeprefix("field:"))
+    elif data.startswith("level:"):
+        reply = admissions.choose_level(lead_id, data.removeprefix("level:"))
+    elif data.startswith("activity:"):
+        reply = admissions.choose_activity(lead_id, data.removeprefix("activity:"))
+    elif data == "discovery:pause":
+        reply = admissions.pause_discovery(lead_id)
+    elif data == "discovery:back_field":
+        reply = admissions.back_to_field(lead_id)
+    elif data == "discovery:back_level":
+        reply = admissions.back_to_level(lead_id)
+    elif data == "language:menu":
+        reply = admissions.language_menu()
+    elif data.startswith("language:"):
+        reply = admissions.choose_language(lead_id, data.removeprefix("language:"))
+    elif data == "menu:start":
+        _, reply = admissions.start(str(user.id), user.username)
+    elif data == "browse":
         reply = admissions.browse(lead_id)
     elif data.startswith("course:"):
         reply = admissions.select_course(lead_id, data.removeprefix("course:"))
@@ -97,6 +125,35 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply = admissions.answer_grade12(lead_id, True)
     elif data == "grade12:no":
         reply = admissions.answer_grade12(lead_id, False)
+    elif data == "payment:yes":
+        lead = repository.get_lead(lead_id)
+        if lead is None or lead["eligible"] != 1:
+            reply = Reply("I can only offer a sample payment link after the sample rules are met.")
+        elif payment_service is None:
+            reply = Reply("The demo payment link is not configured right now.")
+        else:
+            repository.update_lead(lead_id, readiness_status="ready_to_apply")
+            try:
+                offer = await payment_service.create_for_qualified_lead(lead_id)
+            except Exception:
+                logger.exception("Razorpay test Payment Link creation failed for lead %s", lead_id)
+                offer = None
+            if offer is None:
+                payment = repository.get_payment_for_lead(admissions.tenant_id, lead_id)
+                if payment and payment.get("short_url"):
+                    url, amount_paise = payment["short_url"], payment["amount_paise"]
+                    reply = Reply(
+                        f"Demo application fee: {format_inr_from_paise(amount_paise)}. "
+                        f"Complete the Razorpay test-mode payment here: {url}"
+                    )
+                else:
+                    reply = Reply("The demo payment link is not available right now.")
+            else:
+                url, amount_paise = offer
+                reply = Reply(
+                    f"Demo application fee: {format_inr_from_paise(amount_paise)}. "
+                    f"Complete the Razorpay test-mode payment here: {url}"
+                )
     else:
         reply = Reply("Please send /start to see the demo options.")
     repository.add_message(lead_id, "outbound", reply.text)
@@ -106,14 +163,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    repository, admissions, intent_router, payment_service = _services(context)
+    repository, admissions, intent_router, _ = _services(context)
     user = update.effective_user
     message = update.effective_message
     if user is None or message is None or message.text is None:
         return
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     repository.add_message(lead_id, "inbound", message.text, update.update_id)
-    lead_before = repository.get_lead(lead_id)
     if _is_payment_status_question(message.text):
         payment = repository.get_payment_for_lead(admissions.tenant_id, lead_id)
         if payment is None:
@@ -126,34 +182,25 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 "payment link, then ask again after the webhook is received."
             )
         elif payment["status"] == "failed":
-            reply = Reply("Your demo payment link could not be created. Please contact staff.")
+            reply = Reply(
+                "Your demo payment link could not be created. Staff support details are not "
+                "configured; try again later."
+            )
         else:
             reply = Reply("Your demo payment is still being set up. Please check again shortly.")
     else:
         reply = await admissions.free_text(lead_id, message.text, intent_router)
-    lead_after = repository.get_lead(lead_id)
-    if (
-        payment_service is not None
-        and lead_before is not None
-        and lead_before["state"] == "awaiting_marks"
-        and lead_after is not None
-        and lead_after["eligible"] == 1
-    ):
-        try:
-            offer = await payment_service.create_for_qualified_lead(lead_id)
-        except Exception:
-            logger.exception("Razorpay test Payment Link creation failed for lead %s", lead_id)
-            offer = None
-        if offer is not None:
-            url, amount_paise = offer
-            reply = Reply(
-                f"{reply.text}\n\nDemo application fee: "
-                f"{format_inr_from_paise(amount_paise)}. Complete the Razorpay test-mode "
-                f"payment here: {url}"
-            )
-        elif lead_after.get("eligible") == 1:
-            reply = Reply(f"{reply.text}\n\nThe demo payment link is not available right now.")
     await _send_reply(update, reply, repository, lead_id)
+
+
+async def resume_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    repository, admissions, _, _ = _services(context)
+    user = update.effective_user
+    if user is None:
+        return
+    lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
+    repository.add_message(lead_id, "inbound", "/resume", update.update_id)
+    await _send_reply(update, admissions.resume_discovery(lead_id), repository, lead_id)
 
 
 def _is_payment_status_question(text: str) -> bool:

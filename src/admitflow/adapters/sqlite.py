@@ -38,7 +38,14 @@ class Repository:
                     name TEXT NOT NULL,
                     description TEXT NOT NULL,
                     minimum_marks_percent REAL NOT NULL,
-                    application_fee_paise INTEGER NOT NULL
+                    application_fee_paise INTEGER NOT NULL,
+                    education_level TEXT NOT NULL DEFAULT 'undergraduate',
+                    field TEXT NOT NULL DEFAULT '',
+                    interests TEXT NOT NULL DEFAULT '[]',
+                    activities TEXT NOT NULL DEFAULT '[]',
+                    prerequisites TEXT NOT NULL DEFAULT '[]',
+                    medium TEXT NOT NULL DEFAULT 'English',
+                    language_support TEXT NOT NULL DEFAULT '[]'
                 );
                 CREATE TABLE IF NOT EXISTS leads (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,6 +57,13 @@ class Repository:
                     completed_grade12 INTEGER,
                     marks_percent REAL,
                     eligible INTEGER,
+                    lifecycle_stage TEXT NOT NULL DEFAULT 'new',
+                    readiness_status TEXT NOT NULL DEFAULT 'unknown',
+                    discovery_path TEXT,
+                    discovery_step TEXT,
+                    education_level TEXT,
+                    preferred_language TEXT NOT NULL DEFAULT 'en',
+                    handoff_status TEXT NOT NULL DEFAULT 'none',
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL,
                     UNIQUE (tenant_id, telegram_user_id)
@@ -106,6 +120,46 @@ class Repository:
                     "ALTER TABLE knowledge_chunks ADD COLUMN "
                     "search_queries TEXT NOT NULL DEFAULT '[]'"
                 )
+            course_columns = {
+                row["name"] for row in connection.execute("PRAGMA table_info(courses)")
+            }
+            course_migrations = {
+                "education_level": "TEXT NOT NULL DEFAULT 'undergraduate'",
+                "field": "TEXT NOT NULL DEFAULT ''",
+                "interests": "TEXT NOT NULL DEFAULT '[]'",
+                "activities": "TEXT NOT NULL DEFAULT '[]'",
+                "prerequisites": "TEXT NOT NULL DEFAULT '[]'",
+                "medium": "TEXT NOT NULL DEFAULT 'English'",
+                "language_support": "TEXT NOT NULL DEFAULT '[]'",
+            }
+            for column, declaration in course_migrations.items():
+                if column not in course_columns:
+                    connection.execute(f"ALTER TABLE courses ADD COLUMN {column} {declaration}")
+            lead_columns = {row["name"] for row in connection.execute("PRAGMA table_info(leads)")}
+            lead_migrations = {
+                "lifecycle_stage": "TEXT NOT NULL DEFAULT 'new'",
+                "readiness_status": "TEXT NOT NULL DEFAULT 'unknown'",
+                "discovery_path": "TEXT",
+                "discovery_step": "TEXT",
+                "education_level": "TEXT",
+                "preferred_language": "TEXT NOT NULL DEFAULT 'en'",
+                "handoff_status": "TEXT NOT NULL DEFAULT 'none'",
+            }
+            for column, declaration in lead_migrations.items():
+                if column not in lead_columns:
+                    connection.execute(f"ALTER TABLE leads ADD COLUMN {column} {declaration}")
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS lead_facts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+                    fact_key TEXT NOT NULL,
+                    fact_value TEXT NOT NULL,
+                    speaker TEXT NOT NULL CHECK (speaker IN ('student', 'parent', 'unknown')),
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    UNIQUE (lead_id, fact_key)
+                )"""
+            )
 
     def seed_catalog(self) -> None:
         """Upsert clearly fictional catalog and FAQ content from package seed files."""
@@ -121,13 +175,19 @@ class Repository:
             for course in catalog["courses"]:
                 connection.execute(
                     """INSERT INTO courses
-                    (id, tenant_id, name, description, minimum_marks_percent, application_fee_paise)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    (id, tenant_id, name, description, minimum_marks_percent, application_fee_paise,
+                     education_level, field, interests, activities, prerequisites, medium,
+                     language_support)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(id) DO UPDATE SET
                     tenant_id=excluded.tenant_id, name=excluded.name,
                     description=excluded.description,
                     minimum_marks_percent=excluded.minimum_marks_percent,
-                    application_fee_paise=excluded.application_fee_paise""",
+                    application_fee_paise=excluded.application_fee_paise,
+                    education_level=excluded.education_level, field=excluded.field,
+                    interests=excluded.interests, activities=excluded.activities,
+                    prerequisites=excluded.prerequisites, medium=excluded.medium,
+                    language_support=excluded.language_support""",
                     (
                         course["id"],
                         catalog["tenant_id"],
@@ -135,6 +195,13 @@ class Repository:
                         course["description"],
                         course["minimum_marks_percent"],
                         course["application_fee_paise"],
+                        course["education_level"],
+                        course["field"],
+                        json.dumps(course["interests"], ensure_ascii=False),
+                        json.dumps(course["activities"], ensure_ascii=False),
+                        json.dumps(course["prerequisites"], ensure_ascii=False),
+                        course["medium"],
+                        json.dumps(course["language_support"], ensure_ascii=False),
                     ),
                 )
             for faq in faqs:
@@ -203,6 +270,13 @@ class Repository:
                 description=row["description"],
                 minimum_marks_percent=float(row["minimum_marks_percent"]),
                 application_fee_paise=int(row["application_fee_paise"]),
+                education_level=str(row["education_level"]),
+                field=str(row["field"]),
+                interests=tuple(json.loads(row["interests"])),
+                activities=tuple(json.loads(row["activities"])),
+                prerequisites=tuple(json.loads(row["prerequisites"])),
+                medium=str(row["medium"]),
+                language_support=tuple(json.loads(row["language_support"])),
             )
             for row in rows
         ]
@@ -250,7 +324,20 @@ class Repository:
         return dict(row) if row else None
 
     def update_lead(self, lead_id: int, **fields: object) -> None:
-        allowed = {"state", "selected_course_id", "completed_grade12", "marks_percent", "eligible"}
+        allowed = {
+            "state",
+            "selected_course_id",
+            "completed_grade12",
+            "marks_percent",
+            "eligible",
+            "lifecycle_stage",
+            "readiness_status",
+            "discovery_path",
+            "discovery_step",
+            "education_level",
+            "preferred_language",
+            "handoff_status",
+        }
         if not fields or fields.keys() - allowed:
             raise ValueError("Invalid lead fields")
         values = dict(fields)
@@ -259,6 +346,38 @@ class Repository:
         with self._connect() as connection:
             connection.execute(
                 f"UPDATE leads SET {assignments} WHERE id=?", (*values.values(), lead_id)
+            )
+
+    def save_fact(
+        self, lead_id: int, fact_key: str, fact_value: str, speaker: str = "student"
+    ) -> None:
+        if speaker not in {"student", "parent", "unknown"}:
+            raise ValueError("Invalid fact speaker")
+        if not fact_key.strip() or not fact_value.strip():
+            raise ValueError("Fact key and value must not be empty")
+        now = datetime.now(UTC).isoformat()
+        with self._connect() as connection:
+            connection.execute(
+                """INSERT INTO lead_facts
+                (lead_id, fact_key, fact_value, speaker, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(lead_id, fact_key) DO UPDATE SET
+                fact_value=excluded.fact_value, speaker=excluded.speaker,
+                updated_at=excluded.updated_at""",
+                (lead_id, fact_key, fact_value, speaker, now, now),
+            )
+
+    def list_facts(self, lead_id: int) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT * FROM lead_facts WHERE lead_id=? ORDER BY id", (lead_id,)
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def delete_fact(self, lead_id: int, fact_key: str) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                "DELETE FROM lead_facts WHERE lead_id=? AND fact_key=?", (lead_id, fact_key)
             )
 
     def add_message(
@@ -374,7 +493,22 @@ class Repository:
             connection.execute("DELETE FROM payments")
             connection.execute("DELETE FROM razorpay_webhook_events")
             connection.execute("DELETE FROM messages")
+            connection.execute("DELETE FROM lead_facts")
             connection.execute("DELETE FROM leads")
+
+    def delete_lead(self, lead_id: int, tenant_id: str) -> bool:
+        """Delete one lead and its local message, discovery, and payment records."""
+        with self._connect() as connection:
+            exists = connection.execute(
+                "SELECT 1 FROM leads WHERE id=? AND tenant_id=?", (lead_id, tenant_id)
+            ).fetchone()
+            if exists is None:
+                return False
+            connection.execute("DELETE FROM messages WHERE lead_id=?", (lead_id,))
+            connection.execute("DELETE FROM lead_facts WHERE lead_id=?", (lead_id,))
+            connection.execute("DELETE FROM payments WHERE lead_id=?", (lead_id,))
+            connection.execute("DELETE FROM leads WHERE id=? AND tenant_id=?", (lead_id, tenant_id))
+        return True
 
     def apply_razorpay_paid_event(self, event_id: str, event: dict[str, Any]) -> str:
         """Apply a validated event once, only when link, reference, and full amount match."""

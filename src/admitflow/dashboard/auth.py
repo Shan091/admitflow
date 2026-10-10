@@ -53,3 +53,9 @@ def create_delete_demo_data_token(session_cookie: str, secret: str) -> str:
     """Bind the destructive form token to the authenticated staff session."""
     message = f"delete-demo-data:{session_cookie}".encode()
     return hmac.new(secret.encode(), message, hashlib.sha256).hexdigest()
+
+
+def create_delete_lead_token(session_cookie: str, lead_id: int, secret: str) -> str:
+    """Bind an individual deletion form token to its staff session and target lead."""
+    message = f"delete-lead:{lead_id}:{session_cookie}".encode()
+    return hmac.new(secret.encode(), message, hashlib.sha256).hexdigest()

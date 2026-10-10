@@ -34,6 +34,36 @@ Record consequential choices here. Each entry is short; update it when evidence 
 9. **Demo data reset.** Provide a staff-only dashboard reset for lead, conversation, payment, and
    webhook-event records, protected by a session-bound CSRF token and typed confirmation. Keep
    fictional courses and FAQs so the demo can be run again; provider-side records are unaffected.
+10. **Guidance scope and entry.** Keep guidance within the institution's own course catalog; this
+    is interest-led course discovery, not general career counselling. The first turn offers known
+    course, known field, guided exploration, and browsing/question paths. A student can change path
+    without losing unrelated profile facts.
+11. **Catalog scope.** Seed a clearly fictional Kerala institution with vocational/certificate,
+    diploma, undergraduate, and postgraduate examples spanning tech/data, business/accounting,
+    design/media, hospitality/tourism, and non-regulated vocational skills. Only recommend offerings
+    whose required attributes and entry rules are complete. Do not invent regulated-program rules,
+    employment outcomes, or institution facts.
+12. **Student agency and exploration.** Use short conversational prompts and tap choices, with no
+    aptitude score or personality label. Student-stated goals take priority when a parent is involved;
+    preserve speaker attribution. The bot may gently challenge assumptions using verified facts,
+    trade-offs, and alternatives, then leaves the decision to the student.
+13. **Language and handoff.** Offer English, Malayalam, Hindi, and Hinglish as selectable
+    preferences at any stage. Full translated response coverage and fluent-speaker review are not
+    implemented yet; the demo must disclose that most replies remain English. Out-of-catalog or
+    sensitive needs create a staff-dashboard handoff with conversation context. The demo has no
+    live contact or confirmed response time, so it must say those details are not configured.
+14. **Admissions-cycle memory.** Retain the conversation and confirmed discovery facts through the
+    admissions cycle, then expire them under a stated, configurable policy. Students request deletion
+    through staff; staff perform the deletion. The exact retention interval and production privacy
+    review remain open release gates.
+15. **Level-aware discovery and application boundary.** Rank at most three complete fictional
+    catalog entries from explicit field, optional study-level, and optional activity choices. Use no
+    aptitude score. Existing undergraduate sample rules remain deterministic; other levels are
+    handed to staff for eligibility confirmation until course-specific rules are implemented.
+16. **Explicit fee continuation and honest payment follow-up.** Eligibility alone does not create a
+    Razorpay link; the student must tap the demo fee continuation action. Payment confirmation says
+    the dashboard shows paid status, while disclosing that live contact, response time, and course
+    access are not configured.
 
 ## References
 
@@ -43,3 +73,5 @@ Record consequential choices here. Each entry is short; update it when evidence 
   https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-requested-design-patterns
 - Razorpay Payment Links API: https://razorpay.com/docs/api/payments/payment-links/
 - Razorpay webhook security checklist: https://razorpay.com/security/checklist/
+- UNESCO, Languages matter: global guidance on multilingual education:
+  https://www.unesco.org/en/articles/languages-matter-global-guidance-multilingual-education

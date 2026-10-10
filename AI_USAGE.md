@@ -3,6 +3,27 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — interest-led discovery first slice
+
+- **Task:** Extend the Telegram hackathon demo from a fixed course-first opening to an adaptive,
+  catalog-only discovery path based on the user's settled product choices.
+- **Assistance:** Codex reviewed the attached Claude plan, the v1 product notes, local build rules,
+  and organizer instructions; added fictional course metadata and migrations, deterministic matching,
+  persisted discovery paths/facts, Telegram choices and resume flow, parent/student attribution,
+  staff handoffs and individual deletion, payment-consent gating, tests, and docs. Codex also
+  corrected payment copy that had promised an unconfigured live follow-up. No v1 implementation
+  code was copied.
+- **Checks:** `bash scripts/verify.sh` passed (Ruff lint, format, strict mypy, and 63 pytest tests);
+  `git diff --check` passed. Automated tests used fake integrations and temporary SQLite data. No
+  live OpenAI, Telegram, Razorpay, or other network request was made.
+- **Human direction/review:** The human selected conversation-only discovery, student-first
+  parent handling, four language preferences, a fictional broad Kerala course catalog, and no
+  invented staff contact/response time. Human review of translated copy and the final bot flow
+  remains needed.
+- **Corrections/limitations:** Full language coverage, verified course-specific eligibility for
+  non-undergraduate offerings, and configured retention expiry are not complete. Do not call the
+  product fully localized or production-ready.
+
 ## 2026-10-11 — staff demo-data reset
 
 - **Task:** Add a deliberate staff-only action to clear demo/student records so the Telegram and

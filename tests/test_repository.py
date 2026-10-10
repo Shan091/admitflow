@@ -18,6 +18,80 @@ def test_catalog_seeding_is_idempotent_and_fees_are_structured(tmp_path: Path) -
     after = repository.list_courses(repository.tenant_id)
     assert before == after
     assert repository.get_fee_paise(repository.tenant_id, "foundations-computing") == 50000
+    assert {course.education_level for course in after} >= {
+        "vocational_certificate",
+        "diploma",
+        "undergraduate",
+        "postgraduate",
+    }
+    assert all(course.field and course.prerequisites and course.medium for course in after)
+
+
+def test_lead_facts_preserve_attribution_and_update_in_place(tmp_path: Path) -> None:
+    repository = make_repository(tmp_path)
+    lead_id = repository.upsert_lead(repository.tenant_id, "123", "student")
+    repository.save_fact(lead_id, "interest_field", "tech/data", "student")
+    repository.save_fact(lead_id, "interest_field", "design/media", "parent")
+
+    facts = repository.list_facts(lead_id)
+
+    assert len(facts) == 1
+    assert facts[0]["fact_value"] == "design/media"
+    assert facts[0]["speaker"] == "parent"
+
+
+def test_initialize_adds_discovery_columns_without_replacing_existing_rows(tmp_path: Path) -> None:
+    path = tmp_path / "legacy.sqlite3"
+    with sqlite3.connect(path) as connection:
+        connection.executescript(
+            """CREATE TABLE institutions (id TEXT PRIMARY KEY, name TEXT NOT NULL);
+            CREATE TABLE courses (
+                id TEXT PRIMARY KEY, tenant_id TEXT NOT NULL, name TEXT NOT NULL,
+                description TEXT NOT NULL, minimum_marks_percent REAL NOT NULL,
+                application_fee_paise INTEGER NOT NULL
+            );
+            CREATE TABLE leads (
+                id INTEGER PRIMARY KEY, tenant_id TEXT NOT NULL, telegram_user_id TEXT NOT NULL,
+                telegram_username TEXT, state TEXT NOT NULL DEFAULT 'browsing',
+                selected_course_id TEXT, completed_grade12 INTEGER, marks_percent REAL,
+                eligible INTEGER, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+            );
+            CREATE TABLE messages (
+                id INTEGER PRIMARY KEY, lead_id INTEGER NOT NULL, direction TEXT NOT NULL,
+                body TEXT NOT NULL, telegram_update_id INTEGER UNIQUE, created_at TEXT NOT NULL
+            );
+            CREATE TABLE payments (
+                id INTEGER PRIMARY KEY, tenant_id TEXT NOT NULL, lead_id INTEGER NOT NULL UNIQUE,
+                course_id TEXT NOT NULL, reference_id TEXT NOT NULL UNIQUE, razorpay_link_id TEXT,
+                amount_paise INTEGER NOT NULL, currency TEXT NOT NULL, status TEXT NOT NULL,
+                short_url TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+            );
+            CREATE TABLE razorpay_webhook_events (
+                event_id TEXT PRIMARY KEY, received_at TEXT NOT NULL
+            );
+            INSERT INTO courses VALUES
+            ('legacy-course', 'demo', 'Legacy Course', 'sample', 50, 100);
+            INSERT INTO institutions VALUES ('demo', 'Legacy Demo');
+            INSERT INTO leads (id, tenant_id, telegram_user_id, created_at, updated_at)
+            VALUES (7, 'demo', '123', 'old', 'old');
+            INSERT INTO messages VALUES (8, 7, 'inbound', 'hello', 90, 'old');
+            INSERT INTO payments VALUES
+            (9, 'demo', 7, 'legacy-course', 'AF-legacy', NULL, 100, 'INR',
+             'created', NULL, 'old', 'old');"""
+        )
+
+    repository = Repository(path)
+    repository.initialize()
+    lead = repository.get_lead(7)
+
+    assert lead is not None
+    assert lead["telegram_user_id"] == "123"
+    assert lead["lifecycle_stage"] == "new"
+    assert repository.list_messages(7)[0]["body"] == "hello"
+    assert repository.get_payment_for_lead("demo", 7)["reference_id"] == "AF-legacy"  # type: ignore[index]
+    with sqlite3.connect(path) as connection:
+        columns = {row[1] for row in connection.execute("PRAGMA table_info(courses)")}
+    assert "education_level" in columns
 
 
 def test_lead_and_messages_persist_and_duplicate_update_is_ignored(tmp_path: Path) -> None:

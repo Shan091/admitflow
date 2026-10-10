@@ -13,6 +13,7 @@ from admitflow.dashboard.auth import (
     SESSION_COOKIE,
     SESSION_MAX_AGE,
     create_delete_demo_data_token,
+    create_delete_lead_token,
     create_session,
     verify_session,
 )
@@ -20,6 +21,7 @@ from admitflow.dashboard.auth import (
 router = APIRouter()
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 DELETE_DEMO_DATA_CONFIRMATION = "DELETE ALL DEMO DATA"
+DELETE_LEAD_CONFIRMATION = "DELETE LEAD"
 
 
 def _repository(request: Request) -> Any:
@@ -109,6 +111,7 @@ def leads_page(request: Request) -> Response:
             "delete_demo_data_csrf_token": csrf_token,
             "reset_complete": request.query_params.get("reset") == "complete",
             "reset_rejected": request.query_params.get("reset") == "not-deleted",
+            "delete_complete": request.query_params.get("delete") == "complete",
         },
     )
     response.headers["Cache-Control"] = "no-store"
@@ -152,10 +155,42 @@ def lead_detail(request: Request, lead_id: int) -> Response:
         context={
             "lead": lead,
             "messages": repository.list_messages(lead_id),
+            "facts": repository.list_facts(lead_id),
             "payment": repository.get_payment_for_lead(repository.tenant_id, lead_id),
+            "delete_lead_csrf_token": create_delete_lead_token(
+                request.cookies.get(SESSION_COOKIE, ""),
+                lead_id,
+                request.app.state.settings.staff_session_secret or "",
+            ),
+            "delete_rejected": request.query_params.get("delete") == "not-deleted",
             "rag_ready": request.app.state.rag_ready,
             "staff_authenticated": True,
         },
     )
     response.headers["Cache-Control"] = "no-store"
     return response
+
+
+@router.post("/admin/leads/{lead_id}/delete")
+async def delete_lead(request: Request, lead_id: int) -> RedirectResponse:
+    if not _staff_authenticated(request):
+        return RedirectResponse("/login", status_code=303)
+    session_cookie = request.cookies.get(SESSION_COOKIE, "")
+    secret = request.app.state.settings.staff_session_secret
+    if not session_cookie or not secret:
+        return RedirectResponse("/login", status_code=303)
+    try:
+        fields = parse_qs((await request.body()).decode("utf-8"))
+    except UnicodeDecodeError:
+        fields = {}
+    supplied = fields.get("csrf_token", [""])[0]
+    confirmation = fields.get("confirmation", [""])[0]
+    expected = create_delete_lead_token(session_cookie, lead_id, secret)
+    if not hmac.compare_digest(supplied, expected) or not hmac.compare_digest(
+        confirmation, DELETE_LEAD_CONFIRMATION
+    ):
+        return RedirectResponse(f"/leads/{lead_id}?delete=not-deleted", status_code=303)
+    deleted = _repository(request).delete_lead(lead_id, _repository(request).tenant_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    return RedirectResponse("/?delete=complete", status_code=303)

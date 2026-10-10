@@ -8,8 +8,8 @@
       "Do you provide a place to live during the course?",
       "Is accommodation available for learners?"
     ],
-    "answer": "This fictional demo institution has a sample hostel facility. Contact the admissions team for availability and current details.",
-    "source": "Demo FAQ: hostel facilities"
+    "answer": "The fictional sample FAQ mentions a hostel, but availability, eligibility, pricing, and accommodation terms are not confirmed. No live staff contact or response time is configured in this demo.",
+    "source": "Fictional seeded FAQ: hostel facilities"
   },
   {
     "id": "class-format",

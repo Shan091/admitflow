@@ -1,5 +1,7 @@
 import pytest
 
+from admitflow.domain.discovery import recommend_courses
+from admitflow.domain.models import Course
 from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.domain.qualification import assess_eligibility
 
@@ -36,3 +38,69 @@ def test_fee_formatting_uses_rupees_and_paise() -> None:
 def test_fee_formatting_rejects_negative_amount() -> None:
     with pytest.raises(ValueError):
         format_inr_from_paise(-1)
+
+
+def _course(
+    course_id: str,
+    interests: tuple[str, ...],
+    *,
+    level: str = "diploma",
+    activities: tuple[str, ...] = ("making charts",),
+) -> Course:
+    return Course(
+        id=course_id,
+        tenant_id="demo",
+        name=course_id,
+        description="fictional course",
+        minimum_marks_percent=0,
+        application_fee_paise=100,
+        education_level=level,
+        field="sample field",
+        interests=interests,
+        activities=activities,
+        prerequisites=("basic reading",),
+        medium="English",
+        language_support=("Malayalam discussion support",),
+    )
+
+
+def test_recommendations_are_explainable_and_match_only_explicit_preferences() -> None:
+    courses = [
+        _course("data", ("data", "technology")),
+        _course("design", ("design",), activities=("making posters",)),
+        _course("unrelated", ("hospitality",), activities=("serving guests",)),
+    ]
+
+    matches = recommend_courses(
+        courses,
+        interests={" DATA "},
+        activities={"making charts"},
+    )
+
+    assert [match.course.id for match in matches] == ["data"]
+    assert matches[0].reasons == (
+        "Matches your interest in data",
+        "Includes activities you chose: making charts",
+    )
+
+
+def test_recommendations_filter_by_level_and_exclude_incomplete_catalog_items() -> None:
+    complete = _course("diploma", ("data",))
+    postgraduate = _course("masters", ("data",), level="postgraduate")
+    incomplete = Course(
+        id="missing",
+        tenant_id="demo",
+        name="Missing",
+        description="",
+        minimum_marks_percent=0,
+        application_fee_paise=100,
+    )
+
+    matches = recommend_courses(
+        [complete, postgraduate, incomplete],
+        interests={"data"},
+        activities=set(),
+        level="postgraduate",
+    )
+
+    assert [match.course.id for match in matches] == ["masters"]

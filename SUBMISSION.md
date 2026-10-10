@@ -3,9 +3,10 @@
 ## Project
 
 - **Project name:** AdmitFlow
-- **Short description:** A Telegram admissions assistant that remembers inquiries, checks
-  seeded eligibility rules in code, answers institution FAQs with fail-closed vector search,
-  and supports staff login plus Razorpay test-mode application payments.
+- **Short description:** A Telegram admissions assistant that remembers student interests,
+  recommends from a fictional course catalog, checks supported sample eligibility rules in code,
+  answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
+  Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
 - **Verified implementation commit SHA:** `77de766e1056c187c982344978fe7200fd2eb742`
 - **Working demo:** Local `/health` and the public HTTPS tunnel returned 200. The Telegram
@@ -31,10 +32,12 @@
   `OPENAI_EMBEDDING_MODEL`, `DATABASE_PATH`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`,
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
-- **Demo walkthrough:** In Telegram, send `/start`, select a course, answer the qualification
-  prompts, and ask a seeded FAQ. Complete the Razorpay test link to trigger a one-time success
-  message; ask “Has my payment gone through?” to check stored status. Staff can log in to the
-  dashboard and review the paid lead. The staff dashboard also has a confirmed local-data reset.
+- **Demo walkthrough:** In Telegram, send `/start`, pick a known course/field/explore/browse path,
+  choose field, level, and activity prompts, then inspect a catalog-grounded recommendation. The
+  learner may pause and `/resume`. Supported sample undergraduate options continue to code-based
+  qualification and require an explicit tap before a test payment link. Other course levels are
+  handed to staff for eligibility confirmation. Staff can inspect attributed facts and pending
+  handoffs, delete one lead's local data, or reset all local demo data.
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
@@ -49,10 +52,13 @@
   signature-verified webhook event and the staff dashboard shows `paid`. No applicant content was
   used in the OpenAI checks.
 - **Known limitations:** Single fictional tenant, seeded FAQ corpus, one environment-configured
-  staff account, no uploads, production hosting, refunds, or privacy/retention controls. Payment
+  staff account, incomplete localized response copy, incomplete eligibility rules for non-UG
+  offerings, no automatic retention expiry, uploads, production hosting, refunds, or production
+  privacy controls. Payment
   links work only with Razorpay test keys and payment status requires a reachable webhook. Demo chat
   identifiers and messages are stored locally; use fictional test inputs only. Payment confirmation
-  delivery is best-effort, and course access is not enabled automatically; a live rehearsal of the
+  delivery is best-effort, no real staff follow-up contact or response time is configured, and
+  course access is not enabled automatically; a live rehearsal of the
   new confirmation requires another eligible Telegram demo account and test payment. Reset clears
   local app records only; Telegram/Razorpay provider-side records are unaffected.
 - **Libraries and APIs:** FastAPI, python-telegram-bot, OpenAI API (`gpt-6-luna`,

@@ -9,9 +9,10 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 PAYMENT_SUCCESS_MESSAGE = (
-    "✅ Payment successful! Your demo application fee is confirmed and your application is "
-    "recorded. Next, an admissions team member will reach out soon with course access "
-    "instructions. Course access is not automatically enabled in this demo."
+    "✅ Razorpay test payment received. The demo dashboard now shows your paid status. "
+    "Your next step is staff review, but live follow-up contact and a response time are not "
+    "configured for this demo. Course access is not enabled automatically, and this does not "
+    "submit a real application."
 )
 
 

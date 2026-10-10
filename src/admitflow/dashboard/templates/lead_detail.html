@@ -2,13 +2,21 @@
 {% block content %}
 <p><a href="/">← All leads</a></p>
 <h2>{{ lead.telegram_username or lead.telegram_user_id }}</h2>
+{% if delete_rejected %}<p role="alert" class="notice">The lead was not deleted. The confirmation text or form token was invalid.</p>{% endif %}
 <dl>
   <dt>Course</dt><dd>{{ lead.course_name or "Not selected" }}</dd>
   <dt>Status</dt><dd>{{ lead.state }}</dd>
+  <dt>Lifecycle stage</dt><dd>{{ lead.lifecycle_stage }}</dd>
+  <dt>Readiness (student action)</dt><dd>{{ lead.readiness_status }}</dd>
+  <dt>Discovery path</dt><dd>{{ lead.discovery_path or "—" }}</dd>
+  <dt>Preferred language</dt><dd>{{ lead.preferred_language }}</dd>
+  <dt>Staff handoff</dt><dd>{{ lead.handoff_status }}</dd>
   <dt>Grade 12 completed</dt><dd>{{ "Yes" if lead.completed_grade12 else ("No" if lead.completed_grade12 == 0 else "—") }}</dd>
   <dt>Overall marks</dt><dd>{{ lead.marks_percent if lead.marks_percent is not none else "—" }}</dd>
   <dt>Meets sample rules</dt><dd>{{ "Yes" if lead.eligible else ("No" if lead.eligible == 0 else "—") }}</dd>
 </dl>
+<h3>Discovery facts (with speaker)</h3>
+{% if facts %}<dl>{% for fact in facts %}<dt>{{ fact.fact_key }}</dt><dd>{{ fact.fact_value }} <small>({{ fact.speaker }})</small></dd>{% endfor %}</dl>{% else %}<p>No discovery facts recorded.</p>{% endif %}
 <h3>Application fee payment</h3>
 {% if payment %}
 <dl><dt>Amount</dt><dd>₹{{ "{:,.2f}".format(payment.amount_paise / 100) }}</dd>
@@ -17,4 +25,14 @@
 {% else %}<p>No payment link created.</p>{% endif %}
 <h3>Conversation</h3>
 {% for message in messages %}<div class="msg {{ message.direction }}"><strong>{{ message.direction }}:</strong> {{ message.body }}</div>{% else %}<p>No messages recorded.</p>{% endfor %}
+<details class="danger-zone">
+  <summary>Delete this lead's local data</summary>
+  <p>This permanently deletes this student's local profile, discovery facts, conversation, and payment record. It does not delete records held by Telegram or Razorpay.</p>
+  <form method="post" action="/admin/leads/{{ lead.id }}/delete">
+    <input type="hidden" name="csrf_token" value="{{ delete_lead_csrf_token }}">
+    <label for="delete-lead-confirmation">Type <code>DELETE LEAD</code> to confirm</label>
+    <input id="delete-lead-confirmation" name="confirmation" required autocomplete="off" spellcheck="false">
+    <button class="danger-button" type="submit">Delete this lead's local data</button>
+  </form>
+</details>
 {% endblock %}

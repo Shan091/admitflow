@@ -2,16 +2,19 @@
 {% block content %}
 <h2>Leads</h2>
 {% if reset_complete %}<p role="status" class="success">Demo records deleted. Seeded courses and FAQs are still available.</p>{% endif %}
+{% if delete_complete %}<p role="status" class="success">The selected lead's local profile, messages, and payment record were deleted.</p>{% endif %}
 {% if reset_rejected %}<p role="alert" class="notice">Nothing was deleted. The confirmation phrase or form token was invalid.</p>{% endif %}
 {% if leads %}
 <table>
-  <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Eligible</th><th>Updated</th></tr></thead>
+  <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Lifecycle</th><th>Handoff</th><th>Eligible</th><th>Updated</th></tr></thead>
   <tbody>
   {% for lead in leads %}
     <tr>
       <td><a href="/leads/{{ lead.id }}">{{ lead.telegram_username or lead.telegram_user_id }}</a></td>
       <td>{{ lead.course_name or "Not selected" }}</td>
       <td>{{ lead.state }}</td>
+      <td>{{ lead.lifecycle_stage }}</td>
+      <td>{% if lead.handoff_status == "pending" %}<strong>Pending staff review (contact not configured)</strong>{% else %}{{ lead.handoff_status }}{% endif %}</td>
       <td>{% if lead.eligible is none %}—{% elif lead.eligible %}Meets sample rules{% else %}Does not meet sample rules{% endif %}</td>
       <td>{{ lead.updated_at }}</td>
     </tr>
