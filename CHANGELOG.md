@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-10-11 — Telegram webhook transport
+
+- **Change:** Replaced Telegram long-polling with a FastAPI webhook endpoint protected by
+  `X-Telegram-Bot-Api-Secret-Token`, added `TELEGRAM_WEBHOOK_SECRET`, a helper to register/check or
+  remove the Telegram webhook, and setup documentation.
+- **Why:** The demo will receive Telegram updates through the HTTPS tunnel alongside its other
+  webhook integration.
+- **Files:** `src/admitflow/`, `scripts/manage_telegram_webhook.py`, `tests/test_app.py`, `.env.example`,
+  `README.md`, `SPEC.md`, `docs/DECISIONS.md`, `tasks/`, and `AGENTS.md`.
+- **Validation:** `bash scripts/verify.sh` passed (Ruff, formatting, strict mypy, and 35 tests);
+  `git diff --check` passed. The existing public tunnel returned HTTP 200 for `/health`.
+- **Limitations:** No Telegram bot token is configured in `.env`, so I could not register a live
+  webhook or run a live bot walkthrough. A local webhook secret was generated and stored in the
+  ignored `.env`; it was not added to Git. Do not claim Telegram delivery is live until registration
+  and a real `/start` walkthrough succeed.
+
 ## 2026-10-11 — accept the supplied ngrok webhook path
 
 - **Time:** 00:14 IST

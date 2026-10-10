@@ -14,7 +14,8 @@ restricted to test-key IDs; payment state changes only after a verified webhook.
 
 - Python 3.12
 - `uv`
-- Telegram bot token for live Telegram interaction (optional for local dashboard/tests)
+- Telegram bot token and webhook secret for live Telegram interaction (optional for local
+  dashboard/tests)
 - OpenAI API key for Decisions API and embedding-backed FAQ answers (optional; RAG stays
   unavailable without it)
 - Staff username, password, and session signing secret (required for dashboard access)
@@ -30,9 +31,22 @@ cp .env.example .env
 uv run uvicorn admitflow.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000/` for the dashboard and `/health` for health status. Configure
-`TELEGRAM_BOT_TOKEN` to start Telegram long-polling. Configure `OPENAI_API_KEY` to enable intent
-routing and semantic FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
+Open `http://127.0.0.1:8000/` for the dashboard and `/health` for health status. Configure both
+`TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` to enable Telegram webhook handling. Generate a
+webhook secret locally with `python -c "import secrets; print(secrets.token_urlsafe(32))"`; keep
+the secret private. After starting the app on a public HTTPS host or tunnel, register the webhook
+using the helper script. It reads the bot token and webhook secret from your local `.env` and never
+prints them:
+
+```powershell
+uv run python scripts/manage_telegram_webhook.py https://YOUR-PUBLIC-HOST
+```
+
+Telegram webhooks require HTTPS, and Telegram does not allow webhook delivery and `getUpdates`
+polling simultaneously. The helper checks Telegram's reported webhook URL after registration.
+To remove the hook, run `uv run python scripts/manage_telegram_webhook.py --delete`. This project
+currently runs webhook mode only. Configure `OPENAI_API_KEY` to enable
+intent routing and semantic FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
 `STAFF_SESSION_SECRET` in `.env` to log in. Generate the session secret locally with
 `python -c "import secrets; print(secrets.token_urlsafe(48))"`; never commit `.env`.
 
@@ -58,7 +72,7 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
 
 ## Demo walkthrough
 
-1. Send `/start` to the configured Telegram bot.
+1. Register the Telegram webhook as described above, then send `/start` to the configured bot.
 2. Choose a seeded course, answer the two qualification prompts, and view the code-computed result.
 3. Ask a seeded FAQ question; if retrieval is unavailable or uncertain, the bot says so.
 4. Open the local dashboard, log in, and view the same lead and conversation.

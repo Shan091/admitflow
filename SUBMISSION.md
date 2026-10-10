@@ -25,7 +25,7 @@
 - **Prerequisites and versions:** Python 3.12.5, uv 0.11.2 (verified locally)
 - **Install command:** `uv sync --python 3.12`
 - **Required environment variables:** `STAFF_USERNAME`, `STAFF_PASSWORD`, `STAFF_SESSION_SECRET`;
-  optional `TELEGRAM_BOT_TOKEN`, `OPENAI_API_KEY`, `OPENAI_DECISIONS_MODEL`,
+  optional `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `OPENAI_API_KEY`, `OPENAI_DECISIONS_MODEL`,
   `OPENAI_EMBEDDING_MODEL`, `DATABASE_PATH`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`,
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
@@ -35,9 +35,10 @@
   formatting, strict mypy, and 32 pytest tests); `uv sync --locked --python 3.12` passed;
   `git diff --check` passed. GitHub Actions passed for the pushed SHA above (32 tests):
   https://github.com/Shan091/admitflow/actions/runs/38076997956
-- **Live integration checks:** No live OpenAI, Telegram, or Razorpay request was made. Automated
-  payment tests use a fake HTTP transport and signed sample webhook; no API credits or payment
-  transactions were used.
+- **Live integration checks:** No live Telegram Bot API request was made because no bot token is
+  configured; the public tunnel's `/health` endpoint returned `200`. No live OpenAI or Razorpay
+  request was made. Automated payment tests use a fake HTTP transport and signed sample webhook;
+  no API credits or payment transactions were used.
 - **Known limitations:** Single fictional tenant, seeded FAQ corpus, one environment-configured
   staff account, no uploads, production hosting, refunds, or privacy/retention controls. Payment
   links work only with Razorpay test keys and payment status requires a reachable webhook. Demo chat

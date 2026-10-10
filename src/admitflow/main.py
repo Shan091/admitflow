@@ -12,13 +12,14 @@ from admitflow.adapters.razorpay import RazorpayAdapter
 from admitflow.adapters.sqlite import Repository
 from admitflow.adapters.telegram import (
     build_telegram_application,
-    start_polling,
-    stop_polling,
+    start_application,
+    stop_application,
 )
 from admitflow.adapters.vector_store import VectorStore
 from admitflow.config import Settings, get_settings
 from admitflow.dashboard.payment_routes import router as payment_router
 from admitflow.dashboard.routes import router as dashboard_router
+from admitflow.dashboard.telegram_routes import router as telegram_router
 from admitflow.services.admissions import AdmissionsService
 from admitflow.services.payments import PaymentService
 from admitflow.services.retrieval import RetrievalService
@@ -90,9 +91,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.openai_adapter = openai_adapter
         app.state.admissions = admissions
         app.state.payment_service = payment_service
-        app.state.telegram_enabled = bool(app_settings.telegram_bot_token)
+        app.state.telegram_enabled = bool(
+            app_settings.telegram_bot_token and app_settings.telegram_webhook_secret
+        )
         telegram_application = None
-        if app_settings.telegram_bot_token:
+        if app_settings.telegram_bot_token and app_settings.telegram_webhook_secret:
             telegram_application = build_telegram_application(
                 app_settings.telegram_bot_token,
                 repository,
@@ -100,12 +103,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 openai_adapter,
                 payment_service,
             )
-            await start_polling(telegram_application)
+            await start_application(telegram_application)
+        elif app_settings.telegram_bot_token:
+            logger.warning(
+                "Telegram bot disabled; configure TELEGRAM_WEBHOOK_SECRET to enable webhook mode"
+            )
+        app.state.telegram_application = telegram_application
         try:
             yield
         finally:
             if telegram_application is not None:
-                await stop_polling(telegram_application)
+                await stop_application(telegram_application)
             if openai_adapter is not None:
                 await openai_adapter.close()
 
@@ -113,6 +121,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = app_settings
     app.include_router(dashboard_router)
     app.include_router(payment_router)
+    app.include_router(telegram_router)
 
     @app.get("/health")
     def health() -> dict[str, str]:

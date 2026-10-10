@@ -21,12 +21,14 @@ class Settings:
     razorpay_key_id: str | None = None
     razorpay_key_secret: str | None = None
     razorpay_webhook_secret: str | None = None
+    telegram_webhook_secret: str | None = None
 
 
 def get_settings() -> Settings:
     """Read configuration from environment without exposing secret values."""
     return Settings(
         telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN") or None,
+        telegram_webhook_secret=os.getenv("TELEGRAM_WEBHOOK_SECRET") or None,
         openai_api_key=os.getenv("OPENAI_API_KEY") or None,
         openai_decisions_model=os.getenv("OPENAI_DECISIONS_MODEL", "gpt-6-luna"),
         openai_embedding_model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),

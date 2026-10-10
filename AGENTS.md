@@ -19,7 +19,7 @@ The source event rules are in the [hackathon template repository](https://github
 
 ## Project rules
 
-- Python 3.12, FastAPI, Telegram long-polling, SQLite, NumPy, OpenAI API.
+- Python 3.12, FastAPI, Telegram webhook delivery, SQLite, NumPy, OpenAI API.
 - Eligibility and fees are computed from seeded structured data, never from model output.
 - Retrieval is tenant-scoped and fail-closed. Do not send an answer when indexing/search fails.
 - Do not put real keys, participant private data, or `.env` in Git.

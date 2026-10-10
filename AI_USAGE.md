@@ -3,6 +3,19 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — Telegram webhook transport
+
+- **Task:** Replace Telegram polling with secret-validated FastAPI webhook delivery and document
+  local Telegram registration.
+- **Assistance:** Codex implemented the receiver, PTB queue lifecycle, environment setting,
+  registration/removal helper, tests, and documentation updates. Human review is still needed for
+  the bot token and the live Telegram conversation.
+- **Checks:** `bash scripts/verify.sh` passed (Ruff, formatting, strict mypy, and 35 pytest tests);
+  `git diff --check` passed. The existing HTTPS tunnel returned HTTP 200 for `/health`. No Telegram
+  Bot API request was made because no bot token is configured.
+- **Follow-up:** Add the bot token to local `.env`, restart the app, register the HTTPS webhook with
+  `scripts/manage_telegram_webhook.py`, verify `getWebhookInfo`, then complete a live walkthrough.
+
 ## 2026-10-11 — staff login and test-mode payments
 
 - **Task:** Implement environment-configured staff dashboard login and Razorpay test-mode

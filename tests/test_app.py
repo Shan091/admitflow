@@ -99,6 +99,7 @@ def test_settings_read_tokens_paths_and_rag_thresholds_from_environment(
     monkeypatch, tmp_path: Path
 ) -> None:
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_WEBHOOK_SECRET", "webhook-secret")
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "custom.sqlite3"))
     monkeypatch.setenv("RAG_MIN_SIMILARITY", "0.8")
@@ -111,6 +112,7 @@ def test_settings_read_tokens_paths_and_rag_thresholds_from_environment(
     settings = get_settings()
 
     assert settings.telegram_bot_token == "test-token"
+    assert settings.telegram_webhook_secret == "webhook-secret"
     assert settings.openai_api_key == "test-key"
     assert settings.database_path == tmp_path / "custom.sqlite3"
     assert settings.rag_min_similarity == 0.8
@@ -119,3 +121,134 @@ def test_settings_read_tokens_paths_and_rag_thresholds_from_environment(
     assert settings.staff_password == "staff-pass"
     assert settings.staff_session_secret == "session-secret"
     assert settings.razorpay_key_id == "rzp_test_key"
+
+
+def test_telegram_webhook_requires_configured_application_and_secret(tmp_path: Path) -> None:
+    settings = Settings(
+        telegram_bot_token=None,
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=tmp_path / "demo.sqlite3",
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+        telegram_webhook_secret="webhook-secret",
+    )
+    with TestClient(create_app(settings)) as client:
+        assert (
+            client.post(
+                "/api/v1/webhooks/telegram",
+                json={"update_id": 123},
+                headers={"X-Telegram-Bot-Api-Secret-Token": "webhook-secret"},
+            ).status_code
+            == 503
+        )
+
+
+def test_telegram_application_uses_webhook_lifecycle_only_with_both_secrets(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from admitflow import main
+
+    started: list[object] = []
+    stopped: list[object] = []
+    fake_application = object()
+
+    monkeypatch.setattr(main, "build_telegram_application", lambda *args: fake_application)
+
+    async def start(application) -> None:
+        started.append(application)
+
+    async def stop(application) -> None:
+        stopped.append(application)
+
+    monkeypatch.setattr(main, "start_application", start)
+    monkeypatch.setattr(main, "stop_application", stop)
+    settings = Settings(
+        telegram_bot_token="test-bot-token",
+        telegram_webhook_secret="webhook-secret",
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=tmp_path / "demo.sqlite3",
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+    )
+    app = create_app(settings)
+
+    with TestClient(app):
+        assert app.state.telegram_enabled
+        assert app.state.telegram_application is fake_application
+
+    assert started == [fake_application]
+    assert stopped == [fake_application]
+
+    incomplete_settings = Settings(
+        telegram_bot_token="test-bot-token",
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=tmp_path / "incomplete.sqlite3",
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+    )
+    incomplete_app = create_app(incomplete_settings)
+    with TestClient(incomplete_app):
+        assert not incomplete_app.state.telegram_enabled
+        assert incomplete_app.state.telegram_application is None
+    assert started == [fake_application]
+    assert stopped == [fake_application]
+
+
+def test_telegram_webhook_authenticates_and_queues_valid_updates(tmp_path: Path) -> None:
+    from types import SimpleNamespace
+
+    from telegram import Update
+
+    settings = Settings(
+        telegram_bot_token=None,
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=tmp_path / "demo.sqlite3",
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+        telegram_webhook_secret="webhook-secret",
+    )
+    app = create_app(settings)
+
+    class FakeQueue:
+        def __init__(self) -> None:
+            self.items: list[Update] = []
+
+        async def put(self, update: Update) -> None:
+            self.items.append(update)
+
+    queue = FakeQueue()
+
+    with TestClient(app) as client:
+        app.state.telegram_application = SimpleNamespace(bot=object(), update_queue=queue)
+        path = "/api/v1/webhooks/telegram"
+        assert client.post(path, json={"update_id": 123}).status_code == 401
+        rejected = client.post(
+            path,
+            json={"update_id": 123},
+            headers={"X-Telegram-Bot-Api-Secret-Token": "wrong"},
+        )
+        assert rejected.status_code == 401
+        malformed = client.post(
+            path,
+            json=[],
+            headers={"X-Telegram-Bot-Api-Secret-Token": "webhook-secret"},
+        )
+        assert malformed.status_code == 400
+        accepted = client.post(
+            path,
+            json={"update_id": 123},
+            headers={"X-Telegram-Bot-Api-Secret-Token": "webhook-secret"},
+        )
+
+    assert accepted.status_code == 200
+    assert accepted.json() == {"status": "queued"}
+    assert len(queue.items) == 1
+    assert queue.items[0].update_id == 123

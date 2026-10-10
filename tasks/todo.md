@@ -12,6 +12,10 @@ acceptance criteria pass and the corresponding milestone is committed.
 
 ## Telegram course discovery and qualification
 
+- [x] Replace long-polling with the authenticated Telegram webhook requested for the demo; add
+  `TELEGRAM_WEBHOOK_SECRET`, reject invalid requests, and document webhook registration and reset.
+- [x] Verify webhook authorization, update parsing/queueing, disabled configuration, and clean bot
+  lifecycle locally; then run `bash scripts/verify.sh` and record the actual result.
 - [x] Test eligible, ineligible, malformed, missing, and boundary qualification inputs.
 - [x] Test lead/message persistence and idempotent handling of duplicate Telegram updates.
 - [x] Test Telegram flow service behavior with fake updates; no live API in automated tests.

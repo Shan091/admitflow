@@ -13,7 +13,8 @@ admissions system and uses a clearly fictional institution and seeded data.
 
 ## Hackathon capability map
 
-- **Discovery:** Telegram buttons show courses and a no-pressure browse path.
+- **Discovery:** Telegram updates arrive through a secret-validated HTTPS webhook; buttons show
+  courses and a no-pressure browse path.
 - **Qualification:** Structured answers are checked by Python against course rules.
 - **Memory:** SQLite persists the Telegram lead, selected course, qualification answers, and chat.
 - **Knowledge:** OpenAI `text-embedding-3-small` embeds seeded FAQ chunks; NumPy cosine search

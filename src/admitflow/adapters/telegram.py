@@ -139,24 +139,18 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await _send_reply(update, reply, repository, lead_id)
 
 
-async def start_polling(
+async def start_application(
     application: Application[Any, Any, Any, Any, Any, Any],
 ) -> None:
     await application.initialize()
     await application.start()
-    updater = application.updater
-    if updater is None:
-        raise RuntimeError("Telegram updater is not available")
-    await updater.start_polling(drop_pending_updates=True)
-    logger.info("Telegram polling started")
+    logger.info("Telegram webhook application started")
 
 
-async def stop_polling(
+async def stop_application(
     application: Application[Any, Any, Any, Any, Any, Any],
 ) -> None:
-    updater = application.updater
-    if updater is not None and updater.running:
-        await updater.stop()
     if application.running:
         await application.stop()
     await application.shutdown()
+    logger.info("Telegram webhook application stopped")

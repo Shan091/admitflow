@@ -2,8 +2,9 @@
 
 Record consequential choices here. Each entry is short; update it when evidence changes a choice.
 
-1. **Demo channel — Telegram long-polling.** It avoids WhatsApp provisioning/webhook setup for
-   the hackathon; a Telegram bot token is required for live interaction.
+1. **Demo channel — Telegram webhook through FastAPI.** Telegram sends updates to the public
+   HTTPS `/api/v1/webhooks/telegram` route using a configured secret-token header. The app does not
+   run `getUpdates` polling; registering or clearing the webhook is an operator action.
 2. **Runtime and persistence — one FastAPI process and SQLite.** This is enough for one seeded
    demo tenant; no Redis, TaskIQ, Postgres, or separate frontend in this scope.
 3. **Architecture — domain/services/adapters.** Keep one real adapter per boundary; introduce a
