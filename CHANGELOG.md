@@ -9,6 +9,8 @@
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 93 tests;
   `git diff --check` passed. Includes tests for correction-to-same-values, stale callbacks,
   path-switch invalidation, pause/resume, and Telegram callback routing.
+- **Delivery:** Pushed as `6a412fa60a6ae1f3eb9ab6e2efc23d09d3fc7039`; GitHub Actions `verify` run
+  `38089498466` passed.
 - **Reason:** Give learners a chance to correct the bot's understanding before it displays options,
   and prevent a confirmation for one set of preferences from authorizing another.
 
