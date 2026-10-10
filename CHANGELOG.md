@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-10-11 — consent-gated adaptive text discovery
+
+- **Change:** Expanded the fictional seed catalog to 28 complete sample offerings across five
+  fields and four levels. `/start` now discloses OpenAI processing and requires an explicit choice;
+  typed discovery remains button-only after decline/opt-out. Consented free text uses a stateless
+  structured extraction of the current message and allowlisted catalog vocabulary; code validates
+  facts, preserves speaker attribution, selects the next response, and ranks catalog matches. Added
+  direct known-course entry, interest accumulation/correction, safe extraction-failure fallback,
+  and offline schema/flow tests.
+- **Why:** Let students start from their own words without making recommendations or eligibility
+  decisions model-owned, and make the AI data boundary visible before use.
+- **Validation:** `bash scripts/verify.sh` passed with 71 tests (Ruff, format, strict mypy, pytest);
+  `git diff --check` passed. Tests use fake API responses and temporary SQLite. No live API request
+  was made by the tests. A separate live smoke test with seven synthetic prompts checked English,
+  Hindi, Malayalam, and Hinglish activity extraction, exact known-course lookup, out-of-catalog
+  medicine, and an instruction-injection attempt. All returned the expected bounded catalog output
+  (12,308 input and 992 output tokens total). Push and matching GitHub Actions result are pending.
+- **Limitations:** No fluent-speaker language review, broad adversarial extraction evaluation,
+  real-catalog validation, non-undergraduate eligibility engine, retention expiry, or production
+  privacy/legal review is included in this slice.
+
 ## 2026-10-11 — adaptive course discovery first slice
 
 - **Time:** 02:23 IST

@@ -3,6 +3,26 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — consent-gated conversational intake
+
+- **Task:** Add a broader fictional catalog and let students describe interests or known courses
+  naturally, while preserving the institution-only and student-first boundaries.
+- **Assistance:** Codex wired an explicit OpenAI consent/opt-out, a structured stateless extraction
+  request using only the current message and allowlisted fictional catalog values, deterministic
+  fact persistence and catalog matching, and test coverage for refusals, invalid values, course
+  lookup, corrections, and failure behavior. The human explicitly approved this processing only
+  with affirmative consent and a no-real-student-data warning.
+- **Checks:** `bash scripts/verify.sh` passed with 71 tests and `git diff --check` passed locally.
+  Tests use synthetic text, fake APIs, and temporary SQLite. A separate live OpenAI smoke used
+  seven synthetic prompts across English, Hindi, Malayalam, and Hinglish, plus known-course,
+  out-of-catalog, and instruction-injection cases. It returned the expected bounded catalog output;
+  usage was 12,308 input and 992 output tokens total. No real student text or other external API was
+  used.
+- **Human review/limitations:** The UI disclosure warns that messages are stored locally, are sent
+  to OpenAI only after consent, and must be fictional. Translations, minors/guardian privacy review,
+  adversarial multilingual evaluations, and production privacy review remain outstanding.
+- **Push/CI:** Pending; record the exact pushed SHA and matching workflow result after publishing.
+
 ## 2026-10-11 — interest-led discovery first slice
 
 - **Task:** Extend the Telegram hackathon demo from a fixed course-first opening to an adaptive,

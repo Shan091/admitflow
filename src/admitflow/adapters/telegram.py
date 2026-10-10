@@ -43,10 +43,12 @@ def build_telegram_application(
     return application
 
 
-def keyboard(reply: Reply) -> InlineKeyboardMarkup | None:
+def keyboard(reply: Reply, *, ai_processing_allowed: bool = False) -> InlineKeyboardMarkup | None:
     buttons = list(reply.buttons)
     if not any(data == "language:menu" for _, data in buttons):
         buttons.append(("🌐 Change language", "language:menu"))
+    if ai_processing_allowed and not any(data == "ai:consent:no" for _, data in buttons):
+        buttons.append(("Turn off OpenAI processing", "ai:consent:no"))
     if not buttons:
         return None
     return InlineKeyboardMarkup(
@@ -65,12 +67,21 @@ def _services(
     )
 
 
-async def _send_reply(update: Update, reply: Reply, repository: Repository, lead_id: int) -> None:
+async def _send_reply(
+    update: Update,
+    reply: Reply,
+    repository: Repository,
+    admissions: AdmissionsService,
+    lead_id: int,
+) -> None:
     message = update.effective_message
     if message is None:
         return
     repository.add_message(lead_id, "outbound", reply.text)
-    await message.reply_text(reply.text, reply_markup=keyboard(reply))
+    ai_processing_allowed = admissions.openai_processing_consent(lead_id) == "yes"
+    await message.reply_text(
+        reply.text, reply_markup=keyboard(reply, ai_processing_allowed=ai_processing_allowed)
+    )
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -80,7 +91,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         return
     lead_id, reply = admissions.start(str(user.id), user.username)
     repository.add_message(lead_id, "inbound", "/start", update.update_id)
-    await _send_reply(update, reply, repository, lead_id)
+    await _send_reply(update, reply, repository, admissions, lead_id)
 
 
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -93,7 +104,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     data = query.data or ""
     repository.add_message(lead_id, "inbound", data, update.update_id)
-    if data.startswith("path:"):
+    if data == "ai:consent:yes":
+        reply = admissions.set_ai_processing_consent(lead_id, True)
+    elif data == "ai:consent:no":
+        reply = admissions.set_ai_processing_consent(lead_id, False)
+    elif data.startswith("path:"):
         reply = admissions.begin_path(lead_id, data.removeprefix("path:"))
     elif data.startswith("speaker:"):
         reply = admissions.choose_speaker(lead_id, data.removeprefix("speaker:"))
@@ -117,6 +132,8 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply = admissions.choose_language(lead_id, data.removeprefix("language:"))
     elif data == "menu:start":
         _, reply = admissions.start(str(user.id), user.username)
+    elif data == "handoff:request":
+        reply = admissions.handoff(lead_id, "Student requested a staff member.")
     elif data == "browse":
         reply = admissions.browse(lead_id)
     elif data.startswith("course:"):
@@ -159,7 +176,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     repository.add_message(lead_id, "outbound", reply.text)
     message = update.effective_message
     if message is not None:
-        await message.reply_text(reply.text, reply_markup=keyboard(reply))
+        ai_processing_allowed = admissions.openai_processing_consent(lead_id) == "yes"
+        await message.reply_text(
+            reply.text, reply_markup=keyboard(reply, ai_processing_allowed=ai_processing_allowed)
+        )
 
 
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -190,7 +210,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             reply = Reply("Your demo payment is still being set up. Please check again shortly.")
     else:
         reply = await admissions.free_text(lead_id, message.text, intent_router)
-    await _send_reply(update, reply, repository, lead_id)
+    await _send_reply(update, reply, repository, admissions, lead_id)
 
 
 async def resume_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -200,7 +220,7 @@ async def resume_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     repository.add_message(lead_id, "inbound", "/resume", update.update_id)
-    await _send_reply(update, admissions.resume_discovery(lead_id), repository, lead_id)
+    await _send_reply(update, admissions.resume_discovery(lead_id), repository, admissions, lead_id)
 
 
 def _is_payment_status_question(text: str) -> bool:

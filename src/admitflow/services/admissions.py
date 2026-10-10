@@ -5,9 +5,10 @@ from dataclasses import dataclass
 
 from admitflow.adapters.sqlite import Repository
 from admitflow.domain.discovery import recommend_courses
+from admitflow.domain.models import DiscoveryTurn
 from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.domain.qualification import assess_eligibility
-from admitflow.services.contracts import IntentRouter
+from admitflow.services.contracts import DiscoveryInterpreter, IntentRouter
 from admitflow.services.retrieval import RetrievalService
 
 
@@ -23,26 +24,90 @@ class AdmissionsService:
         repository: Repository,
         tenant_id: str,
         retrieval: RetrievalService,
+        discovery_interpreter: DiscoveryInterpreter | None = None,
     ) -> None:
         self.repository = repository
         self.tenant_id = tenant_id
         self.retrieval = retrieval
+        self.discovery_interpreter = discovery_interpreter
 
     def start(self, telegram_user_id: str, username: str | None) -> tuple[int, Reply]:
         lead_id = self.repository.upsert_lead(self.tenant_id, telegram_user_id, username)
-        buttons = (
-            ("I know the course", "path:course"),
-            ("I know the field", "path:field"),
-            ("Help me explore", "path:explore"),
-            ("Just browsing / ask a question", "path:browse"),
-            ("🌐 Change language", "language:menu"),
-            ("I'm a parent/guardian", "speaker:parent"),
+        consent = self.openai_processing_consent(lead_id)
+        if consent == "yes":
+            return lead_id, self._discovery_prompt()
+        if consent == "no":
+            return lead_id, self._tap_only_prompt()
+        return lead_id, self._openai_consent_prompt()
+
+    def openai_processing_consent(self, lead_id: int) -> str | None:
+        fact = next(
+            (
+                item
+                for item in self.repository.list_facts(lead_id)
+                if item["fact_key"] == "openai_processing_consent"
+            ),
+            None,
         )
-        return lead_id, Reply(
-            "Welcome to Demo Admissions Academy. This is fictional sample information. "
-            "Use demo answers only; messages are saved locally. "
-            "What would be most useful? You can switch paths or language at any time. Demo copy.",
-            buttons,
+        return str(fact["fact_value"]) if fact else None
+
+    def set_ai_processing_consent(self, lead_id: int, allowed: bool) -> Reply:
+        speaker_fact = next(
+            (
+                item
+                for item in self.repository.list_facts(lead_id)
+                if item["fact_key"] == "active_speaker"
+            ),
+            None,
+        )
+        speaker = str(speaker_fact["fact_value"]) if speaker_fact else "unknown"
+        self.repository.save_fact(
+            lead_id, "openai_processing_consent", "yes" if allowed else "no", speaker
+        )
+        if allowed:
+            return self._discovery_prompt()
+        return self._tap_only_prompt()
+
+    def _openai_consent_prompt(self) -> Reply:
+        return Reply(
+            "Welcome to Demo Admissions Academy, a fictional sample catalog. To understand free-"
+            "text questions and course interests, this demo sends the message you type to OpenAI; "
+            "FAQ questions may also be sent for matching against sample answers. Messages are "
+            "stored locally. Use demo data only; do not enter real student or personal "
+            "data. Do you agree to OpenAI processing for this demo? You can opt out later.",
+            (
+                ("Agree and continue", "ai:consent:yes"),
+                ("No, use buttons only", "ai:consent:no"),
+                ("🌐 Change language", "language:menu"),
+            ),
+        )
+
+    def _discovery_prompt(self) -> Reply:
+        return Reply(
+            "This is fictional demo guidance, not an admissions decision. What are you thinking "
+            "about studying, or what do you enjoy doing? You can type a course or interest in "
+            "your own words, say you're not sure, or choose a shortcut. Please keep using demo "
+            "text only; you can turn OpenAI processing off at any time.",
+            (
+                ("I know a course", "path:course"),
+                ("I know the field", "path:field"),
+                ("Help me explore", "path:explore"),
+                ("Just browsing / ask a question", "path:browse"),
+                ("I'm a parent/guardian", "speaker:parent"),
+            ),
+        )
+
+    def _tap_only_prompt(self) -> Reply:
+        return Reply(
+            "OpenAI processing is off for this chat. I won't send typed messages to OpenAI. "
+            "You can still explore or browse using the buttons below; avoid typing personal "
+            "details because messages are stored locally.",
+            (
+                ("Explore by field", "path:field"),
+                ("Help me explore with choices", "path:explore"),
+                ("Browse sample courses", "path:browse"),
+                ("Choose a known course", "path:course"),
+            ),
         )
 
     def begin_path(self, lead_id: int, path: str) -> Reply:
@@ -509,6 +574,8 @@ class AdmissionsService:
         lead = self.repository.get_lead(lead_id)
         if lead and lead["state"] == "awaiting_marks":
             return self.answer_marks(lead_id, text)
+        if _is_ai_opt_out(text):
+            return self.set_ai_processing_consent(lead_id, False)
         if _is_deletion_request(text):
             handoff = self.handoff(lead_id, "Student asked staff to delete their local data.")
             return Reply(
@@ -601,6 +668,20 @@ class AdmissionsService:
                 "pricing, and terms are not confirmed. "
                 f"{handoff.text}"
             )
+        if self.openai_processing_consent(lead_id) != "yes":
+            return self._tap_only_prompt()
+        if self.discovery_interpreter is not None:
+            try:
+                turn = await self.discovery_interpreter.extract_discovery(
+                    text, self.repository.list_courses(self.tenant_id)
+                )
+            except Exception:
+                return Reply(
+                    "I couldn't understand that safely just now. You can continue with the "
+                    "buttons, browse sample courses, or try a shorter message.",
+                    (("Choose a path", "menu:start"), ("Browse courses", "path:browse")),
+                )
+            return await self._handle_discovery_turn(lead_id, turn, text)
         if intent_router is None:
             return Reply(
                 "I can help you explore courses or check a sample FAQ. Send /start to begin."
@@ -628,6 +709,198 @@ class AdmissionsService:
             return self.browse(lead_id)
         return Reply(
             "I can help with the sample courses, eligibility, or FAQs. Send /start to see options."
+        )
+
+    async def _handle_discovery_turn(self, lead_id: int, turn: DiscoveryTurn, text: str) -> Reply:
+        courses = self.repository.list_courses(self.tenant_id)
+        speaker_fact = next(
+            (f for f in self.repository.list_facts(lead_id) if f["fact_key"] == "active_speaker"),
+            None,
+        )
+        speaker = str(speaker_fact["fact_value"]) if speaker_fact else "student"
+        if turn.intent == "staff_request":
+            return self.handoff(lead_id, "Student requested a staff member.")
+        if turn.intent == "out_of_scope":
+            return Reply(
+                "This demo explores courses offered in its fictional institution catalog. It "
+                "doesn't predict careers, jobs, or courses outside that catalog. I can show the "
+                "sample courses or flag your question for staff.",
+                (("Browse sample courses", "path:browse"), ("Ask staff", "handoff:request")),
+            )
+        if turn.intent == "knowledge_question":
+            result = await self.retrieval.answer(self.tenant_id, text)
+            if result is None:
+                return self.handoff(
+                    lead_id, "Question could not be answered from sample information."
+                )
+            answer, source = result
+            return Reply(f"{answer}\n\nSource: {source}")
+        if turn.intent == "course_lookup" and turn.course_id:
+            if speaker == "parent":
+                self.repository.save_fact(lead_id, "course_choice_parent", turn.course_id, "parent")
+                return Reply(
+                    "I've recorded this as the parent's course suggestion. Please ask the learner "
+                    "to confirm it.",
+                    (("Learner wants to explore this", f"course:confirm:{turn.course_id}"),),
+                )
+            return self.select_course(lead_id, turn.course_id)
+        if turn.intent == "course_lookup" and not turn.course_id:
+            return Reply(
+                "I couldn't match that wording to an exact course in the fictional catalog. "
+                "Try its full name, choose a field, or browse.",
+                (("Choose a course", "path:course"), ("Browse courses", "path:browse")),
+            )
+
+        if turn.correct_previous:
+            for key in (
+                "interest_field",
+                "interest_fields",
+                "education_level",
+                "interest_terms",
+                "activity_terms",
+            ):
+                self.repository.delete_fact(lead_id, f"{key}_{speaker}")
+            if speaker == "student":
+                self.repository.update_lead(lead_id, education_level=None)
+        if turn.fields:
+            fields_key = f"interest_fields_{speaker}"
+            existing_fields = next(
+                (
+                    f["fact_value"]
+                    for f in self.repository.list_facts(lead_id)
+                    if f["fact_key"] == fields_key
+                ),
+                "",
+            )
+            merged_fields = dict.fromkeys(
+                [*(item for item in existing_fields.split("|") if item), *turn.fields]
+            )
+            self.repository.save_fact(lead_id, fields_key, "|".join(merged_fields), speaker)
+            if len(merged_fields) == 1:
+                self.repository.save_fact(
+                    lead_id, f"interest_field_{speaker}", next(iter(merged_fields)), speaker
+                )
+            else:
+                self.repository.delete_fact(lead_id, f"interest_field_{speaker}")
+        if turn.education_level and turn.education_level != "any":
+            self.repository.save_fact(
+                lead_id, f"education_level_{speaker}", turn.education_level, speaker
+            )
+            if speaker == "student":
+                self.repository.update_lead(lead_id, education_level=turn.education_level)
+        if turn.interests:
+            interests_key = f"interest_terms_{speaker}"
+            existing_interests = next(
+                (
+                    f["fact_value"]
+                    for f in self.repository.list_facts(lead_id)
+                    if f["fact_key"] == interests_key
+                ),
+                "",
+            )
+            self.repository.save_fact(
+                lead_id,
+                interests_key,
+                "|".join(
+                    dict.fromkeys(
+                        [*(item for item in existing_interests.split("|") if item), *turn.interests]
+                    )
+                ),
+                speaker,
+            )
+        if turn.activities:
+            activities_key = f"activity_terms_{speaker}"
+            existing_activities = next(
+                (
+                    f["fact_value"]
+                    for f in self.repository.list_facts(lead_id)
+                    if f["fact_key"] == activities_key
+                ),
+                "",
+            )
+            self.repository.save_fact(
+                lead_id,
+                activities_key,
+                "|".join(
+                    dict.fromkeys(
+                        [
+                            *(item for item in existing_activities.split("|") if item),
+                            *turn.activities,
+                        ]
+                    )
+                ),
+                speaker,
+            )
+        if speaker == "parent" and (
+            turn.fields or turn.interests or turn.activities or turn.education_level
+        ):
+            return Reply(
+                "I've recorded those as the parent's preferences. The learner's own interests "
+                "should guide recommendations; invite them to share or confirm their preferences.",
+                (("Learner sharing now", "speaker:student"),),
+            )
+        if turn.unsure and not (turn.fields or turn.interests or turn.activities):
+            return Reply(
+                "That's okay. What kinds of topics or activities do you enjoy, even outside "
+                "school? You can also choose a field below.",
+                tuple(
+                    (f.replace("/", " & ").title(), f"field:{f}")
+                    for f in sorted({c.field for c in courses})
+                )
+                + (("Browse courses", "path:browse"),),
+            )
+        student_facts = self.repository.list_facts(lead_id)
+        field = next(
+            (f["fact_value"] for f in student_facts if f["fact_key"] == "interest_field_student"),
+            None,
+        )
+        fields_fact = next(
+            (f["fact_value"] for f in student_facts if f["fact_key"] == "interest_fields_student"),
+            None,
+        )
+        interests_fact = next(
+            (f["fact_value"] for f in student_facts if f["fact_key"] == "interest_terms_student"),
+            None,
+        )
+        activities_fact = next(
+            (f["fact_value"] for f in student_facts if f["fact_key"] == "activity_terms_student"),
+            None,
+        )
+        level_fact = next(
+            (f["fact_value"] for f in student_facts if f["fact_key"] == "education_level_student"),
+            None,
+        )
+        interests = set(str(interests_fact).split("|")) if interests_fact else set()
+        if fields_fact:
+            interests.update(str(fields_fact).split("|"))
+        if field:
+            interests.add(str(field))
+        activities = set(str(activities_fact).split("|")) if activities_fact else set()
+        if interests or activities:
+            matches = recommend_courses(
+                courses,
+                interests=interests,
+                activities=activities,
+                level=str(level_fact) if level_fact else None,
+                limit=3,
+            )
+            if matches:
+                buttons = tuple((m.course.name, f"course:{m.course.id}") for m in matches)
+                summaries = "\n".join(
+                    f"• {m.course.name} ({m.course.education_level.replace('_', ' ')}): "
+                    f"{', '.join(m.reasons)}. Sample entry: {'; '.join(m.course.prerequisites)}."
+                    for m in matches
+                )
+                return Reply(
+                    "Based on what you shared, here are matching fictional sample courses:\n"
+                    f"{summaries}\n\nThese are examples, not an admission decision. Which "
+                    "would you like to explore?",
+                    buttons,
+                )
+        return Reply(
+            "I have not got enough detail to suggest a course yet. What topic or activity would "
+            "you like to explore? You can mention a study level too.",
+            (("Choose a field", "path:field"), ("Browse sample courses", "path:browse")),
         )
 
 
@@ -679,6 +952,26 @@ def _is_language_concern(text: str) -> bool:
             "भाषा",
             "अंग्रेज़ी",
             "bhasha",
+        }
+    )
+
+
+def _is_ai_opt_out(text: str) -> bool:
+    normalized = re.sub(r"[^\w]+", " ", text.casefold()).strip()
+    return any(
+        phrase in normalized
+        for phrase in {
+            "stop ai",
+            "turn off ai",
+            "disable ai",
+            "stop openai",
+            "turn off openai",
+            "revoke ai consent",
+            "revoke consent",
+            "do not send to openai",
+            "dont send to openai",
+            "don't send to openai",
+            "no ai processing",
         }
     )
 

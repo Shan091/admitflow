@@ -65,10 +65,18 @@ Record consequential choices here. Each entry is short; update it when evidence 
     the dashboard shows paid status, while disclosing that live contact, response time, and course
     access are not configured.
 
+17. **Consent-gated text extraction.** Explain before sending free-text questions to OpenAI and
+    require affirmative consent; allow opt-out and button-only exploration. Use a stateless
+    structured extraction of the current message plus fictional allowlisted course vocabulary.
+    Application code validates extracted facts and owns questions, recommendations, fees, and
+    eligibility. No user name, chat ID, or transcript is sent as context; this does not replace a
+    privacy/legal review.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings
 - OpenAI Decisions: https://developers.openai.com/api/docs/guides/decisions
+- OpenAI Structured Outputs: https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses
 - Python Telegram Bot async lifecycle:
   https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-requested-design-patterns
 - Razorpay Payment Links API: https://razorpay.com/docs/api/payments/payment-links/

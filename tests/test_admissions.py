@@ -4,6 +4,7 @@ import pytest
 
 from admitflow.adapters.sqlite import Repository
 from admitflow.adapters.vector_store import VectorStore
+from admitflow.domain.models import Course, DiscoveryTurn
 from admitflow.services.admissions import AdmissionsService
 from admitflow.services.retrieval import RetrievalService
 
@@ -11,6 +12,26 @@ from admitflow.services.retrieval import RetrievalService
 class UnexpectedRouter:
     async def route(self, text: str) -> str:
         raise AssertionError("Fee questions must bypass the intent model")
+
+
+class UnexpectedEmbedder:
+    async def embed(self, texts: list[str]) -> list[list[float]]:
+        raise AssertionError("Opted-out messages must not be sent for embeddings")
+
+
+class FakeDiscoveryInterpreter:
+    def __init__(self, turn: DiscoveryTurn) -> None:
+        self.turn = turn
+        self.calls: list[tuple[str, list[str]]] = []
+
+    async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
+        self.calls.append((text, [course.id for course in courses]))
+        return self.turn
+
+
+class FailingDiscoveryInterpreter:
+    async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
+        raise RuntimeError("synthetic extraction failure")
 
 
 @pytest.mark.asyncio
@@ -70,6 +91,225 @@ async def test_hostel_availability_is_handed_to_staff_when_not_confirmed(tmp_pat
     assert "actual availability" in reply.text
     assert "Live contact and response-time details are not configured" in reply.text
     assert repository.get_lead(lead_id)["handoff_status"] == "pending"  # type: ignore[index]
+
+
+@pytest.mark.asyncio
+async def test_discovery_requires_openai_consent_and_still_allows_tap_only_mode(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(
+            repository, VectorStore(repository), UnexpectedEmbedder(), "fake", 0.72, 0.05
+        ),
+    )
+    lead_id, consent_prompt = service.start("123", "student")
+
+    assert any(data == "ai:consent:yes" for _, data in consent_prompt.buttons)
+    assert any(data == "ai:consent:no" for _, data in consent_prompt.buttons)
+    assert "OpenAI" in consent_prompt.text
+    assert "demo data" in consent_prompt.text.casefold()
+
+    service.set_ai_processing_consent(lead_id, False)
+    reply = await service.free_text(lead_id, "I like technology and data", UnexpectedRouter())
+
+    assert "buttons" in reply.text.casefold()
+    assert "technology and data" not in reply.text
+    consent = next(
+        fact
+        for fact in repository.list_facts(lead_id)
+        if fact["fact_key"] == "openai_processing_consent"
+    )
+    assert consent["fact_value"] == "no"
+
+
+def test_consent_grant_opens_open_ended_discovery_and_can_be_revoked(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    prompt = service.set_ai_processing_consent(lead_id, True)
+    assert "what do you enjoy" in prompt.text.casefold() or "already know" in prompt.text.casefold()
+    assert any(data == "path:course" for _, data in prompt.buttons)
+    assert any(data == "path:explore" for _, data in prompt.buttons)
+
+    revoked = service.set_ai_processing_consent(lead_id, False)
+    assert "buttons" in revoked.text.casefold() or "tap" in revoked.text.casefold()
+    consent = next(
+        fact
+        for fact in repository.list_facts(lead_id)
+        if fact["fact_key"] == "openai_processing_consent"
+    )
+    assert consent["fact_value"] == "no"
+
+
+@pytest.mark.asyncio
+async def test_consenting_student_can_describe_multiple_facts_in_one_free_text_turn(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level="diploma",
+            interests=("data",),
+            activities=("making charts",),
+            unsure=False,
+            correct_previous=False,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    service.set_ai_processing_consent(lead_id, True)
+    service.choose_speaker(lead_id, "student")
+
+    reply = await service.free_text(lead_id, "I enjoy charts and want a diploma in data", None)
+
+    assert len(interpreter.calls) == 1
+    assert "Applied Data Analytics Diploma" in reply.text
+    assert "\\n" not in reply.text
+    assert "courses:\n" in reply.text
+    facts = repository.list_facts(lead_id)
+    assert any(
+        fact["fact_key"] == "interest_field_student" and fact["fact_value"] == "tech/data"
+        for fact in facts
+    )
+    assert any(
+        fact["fact_key"] == "education_level_student" and fact["fact_value"] == "diploma"
+        for fact in facts
+    )
+
+    interpreter.turn = DiscoveryTurn(
+        intent="discovery",
+        course_id=None,
+        fields=("design/media",),
+        education_level=None,
+        interests=("design",),
+        activities=("making visuals",),
+        unsure=False,
+        correct_previous=False,
+    )
+    await service.free_text(lead_id, "I also like design and making visuals", None)
+    facts = repository.list_facts(lead_id)
+    assert any(
+        fact["fact_key"] == "interest_fields_student"
+        and set(str(fact["fact_value"]).split("|")) == {"tech/data", "design/media"}
+        for fact in facts
+    )
+
+    interpreter.turn = DiscoveryTurn(
+        intent="discovery",
+        course_id=None,
+        fields=("design/media",),
+        education_level="any",
+        interests=("design",),
+        activities=("making visuals",),
+        unsure=False,
+        correct_previous=True,
+    )
+    await service.free_text(lead_id, "Actually, I changed my mind: design/media", None)
+    facts = repository.list_facts(lead_id)
+    assert any(
+        fact["fact_key"] == "interest_fields_student" and fact["fact_value"] == "design/media"
+        for fact in facts
+    )
+    assert not any(fact["fact_key"] == "education_level_student" for fact in facts)
+
+
+@pytest.mark.asyncio
+async def test_discovery_interpreter_is_never_called_without_consent(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("discovery", None, (), None, (), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(lead_id, "I like design", None)
+
+    assert not interpreter.calls
+    assert "OpenAI processing is off" in reply.text
+    assert "buttons" in reply.text.casefold() or "tap" in reply.text.casefold()
+
+
+@pytest.mark.asyncio
+async def test_extraction_failure_does_not_persist_partial_facts(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        FailingDiscoveryInterpreter(),
+    )
+    lead_id, _ = service.start("123", "student")
+    service.set_ai_processing_consent(lead_id, True)
+    reply = await service.free_text(lead_id, "I enjoy art and making posters", None)
+
+    assert "couldn't understand that safely" in reply.text.casefold()
+    assert not any(
+        fact["fact_key"].startswith(("interest_", "education_level_", "activity_"))
+        for fact in repository.list_facts(lead_id)
+    )
+
+
+@pytest.mark.asyncio
+async def test_natural_language_known_course_enters_existing_course_flow(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    course = next(
+        item
+        for item in repository.list_courses(repository.tenant_id)
+        if item.education_level == "undergraduate"
+    )
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("course_lookup", course.id, (), None, (), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    service.set_ai_processing_consent(lead_id, True)
+
+    reply = await service.free_text(lead_id, f"I already know I want {course.name}", None)
+
+    assert "Grade 12" in reply.text
+    assert repository.get_lead(lead_id)["selected_course_id"] == course.id  # type: ignore[index]
+    assert not any(
+        fact["fact_key"].startswith(("interest_field", "interest_terms", "activity_terms"))
+        for fact in repository.list_facts(lead_id)
+    )
 
 
 @pytest.mark.asyncio
@@ -176,6 +416,7 @@ def test_browse_path_does_not_force_qualification(tmp_path: Path) -> None:
         RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
     )
     lead_id, welcome = service.start("123", "student")
+    welcome = service.set_ai_processing_consent(lead_id, True)
 
     reply = service.browse(lead_id)
 
@@ -196,13 +437,13 @@ def test_known_field_recommends_only_complete_catalog_courses_and_persists_path(
         RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
     )
     lead_id, welcome = service.start("123", "student")
+    welcome = service.set_ai_processing_consent(lead_id, True)
 
     assert {data for _, data in welcome.buttons} >= {
         "path:course",
         "path:field",
         "path:explore",
         "path:browse",
-        "language:menu",
     }
     service.begin_path(lead_id, "field")
     level_reply = service.recommend_field(lead_id, "tech/data")

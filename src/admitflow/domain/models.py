@@ -22,6 +22,22 @@ class Course:
 
 
 @dataclass(frozen=True, slots=True)
+class DiscoveryTurn:
+    """Catalog-bounded interpretation of one consented chat message."""
+
+    intent: Literal[
+        "discovery", "course_lookup", "knowledge_question", "staff_request", "out_of_scope", "other"
+    ]
+    course_id: str | None
+    fields: tuple[str, ...]
+    education_level: str | None
+    interests: tuple[str, ...]
+    activities: tuple[str, ...]
+    unsure: bool
+    correct_previous: bool
+
+
+@dataclass(frozen=True, slots=True)
 class QualificationResult:
     eligible: bool
     reason: str

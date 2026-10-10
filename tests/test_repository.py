@@ -27,6 +27,41 @@ def test_catalog_seeding_is_idempotent_and_fees_are_structured(tmp_path: Path) -
     assert all(course.field and course.prerequisites and course.medium for course in after)
 
 
+def test_catalog_has_broad_fictional_options_with_complete_sample_facts(
+    tmp_path: Path,
+) -> None:
+    repository = make_repository(tmp_path)
+    courses = repository.list_courses(repository.tenant_id)
+
+    assert len(courses) >= 28
+    assert len({course.id for course in courses}) == len(courses)
+    assert {course.education_level for course in courses} == {
+        "vocational_certificate",
+        "diploma",
+        "undergraduate",
+        "postgraduate",
+    }
+    by_field = {course.field for course in courses}
+    assert by_field == {
+        "tech/data",
+        "business/accounting",
+        "design/media",
+        "hospitality/tourism",
+        "vocational-skills",
+    }
+    assert all(sum(course.field == field for course in courses) >= 5 for field in by_field)
+    assert all(
+        course.description
+        and "fictional" in course.description.casefold()
+        and course.interests
+        and course.activities
+        and course.prerequisites
+        and course.medium
+        and course.application_fee_paise > 0
+        for course in courses
+    )
+
+
 def test_lead_facts_preserve_attribution_and_update_in_place(tmp_path: Path) -> None:
     repository = make_repository(tmp_path)
     lead_id = repository.upsert_lead(repository.tenant_id, "123", "student")

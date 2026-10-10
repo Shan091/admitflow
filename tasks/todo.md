@@ -54,6 +54,24 @@ committed.
   `38085663111` passed. The checklist and submission-record update was pushed as
   `9315a93f9c2557d3c00008a775458397b8554837`; its GitHub Actions run `38085770102` passed.
 
+## Consent-gated adaptive intake and larger catalog
+
+See `tasks/features/conversational-intake.md`. Preserve the existing demo boundary: fictional
+courses, no scores, student-first attribution, and truthful staff handoff.
+
+- [ ] Expand the seed catalog to 28+ complete sample courses, at least five per agreed field; test
+  unique IDs, all levels, complete facts, and recommendation provenance.
+- [ ] Add explicit OpenAI processing consent and a tap-only fallback; prove no route, extraction, or
+  embedding call occurs before consent or after opt-out.
+- [ ] Extract only current-turn, catalog-allowlisted discovery facts with a strict schema and
+  stateless API request; validate model output before any persistence or response.
+- [ ] Replace the mandatory field/level/activity sequence with deterministic next-question choice
+  based on already-known facts; support known-course natural-language entry and unsure learners.
+- [ ] Add fake-API tests for consent, multilingual extraction fixtures, injection/unknown values,
+  handoff, dynamic turn selection, and failure fallback.
+- [ ] Run `bash scripts/verify.sh`, review privacy/claims, and commit/push only this slice's files;
+  record the exact pushed SHA and matching GitHub Actions result.
+
 ## FAQ embeddings and vector retrieval
 
 - [x] Test vector packing during seed indexing, cosine ranking, dimension mismatch, and tenant scoping.

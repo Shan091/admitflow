@@ -1,18 +1,23 @@
 # AdmitFlow
 
-AdmitFlow is a hackathon demo of an admissions assistant. In Telegram, a student can choose a
-known course or field, explore sample options through short prompts, or browse/ask a question.
-Catalog-only recommendations use explicit field, education-level, and activity choices; there is
-no aptitude score. Eligible undergraduate demo applicants can choose whether to request a Razorpay
-test-mode fee link. FAQ answers use seeded institution content, OpenAI embeddings, and local vector
-search. Staff can inspect leads, attributed discovery facts, and handoffs in a dashboard.
+AdmitFlow is a hackathon demo of an admissions assistant. In Telegram, a student can opt in to
+OpenAI processing for free-text discovery, name a known course, describe interests, explore through
+short prompts, or browse/ask a question. Declining or switching OpenAI processing off leaves the
+button-based demo usable. Recommendations stay inside the fictional catalog and use no aptitude
+score. Eligible undergraduate demo applicants can choose whether to request a Razorpay test-mode fee
+link. FAQ answers use seeded institution content, OpenAI embeddings, and local vector search. Staff
+can inspect leads, attributed discovery facts, and handoffs in a dashboard.
 
 This is a demo using fictional sample data. Eligibility results are not real admission decisions.
 The language selector stores English, Malayalam, Hindi, or Hinglish preferences, but most current
 bot responses remain English; translated copy is incomplete and needs fluent-speaker review.
 Use fictional/demo answers only: Telegram user IDs, usernames, and chat messages are stored in the
-local SQLite database. Configure staff credentials before viewing the dashboard. Razorpay is
-restricted to test-key IDs; payment state changes only after a verified webhook.
+local SQLite database. Before free-text AI features are enabled, the bot explains that the current
+message may be sent to OpenAI and asks for explicit consent. The extraction request uses only the
+current message and allowlisted fictional catalog vocabulary with API storage disabled; it does not
+include chat ID, name, or transcript. This is not a production privacy review. Configure staff
+credentials before viewing the dashboard. Razorpay is restricted to test-key IDs; payment state
+changes only after a verified webhook.
 
 ## Requirements
 
@@ -55,8 +60,8 @@ demo can continue. This does not delete external records held by Telegram or Raz
 Telegram webhooks require HTTPS, and Telegram does not allow webhook delivery and `getUpdates`
 polling simultaneously. The helper checks Telegram's reported webhook URL after registration.
 To remove the hook, run `uv run python scripts/manage_telegram_webhook.py --delete`. This project
-currently runs webhook mode only. Configure `OPENAI_API_KEY` to enable
-intent routing and semantic FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
+currently runs webhook mode only. Configure `OPENAI_API_KEY` to enable consented discovery and
+semantic FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
 `STAFF_SESSION_SECRET` in `.env` to log in. Generate the session secret locally with
 `python -c "import secrets; print(secrets.token_urlsafe(48))"`; never commit `.env`.
 
@@ -94,9 +99,10 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
 ## Demo walkthrough
 
 1. Register the Telegram webhook as described above, then send `/start` to the configured bot.
-2. Choose a known course, known field, guided exploration, or browse. Exploration asks about study
-   level and activities one at a time; either answer can be skipped. A learner can pause with the
-   inline action and resume with `/resume`.
+2. Read the OpenAI processing notice. Agree to enable free-text course discovery or choose
+   **No, use buttons only**. After consent, describe a known course, interest, activity, or study
+   level in one message, or use the shortcuts. Without consent, use the field/course/browse buttons.
+   A learner can pause with the inline action and resume with `/resume`.
 3. Select a course. Sample undergraduate options can continue through the code-computed eligibility
    check; other levels show sample prerequisites and create a staff handoff instead of using a
    Grade 12 rule that may not apply.

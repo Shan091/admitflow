@@ -13,10 +13,12 @@ admissions system and uses a clearly fictional institution and seeded data.
 
 ## Hackathon capability map
 
-- **Discovery:** Telegram starts with known-course, known-field, guided-exploration, and browse/
-  question paths. Short optional field, education-level, and activity choices produce at most three
-  catalog-only matches with reasons; no aptitude score or personality label is created. The seeded
-  Kerala institute and all course facts are fictional.
+- **Discovery:** Telegram explains OpenAI text processing and asks for explicit consent before
+  free-text extraction or FAQ query embedding. Declining or opting out preserves button-based
+  browsing. After consent, a stateless structured extraction sees only the current message and
+  allowlisted fictional catalog vocabulary; code validates facts, asks the next question, and ranks
+  at most three catalog-only matches. Known-course, known-field, unsure/explore, and browse paths
+  remain available. No aptitude score or personality label is created.
 - **Qualification:** Undergraduate sample rules are checked by Python. Other levels show their
   sample prerequisites and create a staff handoff for confirmation; the app does not reuse a Grade
   12 rule across every program.
@@ -49,6 +51,9 @@ admissions system and uses a clearly fictional institution and seeded data.
    recorded with actual check results.
 6. Staff must log in before viewing lead details; a verified Razorpay test webhook can update a
    demo payment to paid, while invalid webhook signatures cannot.
+7. Before consent, and after opt-out, typed discovery/FAQ text causes no OpenAI call; tap-based
+   course exploration remains available. Extraction failures and unsupported values never create
+   recommendations outside the sample catalog.
 
 ## Roadmap
 

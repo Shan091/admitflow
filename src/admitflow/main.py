@@ -59,7 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await retrieval.index_seeded_faqs(repository.tenant_id)
         except Exception:
             logger.exception("FAQ indexing failed; retrieval remains unavailable until indexed")
-        admissions = AdmissionsService(repository, repository.tenant_id, retrieval)
+        admissions = AdmissionsService(repository, repository.tenant_id, retrieval, openai_adapter)
         payment_service = None
         key_id = app_settings.razorpay_key_id
         if (

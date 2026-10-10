@@ -34,7 +34,7 @@ def make_runtime(tmp_path: Path) -> tuple[Repository, AdmissionsService, SimpleN
 
 
 @pytest.mark.asyncio
-async def test_start_command_creates_lead_and_sends_course_options(tmp_path: Path) -> None:
+async def test_start_command_discloses_ai_processing_before_open_text(tmp_path: Path) -> None:
     repository, _, context = make_runtime(tmp_path)
     message = FakeMessage()
     update = SimpleNamespace(
@@ -49,10 +49,14 @@ async def test_start_command_creates_lead_and_sends_course_options(tmp_path: Pat
     assert len(leads) == 1
     assert leads[0]["telegram_user_id"] == "42"
     assert len(repository.list_messages(int(leads[0]["id"]))) == 2
-    assert "fictional sample information" in message.sent[0][0]
+    assert "fictional sample catalog" in message.sent[0][0]
+    assert "OpenAI" in message.sent[0][0]
+    assert "demo data only" in message.sent[0][0]
     assert message.sent[0][1] is not None
-    assert (
-        "Help me explore" in message.sent[0][0] or "What would be most useful" in message.sent[0][0]
+    assert any(
+        button.callback_data == "ai:consent:yes"
+        for row in message.sent[0][1].inline_keyboard
+        for button in row
     )
 
 
