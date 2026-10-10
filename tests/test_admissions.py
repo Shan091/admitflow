@@ -605,6 +605,136 @@ async def test_delivery_mode_can_be_left_open_and_is_not_repeated(
 
 
 @pytest.mark.asyncio
+async def test_guided_match_opens_course_details_before_explicit_eligibility_step(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+                delivery_modes=("in_person",),
+            )
+            for course in original_courses
+        ],
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+    repository.save_fact(lead_id, "education_level_student", "undergraduate", "student")
+    repository.update_lead(lead_id, education_level="undergraduate")
+    reflection = service._present_guidance(lead_id)
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+
+    results = await service.confirm_guidance(lead_id, token)
+
+    selected_detail_callback = next(
+        data.removeprefix("guidance:course:")
+        for _, data in results.buttons
+        if data.startswith("guidance:course:")
+    )
+    assert repository.get_lead(lead_id)["selected_course_id"] is None
+    details = service.explore_guidance_course(lead_id, selected_detail_callback)
+
+    assert "Fictional sample details" in details.text
+    assert "Sample prerequisites:" in details.text
+    assert any(data == f"course:{selected_detail_callback}" for _, data in details.buttons)
+    assert any(data == "guidance:matches" for _, data in details.buttons)
+    matches_again = service.show_guidance_matches(lead_id)
+    assert selected_detail_callback in {
+        data.removeprefix("guidance:course:")
+        for _, data in matches_again.buttons
+        if data.startswith("guidance:course:")
+    }
+    assert repository.get_lead(lead_id)["selected_course_id"] is None
+
+    service.pause_discovery(lead_id)
+    resumed = service.resume_discovery(lead_id)
+    resumed_course_ids = {
+        data.removeprefix("guidance:course:")
+        for _, data in resumed.buttons
+        if data.startswith("guidance:course:")
+    }
+    assert selected_detail_callback in resumed_course_ids
+    assert repository.get_lead(lead_id)["selected_course_id"] is None
+
+    next_step = service.select_course(lead_id, selected_detail_callback)
+    assert "Have you completed Grade 12" in next_step.text
+    assert repository.get_lead(lead_id)["selected_course_id"] == selected_detail_callback
+
+
+@pytest.mark.asyncio
+async def test_stale_guided_course_detail_callback_does_not_show_old_match(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+                delivery_modes=("in_person",),
+            )
+            for course in original_courses
+        ],
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+    repository.save_fact(lead_id, "education_level_student", "undergraduate", "student")
+    repository.update_lead(lead_id, education_level="undergraduate")
+    reflection = service._present_guidance(lead_id)
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+    results = await service.confirm_guidance(lead_id, token)
+    stale_course_id = next(
+        data.removeprefix("guidance:course:")
+        for _, data in results.buttons
+        if data.startswith("guidance:course:")
+    )
+    repository.save_fact(lead_id, "interest_terms_student", "design", "student")
+
+    stale = service.explore_guidance_course(lead_id, stale_course_id)
+
+    assert stale_course_id not in stale.text
+    assert repository.get_lead(lead_id)["selected_course_id"] is None
+
+    stale_matches = service.show_guidance_matches(lead_id)
+    assert "Did I get that right" in stale_matches.text
+    assert all(not data.startswith("guidance:course:") for _, data in stale_matches.buttons)
+
+
+@pytest.mark.asyncio
 async def test_uniform_support_candidates_do_not_get_language_prompt(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1640,7 +1770,7 @@ async def test_known_field_recommends_only_complete_catalog_courses_and_persists
     assert lead is not None and lead["lifecycle_stage"] == "discovering"
     assert lead["discovery_path"] == "field"
     assert "Matches your interest in tech/data" in reply.text
-    assert all(data.startswith("course:") for _, data in reply.buttons)
+    assert all(data.startswith("guidance:course:") for _, data in reply.buttons)
     assert any(fact["fact_key"] == "interest_field_student" for fact in facts)
 
 
@@ -1899,7 +2029,7 @@ async def test_fixed_catalog_evaluation_matrix_returns_expected_complete_course(
     )
     result = await service.confirm_guidance(lead_id, confirmation.removeprefix("guidance:confirm:"))
 
-    assert any(data == f"course:{expected_course}" for _, data in result.buttons)
+    assert any(data == f"guidance:course:{expected_course}" for _, data in result.buttons)
 
 
 @pytest.mark.parametrize(

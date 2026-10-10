@@ -60,6 +60,11 @@ See `tasks/features/conversational-guidance-agent.md`. This extends course disco
 adaptive, evidence-grounded, multi-turn guidance experience; do not treat lifecycle stages as a
 mandatory linear interview.
 
+- [ ] Current slice: make recommendation exploration distinct from course commitment. A learner
+  should be able to inspect verified sample details and compare back to the current matches before
+  explicitly continuing to the code-owned eligibility/staff path; keep known-course selection
+  direct. Validate stale recommendation callbacks and resume behavior.
+
 - [x] Confirm institution-course-only recommendations, with goal exploration and staff referral for
   out-of-catalog requests; no job or occupation predictions. Production age/privacy policy remains
   an open gate; hackathon testing uses fictional data only.

@@ -117,6 +117,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     appears as a catalog-grounded reason. Do not imply a specific schedule, accessibility, or
     availability. Widen honestly when no complete sample course matches.
 
+25. **Recommendation exploration does not imply course commitment.** Guided match cards open
+    verified fictional course details; the learner can return to the same current match list or
+    explicitly continue to the existing code-owned eligibility/staff path. Only that explicit
+    continuation sets the selected course. Known-course selection stays direct. Stale detail/list
+    callbacks must revalidate the current confirmed learner facts and ranked matches.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

@@ -888,6 +888,102 @@ class AdmissionsService:
         self.repository.update_lead(lead_id, discovery_step="results")
         return self._present_guidance(lead_id)
 
+    def show_guidance_matches(self, lead_id: int) -> Reply:
+        """Return the current confirmed comparison set, refreshing it if it became stale."""
+        lead = self.repository.get_lead(lead_id)
+        if lead is None:
+            return Reply("Send /start to begin a new demo conversation.")
+        if lead["discovery_step"] != "results" or not self._guidance_is_currently_confirmed(
+            lead_id
+        ):
+            self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
+            return self._present_guidance(lead_id)
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        return self._guidance_recommendation_reply(
+            lead_id,
+            self.repository.list_courses(self.tenant_id),
+            interests,
+            activities,
+            level,
+            goals,
+            language_support,
+            self._student_delivery_mode(lead_id),
+        )
+
+    def explore_guidance_course(self, lead_id: int, course_id: str) -> Reply:
+        """Show verified sample details without treating interest as course selection."""
+        lead = self.repository.get_lead(lead_id)
+        if lead is None:
+            return Reply("Send /start to begin a new demo conversation.")
+        matches = self._current_guidance_matches(lead_id)
+        is_current = lead["discovery_step"] == "results" and self._guidance_is_currently_confirmed(
+            lead_id
+        )
+        match = next(
+            (item for item in matches if item.course.id == course_id),
+            None,
+        )
+        if not is_current or match is None:
+            self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
+            return self._present_guidance(lead_id)
+
+        course = match.course
+        study_formats = (
+            ", ".join(mode.replace("_", " ") for mode in course.delivery_modes) or "not specified"
+        )
+        details = (
+            f"Fictional sample details — {course.name}\n"
+            f"Level: {course.education_level.replace('_', ' ')}\n"
+            f"Field: {course.field}\n"
+            f"About: {course.description}\n"
+            f"Why it matched: {'; '.join(match.reasons)}\n"
+            f"Sample prerequisites: {'; '.join(course.prerequisites)}\n"
+            f"Teaching medium: {course.medium}\n"
+            f"Listed language support: {', '.join(course.language_support) or 'not specified'}\n"
+            f"Listed study formats: {study_formats}\n"
+            f"Sample application fee: {format_inr_from_paise(course.application_fee_paise)}\n\n"
+            "This is fictional sample catalog data, not an admission decision or a promise of "
+            "availability. You can compare the other matches before choosing whether to continue."
+        )
+        return Reply(
+            details,
+            (
+                ("Continue to sample eligibility/staff check", f"course:{course.id}"),
+                ("Back to matching courses", "guidance:matches"),
+            ),
+        )
+
+    def _current_guidance_matches(self, lead_id: int) -> list[CourseMatch]:
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        return recommend_courses(
+            self.repository.list_courses(self.tenant_id),
+            interests=interests,
+            activities=activities,
+            learning_goals=goals,
+            language_support_preference=language_support,
+            delivery_mode_preference=self._student_delivery_mode(lead_id),
+            level=None if level == "any" else level,
+            limit=3,
+        )
+
+    def _guidance_is_currently_confirmed(self, lead_id: int) -> bool:
+        interests, activities, level, goals, language_support = self._student_guidance_context(
+            lead_id
+        )
+        signature = _guidance_signature(
+            interests,
+            activities,
+            level,
+            goals,
+            language_support,
+            self._student_delivery_mode(lead_id),
+        )
+        return self._fact_value(lead_id, "guidance_confirmed_signature") == signature
+
     def pause_discovery(self, lead_id: int) -> Reply:
         self.repository.update_lead(lead_id, lifecycle_stage="paused")
         return Reply(
@@ -1956,7 +2052,7 @@ class AdmissionsService:
             "Based on what you confirmed, here are matching fictional sample courses:\n"
             f"{summaries}\n\nThese are examples, not an admission decision. Which would you "
             "like to explore?",
-            tuple((match.course.name, f"course:{match.course.id}") for match in matches),
+            tuple((match.course.name, f"guidance:course:{match.course.id}") for match in matches),
         )
 
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-11 — inspect a recommendation before committing to a course
+
+- **Change:** Guided recommendation buttons now open catalog-verified fictional course details,
+  including fit reasons, sample prerequisites, teaching medium, listed support/formats, and sample
+  fee. The detail view offers a return to the currently confirmed matches or an explicit continue
+  action into the existing eligibility/staff path. The known-course shortcut remains direct.
+  Stale detail and back-to-matches callbacks revalidate the learner's current confirmation and
+  ranked results; pause/resume restores the results. Telegram now routes guided detail callbacks
+  separately from direct course selection.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 168 tests;
+  `git diff --check` passed. Tests cover the detail/continue boundary, stale callbacks, resume, and
+  Telegram dispatch. No live or paid API calls were made.
+- **Reason:** Exploring an option is not a commitment to apply. Learners can compare course facts
+  before the app starts qualification or staff review.
+
 ## 2026-10-11 — add adaptive study-format exploration
 
 - **Change:** Added fictional catalog delivery modes (in-person, online, hybrid), migrated existing

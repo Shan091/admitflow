@@ -3,6 +3,18 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — separate recommendation exploration from course selection
+
+- **Task:** Let learners inspect a matched course and compare options before entering qualification.
+- **Assistance:** Codex added a catalog-grounded detail reply, explicit continue and back-to-match
+  actions, stale callback validation, Telegram callback routing, and coverage for pause/resume.
+  Existing direct known-course selection remains unchanged. The decision and acceptance criteria
+  were recorded in `docs/DECISIONS.md` and the conversational-guidance feature brief.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 168 tests;
+  `git diff --check` passed. No live or paid API calls were made.
+- **Human review:** Details are clearly labeled fictional sample data and do not imply admission,
+  course availability, or access. The real catalog and staff process remain unconfigured.
+
 ## 2026-10-11 — add adaptive course delivery-format exploration
 
 - **Task:** Add delivery-format preferences to the multi-turn, institution-course guidance flow.

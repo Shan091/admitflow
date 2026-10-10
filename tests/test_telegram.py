@@ -156,6 +156,74 @@ async def test_course_callback_updates_lead_and_persists_exchange(tmp_path: Path
 
 
 @pytest.mark.asyncio
+async def test_guided_course_detail_callback_does_not_enter_qualification(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    original_courses = repository.list_courses(repository.tenant_id)
+    monkeypatch.setattr(
+        repository,
+        "list_courses",
+        lambda tenant_id: [
+            replace(
+                course,
+                learning_goals=("analyze data",),
+                language_support=("English support sessions",),
+                delivery_modes=("in_person",),
+            )
+            for course in original_courses
+        ],
+    )
+    lead_id, _ = admissions.start("42", "sample")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    repository.save_fact(lead_id, "activity_terms_student", "making charts", "student")
+    repository.save_fact(lead_id, "education_level_student", "undergraduate", "student")
+    repository.update_lead(lead_id, education_level="undergraduate")
+    reflection = admissions._present_guidance(lead_id)
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+    results = await admissions.confirm_guidance(lead_id, token)
+    course_id = next(
+        data.removeprefix("guidance:course:")
+        for _, data in results.buttons
+        if data.startswith("guidance:course:")
+    )
+    message = FakeMessage()
+
+    async def answer() -> None:
+        return None
+
+    update = SimpleNamespace(
+        callback_query=SimpleNamespace(answer=answer, data=f"guidance:course:{course_id}"),
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=150,
+    )
+    await callback_handler(update, context)
+
+    assert "Fictional sample details" in message.sent[-1][0]
+    assert repository.get_lead(lead_id)["selected_course_id"] is None
+    callbacks = {
+        button.callback_data for row in message.sent[-1][1].inline_keyboard for button in row
+    }
+    assert f"course:{course_id}" in callbacks
+    assert "guidance:matches" in callbacks
+
+    update.callback_query = SimpleNamespace(answer=answer, data="guidance:matches")
+    update.update_id = 151
+    await callback_handler(update, context)
+    assert "matching fictional sample courses" in message.sent[-1][0]
+    assert any(
+        button.callback_data == f"guidance:course:{course_id}"
+        for row in message.sent[-1][1].inline_keyboard
+        for button in row
+    )
+
+
+@pytest.mark.asyncio
 async def test_language_support_callback_records_catalog_option(tmp_path: Path) -> None:
     repository, admissions, context = make_runtime(tmp_path)
     lead_id, _ = admissions.start("42", "sample")

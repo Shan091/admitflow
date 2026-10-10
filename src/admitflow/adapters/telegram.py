@@ -157,6 +157,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         )
     elif data.startswith("guidance:confirm:"):
         reply = await admissions.confirm_guidance(lead_id, data.removeprefix("guidance:confirm:"))
+    elif data.startswith("guidance:course:"):
+        reply = admissions.explore_guidance_course(lead_id, data.removeprefix("guidance:course:"))
+    elif data == "guidance:matches":
+        reply = admissions.show_guidance_matches(lead_id)
     elif data.startswith("guidance:revise:"):
         reply = await admissions.revise_guidance(lead_id, data.removeprefix("guidance:revise:"))
     elif data.startswith("speaker:"):
