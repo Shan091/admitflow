@@ -1601,6 +1601,42 @@ def test_field_and_explore_paths_keep_their_choices_and_resume_prompt(tmp_path: 
     assert repository.get_lead(lead_id)["discovery_step"] == "explore"  # type: ignore[index]
 
 
+@pytest.mark.asyncio
+async def test_repeated_uncertainty_changes_prompt_and_resumes_recovery(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    unsure_turn = DiscoveryTurn("discovery", None, (), None, (), (), True, False)
+    interpreter = FakeDiscoveryInterpreter(unsure_turn)
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    first = await service.free_text(lead_id, "I don't know what to study", None)
+
+    assert "What do you enjoy doing or learning about" in first.text
+    assert any(data.startswith("guidance:activity:") for _, data in first.buttons)
+    assert any(data.startswith("field:") for _, data in first.buttons)
+    service.pause_discovery(lead_id)
+    assert service.resume_discovery(lead_id) == first
+
+    second = await service.free_text(lead_id, "I'm still not sure", None)
+
+    assert second.text != first.text
+    assert "You don't need to decide now" in second.text
+    assert {data for _, data in second.buttons} >= {
+        "path:browse",
+        "discovery:pause",
+        "handoff:request",
+    }
+    service.pause_discovery(lead_id)
+    assert service.resume_discovery(lead_id) == second
+
+
 def test_parent_preference_is_attributed_and_waits_for_student_interest(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()

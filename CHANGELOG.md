@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — prevent repeated unsure-prompt loops
+
+- **Change:** An unsure learner now gets one gentle prompt with representative activities from the
+  fictional catalog, field choices, free-text response, browse, and pause. A repeated unsure reply
+  changes to browse, choose-field, pause, or staff handoff; no recommendation is produced without a
+  relevant learner preference. The pending prompt/recovery is restored after resume.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 127 tests;
+  `git diff --check` passed. The new sequence test covers first/second uncertainty and resume at
+  both stages.
+- **Delivery:** Implementation commit and CI pending.
+- **Reason:** Give undecided learners a supportive way forward without making them repeat an open
+  question or surfacing a course match before enough context exists.
+
 ## 2026-10-11 — unify tap field choices with adaptive discovery
 
 - **Change:** A learner's field tap now enters the shared guidance policy, which asks for a

@@ -106,6 +106,11 @@ Record consequential choices here. Each entry is short; update it when evidence 
     and must not mutate the student's lead mirror, profile, lifecycle step, or recommendation
     confirmation.
 
+23. **Repeated uncertainty changes the next move.** Offer an unsure learner a small set of
+    catalog-grounded activity/field starting points with no pressure to know a course name. If they
+    remain unsure, stop asking the same open question and offer browse, pause, or staff handoff;
+    never recommend before the learner shares a relevant preference.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

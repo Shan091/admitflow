@@ -3,6 +3,16 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — handle repeated learner uncertainty
+
+- **Task:** Keep undecided learners from receiving the same exploratory prompt indefinitely.
+- **Assistance:** Codex added a catalog-grounded first activity/field prompt, a different low-pressure
+  recovery on repeated uncertainty, persisted prompt state for resume, and a turn-sequence test.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 127 tests;
+  `git diff --check` passed. Commit and CI are pending.
+- **Human review:** The flow does not score or label the learner and does not recommend without a
+  learner-stated preference.
+
 ## 2026-10-11 — unify tap field selection with adaptive guidance
 
 - **Task:** Remove the fixed level-first tap sequence, preserve student facts during field changes,

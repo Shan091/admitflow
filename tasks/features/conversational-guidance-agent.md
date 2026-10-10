@@ -74,6 +74,9 @@ human escalation, and operational requirements are verified.
   would be more useful. Parent field/level taps also previously mutated learner-level state. The
   current slice routes student field choices into the shared adaptive policy, preserves independent
   profile facts when the field changes, and keeps parent suggestions separate.
+- Repeated “not sure” turns previously returned the same open question indefinitely. The current
+  policy gives one concrete catalog-grounded exploration prompt and then switches to browse, pause,
+  or staff options without implying a course match.
 
 ## v1 lifecycle mapping
 
@@ -168,6 +171,8 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   without inventing a match.
 - An unsure learner receives a short, low-pressure prompt anchored in things they enjoy, have tried,
   want to learn, or hope study will help them do. No formal assessment or score is produced.
+- If the learner remains unsure, the next response changes to browse/pause/staff choices rather than
+  repeating the same prompt; no recommendation is shown until they share a relevant preference.
 - Before a material recommendation, the system reflects its understanding and requires a clear
   confirmation; typed corrections or stale tap replies cannot surface recommendations from old
   facts, while unrelated valid facts remain intact.

@@ -87,6 +87,9 @@ mandatory linear interview.
   the student's profile, clearing learner activity, or advancing the learner's pending step.
   Full gate passed (126 tests); pushed as `dcaabdea9f7e4b2b931552212f892d2ecfb02e93`; GitHub
   Actions CI run `38093609621` passed.
+- [ ] Prevent an unsure learner from being asked the same open prompt indefinitely: offer varied,
+  catalog-grounded activity/field starting points once, then offer browse, pause, or truthful staff
+  handoff on repeated uncertainty; restore the pending recovery after resume.
 - [x] Make preference corrections category/value scoped: preserve every non-corrected attributed
   fact, accept retractions only for exact catalog-supported values already stored for that speaker,
   update the student-level mirror consistently, and invalidate stale recommendation confirmations.

@@ -565,6 +565,47 @@ class AdmissionsService:
             buttons + (("Skip / browse all", "path:browse"), ("Pause for now", "discovery:pause")),
         )
 
+    def _unsure_exploration_reply(self, lead_id: int) -> Reply:
+        courses = self.repository.list_courses(self.tenant_id)
+        activity_by_field: dict[str, str] = {}
+        for course in courses:
+            if course.field and course.activities:
+                activity_by_field.setdefault(course.field, course.activities[0])
+        activity_buttons = tuple(
+            (
+                f"{field.replace('/', ' & ').title()}: {_activity_label(activity)}",
+                f"guidance:activity:{_activity_slug(activity)}",
+            )
+            for field, activity in sorted(activity_by_field.items())
+        )
+        fields = sorted({course.field for course in courses if course.field})
+        field_buttons = tuple(
+            (field.replace("/", " & ").replace("-", " ").title(), f"field:{field}")
+            for field in fields
+        )
+        self.repository.update_lead(lead_id, discovery_step="guidance_unsure")
+        return Reply(
+            "No need to know a course name yet. What do you enjoy doing or learning about in "
+            "class or outside school? Pick an example or tell me in your own words.",
+            activity_buttons
+            + field_buttons
+            + (("Browse sample courses", "path:browse"), ("Pause for now", "discovery:pause")),
+        )
+
+    def _uncertainty_recovery_reply(self, lead_id: int) -> Reply:
+        self.repository.update_lead(lead_id, discovery_step="guidance_unsure_support")
+        return Reply(
+            "You don't need to decide now. You can browse examples without choosing, pick a field "
+            "to explore, pause, or ask staff to review your question. No course will be suggested "
+            "until you share something to guide it.",
+            (
+                ("Browse sample courses", "path:browse"),
+                ("Choose a field to explore", "path:field"),
+                ("Ask staff", "handoff:request"),
+                ("Pause for now", "discovery:pause"),
+            ),
+        )
+
     def recommend_field(self, lead_id: int, field: str) -> Reply:
         courses = self.repository.list_courses(self.tenant_id)
         selected = next((course.field for course in courses if course.field == field), None)
@@ -584,6 +625,7 @@ class AdmissionsService:
         existing_field = self._fact_value(lead_id, f"interest_field_{speaker}")
         if existing_field != selected and speaker == "student":
             self._clear_guidance_confirmation(lead_id)
+        self.repository.delete_fact(lead_id, f"guidance_unsure_count_{speaker}")
         self.repository.save_fact(lead_id, f"interest_fields_{speaker}", selected, speaker)
         self.repository.save_fact(lead_id, f"interest_field_{speaker}", selected, speaker)
         if speaker == "parent":
@@ -627,6 +669,7 @@ class AdmissionsService:
         speaker = str(active)
         selected_level = None if level == "any" else level
         if speaker == "student":
+            self.repository.delete_fact(lead_id, f"guidance_unsure_count_{speaker}")
             lead = self.repository.get_lead(lead_id)
             current_level = (
                 str(lead["education_level"]) if lead and lead["education_level"] else None
@@ -743,6 +786,10 @@ class AdmissionsService:
             return self._activity_choices(lead_id)
         if step == "guidance_signal":
             return self._present_guidance(lead_id)
+        if step == "guidance_unsure":
+            return self._unsure_exploration_reply(lead_id)
+        if step == "guidance_unsure_support":
+            return self._uncertainty_recovery_reply(lead_id)
         if step == "results":
             fact = next(
                 (
@@ -1142,6 +1189,16 @@ class AdmissionsService:
             self._retract_discovery_preferences(
                 lead_id, speaker, turn.retracted_preferences, courses
             )
+        if (
+            turn.fields
+            or turn.education_level
+            or turn.interests
+            or turn.activities
+            or turn.learning_goals
+            or turn.language_support_preference
+            or turn.retracted_preferences
+        ):
+            self.repository.delete_fact(lead_id, f"guidance_unsure_count_{speaker}")
         if speaker == "student" and (
             turn.correct_previous
             or turn.fields
@@ -1331,15 +1388,25 @@ class AdmissionsService:
             or current_activities
             or current_goals
         ):
-            return Reply(
-                "That's okay. What kinds of topics or activities do you enjoy, even outside "
-                "school? You can also choose a field below.",
-                tuple(
-                    (f.replace("/", " & ").title(), f"field:{f}")
-                    for f in sorted({c.field for c in courses})
+            if speaker == "parent":
+                return Reply(
+                    "It's okay if the learner is unsure. Invite them to share what they enjoy or "
+                    "have tried; their own interests should guide the suggestions.",
+                    (
+                        ("Learner sharing now", "speaker:student"),
+                        ("Browse sample courses", "path:browse"),
+                    ),
                 )
-                + (("Browse courses", "path:browse"),),
-            )
+            count_fact = f"guidance_unsure_count_{speaker}"
+            try:
+                previous_count = int(self._fact_value(lead_id, count_fact) or "0")
+            except ValueError:
+                previous_count = 0
+            count = min(previous_count + 1, 2)
+            self.repository.save_fact(lead_id, count_fact, str(count), speaker)
+            if count == 1:
+                return self._unsure_exploration_reply(lead_id)
+            return self._uncertainty_recovery_reply(lead_id)
         lead = self.repository.get_lead(lead_id)
         if (
             lead
