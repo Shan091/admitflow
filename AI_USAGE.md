@@ -3,6 +3,20 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — expand the fictional course catalog
+
+- **Task:** Give learners additional institution-course examples while preserving catalog-only
+  recommendations and complete known fields.
+- **Assistance:** Codex added ten complete sample offerings, two in each agreed field, extended the
+  field/level expected-match matrix, and tested exact retrieval for each new course's distinct
+  stated learning goal. The fictional records include sample fees and requirements; they are not
+  real institutional facts.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 160 tests;
+  `git diff --check` passed. Commit `d36a221d743081e3000208cc5294c5132f0a2ee2` was pushed and
+  GitHub Actions `CI` run `38094573591` passed. No live or paid API calls were made.
+- **Human review:** No admissions staff or counsellor has validated these invented sample offerings.
+  Submission copy labels them fictional and makes no job, placement, or real institution claim.
+
 ## 2026-10-11 — evaluate field and level coverage
 
 - **Task:** Check the sample catalog matcher across every agreed field and education level, including

@@ -129,10 +129,15 @@ mandatory linear interview.
   `67472c5b4fb2d6a538dfe141c663779ee93d053f`; GitHub Actions `CI` run `38091855872` passed.
 - [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
   retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
-- [ ] Current slice: expand the fictional, non-regulated sample catalog with distinct choices in all
+- [x] Expand the fictional, non-regulated sample catalog with distinct choices in all
   five agreed fields; validate completeness, unique IDs, exact field/level matches, and retrieval
   from each new course's explicit learning goal. Update catalog counts and submission notes after
-  the full verification gate and matching GitHub CI pass.
+  the full verification gate and matching GitHub CI pass. The 50-course seed has ten complete
+  offerings in each agreed field; matrix and distinct-goal retrieval checks pass.
+  `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 160 tests;
+  `git diff --check` passed.
+  Pushed as `d36a221d743081e3000208cc5294c5132f0a2ee2`; GitHub Actions `CI` run
+  `38094573591` passed. All ten new records are explicitly fictional, non-regulated examples.
 - [x] Add a fixed, catalog-verified fictional evaluation matrix for every
   agreed field/education-level pair, including empty catalog cells, mixed-field preferences, and
   out-of-catalog abstention. **AC:** expected catalog IDs are explicit in the fixture; matching
