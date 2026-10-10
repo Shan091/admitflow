@@ -56,6 +56,28 @@ async def test_payment_link_uses_server_fee_and_stores_razorpay_result(tmp_path:
     assert payment["razorpay_link_id"] == "plink_test_123"
 
 
+@pytest.mark.asyncio
+async def test_link_creation_failure_does_not_change_qualification(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "payments.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    lead_id = make_qualified_lead(repository)
+
+    def fail_request(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(502, json={"error": {"description": "test provider failure"}})
+
+    adapter = RazorpayAdapter("rzp_test_key", "secret", transport=httpx.MockTransport(fail_request))
+    service = PaymentService(repository, repository.tenant_id, adapter, "webhook-secret")
+
+    with pytest.raises(httpx.HTTPStatusError):
+        await service.create_for_qualified_lead(lead_id)
+
+    payment = repository.get_payment_for_lead(repository.tenant_id, lead_id)
+    assert payment is not None
+    assert payment["status"] == "failed"
+    assert repository.get_lead(lead_id)["eligible"] == 1  # type: ignore[index]
+
+
 def test_paid_webhook_requires_signature_link_reference_and_full_amount(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "payments.sqlite3")
     repository.initialize()
