@@ -59,9 +59,11 @@ human escalation, and operational requirements are verified.
   service can offer one optional support preference, unless it already used the optional goal
   question for that fact set. It filters only on a listed support label; it does not infer
   proficiency or promise support outside the course record. A learner may leave it open.
-- Course matching uses direct overlap with seeded interests and activities. It has a first
-  deterministic sufficiency/confirmation policy, but that policy still needs evaluation against a
-  human-reviewed golden set; there is no validated general-career evidence corpus.
+- Course matching uses direct overlap with seeded interests and activities. It has a deterministic
+  sufficiency/confirmation policy and a fixed catalog-verified matrix across all 20 field/level
+  pairs, plus mixed-field and abstention cases. This checks consistency with the fictional catalog;
+  it is not a counsellor-reviewed dialogue evaluation, and there is no validated general-career
+  evidence corpus.
 - A student correction turn now preserves preferences it does not mention. It can retract only
   exact catalog-allowlisted values for the active speaker; student additions, retractions, and
   replacements invalidate old recommendation confirmations. Parent-only notes remain attributed
@@ -206,6 +208,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 - Evaluate retrieval and recommendations against a human-reviewed golden set with expected matches,
   acceptable alternatives, required facts, and abstentions. Track coverage as well as incorrect-match
   rate; do not tune to maximize recommendations at the expense of honesty.
+- Keep the catalog-verified field/level matrix current when sample offerings change; it must list
+  exact expected IDs, including empty catalog cells, and assert that unsupported or conflicting
+  preferences abstain.
 - Verify that model output cannot create a course, prerequisite, fee, eligibility result, factual
   career claim, or unverified institutional promise.
 - Run `bash scripts/verify.sh`, `git diff --check`, migration/data-preservation tests, and end-to-end

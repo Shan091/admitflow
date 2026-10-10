@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — verify the full field/level recommendation matrix
+
+- **Change:** Added a fixed expected-match fixture for every combination of the five sample fields
+  and four education levels, including the two vocational-skills levels with no offerings. Added
+  mixed-field, unknown-interest, and conflicting-field/goal abstention cases. The fixture explicitly
+  lists expected course IDs and checks that every result is complete, level-correct, and explained
+  by a catalog-grounded reason.
+- **Validation:** Focused evaluation passed 23 cases. `bash scripts/verify.sh` passed Ruff lint and
+  formatting, strict mypy, and all 150 tests. No live or paid API calls were made.
+- **Reason:** Catch course leakage across fields/levels and unsafe fallback when a preference cannot
+  be supported by the fictional catalog. This is catalog consistency evidence, not a counsellor-
+  reviewed or production recommendation evaluation.
+
 ## 2026-10-11 — prevent repeated unsure-prompt loops
 
 - **Change:** An unsure learner now gets one gentle prompt with representative activities from the

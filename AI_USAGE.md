@@ -3,6 +3,19 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — evaluate field and level coverage
+
+- **Task:** Check the sample catalog matcher across every agreed field and education level, including
+  unsupported combinations and conflicting stated preferences.
+- **Assistance:** Codex added a static expected-ID matrix, a mixed-field case, and unknown/conflicting
+  preference abstention cases. The fixture is based on the committed fictional catalog; it is not a
+  counsellor-validated recommendation set.
+- **Checks:** Focused `pytest tests/test_guidance_golden.py -q` passed 23 tests. The full
+  `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 150 tests; `git diff --check`
+  passed. No live or paid API calls were made.
+- **Human review:** No counselor reviewed these cases. The static expected IDs were checked against
+  the fictional seed data, and the feature brief labels independent guidance evaluation as open.
+
 ## 2026-10-11 — handle repeated learner uncertainty
 
 - **Task:** Keep undecided learners from receiving the same exploratory prompt indefinitely.
