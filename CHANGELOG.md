@@ -5,13 +5,14 @@
 - **Change:** A correction now replaces values only in categories it explicitly restates, preserves
   unmentioned learner and parent facts, supports exact catalog-bounded retractions, and clears stale
   recommendation confirmations. Ambiguous corrections ask what to change instead of reflecting old
-  facts. The flow continues without an affirmative consent step; OpenAI processing is disclosed and
-  users can opt out.
-- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 122 tests.
+  facts. Language-concern shortcuts now allow explicit preference corrections through to discovery.
+  The flow continues without an affirmative consent step; OpenAI processing is disclosed and users
+  can opt out.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 123 tests.
   Tests cover single-category replacement, preservation of other categories, exact retractions,
   speaker attribution, stale confirmation invalidation, ambiguity, and schema allowlisting. No live
   or paid API calls were made.
-- **Delivery:** Pending commit and CI.
+- **Delivery:** Implementation commit and CI pending.
 - **Reason:** Keep conversational preferences accurate when a learner changes one part of their
   guidance profile without silently erasing other relevant facts.
 

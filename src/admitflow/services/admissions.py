@@ -1732,6 +1732,21 @@ def _is_language_concern(text: str) -> bool:
         phrase in normalized for phrase in {"medium of instruction", "teaching medium", "taught in"}
     ) or ("medium" in normalized.split() and bool(medium_terms & set(normalized.split()))):
         return True
+    if any(
+        phrase in normalized
+        for phrase in (
+            "changed my mind",
+            "don t want",
+            "no longer",
+            "not anymore",
+            "remove",
+            "retract",
+            "withdraw",
+            "drop",
+            "instead of",
+        )
+    ):
+        return False
     if normalized.startswith(
         ("i want ", "i need ", "i prefer ", "i would like ", "i d like ", "my preference ")
     ):

@@ -8,10 +8,10 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
 - **Task:** Preserve unaffected student/parent guidance facts while supporting corrections and
   exact withdrawals of previously saved preferences.
 - **Assistance:** Codex added typed catalog-bounded retractions, category-level replacement on
-  explicit correction, ambiguous-correction recovery, stale-confirmation invalidation, tests, and
-  decision/feature documentation. Existing behavior was confirmed: processing disclosure plus
-  opt-out, with no affirmative consent prompt.
-- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 122 tests. No live or
+  explicit correction, ambiguous-correction recovery, stale-confirmation invalidation, a routing fix
+  so language corrections reach discovery, tests, and decision/feature documentation. Existing
+  behavior was confirmed: processing disclosure plus opt-out, with no affirmative consent prompt.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 123 tests. No live or
   paid API calls were made. Commit and CI are pending.
 - **Human review:** The user clarified that no consent session or user consent prompt is needed;
   the implementation keeps the processing disclosure and opt-out behavior.

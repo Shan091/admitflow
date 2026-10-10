@@ -1020,7 +1020,17 @@ async def test_correction_of_one_fact_preserves_other_explicit_preferences(
     lead_id, _ = service.start("123", "student")
 
     await service.free_text(lead_id, "I like design and making visuals", None)
-    interpreter.turn = DiscoveryTurn("discovery", None, (), "undergraduate", (), (), False, True)
+    interpreter.turn = DiscoveryTurn(
+        "discovery",
+        None,
+        (),
+        "undergraduate",
+        (),
+        (),
+        False,
+        True,
+        language_support_preference="Hindi discussion support",
+    )
     corrected = await service.free_text(
         lead_id, "Actually, I am considering undergraduate study instead of a diploma", None
     )
@@ -1031,7 +1041,7 @@ async def test_correction_of_one_fact_preserves_other_explicit_preferences(
     assert facts["interest_terms_student"] == "design"
     assert facts["activity_terms_student"] == "making visuals"
     assert facts["learning_goals_student"] == "create visual work"
-    assert facts["language_support_preference_student"] == "Malayalam discussion support"
+    assert facts["language_support_preference_student"] == "Hindi discussion support"
     assert "undergraduate" in corrected.text
     assert "interested in design" in corrected.text
 
@@ -1092,6 +1102,63 @@ async def test_correction_can_retract_exact_values_without_erasing_other_choices
     assert facts["learning_goals_student"] == "create visual work"
     assert facts["education_level_student"] == "diploma"
     assert facts["language_support_preference_student"] == "Malayalam discussion support"
+
+
+@pytest.mark.asyncio
+async def test_exact_level_and_language_retractions_clear_only_those_scalar_facts(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            "discovery",
+            None,
+            ("design/media",),
+            "diploma",
+            ("design",),
+            ("making visuals",),
+            False,
+            False,
+            ("create visual work",),
+            "Malayalam discussion support",
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    await service.free_text(lead_id, "I like design and making visuals", None)
+    interpreter.turn = DiscoveryTurn(
+        "discovery",
+        None,
+        (),
+        None,
+        (),
+        (),
+        False,
+        True,
+        retracted_preferences=(
+            RetractedPreference("education_level", "diploma"),
+            RetractedPreference("language_support", "Malayalam discussion support"),
+        ),
+    )
+
+    await service.free_text(lead_id, "Remove diploma and Malayalam support", None)
+
+    facts = {fact["fact_key"]: fact["fact_value"] for fact in repository.list_facts(lead_id)}
+    lead = repository.get_lead(lead_id)
+    assert "education_level_student" not in facts
+    assert "language_support_preference_student" not in facts
+    assert lead is not None and lead["education_level"] is None
+    assert facts["interest_fields_student"] == "design/media"
+    assert facts["interest_terms_student"] == "design"
+    assert facts["activity_terms_student"] == "making visuals"
+    assert facts["learning_goals_student"] == "create visual work"
 
 
 @pytest.mark.asyncio
