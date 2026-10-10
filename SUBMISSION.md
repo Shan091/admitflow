@@ -7,7 +7,7 @@
   seeded eligibility rules in code, answers institution FAQs with fail-closed vector search,
   and supports staff login plus Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Final pushed verification commit SHA:** `182c27689544f21a6536146db870a553b03e14a5`
+- **Verified Telegram-webhook implementation commit SHA:** `ded8105a22a875b281b8dd877d9474b41db13d64`
 - **Working demo:** `/health` runs locally; dashboard requires configured staff credentials. Live
   Telegram bot username and walkthrough are pending bot-token setup and a real rehearsal.
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
@@ -31,10 +31,9 @@
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
 - **Demo walkthrough:** Pending live Telegram setup and rehearsal; see the local-only verification
   steps in `README.md`.
-- **Checks performed and results:** Latest local `bash scripts/verify.sh` passed (Ruff lint,
-  formatting, strict mypy, and 32 pytest tests); `uv sync --locked --python 3.12` passed;
-  `git diff --check` passed. GitHub Actions passed for the pushed SHA above (32 tests):
-  https://github.com/Shan091/admitflow/actions/runs/38076997956
+- **Checks performed and results:** Local `bash scripts/verify.sh` passed for the webhook
+  implementation commit (Ruff lint, formatting, strict mypy, and 35 pytest tests); `git diff
+  --check` passed. GitHub Actions status for that commit has not been confirmed.
 - **Live integration checks:** No live Telegram Bot API request was made because no bot token is
   configured; the public tunnel's `/health` endpoint returned `200`. No live OpenAI or Razorpay
   request was made. Automated payment tests use a fake HTTP transport and signed sample webhook;
