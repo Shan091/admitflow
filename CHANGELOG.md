@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-10-11 — staff login and Razorpay test-mode payments
+
+- **Time:** 00:02 IST
+- **Change:** Added an environment-configured staff login with signed, expiring HTTP-only sessions;
+  protected lead pages; Razorpay test-mode Payment Links created after successful qualification;
+  payment persistence and a signature-verified, idempotent webhook; and payment status on staff
+  lead details.
+- **Why:** Include the requested staff access and application payment demo without trusting client
+  prices or browser redirects for payment status.
+- **Files:** `src/admitflow/`, `tests/test_app.py`, `tests/test_payments.py`, `.env.example`,
+  `README.md`, `SPEC.md`, `SUBMISSION.md`, `docs/DECISIONS.md`, `tasks/`, `AI_USAGE.md`,
+  `pyproject.toml`, and `uv.lock`.
+- **Validation:** `uv sync --locked --python 3.12` passed; `bash scripts/verify.sh` passed (Ruff,
+  formatting, strict mypy, and 30 pytest tests); `git diff --check` passed. No live Razorpay,
+  Telegram, or OpenAI request was made. GitHub Actions result is pending the push.
+- **Limitations:** Payment links require all three Razorpay test credentials and a public webhook
+  URL for status updates; payment creation cannot be retried automatically after an ambiguous API
+  failure. Staff login is one local demo account, not production identity management.
+
 ## 2026-10-10 — implementation foundation and first demo slice
 
 - **Time:** 23:49 IST

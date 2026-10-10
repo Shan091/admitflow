@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff login — AdmitFlow Demo</title>
+  <style>body{font:16px/1.5 system-ui,sans-serif;max-width:440px;margin:3rem auto;padding:0 1rem;color:#18212f}label{display:block;margin:1rem 0 .25rem}input{box-sizing:border-box;width:100%;padding:.65rem}button{margin-top:1rem;padding:.65rem 1rem}.notice{background:#fff4d6;padding:.75rem}.error{color:#a00}</style>
+</head>
+<body>
+  <h1>AdmitFlow staff login</h1>
+  {% if not configured %}<p class="notice">Staff login is not configured. Set STAFF_USERNAME, STAFF_PASSWORD, and STAFF_SESSION_SECRET in your local environment.</p>
+  {% else %}
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <form method="post" action="/login">
+    <label for="username">Username</label><input id="username" name="username" autocomplete="username" required>
+    <label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit">Log in</button>
+  </form>
+  {% endif %}
+</body>
+</html>

@@ -15,7 +15,8 @@
   </style>
 </head>
 <body>
-  <header><h1><a href="/">AdmitFlow</a> <small>fictional demo</small></h1></header>
+  <header><h1><a href="/">AdmitFlow</a> <small>fictional demo</small></h1>
+  {% if staff_authenticated %}<form method="post" action="/logout"><button type="submit">Log out</button></form>{% endif %}</header>
   {% if not rag_ready %}<p class="notice">FAQ retrieval is unavailable until OpenAI embeddings are configured and indexed.</p>{% endif %}
   {% block content %}{% endblock %}
 </body>

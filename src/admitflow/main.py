@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from admitflow.adapters.openai import OpenAIAdapter
+from admitflow.adapters.razorpay import RazorpayAdapter
 from admitflow.adapters.sqlite import Repository
 from admitflow.adapters.telegram import (
     build_telegram_application,
@@ -16,8 +17,10 @@ from admitflow.adapters.telegram import (
 )
 from admitflow.adapters.vector_store import VectorStore
 from admitflow.config import Settings, get_settings
+from admitflow.dashboard.payment_routes import router as payment_router
 from admitflow.dashboard.routes import router as dashboard_router
 from admitflow.services.admissions import AdmissionsService
+from admitflow.services.payments import PaymentService
 from admitflow.services.retrieval import RetrievalService
 
 load_dotenv()
@@ -55,12 +58,38 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except Exception:
             logger.exception("FAQ indexing failed; retrieval remains unavailable until indexed")
         admissions = AdmissionsService(repository, repository.tenant_id, retrieval)
+        payment_service = None
+        key_id = app_settings.razorpay_key_id
+        if (
+            key_id
+            and key_id.startswith("rzp_test_")
+            and app_settings.razorpay_key_secret
+            and app_settings.razorpay_webhook_secret
+        ):
+            payment_service = PaymentService(
+                repository,
+                repository.tenant_id,
+                RazorpayAdapter(key_id, app_settings.razorpay_key_secret),
+                app_settings.razorpay_webhook_secret,
+            )
+        elif any(
+            (
+                app_settings.razorpay_key_id,
+                app_settings.razorpay_key_secret,
+                app_settings.razorpay_webhook_secret,
+            )
+        ):
+            logger.warning(
+                "Razorpay payments disabled; configure a complete test-mode credential set "
+                "with an rzp_test_ key ID"
+            )
         app.state.repository = repository
         app.state.rag_ready = not repository.get_unembedded_faqs(
             repository.tenant_id, app_settings.openai_embedding_model
         )
         app.state.openai_adapter = openai_adapter
         app.state.admissions = admissions
+        app.state.payment_service = payment_service
         app.state.telegram_enabled = bool(app_settings.telegram_bot_token)
         telegram_application = None
         if app_settings.telegram_bot_token:
@@ -69,6 +98,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 repository,
                 admissions,
                 openai_adapter,
+                payment_service,
             )
             await start_polling(telegram_application)
         try:
@@ -80,7 +110,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 await openai_adapter.close()
 
     app = FastAPI(title="AdmitFlow Demo", lifespan=lifespan)
+    app.state.settings = app_settings
     app.include_router(dashboard_router)
+    app.include_router(payment_router)
 
     @app.get("/health")
     def health() -> dict[str, str]:

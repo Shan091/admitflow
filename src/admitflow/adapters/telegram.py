@@ -15,8 +15,10 @@ from telegram.ext import (
 )
 
 from admitflow.adapters.sqlite import Repository
+from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.services.admissions import AdmissionsService, Reply
 from admitflow.services.contracts import IntentRouter
+from admitflow.services.payments import PaymentService
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +28,13 @@ def build_telegram_application(
     repository: Repository,
     admissions: AdmissionsService,
     intent_router: IntentRouter | None,
+    payment_service: PaymentService | None = None,
 ) -> Application[Any, Any, Any, Any, Any, Any]:
     application = ApplicationBuilder().token(token).build()
     application.bot_data["repository"] = repository
     application.bot_data["admissions"] = admissions
     application.bot_data["intent_router"] = intent_router
+    application.bot_data["payment_service"] = payment_service
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CallbackQueryHandler(callback_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
@@ -47,11 +51,12 @@ def keyboard(reply: Reply) -> InlineKeyboardMarkup | None:
 
 def _services(
     context: ContextTypes.DEFAULT_TYPE,
-) -> tuple[Repository, AdmissionsService, IntentRouter | None]:
+) -> tuple[Repository, AdmissionsService, IntentRouter | None, PaymentService | None]:
     return (
         cast(Repository, context.application.bot_data["repository"]),
         cast(AdmissionsService, context.application.bot_data["admissions"]),
         cast(IntentRouter | None, context.application.bot_data["intent_router"]),
+        cast(PaymentService | None, context.application.bot_data.get("payment_service")),
     )
 
 
@@ -64,7 +69,7 @@ async def _send_reply(update: Update, reply: Reply, repository: Repository, lead
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    repository, admissions, _ = _services(context)
+    repository, admissions, _, _ = _services(context)
     user = update.effective_user
     if user is None:
         return
@@ -74,7 +79,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    repository, admissions, _ = _services(context)
+    repository, admissions, _, _ = _services(context)
     query = update.callback_query
     user = update.effective_user
     if query is None or user is None:
@@ -100,14 +105,37 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    repository, admissions, intent_router = _services(context)
+    repository, admissions, intent_router, payment_service = _services(context)
     user = update.effective_user
     message = update.effective_message
     if user is None or message is None or message.text is None:
         return
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     repository.add_message(lead_id, "inbound", message.text, update.update_id)
+    lead_before = repository.get_lead(lead_id)
     reply = await admissions.free_text(lead_id, message.text, intent_router)
+    lead_after = repository.get_lead(lead_id)
+    if (
+        payment_service is not None
+        and lead_before is not None
+        and lead_before["state"] == "awaiting_marks"
+        and lead_after is not None
+        and lead_after["eligible"] == 1
+    ):
+        try:
+            offer = await payment_service.create_for_qualified_lead(lead_id)
+        except Exception:
+            logger.exception("Razorpay test Payment Link creation failed for lead %s", lead_id)
+            offer = None
+        if offer is not None:
+            url, amount_paise = offer
+            reply = Reply(
+                f"{reply.text}\n\nDemo application fee: "
+                f"{format_inr_from_paise(amount_paise)}. Complete the Razorpay test-mode "
+                f"payment here: {url}"
+            )
+        elif lead_after.get("eligible") == 1:
+            reply = Reply(f"{reply.text}\n\nThe demo payment link is not available right now.")
     await _send_reply(update, reply, repository, lead_id)
 
 

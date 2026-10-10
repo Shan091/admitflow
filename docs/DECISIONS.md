@@ -15,9 +15,14 @@ Record consequential choices here. Each entry is short; update it when evidence 
 6. **Fail-closed retrieval and initial thresholds.** Begin at cosine `0.72` and top-result margin
    `0.05`; calibrate against fixed demo cases. These are provisional, not guarantees. Abstain on
    weak, ambiguous, or unavailable retrieval.
-7. **Fee routing and scope.** Route price questions to structured course data before RAG; exclude
-   amounts from free-form FAQ chunks. Payments, WhatsApp, uploads, and production services are
-   deferred.
+7. **Fee routing and fee payment.** Route price questions to structured course data before RAG;
+   exclude amounts from free-form FAQ chunks. Qualified demo applicants may receive a Razorpay
+   Payment Link created in test mode from the server-owned course fee. Never accept a client amount
+   or mark a payment paid from a browser redirect; accept only signature-verified webhooks. Live
+   payments, refunds, uploads, and production finance workflows are deferred.
+8. **Staff dashboard access.** Protect dashboard routes with one environment-configured staff
+   username/password and a signed, HTTP-only, SameSite=Lax session cookie. No self-registration,
+   roles, or production identity provider in the hackathon demo. Missing credentials fail closed.
 
 ## References
 
@@ -25,3 +30,5 @@ Record consequential choices here. Each entry is short; update it when evidence 
 - OpenAI Decisions: https://developers.openai.com/api/docs/guides/decisions
 - Python Telegram Bot async lifecycle:
   https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-requested-design-patterns
+- Razorpay Payment Links API: https://razorpay.com/docs/api/payments/payment-links/
+- Razorpay webhook security checklist: https://razorpay.com/security/checklist/

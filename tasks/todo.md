@@ -27,6 +27,28 @@ acceptance criteria pass and the corresponding milestone is committed.
 - [ ] Calibrate similarity and margin thresholds using live embedding/query examples.
 - [ ] Run and separately record a live OpenAI embedding smoke check when a key is configured.
 
+## Staff login
+
+- [ ] Add a feature brief and auth/session settings; require configured credentials for dashboard
+  and login/logout behavior, failing closed if credentials are missing.
+- [ ] Test anonymous redirects, valid/invalid login, logout, protected lead detail, and missing
+  auth configuration using the app test client.
+- [ ] Document local staff credentials/session secret setup without committing secrets.
+
+## Razorpay test-mode application payments
+
+- [ ] Add a feature brief and payment schema/repository operations; price and lead association must
+  come from server-side course/lead records.
+- [ ] Create a Razorpay test-mode Payment Link after successful demo qualification and send it to
+  Telegram; do not create links when payment credentials are absent.
+- [ ] Verify webhook HMAC signatures, event idempotency, known link association, and expected amount
+  before changing a payment to paid.
+- [ ] Test Payment Link request payload and errors with a fake HTTP transport; automated tests must
+  make no Razorpay network requests.
+- [ ] Document Razorpay test credentials and webhook setup, test commands, and live-mode limitation.
+- [ ] Run `bash scripts/verify.sh`, review the diff, commit and push, and record the exact pushed SHA
+  plus GitHub Actions test result.
+
 ## Final verification and submission
 
 - [x] Run `bash scripts/verify.sh`; record actual output and results in `CHANGELOG.md` and `SUBMISSION.md`.

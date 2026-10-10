@@ -75,6 +75,26 @@ class Repository:
                     embedding_dimension INTEGER,
                     PRIMARY KEY (tenant_id, id)
                 );
+                CREATE TABLE IF NOT EXISTS payments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tenant_id TEXT NOT NULL REFERENCES institutions(id),
+                    lead_id INTEGER NOT NULL UNIQUE REFERENCES leads(id),
+                    course_id TEXT NOT NULL REFERENCES courses(id),
+                    reference_id TEXT NOT NULL UNIQUE,
+                    razorpay_link_id TEXT UNIQUE,
+                    amount_paise INTEGER NOT NULL,
+                    currency TEXT NOT NULL DEFAULT 'INR',
+                    status TEXT NOT NULL CHECK (
+                        status IN ('creating', 'created', 'paid', 'failed')
+                    ),
+                    short_url TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS razorpay_webhook_events (
+                    event_id TEXT PRIMARY KEY,
+                    received_at TEXT NOT NULL
+                );
                 """
             )
 
@@ -258,6 +278,107 @@ class Repository:
                 "SELECT * FROM messages WHERE lead_id=? ORDER BY id", (lead_id,)
             ).fetchall()
         return [dict(row) for row in rows]
+
+    def get_or_create_payment_intent(
+        self, tenant_id: str, lead_id: int, reference_id: str
+    ) -> tuple[dict[str, Any] | None, bool]:
+        """Reserve a one-time application payment for a qualified lead."""
+        now = datetime.now(UTC).isoformat()
+        with self._connect() as connection:
+            lead = connection.execute(
+                """SELECT selected_course_id, eligible FROM leads
+                WHERE id=? AND tenant_id=?""",
+                (lead_id, tenant_id),
+            ).fetchone()
+            if lead is None or lead["eligible"] != 1 or not lead["selected_course_id"]:
+                return None, False
+            course = connection.execute(
+                "SELECT application_fee_paise FROM courses WHERE id=? AND tenant_id=?",
+                (lead["selected_course_id"], tenant_id),
+            ).fetchone()
+            if course is None:
+                return None, False
+            connection.execute(
+                """INSERT OR IGNORE INTO payments
+                (tenant_id, lead_id, course_id, reference_id, amount_paise, status,
+                 created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, 'creating', ?, ?)""",
+                (
+                    tenant_id,
+                    lead_id,
+                    lead["selected_course_id"],
+                    reference_id,
+                    int(course["application_fee_paise"]),
+                    now,
+                    now,
+                ),
+            )
+            created = connection.execute("SELECT changes() AS changed").fetchone()["changed"] == 1
+            row = connection.execute(
+                "SELECT * FROM payments WHERE tenant_id=? AND lead_id=?", (tenant_id, lead_id)
+            ).fetchone()
+        return (dict(row), created) if row else (None, False)
+
+    def save_payment_link(self, payment_id: int, razorpay_link_id: str, short_url: str) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """UPDATE payments SET razorpay_link_id=?, short_url=?, status='created',
+                updated_at=? WHERE id=? AND status='creating'""",
+                (razorpay_link_id, short_url, datetime.now(UTC).isoformat(), payment_id),
+            )
+
+    def fail_payment_creation(self, payment_id: int) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                "UPDATE payments SET status='failed', updated_at=? "
+                "WHERE id=? AND status='creating'",
+                (datetime.now(UTC).isoformat(), payment_id),
+            )
+
+    def get_payment_for_lead(self, tenant_id: str, lead_id: int) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM payments WHERE tenant_id=? AND lead_id=?", (tenant_id, lead_id)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def apply_razorpay_paid_event(self, event_id: str, event: dict[str, Any]) -> str:
+        """Apply a validated event once, only when link, reference, and full amount match."""
+        payload = event.get("payload")
+        link_wrap = payload.get("payment_link") if isinstance(payload, dict) else None
+        link = link_wrap.get("entity") if isinstance(link_wrap, dict) else None
+        if not isinstance(link, dict) or link.get("status") != "paid":
+            return "ignored"
+        link_id = link.get("id")
+        reference_id = link.get("reference_id")
+        amount = link.get("amount")
+        amount_paid = link.get("amount_paid")
+        currency = link.get("currency")
+        now = datetime.now(UTC).isoformat()
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM payments WHERE razorpay_link_id=?", (link_id,)
+            ).fetchone()
+            if (
+                row is None
+                or row["reference_id"] != reference_id
+                or row["amount_paise"] != amount
+                or row["amount_paise"] != amount_paid
+                or row["currency"] != currency
+            ):
+                return "ignored"
+            inserted = connection.execute(
+                "INSERT OR IGNORE INTO razorpay_webhook_events(event_id, received_at) "
+                "VALUES (?, ?)",
+                (event_id, now),
+            ).rowcount
+            if inserted == 0:
+                return "duplicate"
+            connection.execute(
+                "UPDATE payments SET status='paid', updated_at=? WHERE id=?",
+                (now, row["id"]),
+            )
+        return "applied"
 
     def get_unembedded_faqs(self, tenant_id: str, model: str) -> list[dict[str, str]]:
         with self._connect() as connection:

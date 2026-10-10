@@ -14,6 +14,13 @@ class Settings:
     database_path: Path
     rag_min_similarity: float
     rag_min_margin: float
+    staff_username: str | None = None
+    staff_password: str | None = None
+    staff_session_secret: str | None = None
+    staff_cookie_secure: bool = False
+    razorpay_key_id: str | None = None
+    razorpay_key_secret: str | None = None
+    razorpay_webhook_secret: str | None = None
 
 
 def get_settings() -> Settings:
@@ -26,4 +33,11 @@ def get_settings() -> Settings:
         database_path=Path(os.getenv("DATABASE_PATH", "data/admitflow.sqlite3")),
         rag_min_similarity=float(os.getenv("RAG_MIN_SIMILARITY", "0.72")),
         rag_min_margin=float(os.getenv("RAG_MIN_MARGIN", "0.05")),
+        staff_username=os.getenv("STAFF_USERNAME") or None,
+        staff_password=os.getenv("STAFF_PASSWORD") or None,
+        staff_session_secret=os.getenv("STAFF_SESSION_SECRET") or None,
+        staff_cookie_secure=os.getenv("STAFF_COOKIE_SECURE", "false").casefold() == "true",
+        razorpay_key_id=os.getenv("RAZORPAY_KEY_ID") or None,
+        razorpay_key_secret=os.getenv("RAZORPAY_KEY_SECRET") or None,
+        razorpay_webhook_secret=os.getenv("RAZORPAY_WEBHOOK_SECRET") or None,
     )
