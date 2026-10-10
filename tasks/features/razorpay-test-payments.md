@@ -7,13 +7,13 @@ Payment Link for the selected course's application fee and show staff the verifi
 
 ## Acceptance criteria
 
-- [ ] Link amount/currency/course/lead association are derived from server-side records.
-- [ ] Link creation is unavailable without Razorpay test credentials and makes no implicit live-mode
+- [x] Link amount/currency/course/lead association are derived from server-side records.
+- [x] Link creation is unavailable without Razorpay test credentials and makes no implicit live-mode
   request.
-- [ ] Only a valid Razorpay webhook signature and matching known payment-link ID/reference/amount
+- [x] Only a valid Razorpay webhook signature and matching known payment-link ID/reference/amount
   can transition payment state to paid; duplicate events are idempotent.
-- [ ] Payment-link creation errors do not claim payment succeeded or break qualification results.
-- [ ] Fake HTTP/webhook tests make no live Razorpay requests.
+- [x] Payment-link creation errors do not claim payment succeeded or break qualification results.
+- [x] Fake HTTP/webhook tests make no live Razorpay requests.
 
 ## Dependencies and decisions
 
@@ -22,15 +22,15 @@ Payment Link for the selected course's application fee and show staff the verifi
 
 ## Implementation slices
 
-- [ ] Add payment schema and repository methods.
-- [ ] Add Razorpay Payment Link adapter and wire it to successful qualification.
-- [ ] Add signed webhook handling and dashboard payment status.
-- [ ] Add fake-based tests and document test-mode credentials/webhook setup.
+- [x] Add payment schema and repository methods.
+- [x] Add Razorpay Payment Link adapter and wire it to successful qualification.
+- [x] Add signed webhook handling and dashboard payment status.
+- [x] Add fake-based tests and document test-mode credentials/webhook setup.
 
 ## Verification
 
-- [ ] `uv run pytest tests/test_payments.py`
-- [ ] Full quality gate: `bash scripts/verify.sh`
+- [x] `uv run pytest tests/test_payments.py`
+- [x] Full quality gate: `bash scripts/verify.sh` (32 passed)
 
 ## Risks and limitations
 

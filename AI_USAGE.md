@@ -12,7 +12,7 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   fake-backed tests. Human review is still needed for demo credentials, Razorpay setup, and the
   final payment experience.
 - **Checks:** `uv sync --locked --python 3.12` passed; `bash scripts/verify.sh` passed (Ruff,
-  formatting, strict mypy, and 30 pytest tests); `git diff --check` passed. No live Razorpay,
+  formatting, strict mypy, and 32 pytest tests); `git diff --check` passed. No live Razorpay,
   Telegram, or OpenAI API was called.
 - **Corrections:** TestClient follows redirects unless explicitly disabled; auth tests were updated
   to inspect actual 303 responses. The payment adapter rejects non-test `rzp_live_` key IDs.

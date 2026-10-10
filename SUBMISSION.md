@@ -7,7 +7,7 @@
   seeded eligibility rules in code, answers institution FAQs with fail-closed vector search,
   and supports staff login plus Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Final implementation commit SHA:** Pending this changeset's push.
+- **Final implementation commit SHA:** `0ddc470097a08365fec07e8278fa58e32697f7de`
 - **Working demo:** `/health` runs locally; dashboard requires configured staff credentials. Live
   Telegram bot username and walkthrough are pending bot-token setup and a real rehearsal.
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
@@ -32,11 +32,11 @@
 - **Demo walkthrough:** Pending live Telegram setup and rehearsal; see the local-only verification
   steps in `README.md`.
 - **Checks performed and results:** Latest local `bash scripts/verify.sh` passed (Ruff lint,
-  formatting, strict mypy, and 30 pytest tests); `uv sync --locked --python 3.12` passed;
+  formatting, strict mypy, and 32 pytest tests); `uv sync --locked --python 3.12` passed;
   `git diff --check` passed. GitHub Actions result for this new commit is pending push.
 - **Live integration checks:** No live OpenAI, Telegram, or Razorpay request was made. Automated
   payment tests use a fake HTTP transport and signed sample webhook; no API credits or payment
-  transactions were used.
+  transactions were used. GitHub Actions status for this commit is pending push.
 - **Known limitations:** Single fictional tenant, seeded FAQ corpus, one environment-configured
   staff account, no uploads, production hosting, refunds, or privacy/retention controls. Payment
   links work only with Razorpay test keys and payment status requires a reachable webhook. Demo chat

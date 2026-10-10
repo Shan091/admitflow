@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — verified payment handoff and failure handling
+
+- **Time:** 00:04 IST
+- **Change:** Added tests covering the Telegram delivery of a generated Razorpay test link and the
+  behavior when Razorpay link creation fails; qualification remains successful in that case.
+- **Why:** Verify the full student-facing handoff and ensure provider failures are visible without
+  changing the code-computed eligibility result.
+- **Files:** `tests/test_telegram.py`, `tests/test_payments.py`.
+- **Validation:** `bash scripts/verify.sh` passed with Ruff, formatting, strict mypy, and 32 pytest
+  tests; `git diff --check` passed. No live API call was made. GitHub Actions is pending push.
+- **Limitations:** Razorpay test credentials and a public webhook URL are still needed to rehearse
+  the payment flow end to end.
+
 ## 2026-10-11 — staff login and Razorpay test-mode payments
 
 - **Time:** 00:02 IST
