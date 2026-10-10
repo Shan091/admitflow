@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — validate guided continuation at tap time
+
+- **Change:** Guided course details now use a `guidance:continue` action that rechecks the current
+  confirmed learner profile, results step, and top-three match before selecting the course. A stale
+  Continue tap cannot enter eligibility or staff review. The known-course shortcut and other direct
+  course lookups continue using their existing direct selection action.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests;
+  `git diff --check` passed. Regression tests cover preference changes, an expired results state,
+  Telegram Continue dispatch, and preservation of direct known-course selection. No live or paid API
+  calls were made.
+- **Reason:** A recommendation detail page can outlive the preferences and comparison that produced
+  it; explicit continuation must be checked against current state too.
+
 ## 2026-10-11 — handle unrelated text without repeating a guidance poll
 
 - **Change:** A free-text turn with no preference, correction, or explicit uncertainty no longer

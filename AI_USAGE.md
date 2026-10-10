@@ -3,6 +3,18 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — validate guided course continuation against current state
+
+- **Task:** Prevent an old course-detail Continue button from selecting a match after the learner
+  changes preferences or leaves the guided results step.
+- **Assistance:** Codex separated guided continuation callbacks from direct known-course selection,
+  revalidated the current confirmed signature and ranked matches at tap time, and tested the stale
+  and Telegram callback paths. Known-course fast-path behavior remains unchanged.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 172 tests;
+  `git diff --check` passed. No live or paid API calls were made.
+- **Human review:** A guided recommendation remains an exploration until the learner chooses
+  Continue, and that action is accepted only while its confirmed match is still current.
+
 ## 2026-10-11 — stop replaying a pending poll for unrelated messages
 
 - **Task:** Fix the guidance conversation behavior shown when an unrelated typed request repeated

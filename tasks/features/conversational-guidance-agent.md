@@ -187,8 +187,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   best.
 - A guided recommendation opens verified fictional course details first. Returning restores the
   current confirmed match list; only an explicit continue action enters eligibility or staff
-  review. Detail callbacks for a changed profile or a course outside the current top matches are
-  rejected safely. The known-course shortcut remains direct.
+  review. Detail and continue callbacks revalidate the current confirmed profile and top matches;
+  stale actions cannot select an old course or enter eligibility. The known-course shortcut remains
+  direct.
 - Course selection, eligibility, costs, FAQ answers, parent attribution, and payment remain safe and
   code-verified; unsupported levels or missing data create a truthful handoff.
 - A learner can interrupt discovery to ask an FAQ/fee question, change language/path, pause, resume,
@@ -218,7 +219,8 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   stale-button invalidation, preference filtering/explanations, parent attribution, and honest
   widening when a selected format leaves no complete match.
 - Verify match -> detail -> back-to-matches -> pause/resume -> explicit eligibility/staff
-  continuation, including stale detail callbacks and Telegram callback dispatch.
+  continuation, including stale detail/continue callbacks, expired results state, and Telegram
+  callback dispatch.
 - Evaluate fixed fictional dialogues in English, Hindi, Malayalam, and Hinglish; test code-switching,
   short/empty answers, spelling variation, ambiguity, contradictions, prompt injection, parent-child
   disagreement, and unsupported/regulated interests.

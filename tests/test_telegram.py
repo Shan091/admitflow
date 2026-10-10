@@ -210,7 +210,7 @@ async def test_guided_course_detail_callback_does_not_enter_qualification(
     callbacks = {
         button.callback_data for row in message.sent[-1][1].inline_keyboard for button in row
     }
-    assert f"course:{course_id}" in callbacks
+    assert f"guidance:continue:{course_id}" in callbacks
     assert "guidance:matches" in callbacks
 
     update.callback_query = SimpleNamespace(answer=answer, data="guidance:matches")
@@ -222,6 +222,11 @@ async def test_guided_course_detail_callback_does_not_enter_qualification(
         for row in message.sent[-1][1].inline_keyboard
         for button in row
     )
+    update.callback_query = SimpleNamespace(answer=answer, data=f"guidance:continue:{course_id}")
+    update.update_id = 153
+    await callback_handler(update, context)
+    assert "Have you completed Grade 12?" in message.sent[-1][0]
+    assert repository.get_lead(lead_id)["selected_course_id"] == course_id
 
 
 @pytest.mark.asyncio

@@ -655,7 +655,9 @@ async def test_guided_match_opens_course_details_before_explicit_eligibility_ste
 
     assert "Fictional sample details" in details.text
     assert "Sample prerequisites:" in details.text
-    assert any(data == f"course:{selected_detail_callback}" for _, data in details.buttons)
+    assert any(
+        data == f"guidance:continue:{selected_detail_callback}" for _, data in details.buttons
+    )
     assert any(data == "guidance:matches" for _, data in details.buttons)
     matches_again = service.show_guidance_matches(lead_id)
     assert selected_detail_callback in {
@@ -675,7 +677,7 @@ async def test_guided_match_opens_course_details_before_explicit_eligibility_ste
     assert selected_detail_callback in resumed_course_ids
     assert repository.get_lead(lead_id)["selected_course_id"] is None
 
-    next_step = service.select_course(lead_id, selected_detail_callback)
+    next_step = service.continue_guidance_course(lead_id, selected_detail_callback)
     assert "Have you completed Grade 12" in next_step.text
     assert repository.get_lead(lead_id)["selected_course_id"] == selected_detail_callback
 
@@ -748,7 +750,7 @@ async def test_non_course_request_does_not_repeat_pending_guidance_confirmation(
 
 
 @pytest.mark.asyncio
-async def test_stale_guided_course_detail_callback_does_not_show_old_match(
+async def test_stale_guided_course_callbacks_do_not_select_old_match(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -790,12 +792,21 @@ async def test_stale_guided_course_detail_callback_does_not_show_old_match(
         for _, data in results.buttons
         if data.startswith("guidance:course:")
     )
+    stale_detail = service.explore_guidance_course(lead_id, stale_course_id)
+    stale_continue_id = next(
+        data.removeprefix("guidance:continue:")
+        for _, data in stale_detail.buttons
+        if data.startswith("guidance:continue:")
+    )
     repository.save_fact(lead_id, "interest_terms_student", "design", "student")
 
-    stale = service.explore_guidance_course(lead_id, stale_course_id)
+    stale = service.continue_guidance_course(lead_id, stale_continue_id)
 
+    assert "Have you completed Grade 12" not in stale.text
     assert stale_course_id not in stale.text
     assert repository.get_lead(lead_id)["selected_course_id"] is None
+    stale_detail_after_change = service.explore_guidance_course(lead_id, stale_course_id)
+    assert stale_course_id not in stale_detail_after_change.text
 
     stale_matches = service.show_guidance_matches(lead_id)
     assert "Did I get that right" in stale_matches.text

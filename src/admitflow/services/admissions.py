@@ -942,10 +942,27 @@ class AdmissionsService:
         return Reply(
             details,
             (
-                ("Continue to sample eligibility/staff check", f"course:{course.id}"),
+                ("Continue to sample eligibility/staff check", f"guidance:continue:{course.id}"),
                 ("Back to matching courses", "guidance:matches"),
             ),
         )
+
+    def continue_guidance_course(self, lead_id: int, course_id: str) -> Reply:
+        """Enter code-owned qualification only for a currently confirmed guided match."""
+        lead = self.repository.get_lead(lead_id)
+        if lead is None:
+            return Reply("Send /start to begin a new demo conversation.")
+        if lead["discovery_step"] != "results":
+            return Reply(
+                "That course comparison has expired. Your current course path is unchanged."
+            )
+        matches = self._current_guidance_matches(lead_id)
+        if not self._guidance_is_currently_confirmed(lead_id) or course_id not in {
+            item.course.id for item in matches
+        }:
+            self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
+            return self._present_guidance(lead_id)
+        return self.select_course(lead_id, course_id)
 
     def _current_guidance_matches(self, lead_id: int) -> list[CourseMatch]:
         interests, activities, level, goals, language_support = self._student_guidance_context(
