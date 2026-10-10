@@ -14,7 +14,9 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   user-controlled opt-out.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 96 tests;
   `git diff --check` passed. All test inputs were fictional and OpenAI calls were mocked. No
-  applicant data or API credits were used. Commit/push and GitHub Actions result are pending.
+  applicant data or API credits were used. Pushed as `bdacf0b1cb1d6fd7c91e72e2530ac8ceaadfa77e`;
+  GitHub Actions `CI` run [38090277836](https://github.com/Shan091/admitflow/actions/runs/38090277836)
+  passed for that SHA.
 - **Human review:** Recommendations remain within the fictional course catalog. Goal tags are demo
   metadata, not independently validated career or employment outcomes. Production quality and
   privacy reviews remain open.

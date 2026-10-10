@@ -78,9 +78,11 @@ mandatory linear interview.
 - [ ] Define and test coverage for contradictory/corrected preferences, mixed interests, constraints,
   parent/student conflict, unknown/out-of-catalog requests, sensitive disclosures, provider/RAG
   failures, language switching, deletion, and concurrent/duplicate updates.
-- [ ] Add a catalog-grounded optional study-goal signal for broad/ambiguous interest matches:
-  persist only explicit goals, ask at most one useful follow-up, allow skip, and include goals in
-  correction/confirmation fingerprints and transparent recommendation reasons.
+- [x] Add a catalog-grounded optional study-goal signal for broad/ambiguous interest matches:
+  persist only explicit goals, ask at most one useful follow-up, allow skip/resume, and include goals
+  in correction/confirmation fingerprints and transparent recommendation reasons. Full gate passed
+  (96 tests); pushed as `bdacf0b1cb1d6fd7c91e72e2530ac8ceaadfa77e`; GitHub Actions CI run
+  `38090277836` passed.
 - [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
   retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
 

@@ -9,7 +9,9 @@
   Known-course routing remains direct. No job or occupation predictions were added.
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 96 tests;
   `git diff --check` passed. Tests use fictional data and fake OpenAI responses only; no paid API
-  call was made. Commit/push and matching GitHub Actions result are pending.
+  call was made.
+- **Delivery:** Pushed as `bdacf0b1cb1d6fd7c91e72e2530ac8ceaadfa77e`; GitHub Actions `CI` run
+  [38090277836](https://github.com/Shan091/admitflow/actions/runs/38090277836) passed for this SHA.
 - **Reason:** Give undecided learners one more relevant way to distinguish a broad set of sample
   courses while keeping the question optional, course-bounded, and based on explicit preferences.
 

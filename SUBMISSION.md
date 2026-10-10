@@ -8,12 +8,12 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`
+- **Verified implementation commit SHA:** `bdacf0b1cb1d6fd7c91e72e2530ac8ceaadfa77e`
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
   test payment were verified during earlier milestones; the user confirmed the live bot flow. The
-  consent-gated adaptive discovery changes in this SHA passed automated CI and synthetic OpenAI
-  smoke checks, but have not been rehearsed live or deployed to the running tunnel. The Telegram
-  demo bot is
+  latest adaptive study-goal guidance in this SHA passed automated CI and local tests, but the new
+  goal question has not yet been rehearsed live or deployed to the running tunnel. The Telegram demo
+  bot is
   [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
   account and bot token for the live conversation; OpenAI API key for disclosed discovery and FAQ
@@ -35,9 +35,10 @@
   `OPENAI_EMBEDDING_MODEL`, `DATABASE_PATH`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`,
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
-- **Demo walkthrough:** In Telegram, send `/start` and read the OpenAI processing notice. Free-text
-  discovery is enabled by default; name a known course or
-  describe interest/activity/level in your own words; inspect the bounded catalog recommendation. The
+- **Demo walkthrough:** In Telegram, send `/start` and read the OpenAI processing notice; there is
+  no separate consent step. Free-text discovery is enabled by default; name a known course or
+  describe interest/activity/goal/level in your own words. When a broad match has different sample
+  learning goals, answer or skip the optional prompt, then inspect the bounded catalog recommendation. The
   learner may pause and `/resume`. Supported sample undergraduate options continue to code-based
   qualification and require an explicit tap before a test payment link. Other course levels are
   handed to staff for eligibility confirmation. Staff can inspect attributed facts and pending
@@ -45,10 +46,10 @@
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
-- **Checks performed and results:** On `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`,
-  `bash scripts/verify.sh` passed locally (Ruff lint, format, strict mypy, and 71 pytest tests);
+- **Checks performed and results:** On `bdacf0b1cb1d6fd7c91e72e2530ac8ceaadfa77e`,
+  `bash scripts/verify.sh` passed locally (Ruff lint/format, strict mypy, and 96 pytest tests);
   `git diff --check` passed. GitHub Actions run
-  [38087034051](https://github.com/Shan091/admitflow/actions/runs/38087034051) passed for this SHA.
+  [38090277836](https://github.com/Shan091/admitflow/actions/runs/38090277836) passed for this SHA.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.
