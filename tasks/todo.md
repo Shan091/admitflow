@@ -70,8 +70,10 @@ mandatory linear interview.
   unsupported eligibility, and job-outcome promises out of recommendations.
 - [ ] Implement a multi-turn question policy that uses existing attributed facts, asks only useful
   next questions, reflects understanding for correction, and preserves path switching/resume.
-- [ ] Preserve the distinct guided-exploration step and restore its exact pending prompt/options
+- [x] Preserve the distinct guided-exploration step and restore its exact pending prompt/options
   after pause/resume; verify it is not silently reset to the known-field selection step.
+  Full gate passed (124 tests); pushed as `0702fe4b9e66e6e38c0be4c5b4c66eb4b8b99b88`; GitHub
+  Actions CI run `38093151318` passed.
 - [x] Current slice: require a complementary signal before recommending from broad interests;
   when context is thin, ask one tailored follow-up and preserve the known-course fast path.
 - [x] Current slice: reflect the learner's stated interests, activity, and level before surfacing

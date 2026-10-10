@@ -8,7 +8,8 @@
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 124 tests;
   `git diff --check` passed. New coverage asserts the field choices, browse/pause actions, and exact
   exploration prompt/options after resume.
-- **Delivery:** Implementation commit and CI pending.
+- **Delivery:** Pushed as `0702fe4b9e66e6e38c0be4c5b4c66eb4b8b99b88`; GitHub Actions `CI` run
+  [38093151318](https://github.com/Shan091/admitflow/actions/runs/38093151318) passed.
 - **Reason:** Learners who are unsure can return to the question that fits their chosen exploration
   path after pausing, without being pushed into a different flow.
 
