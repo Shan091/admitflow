@@ -16,7 +16,7 @@
   demo bot is
   [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
-  account and bot token for the live conversation; OpenAI API key for consented discovery and FAQ
+  account and bot token for the live conversation; OpenAI API key for disclosed discovery and FAQ
   retrieval; optional
   Razorpay test API keys and webhook secret for the test payment. Do not include credential values.
 
@@ -35,8 +35,8 @@
   `OPENAI_EMBEDDING_MODEL`, `DATABASE_PATH`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`,
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
-- **Demo walkthrough:** In Telegram, send `/start`, read the OpenAI processing notice, and either
-  consent to free-text discovery or continue with buttons. After consent, name a known course or
+- **Demo walkthrough:** In Telegram, send `/start` and read the OpenAI processing notice. Free-text
+  discovery is enabled by default; name a known course or
   describe interest/activity/level in your own words; inspect the bounded catalog recommendation. The
   learner may pause and `/resume`. Supported sample undergraduate options continue to code-based
   qualification and require an explicit tap before a test payment link. Other course levels are

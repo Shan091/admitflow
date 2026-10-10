@@ -1,0 +1,380 @@
+/* AdmitFlow landing page - calm editorial. Built on tokens.css. No gradients, soft depth. */
+
+body.landing {
+  margin: 0;
+  position: relative;
+}
+/* Subtle film grain for a physical, non-templated feel */
+body.landing::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
+  background-size: 160px 160px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+.em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ---- Buttons (small-radius, editorial; not pills) ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  padding: 0.72rem 1.1rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    transform 0.5s var(--ease),
+    background-color 0.5s var(--ease),
+    border-color 0.5s var(--ease);
+}
+.btn .ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgba(245, 242, 235, 0.16);
+}
+.btn .ic svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  transition: transform 0.5s var(--ease);
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--canvas);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.985);
+}
+.btn-primary:hover .ic svg {
+  transform: translate(2px, -1px);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border-strong);
+}
+.btn-ghost:hover {
+  border-color: var(--ink);
+}
+.btn-ghost .ic {
+  background: rgba(33, 28, 22, 0.06);
+}
+
+/* ---- Nav ---- */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: 84px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand .mark {
+  width: 26px;
+  height: 26px;
+  color: var(--brand);
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+.nav-links .muted {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.nav-links .muted:hover {
+  color: var(--ink);
+}
+
+/* ---- Eyebrow pill ---- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--brand-strong);
+  background: var(--brand-tint);
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.8rem;
+}
+
+/* ---- Hero ---- */
+.hero {
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: var(--space-8);
+  align-items: center;
+  padding: var(--space-8) 0;
+}
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  line-height: 1.08;
+  margin: var(--space-5) 0 var(--space-5);
+  max-width: 15ch;
+}
+.hero .lead {
+  color: var(--ink-soft);
+  font-size: var(--step-1);
+  line-height: 1.6;
+  max-width: 44ch;
+  margin: 0 0 var(--space-6);
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Welcome card: double-bezel (outer shell + inner core) */
+.welcome-shell {
+  background: #efe9e0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-2);
+}
+.welcome-card {
+  background: var(--card);
+  border-radius: calc(var(--radius-lg) - 0.4rem);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  padding: var(--space-6);
+}
+.welcome-card .cap {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 var(--space-5);
+}
+.welcome-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-5);
+}
+.welcome-card li {
+  display: grid;
+  gap: 0.25rem;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--border);
+}
+.welcome-card .greet {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.welcome-card .lang {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+}
+
+/* ---- Sections ---- */
+.section {
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--border);
+}
+.section-head {
+  max-width: 50ch;
+  margin-bottom: var(--space-7);
+}
+.section-head h2 {
+  font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+  font-weight: 500;
+  margin: var(--space-4) 0 var(--space-4);
+}
+.section-head p {
+  color: var(--ink-soft);
+  font-size: var(--step-1);
+  margin: 0;
+  max-width: var(--measure);
+}
+
+/* ---- Steps (calm bordered cards) ---- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+.step-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-6);
+  transition:
+    transform 0.6s var(--ease),
+    box-shadow 0.6s var(--ease);
+}
+.step-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-1);
+}
+.step-card .num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--brand);
+}
+.step-card h3 {
+  font-size: var(--step-2);
+  font-weight: 500;
+  margin: var(--space-3) 0 var(--space-2);
+}
+.step-card p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+}
+
+/* ---- Trust ---- */
+.trust {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+.trust-item {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-strong);
+}
+.trust-item strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 500;
+  margin-bottom: var(--space-3);
+}
+.trust-item p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  max-width: 36ch;
+}
+
+/* ---- CTA panel (calm, bordered, no gradient) ---- */
+.cta-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  margin: var(--space-8) 0;
+}
+.cta-panel h2 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 500;
+  margin: 0 auto var(--space-4);
+  max-width: 20ch;
+}
+.cta-panel p {
+  color: var(--ink-soft);
+  font-size: var(--step-1);
+  max-width: 46ch;
+  margin: 0 auto var(--space-6);
+}
+.cta-panel .note {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: var(--space-5) auto 0;
+}
+
+/* ---- Footer ---- */
+.foot {
+  padding: var(--space-7) 0 var(--space-8);
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+.foot .brand {
+  font-size: var(--step-1);
+  margin-bottom: var(--space-4);
+}
+.foot p {
+  max-width: 72ch;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ---- Scroll reveal (progressive enhancement) ---- */
+body.js .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(6px);
+  transition:
+    opacity 0.8s var(--ease),
+    transform 0.8s var(--ease),
+    filter 0.8s var(--ease);
+}
+body.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6) 0;
+  }
+  .hero h1 {
+    max-width: none;
+  }
+  .steps,
+  .trust {
+    grid-template-columns: 1fr;
+  }
+  .nav-links .muted {
+    display: none;
+  }
+}

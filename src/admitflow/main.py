@@ -3,9 +3,11 @@
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from admitflow.adapters.openai import OpenAIAdapter
 from admitflow.adapters.razorpay import RazorpayAdapter
@@ -17,6 +19,7 @@ from admitflow.adapters.telegram import (
 )
 from admitflow.adapters.vector_store import VectorStore
 from admitflow.config import Settings, get_settings
+from admitflow.dashboard.landing_routes import router as landing_router
 from admitflow.dashboard.payment_routes import router as payment_router
 from admitflow.dashboard.routes import router as dashboard_router
 from admitflow.dashboard.telegram_routes import router as telegram_router
@@ -123,6 +126,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(dashboard_router)
     app.include_router(payment_router)
     app.include_router(telegram_router)
+    app.include_router(landing_router)
+    static_dir = Path(__file__).parent / "dashboard" / "static"
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
     @app.get("/health")
     def health() -> dict[str, str]:

@@ -1,0 +1,157 @@
+/* AdmitFlow design tokens - single source of truth for landing + dashboard.
+   Calm editorial direction: warm paper, near-monochrome, one quiet accent, no gradients. */
+
+/* ---- Self-hosted fonts: Newsreader (editorial display) + Plus Jakarta Sans (UI) + Noto (Indic) ---- */
+@font-face {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/static/fonts/newsreader-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Newsreader";
+  font-style: italic;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("/static/fonts/newsreader-italic-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/static/fonts/jakarta-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("/static/fonts/noto-sans-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/static/fonts/noto-sans-deva-400.woff2") format("woff2");
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A8FF;
+}
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/static/fonts/noto-sans-mal-400.woff2") format("woff2");
+  unicode-range: U+0307, U+0323, U+0951-0952, U+0964-0965, U+0D00-0D7F, U+200C-200D, U+20B9, U+25CC;
+}
+
+:root {
+  --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-sans: "Plus Jakarta Sans", "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Warm, near-monochrome palette; one quiet accent used sparingly */
+  --ink: #211c16;
+  --ink-soft: #6a6459;
+  --canvas: #f5f2eb;
+  --card: #fbf9f5;
+  --border: #e4ded2;
+  --border-strong: #d6cfbf;
+
+  --brand: #8a4b3c; /* muted brick, interactive + marks only */
+  --brand-strong: #6f3a2e;
+  --brand-tint: #efe6de;
+
+  /* Dashboard status colors (kept for continuity) */
+  --panel: #efeae1;
+  --warning-bg: #f6edd3;
+  --success-bg: #e7efe4;
+  --outbound-bg: #efe9e1;
+  --danger: #a23a2b;
+
+  /* Type scale (~1.25) */
+  --step--1: 0.84rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.5rem;
+  --step-3: 1.95rem;
+  --step-4: 2.5rem;
+  --step-5: 3.2rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3.5rem;
+  --space-8: 6rem;
+
+  /* Shape: small radius on controls, larger on enclosures; soft diffused shadows */
+  --radius: 0.55rem;
+  --radius-sm: 0.4rem;
+  --radius-lg: 1.1rem;
+  --radius-pill: 999px;
+  --shadow-1: 0 2px 10px rgba(33, 28, 22, 0.05);
+  --shadow-2: 0 26px 64px -30px rgba(33, 28, 22, 0.32);
+
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --measure: 60ch;
+  --container: 1020px;
+  --container-wide: 1140px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--canvas);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  line-height: 1.12;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--brand);
+}
+
+:where(a, button, summary, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

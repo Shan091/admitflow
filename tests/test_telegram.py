@@ -4,9 +4,9 @@ from types import SimpleNamespace
 import pytest
 
 from admitflow.adapters.sqlite import Repository
-from admitflow.adapters.telegram import callback_handler, start_command, text_handler
+from admitflow.adapters.telegram import callback_handler, keyboard, start_command, text_handler
 from admitflow.adapters.vector_store import VectorStore
-from admitflow.services.admissions import AdmissionsService
+from admitflow.services.admissions import AdmissionsService, Reply
 from admitflow.services.retrieval import RetrievalService
 
 
@@ -33,8 +33,29 @@ def make_runtime(tmp_path: Path) -> tuple[Repository, AdmissionsService, SimpleN
     return repository, admissions, context
 
 
+@pytest.mark.parametrize(
+    ("language", "opt_out_label"),
+    [
+        ("en", "Turn off OpenAI processing"),
+        ("hi", "OpenAI प्रोसेसिंग बंद करें"),
+        ("ml", "OpenAI പ്രോസസ്സിംഗ് ഓഫ് ചെയ്യുക"),
+        ("hinglish", "OpenAI processing band karein"),
+    ],
+)
+def test_persistent_openai_opt_out_keyboard_uses_selected_language(
+    language: str, opt_out_label: str
+) -> None:
+    markup = keyboard(Reply("Continue"), ai_processing_allowed=True, language=language)
+
+    assert markup is not None
+    labels = {button.text for row in markup.inline_keyboard for button in row}
+    callback_data = {button.callback_data for row in markup.inline_keyboard for button in row}
+    assert opt_out_label in labels
+    assert "ai:processing:off" in callback_data
+
+
 @pytest.mark.asyncio
-async def test_start_command_discloses_ai_processing_before_open_text(tmp_path: Path) -> None:
+async def test_start_command_discloses_ai_processing_and_starts_discovery(tmp_path: Path) -> None:
     repository, _, context = make_runtime(tmp_path)
     message = FakeMessage()
     update = SimpleNamespace(
@@ -49,13 +70,58 @@ async def test_start_command_discloses_ai_processing_before_open_text(tmp_path: 
     assert len(leads) == 1
     assert leads[0]["telegram_user_id"] == "42"
     assert len(repository.list_messages(int(leads[0]["id"]))) == 2
-    assert "fictional sample catalog" in message.sent[0][0]
+    assert "fictional demo guidance" in message.sent[0][0]
     assert "OpenAI" in message.sent[0][0]
-    assert "demo data only" in message.sent[0][0]
+    assert "demo text only" in message.sent[0][0]
     assert message.sent[0][1] is not None
     assert any(
-        button.callback_data == "ai:consent:yes"
+        button.callback_data == "path:explore"
         for row in message.sent[0][1].inline_keyboard
+        for button in row
+    )
+    assert any(
+        button.callback_data == "language:menu"
+        for row in message.sent[0][1].inline_keyboard
+        for button in row
+    )
+
+
+@pytest.mark.asyncio
+async def test_user_can_turn_openai_processing_off_and_back_on(tmp_path: Path) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("42", "sample")
+    message = FakeMessage()
+
+    async def answer() -> None:
+        return None
+
+    update = SimpleNamespace(
+        callback_query=SimpleNamespace(answer=answer, data="ai:processing:off"),
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=140,
+    )
+    await callback_handler(update, context)
+    assert not admissions.ai_processing_enabled(lead_id)
+    assert "OpenAI processing is off" in message.sent[-1][0]
+    off_markup = message.sent[-1][1]
+    assert off_markup is not None
+    assert any(
+        button.callback_data == "ai:processing:on"
+        for row in off_markup.inline_keyboard
+        for button in row
+    )
+
+    update.callback_query = SimpleNamespace(answer=answer, data="ai:processing:on")
+    update.update_id = 141
+    await callback_handler(update, context)
+    assert admissions.ai_processing_enabled(lead_id)
+    assert "Typed messages are sent to OpenAI" in message.sent[-1][0]
+    on_markup = message.sent[-1][1]
+    assert on_markup is not None
+    assert any(
+        button.callback_data == "ai:processing:off"
+        for row in on_markup.inline_keyboard
         for button in row
     )
 
@@ -143,7 +209,12 @@ async def test_exploration_callbacks_recommend_and_language_choice_persists(tmp_
     await callback_handler(update, context)
     lead = repository.list_leads(repository.tenant_id)[0]
     assert lead["preferred_language"] == "ml"
-    assert message.sent[-1][0]
+    assert "OpenAI-ലേക്ക് അയയ്ക്കുകയും" in message.sent[-1][0]
+    markup = message.sent[-1][1]
+    assert markup is not None
+    callbacks = {button.callback_data for row in markup.inline_keyboard for button in row}
+    assert "path:explore" in callbacks
+    assert "ai:processing:off" in callbacks
 
 
 @pytest.mark.asyncio

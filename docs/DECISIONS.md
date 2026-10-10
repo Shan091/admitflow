@@ -65,12 +65,14 @@ Record consequential choices here. Each entry is short; update it when evidence 
     the dashboard shows paid status, while disclosing that live contact, response time, and course
     access are not configured.
 
-17. **Consent-gated text extraction.** Explain before sending free-text questions to OpenAI and
-    require affirmative consent; allow opt-out and button-only exploration. Use a stateless
-    structured extraction of the current message plus fictional allowlisted course vocabulary.
-    Application code validates extracted facts and owns questions, recommendations, fees, and
-    eligibility. No user name, chat ID, or transcript is sent as context; this does not replace a
-    privacy/legal review.
+17. **Disclosed OpenAI text processing with user controls.** Explain at `/start` that typed
+    messages are sent to OpenAI, locally stored, and must contain demo data only. Enable free-text
+    AI by default; provide persistent opt-out and re-enable controls plus button-only exploration.
+    This supersedes the earlier affirmative-consent gate as the hackathon product behavior; it is
+    not a legal/privacy determination. Use stateless structured extraction of only the current
+    message and fictional allowlisted course vocabulary. Code validates extracted facts and owns
+    questions, recommendations, fees, and eligibility. No user name, chat ID, or transcript is sent
+    as context; privacy/legal review remains a production gate.
 
 ## References
 

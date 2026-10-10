@@ -67,7 +67,7 @@ class OpenAIAdapter:
         return str(answer.choice)
 
     async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
-        """Extract only explicit, catalog-bounded facts from this consented user turn."""
+        """Extract only explicit, catalog-bounded facts from this user turn."""
         field_values = sorted({course.field for course in courses})
         course_options = [
             {

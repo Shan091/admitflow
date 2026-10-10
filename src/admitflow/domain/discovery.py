@@ -11,6 +11,13 @@ class CourseMatch:
     reasons: tuple[str, ...]
 
 
+def has_sufficient_guidance_context(
+    *, interests: set[str], activities: set[str], level: str | None = None
+) -> bool:
+    """Require an expressed interest plus one complementary signal to recommend."""
+    return bool(_normalize(interests) and (_normalize(activities) or (level and level.strip())))
+
+
 def recommend_courses(
     courses: list[Course],
     *,

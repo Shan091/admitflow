@@ -43,12 +43,29 @@ def build_telegram_application(
     return application
 
 
-def keyboard(reply: Reply, *, ai_processing_allowed: bool = False) -> InlineKeyboardMarkup | None:
+def keyboard(
+    reply: Reply,
+    *,
+    ai_processing_allowed: bool = False,
+    language: str = "en",
+) -> InlineKeyboardMarkup | None:
     buttons = list(reply.buttons)
     if not any(data == "language:menu" for _, data in buttons):
-        buttons.append(("🌐 Change language", "language:menu"))
-    if ai_processing_allowed and not any(data == "ai:consent:no" for _, data in buttons):
-        buttons.append(("Turn off OpenAI processing", "ai:consent:no"))
+        language_label = {
+            "en": "Change language",
+            "hi": "भाषा बदलें",
+            "ml": "ഭാഷ മാറ്റുക",
+            "hinglish": "Language badlein",
+        }.get(language, "Change language")
+        buttons.append((f"🌐 {language_label}", "language:menu"))
+    if ai_processing_allowed and not any(data == "ai:processing:off" for _, data in buttons):
+        opt_out_label = {
+            "en": "Turn off OpenAI processing",
+            "hi": "OpenAI प्रोसेसिंग बंद करें",
+            "ml": "OpenAI പ്രോസസ്സിംഗ് ഓഫ് ചെയ്യുക",
+            "hinglish": "OpenAI processing band karein",
+        }.get(language, "Turn off OpenAI processing")
+        buttons.append((opt_out_label, "ai:processing:off"))
     if not buttons:
         return None
     return InlineKeyboardMarkup(
@@ -78,9 +95,14 @@ async def _send_reply(
     if message is None:
         return
     repository.add_message(lead_id, "outbound", reply.text)
-    ai_processing_allowed = admissions.openai_processing_consent(lead_id) == "yes"
+    ai_processing_allowed = admissions.ai_processing_enabled(lead_id)
     await message.reply_text(
-        reply.text, reply_markup=keyboard(reply, ai_processing_allowed=ai_processing_allowed)
+        reply.text,
+        reply_markup=keyboard(
+            reply,
+            ai_processing_allowed=ai_processing_allowed,
+            language=admissions.preferred_language(lead_id),
+        ),
     )
 
 
@@ -104,12 +126,20 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     data = query.data or ""
     repository.add_message(lead_id, "inbound", data, update.update_id)
-    if data == "ai:consent:yes":
-        reply = admissions.set_ai_processing_consent(lead_id, True)
-    elif data == "ai:consent:no":
-        reply = admissions.set_ai_processing_consent(lead_id, False)
+    if data in {"ai:consent:yes", "ai:processing:on"}:
+        reply = admissions.set_ai_processing_enabled(lead_id, True)
+    elif data in {"ai:consent:no", "ai:processing:off"}:
+        reply = admissions.set_ai_processing_enabled(lead_id, False)
     elif data.startswith("path:"):
         reply = admissions.begin_path(lead_id, data.removeprefix("path:"))
+    elif data.startswith("guidance:activity:"):
+        reply = await admissions.choose_guidance_signal(
+            lead_id, activity_slug=data.removeprefix("guidance:activity:")
+        )
+    elif data.startswith("guidance:level:"):
+        reply = await admissions.choose_guidance_signal(
+            lead_id, level=data.removeprefix("guidance:level:")
+        )
     elif data.startswith("speaker:"):
         reply = admissions.choose_speaker(lead_id, data.removeprefix("speaker:"))
     elif data.startswith("course:confirm:"):
@@ -127,7 +157,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     elif data == "discovery:back_level":
         reply = admissions.back_to_level(lead_id)
     elif data == "language:menu":
-        reply = admissions.language_menu()
+        reply = admissions.language_menu(lead_id)
     elif data.startswith("language:"):
         reply = admissions.choose_language(lead_id, data.removeprefix("language:"))
     elif data == "menu:start":
@@ -176,9 +206,14 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     repository.add_message(lead_id, "outbound", reply.text)
     message = update.effective_message
     if message is not None:
-        ai_processing_allowed = admissions.openai_processing_consent(lead_id) == "yes"
+        ai_processing_allowed = admissions.ai_processing_enabled(lead_id)
         await message.reply_text(
-            reply.text, reply_markup=keyboard(reply, ai_processing_allowed=ai_processing_allowed)
+            reply.text,
+            reply_markup=keyboard(
+                reply,
+                ai_processing_allowed=ai_processing_allowed,
+                language=admissions.preferred_language(lead_id),
+            ),
         )
 
 

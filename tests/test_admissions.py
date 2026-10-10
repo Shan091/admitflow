@@ -34,6 +34,55 @@ class FailingDiscoveryInterpreter:
         raise RuntimeError("synthetic extraction failure")
 
 
+@pytest.mark.parametrize(
+    ("language", "disclosure_phrase", "off_phrase"),
+    [
+        ("hi", "OpenAI को भेजे जाते हैं", "OpenAI प्रोसेसिंग बंद"),
+        ("ml", "OpenAI-ലേക്ക് അയയ്ക്കുകയും", "OpenAI പ്രോസസ്സിംഗ് ഓഫ്"),
+        ("hinglish", "OpenAI ko bheje", "OpenAI processing band"),
+    ],
+)
+def test_language_switch_localizes_ai_disclosure_and_opt_out_copy(
+    tmp_path: Path,
+    language: str,
+    disclosure_phrase: str,
+    off_phrase: str,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    discovery = service.choose_language(lead_id, language)
+
+    assert disclosure_phrase in discovery.text
+    assert any(data == "path:explore" for _, data in discovery.buttons)
+    tap_only = service.set_ai_processing_enabled(lead_id, False)
+    assert off_phrase in tap_only.text
+    assert service.preferred_language(lead_id) == language
+
+
+def test_language_switch_updates_disclosure_and_discovery_prompt(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    prompt = service.choose_language(lead_id, "hi")
+
+    assert "आप क्या पढ़ने" in prompt.text
+    assert "अंग्रेज़ी में" in prompt.text
+
+
 @pytest.mark.asyncio
 async def test_fee_question_uses_structured_course_price_before_router(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -94,7 +143,7 @@ async def test_hostel_availability_is_handed_to_staff_when_not_confirmed(tmp_pat
 
 
 @pytest.mark.asyncio
-async def test_discovery_requires_openai_consent_and_still_allows_tap_only_mode(
+async def test_discovery_is_enabled_by_default_and_opt_out_keeps_tap_only_mode(
     tmp_path: Path,
 ) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -107,14 +156,14 @@ async def test_discovery_requires_openai_consent_and_still_allows_tap_only_mode(
             repository, VectorStore(repository), UnexpectedEmbedder(), "fake", 0.72, 0.05
         ),
     )
-    lead_id, consent_prompt = service.start("123", "student")
+    lead_id, welcome_prompt = service.start("123", "student")
 
-    assert any(data == "ai:consent:yes" for _, data in consent_prompt.buttons)
-    assert any(data == "ai:consent:no" for _, data in consent_prompt.buttons)
-    assert "OpenAI" in consent_prompt.text
-    assert "demo data" in consent_prompt.text.casefold()
+    assert "OpenAI" in welcome_prompt.text
+    assert "demo text only" in welcome_prompt.text.casefold()
+    assert any(data == "path:explore" for _, data in welcome_prompt.buttons)
+    assert service.ai_processing_enabled(lead_id)
 
-    service.set_ai_processing_consent(lead_id, False)
+    service.set_ai_processing_enabled(lead_id, False)
     reply = await service.free_text(lead_id, "I like technology and data", UnexpectedRouter())
 
     assert "buttons" in reply.text.casefold()
@@ -122,7 +171,7 @@ async def test_discovery_requires_openai_consent_and_still_allows_tap_only_mode(
     consent = next(
         fact
         for fact in repository.list_facts(lead_id)
-        if fact["fact_key"] == "openai_processing_consent"
+        if fact["fact_key"] == "openai_processing_enabled"
     )
     assert consent["fact_value"] == "no"
 
@@ -138,7 +187,7 @@ async def test_openai_opt_out_takes_priority_while_waiting_for_marks(tmp_path: P
         RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
     )
     lead_id, _ = service.start("123", "student")
-    service.set_ai_processing_consent(lead_id, True)
+    service.set_ai_processing_enabled(lead_id, True)
     repository.update_lead(lead_id, state="awaiting_marks")
 
     reply = await service.free_text(lead_id, "Don't send to OpenAI", UnexpectedRouter())
@@ -147,13 +196,13 @@ async def test_openai_opt_out_takes_priority_while_waiting_for_marks(tmp_path: P
     consent = next(
         fact
         for fact in repository.list_facts(lead_id)
-        if fact["fact_key"] == "openai_processing_consent"
+        if fact["fact_key"] == "openai_processing_enabled"
     )
     assert consent["fact_value"] == "no"
     assert "buttons" in reply.text.casefold()
 
 
-def test_consent_grant_opens_open_ended_discovery_and_can_be_revoked(tmp_path: Path) -> None:
+def test_openai_preference_can_be_disabled_and_reenabled(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
     repository.seed_catalog()
@@ -164,23 +213,23 @@ def test_consent_grant_opens_open_ended_discovery_and_can_be_revoked(tmp_path: P
     )
     lead_id, _ = service.start("123", "student")
 
-    prompt = service.set_ai_processing_consent(lead_id, True)
+    prompt = service.set_ai_processing_enabled(lead_id, True)
     assert "what do you enjoy" in prompt.text.casefold() or "already know" in prompt.text.casefold()
     assert any(data == "path:course" for _, data in prompt.buttons)
     assert any(data == "path:explore" for _, data in prompt.buttons)
 
-    revoked = service.set_ai_processing_consent(lead_id, False)
+    revoked = service.set_ai_processing_enabled(lead_id, False)
     assert "buttons" in revoked.text.casefold() or "tap" in revoked.text.casefold()
     consent = next(
         fact
         for fact in repository.list_facts(lead_id)
-        if fact["fact_key"] == "openai_processing_consent"
+        if fact["fact_key"] == "openai_processing_enabled"
     )
     assert consent["fact_value"] == "no"
 
 
 @pytest.mark.asyncio
-async def test_consenting_student_can_describe_multiple_facts_in_one_free_text_turn(
+async def test_student_can_describe_multiple_facts_without_consent_step(
     tmp_path: Path,
 ) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -205,7 +254,6 @@ async def test_consenting_student_can_describe_multiple_facts_in_one_free_text_t
         interpreter,
     )
     lead_id, _ = service.start("123", "student")
-    service.set_ai_processing_consent(lead_id, True)
     service.choose_speaker(lead_id, "student")
 
     reply = await service.free_text(lead_id, "I enjoy charts and want a diploma in data", None)
@@ -262,7 +310,54 @@ async def test_consenting_student_can_describe_multiple_facts_in_one_free_text_t
 
 
 @pytest.mark.asyncio
-async def test_discovery_interpreter_is_never_called_without_consent(tmp_path: Path) -> None:
+async def test_vague_interest_gets_targeted_follow_up_before_recommendations(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("design/media",),
+            education_level=None,
+            interests=("design",),
+            activities=(),
+            unsure=False,
+            correct_previous=False,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    follow_up = await service.free_text(lead_id, "I like design", None)
+
+    assert "What would you like to do or learn more about" in follow_up.text
+    assert "Digital Design Diploma" not in follow_up.text
+    activity_choice = next(
+        (data for _, data in follow_up.buttons if data.startswith("guidance:activity:")), None
+    )
+    assert activity_choice is not None
+
+    recommendation = await service.choose_guidance_signal(
+        lead_id, activity_slug=activity_choice.removeprefix("guidance:activity:")
+    )
+
+    assert "Digital Design Diploma" in recommendation.text
+    assert "Matches your interest in design" in recommendation.text
+    assert "Includes activities you chose" in recommendation.text
+
+
+@pytest.mark.asyncio
+async def test_discovery_interpreter_is_called_by_default_and_opt_out_disables_it(
+    tmp_path: Path,
+) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
     repository.seed_catalog()
@@ -279,7 +374,12 @@ async def test_discovery_interpreter_is_never_called_without_consent(tmp_path: P
 
     reply = await service.free_text(lead_id, "I like design", None)
 
-    assert not interpreter.calls
+    assert len(interpreter.calls) == 1
+
+    service.set_ai_processing_enabled(lead_id, False)
+    reply = await service.free_text(lead_id, "I like design", None)
+
+    assert len(interpreter.calls) == 1
     assert "OpenAI processing is off" in reply.text
     assert "buttons" in reply.text.casefold() or "tap" in reply.text.casefold()
 
@@ -296,7 +396,7 @@ async def test_extraction_failure_does_not_persist_partial_facts(tmp_path: Path)
         FailingDiscoveryInterpreter(),
     )
     lead_id, _ = service.start("123", "student")
-    service.set_ai_processing_consent(lead_id, True)
+    service.set_ai_processing_enabled(lead_id, True)
     reply = await service.free_text(lead_id, "I enjoy art and making posters", None)
 
     assert "couldn't understand that safely" in reply.text.casefold()
@@ -326,7 +426,7 @@ async def test_natural_language_known_course_enters_existing_course_flow(tmp_pat
         interpreter,
     )
     lead_id, _ = service.start("123", "student")
-    service.set_ai_processing_consent(lead_id, True)
+    service.set_ai_processing_enabled(lead_id, True)
 
     reply = await service.free_text(lead_id, f"I already know I want {course.name}", None)
 
@@ -442,7 +542,7 @@ def test_browse_path_does_not_force_qualification(tmp_path: Path) -> None:
         RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
     )
     lead_id, welcome = service.start("123", "student")
-    welcome = service.set_ai_processing_consent(lead_id, True)
+    welcome = service.set_ai_processing_enabled(lead_id, True)
 
     reply = service.browse(lead_id)
 
@@ -463,7 +563,7 @@ def test_known_field_recommends_only_complete_catalog_courses_and_persists_path(
         RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
     )
     lead_id, welcome = service.start("123", "student")
-    welcome = service.set_ai_processing_consent(lead_id, True)
+    welcome = service.set_ai_processing_enabled(lead_id, True)
 
     assert {data for _, data in welcome.buttons} >= {
         "path:course",

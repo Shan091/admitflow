@@ -1,9 +1,10 @@
 # AdmitFlow
 
-AdmitFlow is a hackathon demo of an admissions assistant. In Telegram, a student can opt in to
-OpenAI processing for free-text discovery, name a known course, describe interests, explore through
-short prompts, or browse/ask a question. Declining or switching OpenAI processing off leaves the
-button-based demo usable. Recommendations stay inside the fictional catalog and use no aptitude
+AdmitFlow is a hackathon demo of an admissions assistant. In Telegram, a student can use
+OpenAI-assisted free-text discovery, name a known course, describe interests, explore through short
+prompts, or browse/ask a question. OpenAI processing is disclosed at the start and can be switched
+off or back on at any time; button-based exploration remains usable while it is off. Recommendations
+stay inside the fictional catalog and use no aptitude
 score. Eligible undergraduate demo applicants can choose whether to request a Razorpay test-mode fee
 link. FAQ answers use seeded institution content, OpenAI embeddings, and local vector search. Staff
 can inspect leads, attributed discovery facts, and handoffs in a dashboard.
@@ -12,8 +13,9 @@ This is a demo using fictional sample data. Eligibility results are not real adm
 The language selector stores English, Malayalam, Hindi, or Hinglish preferences, but most current
 bot responses remain English; translated copy is incomplete and needs fluent-speaker review.
 Use fictional/demo answers only: Telegram user IDs, usernames, and chat messages are stored in the
-local SQLite database. Before free-text AI features are enabled, the bot explains that the current
-message may be sent to OpenAI and asks for explicit consent. The extraction request uses only the
+local SQLite database. At `/start`, the bot explains that typed messages are sent to OpenAI for
+processing, messages are stored locally, and only fictional demo data should be used. AI processing
+starts enabled; users can turn it off or back on in the chat. The extraction request uses only the
 current message and allowlisted fictional catalog vocabulary with API storage disabled; it does not
 include chat ID, name, or transcript. This is not a production privacy review. Configure staff
 credentials before viewing the dashboard. Razorpay is restricted to test-key IDs; payment state
@@ -40,7 +42,8 @@ cp .env.example .env
 uv run uvicorn admitflow.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000/` for the dashboard and `/health` for health status. Configure both
+Open `http://127.0.0.1:8000/welcome` for the public landing page. `/` redirects to staff login,
+then opens the authenticated dashboard; `/health` reports health status. Configure both
 `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` to enable Telegram webhook handling. Generate a
 webhook secret locally with `python -c "import secrets; print(secrets.token_urlsafe(32))"`; keep
 the secret private. After starting the app on a public HTTPS host or tunnel, register the webhook
@@ -60,8 +63,8 @@ demo can continue. This does not delete external records held by Telegram or Raz
 Telegram webhooks require HTTPS, and Telegram does not allow webhook delivery and `getUpdates`
 polling simultaneously. The helper checks Telegram's reported webhook URL after registration.
 To remove the hook, run `uv run python scripts/manage_telegram_webhook.py --delete`. This project
-currently runs webhook mode only. Configure `OPENAI_API_KEY` to enable consented discovery and
-semantic FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
+currently runs webhook mode only. Configure `OPENAI_API_KEY` to enable AI discovery and semantic
+FAQ search. Set `STAFF_USERNAME`, `STAFF_PASSWORD`, and
 `STAFF_SESSION_SECRET` in `.env` to log in. Generate the session secret locally with
 `python -c "import secrets; print(secrets.token_urlsafe(48))"`; never commit `.env`.
 
@@ -99,9 +102,9 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
 ## Demo walkthrough
 
 1. Register the Telegram webhook as described above, then send `/start` to the configured bot.
-2. Read the OpenAI processing notice. Agree to enable free-text course discovery or choose
-   **No, use buttons only**. After consent, describe a known course, interest, activity, or study
-   level in one message, or use the shortcuts. Without consent, use the field/course/browse buttons.
+2. Read the OpenAI processing notice and use fictional demo text only. Free-text course discovery
+   is enabled by default; describe a known course, interest, activity, or study level, or use the
+   shortcuts. Turn OpenAI processing off to continue with buttons only; it can be turned back on.
    A learner can pause with the inline action and resume with `/resume`.
 3. Select a course. Sample undergraduate options can continue through the code-computed eligibility
    check; other levels show sample prerequisites and create a staff handoff instead of using a

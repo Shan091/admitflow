@@ -54,26 +54,51 @@ committed.
   `38085663111` passed. The checklist and submission-record update was pushed as
   `9315a93f9c2557d3c00008a775458397b8554837`; its GitHub Actions run `38085770102` passed.
 
-## Consent-gated adaptive intake and larger catalog
+## Conversational career-guidance agent (production objective)
+
+See `tasks/features/conversational-guidance-agent.md`. This extends course discovery into an
+adaptive, evidence-grounded, multi-turn guidance experience; do not treat lifecycle stages as a
+mandatory linear interview.
+
+- [ ] Confirm whether the earlier institution-only boundary still holds or is expanded to discuss
+  occupations/pathways; confirm youngest learner age and any catalog fields to add.
+- [ ] Map current conversation behavior and v1 lifecycle semantics to a turn-by-turn adaptive
+  interaction model; define the user's open-question start, known-course fast path, exploration,
+  recommendation comparison, interrupts, and safe handoffs.
+- [ ] Extend catalog/course knowledge only from verified complete records; keep invented facts,
+  unsupported eligibility, and job-outcome promises out of recommendations.
+- [ ] Implement a multi-turn question policy that uses existing attributed facts, asks only useful
+  next questions, reflects understanding for correction, and preserves path switching/resume.
+- [ ] Current slice: require a complementary signal before recommending from broad interests;
+  when context is thin, ask one tailored follow-up and preserve the known-course fast path.
+- [ ] Define and test coverage for contradictory/corrected preferences, mixed interests, constraints,
+  parent/student conflict, unknown/out-of-catalog requests, sensitive disclosures, provider/RAG
+  failures, language switching, deletion, and concurrent/duplicate updates.
+- [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
+  retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
+
+## AI-assisted adaptive intake and larger catalog
 
 See `tasks/features/conversational-intake.md`. Preserve the existing demo boundary: fictional
 courses, no scores, student-first attribution, and truthful staff handoff.
 
 - [x] Expand the seed catalog to 28+ complete sample courses, at least five per agreed field; test
   unique IDs, all levels, complete facts, and recommendation provenance.
-- [x] Add explicit OpenAI processing consent and a tap-only fallback; prove no route, extraction, or
-  embedding call occurs before consent or after opt-out.
+- [x] Keep discovery available without an affirmative-consent step; disclose OpenAI processing and
+  demo-only data use at start, enable AI by default, and verify opt-out/re-enable behavior locally.
 - [x] Extract only current-turn, catalog-allowlisted discovery facts with a strict schema and
   stateless API request; validate model output before any persistence or response.
 - [x] Replace the mandatory field/level/activity sequence with deterministic next-question choice
   based on already-known facts; support known-course natural-language entry and unsure learners.
-- [x] Add fake-API tests for consent, catalog allowlisting, injection instructions, known-course
+- [x] Add fake-API tests for opt-out, catalog allowlisting, injection instructions, known-course
   entry, corrections, handoff, dynamic responses, and extraction failure; run synthetic live
   language checks in English, Hindi, Malayalam, and Hinglish.
 - [x] Run `bash scripts/verify.sh` (71 tests), review privacy/claims, commit and push this slice as
   `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`; GitHub Actions CI run `38087034051` passed.
 - [x] Verify opt-out still works while collecting marks; full gate passed with 73 tests. Pushed as
   `a2c3582cbf36945841a9c5f7ae58f885038c7de4`; CI run `38087386606` passed.
+- [ ] Localize the OpenAI processing notice, tap-only response, opt-out/re-enable controls to
+  English, Hindi, Malayalam, and Hinglish; have a fluent speaker review translations.
 
 ## FAQ embeddings and vector retrieval
 
@@ -125,6 +150,37 @@ courses, no scores, student-first attribution, and truthful staff handoff.
 
   Verified 32 tests locally and GitHub Actions run 38076997956 passed on
   `182c27689544f21a6536146db870a553b03e14a5` (including the `/api/v1/webhooks/razorpay` alias).
+
+## Visual identity: brand kit, landing page, dashboard restyle
+
+Calm editorial / trust-first design, implemented in plain HTML + native CSS + a little vanilla
+JS (no Node, no new runtime deps). `StaticFiles` ships with Starlette. Acceptance criteria below
+must pass and the milestone be committed before any box is marked `[x]`.
+
+**Current work slice:** finish the in-progress public landing route and shared visual foundation.
+Preserve other working-tree changes. Verify `/welcome` without a staff cookie, `/`'s staff-login
+redirect, static asset delivery, responsive layout, no-JS content, and reduced-motion behavior.
+Do not claim production admissions, live staff contact, or real institutional offerings.
+
+- [ ] Add `static/tokens.css` design tokens (locked navy accent `#1f3a5f`, existing status colors
+  preserved, Noto Serif/Sans with system fallbacks, type/space/radius/shadow scales). **AC:**
+  single source of truth consumed by both surfaces; white-on-`--danger` passes WCAG AA.
+- [ ] Mount `/static` and add an unauthenticated `GET /welcome` landing route in a new
+  `landing_routes.py`. **AC:** `/welcome` returns 200 with no cookie; `/` still 303s to `/login`;
+  new Python is fully typed and passes strict mypy + ruff format.
+- [ ] Author brand assets: hand-written `brand/logo.svg` + `favicon.svg` (code), and generate the
+  brand board + `og-image.png` via `/brandkit` (images). **AC:** logo themeable via `currentColor`;
+  code vs image split documented in SUBMISSION/README.
+- [ ] Build `templates/landing.html` + `static/landing.css` (AIDA, prominent fictional-demo badge,
+  single Telegram CTA, honest copy, no em-dashes). **AC:** hero fits viewport; no fabricated claims;
+  renders with no-JS and reduced-motion.
+- [ ] Restyle dashboard: extract inline CSS to `static/app.css`, swap `<style>`→`<link>` in
+  `base.html`/`login.html` only; leave `leads.html`/`lead_detail.html` markup untouched. **AC:**
+  every test-asserted string/markup preserved; all pages render correctly.
+- [ ] Hybrid motion: dashboard CSS hover/focus only; landing uses one IntersectionObserver reveal as
+  progressive enhancement; both honor `prefers-reduced-motion`. **Dependencies:** tokens.css first.
+- [ ] Run `bash scripts/verify.sh` (ruff, ruff format, strict mypy, pytest) and manual page checks;
+  record actual results in CHANGELOG/SUBMISSION; commit the milestone with a plain message.
 
 ## Final verification and submission
 

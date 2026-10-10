@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 
 from admitflow.adapters.sqlite import Repository
-from admitflow.domain.discovery import recommend_courses
+from admitflow.domain.discovery import has_sufficient_guidance_context, recommend_courses
 from admitflow.domain.models import DiscoveryTurn
 from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.domain.qualification import assess_eligibility
@@ -33,25 +33,28 @@ class AdmissionsService:
 
     def start(self, telegram_user_id: str, username: str | None) -> tuple[int, Reply]:
         lead_id = self.repository.upsert_lead(self.tenant_id, telegram_user_id, username)
-        consent = self.openai_processing_consent(lead_id)
-        if consent == "yes":
-            return lead_id, self._discovery_prompt()
-        if consent == "no":
-            return lead_id, self._tap_only_prompt()
-        return lead_id, self._openai_consent_prompt()
+        processing = self.ai_processing_enabled(lead_id)
+        language = self.preferred_language(lead_id)
+        if not processing:
+            return lead_id, self._tap_only_prompt(language)
+        return lead_id, self._discovery_prompt(language)
 
-    def openai_processing_consent(self, lead_id: int) -> str | None:
-        fact = next(
-            (
-                item
-                for item in self.repository.list_facts(lead_id)
-                if item["fact_key"] == "openai_processing_consent"
-            ),
-            None,
-        )
-        return str(fact["fact_value"]) if fact else None
+    def preferred_language(self, lead_id: int) -> str:
+        lead = self.repository.get_lead(lead_id)
+        language = str(lead["preferred_language"]) if lead else "en"
+        return language if language in {"en", "ml", "hi", "hinglish"} else "en"
 
-    def set_ai_processing_consent(self, lead_id: int, allowed: bool) -> Reply:
+    def ai_processing_enabled(self, lead_id: int) -> bool:
+        facts = {
+            str(item["fact_key"]): str(item["fact_value"])
+            for item in self.repository.list_facts(lead_id)
+        }
+        if "openai_processing_enabled" in facts:
+            return facts["openai_processing_enabled"] == "yes"
+        # Respect opt-outs saved by older versions which used this consent-named fact.
+        return facts.get("openai_processing_consent") != "no"
+
+    def set_ai_processing_enabled(self, lead_id: int, enabled: bool) -> Reply:
         speaker_fact = next(
             (
                 item
@@ -62,32 +65,87 @@ class AdmissionsService:
         )
         speaker = str(speaker_fact["fact_value"]) if speaker_fact else "unknown"
         self.repository.save_fact(
-            lead_id, "openai_processing_consent", "yes" if allowed else "no", speaker
+            lead_id, "openai_processing_enabled", "yes" if enabled else "no", speaker
         )
-        if allowed:
-            return self._discovery_prompt()
-        return self._tap_only_prompt()
+        language = self.preferred_language(lead_id)
+        if enabled:
+            return self._discovery_prompt(language)
+        return self._tap_only_prompt(language)
 
-    def _openai_consent_prompt(self) -> Reply:
-        return Reply(
-            "Welcome to Demo Admissions Academy, a fictional sample catalog. To understand free-"
-            "text questions and course interests, this demo sends the message you type to OpenAI; "
-            "FAQ questions may also be sent for matching against sample answers. Messages are "
-            "stored locally. Use demo data only; do not enter real student or personal "
-            "data. Do you agree to OpenAI processing for this demo? You can opt out later.",
-            (
-                ("Agree and continue", "ai:consent:yes"),
-                ("No, use buttons only", "ai:consent:no"),
-                ("🌐 Change language", "language:menu"),
-            ),
+    async def choose_guidance_signal(
+        self,
+        lead_id: int,
+        *,
+        activity_slug: str | None = None,
+        level: str | None = None,
+    ) -> Reply:
+        """Record a validated quick reply and continue the same adaptive turn policy."""
+        if (activity_slug is None) == (level is None):
+            return Reply("Choose one follow-up option so I can continue.")
+        valid_levels = {
+            "vocational_certificate",
+            "diploma",
+            "undergraduate",
+            "postgraduate",
+        }
+        if level is not None and level not in valid_levels:
+            return Reply("Please choose one of the listed sample education levels.")
+        activities = {
+            activity
+            for course in self.repository.list_courses(self.tenant_id)
+            for activity in course.activities
+            if activity_slug is not None and _activity_slug(activity) == activity_slug
+        }
+        if activity_slug is not None and not activities:
+            return Reply("That activity choice is not in the sample catalog. Please choose again.")
+        turn = DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=(),
+            education_level=level,
+            interests=(),
+            activities=tuple(sorted(activities)),
+            unsure=False,
+            correct_previous=False,
         )
+        return await self._handle_discovery_turn(lead_id, turn, "")
 
-    def _discovery_prompt(self) -> Reply:
+    def _discovery_prompt(self, language: str = "en") -> Reply:
+        copy = {
+            "en": "This is fictional demo guidance, not an admissions decision. Typed messages "
+            "are sent to OpenAI to help match sample courses; messages are stored locally. Use "
+            "demo text only, not real student or personal data. What are you "
+            "thinking about studying, or what do you enjoy doing? You can type a course or "
+            "interest in your own words, say you're not sure, or choose a shortcut. Most other "
+            "demo replies remain in English; translated copy needs fluent-speaker review. Please "
+            "use demo text only. You can turn OpenAI processing off at any time.",
+            "hi": "यह काल्पनिक डेमो मार्गदर्शन है, प्रवेश निर्णय नहीं। आपके लिखे संदेश नमूना कोर्स "
+            "मिलाने के लिए OpenAI को भेजे जाते हैं और स्थानीय रूप से सहेजे जाते हैं। केवल डेमो "
+            "जानकारी लिखें, असली छात्र या निजी जानकारी नहीं। आप क्या पढ़ने के बारे में सोच "
+            "रहे हैं, या आपको क्या करना पसंद है? आप अपने शब्दों "
+            "में कोर्स या रुचि लिख सकते हैं, कह सकते हैं कि अभी तय नहीं है, या नीचे विकल्प चुन सकते "
+            "हैं। डेमो के ज़्यादातर जवाब अभी अंग्रेज़ी में हैं; अनुवाद की समीक्षा बाकी है। आप "
+            "केवल डेमो जानकारी लिखें। OpenAI प्रोसेसिंग कभी भी बंद कर सकते हैं।",
+            "ml": "ഇത് സാങ്കൽപ്പിക ഡെമോ മാർഗനിർദ്ദേശമാണ്, പ്രവേശന തീരുമാനം അല്ല. മാതൃകാ കോഴ്സുകൾ "
+            "കണ്ടെത്താൻ നിങ്ങൾ ടൈപ്പ് ചെയ്യുന്ന സന്ദേശങ്ങൾ OpenAI-ലേക്ക് അയയ്ക്കുകയും പ്രാദേശികമായി "
+            "സൂക്ഷിക്കുകയും ചെയ്യും. ഡെമോ വിവരങ്ങൾ മാത്രം നൽകുക; യഥാർത്ഥ വ്യക്തിഗത വിവരങ്ങൾ "
+            "നൽകരുത്. നിങ്ങൾ എന്താണ് "
+            "പഠിക്കാൻ ആലോചിക്കുന്നത്, അല്ലെങ്കിൽ എന്ത് ചെയ്യാനാണ് ഇഷ്ടം? "
+            "കോഴ്സോ താൽപര്യമോ നിങ്ങളുടെ വാക്കുകളിൽ ടൈപ്പ് ചെയ്യാം, ഉറപ്പില്ലെന്ന് പറയാം, അല്ലെങ്കിൽ "
+            "താഴെയുള്ളൊരു വഴി തിരഞ്ഞെടുക്കാം. ഡെമോയുടെ മിക്ക മറുപടികളും ഇപ്പോൾ ഇംഗ്ലീഷിലാണ്; "
+            "വിവർത്തനത്തിന് വിദഗ്ധ പരിശോധന വേണം. OpenAI പ്രോസസ്സിംഗ് എപ്പോൾ വേണമെങ്കിലും ഓഫ് "
+            "ചെയ്യാം. ഡെമോ ടെക്സ്റ്റ് മാത്രം ഉപയോഗിക്കുക.",
+            "hinglish": "Yeh fictional demo guidance hai, admission decision nahi. Sample courses "
+            "match karne ke liye typed messages OpenAI ko bheje aur locally save kiye jaate hain. "
+            "Sirf demo text use karein; real student ya personal details nahi. Aap kya study "
+            "karne ka soch rahe hain, ya aapko kya karna pasand hai? "
+            "Course ya interest apne words mein likhein, unsure bol sakte hain, ya neeche shortcut "
+            "chunein. Demo ke most replies abhi English mein hain; translation ko fluent speaker "
+            "review karega. Sirf demo text use karein. OpenAI processing kabhi bhi off kar "
+            "sakte hain.",
+        }
         return Reply(
-            "This is fictional demo guidance, not an admissions decision. What are you thinking "
-            "about studying, or what do you enjoy doing? You can type a course or interest in "
-            "your own words, say you're not sure, or choose a shortcut. Please keep using demo "
-            "text only; you can turn OpenAI processing off at any time.",
+            copy.get(language, copy["en"]),
             (
                 ("I know a course", "path:course"),
                 ("I know the field", "path:field"),
@@ -97,16 +155,58 @@ class AdmissionsService:
             ),
         )
 
-    def _tap_only_prompt(self) -> Reply:
+    def _tap_only_prompt(self, language: str = "en") -> Reply:
+        copy = {
+            "en": (
+                "OpenAI processing is off for this chat. I won't send typed messages to OpenAI. "
+                "You can still explore or browse using the buttons below; avoid typing personal "
+                "details because messages are stored locally.",
+                "Explore by field",
+                "Explore with choices",
+                "Browse sample courses",
+                "Choose a known course",
+                "Turn on OpenAI processing",
+            ),
+            "hi": (
+                "इस चैट में OpenAI प्रोसेसिंग बंद है। आपके लिखे संदेश OpenAI को नहीं भेजे जाएंगे। "
+                "नीचे के बटनों से कोर्स देखें। निजी जानकारी न लिखें; संदेश स्थानीय रूप से सहेजे जाते "
+                "हैं।",
+                "विषय चुनें",
+                "विकल्पों से खोजें",
+                "नमूना कोर्स देखें",
+                "कोर्स चुनें",
+                "OpenAI प्रोसेसिंग चालू करें",
+            ),
+            "ml": (
+                "ഈ ചാറ്റിൽ OpenAI പ്രോസസ്സിംഗ് ഓഫ് ആണ്. നിങ്ങൾ ടൈപ്പ് ചെയ്യുന്ന സന്ദേശങ്ങൾ OpenAI-ലേക്ക് "
+                "അയയ്ക്കില്ല. താഴെയുള്ള ബട്ടണുകൾ ഉപയോഗിച്ച് കോഴ്സുകൾ കാണാം. സ്വകാര്യ വിവരങ്ങൾ "
+                "നൽകരുത്; സന്ദേശങ്ങൾ പ്രാദേശികമായി സൂക്ഷിക്കും.",
+                "മേഖല തിരഞ്ഞെടുക്കുക",
+                "ഓപ്ഷനുകളിലൂടെ കണ്ടെത്തുക",
+                "മാതൃകാ കോഴ്സുകൾ കാണുക",
+                "കോഴ്സ് തിരഞ്ഞെടുക്കുക",
+                "OpenAI പ്രോസസ്സിംഗ് ഓൺ ചെയ്യുക",
+            ),
+            "hinglish": (
+                "Is chat mein OpenAI processing band hai. Aapke typed messages OpenAI ko nahi "
+                "bheje jayenge. Neeche buttons se courses explore karein. Personal details mat "
+                "bhejein; messages local database mein save hote hain.",
+                "Field se explore karein",
+                "Choices se explore karein",
+                "Sample courses dekhein",
+                "Course choose karein",
+                "OpenAI processing chalu karein",
+            ),
+        }
+        text, field, explore, browse, course, enable = copy.get(language, copy["en"])
         return Reply(
-            "OpenAI processing is off for this chat. I won't send typed messages to OpenAI. "
-            "You can still explore or browse using the buttons below; avoid typing personal "
-            "details because messages are stored locally.",
+            text,
             (
-                ("Explore by field", "path:field"),
-                ("Help me explore with choices", "path:explore"),
-                ("Browse sample courses", "path:browse"),
-                ("Choose a known course", "path:course"),
+                (field, "path:field"),
+                (explore, "path:explore"),
+                (browse, "path:browse"),
+                (course, "path:course"),
+                (enable, "ai:processing:on"),
             ),
         )
 
@@ -405,25 +505,23 @@ class AdmissionsService:
             return Reply("Please choose one of the listed demo languages.")
         self.repository.update_lead(lead_id, preferred_language=language)
         self.repository.save_fact(lead_id, "preferred_language", language)
-        # The short demo flow is localized incrementally; unreviewed strings stay visibly marked.
-        welcome = {
-            "en": "English preference saved. Most demo replies are still in English; language "
-            "copy is incomplete and needs fluent-speaker review.",
-            "ml": "മലയാളം ഭാഷാ മുൻഗണന സേവ് ചെയ്തു. ഡെമോ മറുപടികളിൽ ഭൂരിഭാഗവും ഇപ്പോഴും ഇംഗ്ലീഷിലാണ്; "
-            "മലയാളം പകർപ്പിന് ഭാഷാ വിദഗ്ധരുടെ പരിശോധന വേണം.",
-            "hi": "हिंदी भाषा प्राथमिकता सहेजी गई। डेमो के ज़्यादातर जवाब अभी अंग्रेज़ी में हैं; "
-            "हिंदी पाठ की समीक्षा ज़रूरी है।",
-            "hinglish": "Hinglish preference save ho gayi. Demo ke most replies abhi English mein "
-            "hain; translated copy ko fluent speaker se review karna baaki hai.",
-        }[language]
-        return Reply(
-            welcome, (("Start / change path", "menu:start"), ("Choose language", "language:menu"))
-        )
+        processing = self.ai_processing_enabled(lead_id)
+        if not processing:
+            return self._tap_only_prompt(language)
+        return self._discovery_prompt(language)
 
-    def language_menu(self) -> Reply:
+    def language_menu(self, lead_id: int | None = None) -> Reply:
+        language = self.preferred_language(lead_id) if lead_id is not None else "en"
+        messages = {
+            "en": "Choose a demo language. Most replies are currently English; other copy "
+            "needs fluent-speaker review.",
+            "hi": "डेमो की भाषा चुनें। ज़्यादातर जवाब अभी अंग्रेज़ी में हैं; बाकी अनुवाद की समीक्षा बाकी है।",
+            "ml": "ഡെമോ ഭാഷ തിരഞ്ഞെടുക്കുക. മിക്ക മറുപടികളും ഇപ്പോൾ ഇംഗ്ലീഷിലാണ്; മറ്റ് വിവർത്തനങ്ങൾ പരിശോധിക്കണം.",
+            "hinglish": "Demo language chunein. Most replies abhi English mein hain; baaki copy "
+            "ko fluent speaker review karega.",
+        }
         return Reply(
-            "Choose a demo language. Most replies are currently English; localized copy needs "
-            "fluent-speaker review.",
+            messages.get(language, messages["en"]),
             (
                 ("English", "language:en"),
                 ("മലയാളം", "language:ml"),
@@ -573,7 +671,7 @@ class AdmissionsService:
     async def free_text(self, lead_id: int, text: str, intent_router: IntentRouter | None) -> Reply:
         lead = self.repository.get_lead(lead_id)
         if _is_ai_opt_out(text):
-            return self.set_ai_processing_consent(lead_id, False)
+            return self.set_ai_processing_enabled(lead_id, False)
         if lead and lead["state"] == "awaiting_marks":
             return self.answer_marks(lead_id, text)
         if _is_deletion_request(text):
@@ -668,7 +766,7 @@ class AdmissionsService:
                 "pricing, and terms are not confirmed. "
                 f"{handoff.text}"
             )
-        if self.openai_processing_consent(lead_id) != "yes":
+        if not self.ai_processing_enabled(lead_id):
             return self._tap_only_prompt()
         if self.discovery_interpreter is not None:
             try:
@@ -877,11 +975,55 @@ class AdmissionsService:
             interests.add(str(field))
         activities = set(str(activities_fact).split("|")) if activities_fact else set()
         if interests or activities:
+            level = str(level_fact) if level_fact else None
+            if not has_sufficient_guidance_context(
+                interests=interests, activities=activities, level=level
+            ):
+                if interests:
+                    candidate_courses = recommend_courses(
+                        courses, interests=interests, activities=set(), limit=10
+                    )
+                    activity_choices = tuple(
+                        (
+                            _activity_label(activity),
+                            f"guidance:activity:{_activity_slug(activity)}",
+                        )
+                        for activity in dict.fromkeys(
+                            activity
+                            for match in candidate_courses
+                            for activity in match.course.activities
+                        )
+                    )[:3]
+                    return Reply(
+                        "You mentioned "
+                        f"{', '.join(sorted(interests))}. What would you like to do or learn "
+                        "more about in that area? You can choose an example or tell me your "
+                        "study level.",
+                        activity_choices
+                        + tuple(
+                            (label, f"guidance:level:{value}")
+                            for label, value in (
+                                ("Certificate / vocational", "vocational_certificate"),
+                                ("Diploma", "diploma"),
+                                ("Undergraduate", "undergraduate"),
+                                ("Postgraduate", "postgraduate"),
+                            )
+                        ),
+                    )
+                return Reply(
+                    f"You mentioned {', '.join(sorted(activities))}. What topics would you "
+                    "like to explore through those activities? You can choose a field or describe "
+                    "one in your own words.",
+                    tuple(
+                        (field.replace("/", " & ").title(), f"field:{field}")
+                        for field in sorted({course.field for course in courses})
+                    ),
+                )
             matches = recommend_courses(
                 courses,
                 interests=interests,
                 activities=activities,
-                level=str(level_fact) if level_fact else None,
+                level=level,
                 limit=3,
             )
             if matches:
@@ -976,6 +1118,17 @@ def _is_ai_opt_out(text: str) -> bool:
             "don t send to openai",
             "don t send openai",
             "no ai processing",
+            "openai processing band karo",
+            "openai processing band karein",
+            "ai band karo",
+            "consent wapas lo",
+            "meri consent wapas lo",
+            "openai प्रोसेसिंग बंद करें",
+            "एआई बंद करें",
+            "मेरी सहमति वापस लें",
+            "openai പ്രോസസ്സിംഗ് ഓഫ് ചെയ്യുക",
+            "ai ഓഫ് ചെയ്യുക",
+            "സമ്മതം പിൻവലിക്കുക",
         }
     )
 

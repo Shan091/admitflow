@@ -1,6 +1,6 @@
 import pytest
 
-from admitflow.domain.discovery import recommend_courses
+from admitflow.domain.discovery import has_sufficient_guidance_context, recommend_courses
 from admitflow.domain.models import Course
 from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.domain.qualification import assess_eligibility
@@ -38,6 +38,26 @@ def test_fee_formatting_uses_rupees_and_paise() -> None:
 def test_fee_formatting_rejects_negative_amount() -> None:
     with pytest.raises(ValueError):
         format_inr_from_paise(-1)
+
+
+@pytest.mark.parametrize(
+    ("interests", "activities", "level", "expected"),
+    [
+        ({"tech/data"}, set(), None, False),
+        ({"tech/data"}, {"making charts"}, None, True),
+        ({"tech/data"}, set(), "diploma", True),
+        (set(), {"making charts"}, None, False),
+        (set(), set(), "diploma", False),
+        (set(), set(), None, False),
+    ],
+)
+def test_guidance_needs_two_complementary_signals_before_recommendation(
+    interests: set[str], activities: set[str], level: str | None, expected: bool
+) -> None:
+    assert (
+        has_sufficient_guidance_context(interests=interests, activities=activities, level=level)
+        is expected
+    )
 
 
 def _course(

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdmitFlow - conversational admissions demo</title>
+  <meta name="description" content="AdmitFlow is a fictional, conversational admissions assistant demo: explore courses, check eligibility in code, and pay a test-mode fee, all by chat, in your language.">
+  <link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/tokens.css">
+  <link rel="stylesheet" href="/static/landing.css">
+</head>
+<body class="landing">
+  <header class="wrap">
+    <nav class="nav">
+      <a class="brand" href="/welcome">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 24 C 11 24, 12 15.5, 16 15.5 S 22 7.5, 27 7.5"/><circle cx="5" cy="24" r="2.1" fill="currentColor" stroke="none"/><circle cx="16" cy="15.5" r="2.1" fill="currentColor" stroke="none"/><circle cx="27" cy="7.5" r="2.1" fill="currentColor" stroke="none"/></svg>
+        AdmitFlow
+      </a>
+      <span class="nav-links">
+        <a class="muted" href="#how">How it works</a>
+        <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open the demo on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
+      </span>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div class="hero-copy">
+        <span class="pill">Fictional admissions demo</span>
+        <h1>Explore, qualify, and <span class="em">apply</span> by chat.</h1>
+        <p class="lead">A conversational admissions assistant for a fictional institution. It guides students in their own language, and never invents the facts.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open the demo on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
+          <a class="btn btn-ghost" href="#how">See how it works</a>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="welcome-shell">
+          <aside class="welcome-card" aria-label="The same welcome, in four languages">
+            <p class="cap">One welcome, four languages</p>
+            <ul>
+              <li><span class="greet">Hello! Shall we find a course together?</span><span class="lang">English</span></li>
+              <li><span class="greet">നമസ്കാരം! നമുക്ക് ഒരുമിച്ച് ഒരു കോഴ്‌സ് കണ്ടെത്താം?</span><span class="lang">Malayalam</span></li>
+              <li><span class="greet">नमस्ते! चलिए मिलकर एक कोर्स ढूँढें?</span><span class="lang">Hindi</span></li>
+              <li><span class="greet">Hi! Chalo saath me ek course dhoondhte hain?</span><span class="lang">Hinglish</span></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="wrap section reveal">
+      <div class="section-head">
+        <span class="pill">How it works</span>
+        <h2>A guided path, from first question to application.</h2>
+        <p>Every answer that matters is computed in code, so the conversation stays consistent and honest.</p>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <span class="num">01</span>
+          <h3>Discover</h3>
+          <p>Tell the bot what you are curious about, or ask it to help you explore. It remembers what you and your family mention.</p>
+        </div>
+        <div class="step-card">
+          <span class="num">02</span>
+          <h3>Qualify</h3>
+          <p>Eligibility is checked against sample rules in code, so the answer stays consistent and is never guessed by a model.</p>
+        </div>
+        <div class="step-card">
+          <span class="num">03</span>
+          <h3>Ask</h3>
+          <p>Admissions questions are answered from a fixed, fictional FAQ. When it is not sure, it says so instead of making something up.</p>
+        </div>
+        <div class="step-card">
+          <span class="num">04</span>
+          <h3>Apply</h3>
+          <p>If you qualify, it shares a test-mode application-fee link in rupees. No real payment is ever taken.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section reveal">
+      <div class="section-head">
+        <h2>Built to be honest.</h2>
+        <p>AdmitFlow is designed to say less, truthfully, rather than more.</p>
+      </div>
+      <div class="trust">
+        <div class="trust-item">
+          <strong>Facts come from code</strong>
+          <p>Eligibility and fees are computed from seeded, structured data, not written by the language model.</p>
+        </div>
+        <div class="trust-item">
+          <strong>It fails closed</strong>
+          <p>If search or indexing is unavailable, AdmitFlow stays quiet rather than answering with a guess.</p>
+        </div>
+        <div class="trust-item">
+          <strong>Nothing here is real</strong>
+          <p>The institution, courses, fees, and conversations are fictional samples built for a hackathon.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="cta-panel reveal">
+        <h2>Try the demo yourself.</h2>
+        <p>Open a chat with the demo bot and walk through discovery, eligibility, and a test-mode application fee.</p>
+        <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open the demo on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
+        <p class="note">Staff can open the read-only dashboard at <a href="/login">/login</a>, which requires local demo credentials.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <a class="brand" href="/welcome">
+      <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 24 C 11 24, 12 15.5, 16 15.5 S 22 7.5, 27 7.5"/><circle cx="5" cy="24" r="2.1" fill="currentColor" stroke="none"/><circle cx="16" cy="15.5" r="2.1" fill="currentColor" stroke="none"/><circle cx="27" cy="7.5" r="2.1" fill="currentColor" stroke="none"/></svg>
+      AdmitFlow
+    </a>
+    <p>A fictional demonstration built for the DevDay Exchange Community Hackathon, Kochi. The institution, courses, fees, and conversations shown are not real, and no genuine admissions decision or payment is made.</p>
+  </footer>
+
+  <script src="/static/landing.js"></script>
+</body>
+</html>

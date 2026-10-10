@@ -3,6 +3,46 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — adaptive follow-up before a course recommendation
+
+- **Task:** Make free-text course guidance multi-turn when a learner has shared only a broad
+  interest, without adding a gate for learners who already name a course.
+- **Assistance:** Codex added a tested two-signal domain rule, a tailored activity/level follow-up,
+  validated tap callbacks that feed the existing discovery policy, and removed outdated consented-
+  message wording from the domain model. The product has no affirmative-consent prompt.
+- **Checks:** Focused domain/admissions tests passed (49); `bash scripts/verify.sh` passed Ruff
+  lint/format, strict mypy, and 89 tests. No live API call or real student data was used.
+- **Human review:** Product owner explicitly confirmed that the conversation should not require
+  user consent before OpenAI-assisted guidance.
+
+## 2026-10-11 — remove affirmative OpenAI consent gate
+
+- **Task:** Implement the updated hackathon product decision that AI processing should start
+  without an affirmative-consent step.
+- **Assistance:** Codex changed `/start` to show an OpenAI/local-storage/demo-data disclosure and
+  continue into discovery, added persistent opt-out/re-enable preference controls, preserved legacy
+  opt-out records, and revised the feature, spec, and submission documentation. The disclosure is
+  not a legal/privacy determination.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 82 tests;
+  `git diff --check` passed. No live API call or student data was used for this change.
+- **Human review:** The product owner requested removal of the affirmative consent prompt. Fluent
+  review of translated disclosure text and privacy/legal review remain outstanding.
+
+## 2026-10-11 — AdmitFlow public visual design
+
+- **Task:** Finish the public landing page and align it with the existing staff dashboard styles.
+- **Assistance:** Codex audited the product spec and existing design checklist, completed the
+  responsive `/welcome` page and shared visual styles, added an openly usable Pexels photo with
+  visible credit, clarified public vs. staff routes in the README, and added an unauthenticated
+  route/static-asset regression test. Copy continues to identify the institution and catalog as
+  fictional. No real applicant data or secrets were used.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 72 tests;
+  `git diff --check` passed. Playwright checked the rendered desktop and 390px layouts, image load,
+  and mobile horizontal overflow. Automated requests used a temporary SQLite database.
+- **Human review/limitations:** The selected brand direction is calm, navy-led, and trust-focused.
+  The page still needs an eventual dedicated social preview image; the included student photo is
+  illustrative and credited to its Pexels creator.
+
 ## 2026-10-11 — consent-gated conversational intake
 
 - **Task:** Add a broader fictional catalog and let students describe interests or known courses

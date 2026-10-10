@@ -61,6 +61,27 @@ def test_health_and_dashboard_require_staff_login(tmp_path: Path) -> None:
         assert client.get(f"/leads/{lead_id}", follow_redirects=False).status_code == 303
 
 
+def test_public_welcome_and_static_design_assets_do_not_require_login(tmp_path: Path) -> None:
+    settings = Settings(
+        telegram_bot_token=None,
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=tmp_path / "demo.sqlite3",
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+    )
+
+    with TestClient(create_app(settings)) as client:
+        welcome = client.get("/welcome")
+        assert welcome.status_code == 200
+        assert "conversational admissions assistant for a fictional institution" in welcome.text
+        assert "Open the demo on Telegram" in welcome.text
+        assert client.get("/static/tokens.css").status_code == 200
+        assert client.get("/static/brand/favicon.svg").status_code == 200
+        assert client.get("/", follow_redirects=False).headers["location"] == "/login"
+
+
 def test_staff_can_delete_demo_records_with_confirmation_and_csrf(
     tmp_path: Path,
 ) -> None:

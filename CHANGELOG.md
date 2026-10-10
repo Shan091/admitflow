@@ -1,5 +1,52 @@
 # Changelog
 
+## 2026-10-11 — require more than a broad interest before recommending
+
+- **Change:** Add a domain policy requiring an expressed interest plus an activity or study level
+  before conversational discovery recommends courses. Thin context now produces one targeted
+  follow-up with validated activity/level tap replies; known-course lookup remains a direct path.
+- **Validation:** Focused domain/admissions tests passed (49 tests). `bash scripts/verify.sh` passed
+  Ruff lint/format, strict mypy, and all 89 tests after formatting; `git diff --check` passed.
+- **Reason:** A broad interest such as “I like design” should lead to useful exploration rather than
+  an immediate course list, while learners who already know their course should not be forced
+  through extra questions.
+
+## 2026-10-11 — remove affirmative OpenAI consent gate
+
+- **Change:** Start AI-assisted discovery after disclosing OpenAI processing and local storage.
+  Enable it by default, persist opt-out/re-enable preferences, and keep button-only exploration
+  available while processing is off. Preserve older opt-out records.
+- **Validation:** `bash scripts/verify.sh` passed: Ruff lint, formatting, strict mypy, and 82 pytest
+  tests; `git diff --check` passed. Commit and push are pending.
+- **Reason:** The hackathon product decision removes the consent prompt while keeping the data use
+  visible and giving users an ongoing processing control. This is not a legal/privacy determination.
+
+## 2026-10-11 — opt-out priority across conversation states
+
+- **Change:** Move textual OpenAI opt-out handling ahead of qualification-state parsing, so a
+  student can revoke consent even while the bot is waiting for marks. Cover common apostrophe and
+  spacing variants.
+- **Validation:** `bash scripts/verify.sh` passed with 73 tests (Ruff, format, strict mypy, pytest);
+  `git diff --check` passed. Push and matching GitHub Actions result are pending.
+- **Reason:** Consent withdrawal must work at any point in a conversation.
+
+## 2026-10-11 — public landing page and visual system
+
+- **Change:** Added the public `/welcome` admissions-demo page, a shared self-hosted type and
+  color foundation, brand marks, static assets, and consistent dashboard/login styling. Reworked
+  the landing page with a responsive split hero, an explicitly illustrative and credited Pexels
+  photo, a four-step explanation, grounded-claims section, and working Telegram CTA. `/` remains
+  staff-login protected. Added a public-route/static-asset regression check.
+- **Why:** Give AdmitFlow a clear, professional first impression for students and families while
+  keeping the fictional demo boundary and the staff dashboard visible.
+- **Validation:** `bash scripts/verify.sh` passed: Ruff lint, formatting, strict mypy, and 72
+  pytest tests. `git diff --check` passed. Manual Playwright checks confirmed `/welcome` loads,
+  the hero image loads, and the mobile layout at 390px has no horizontal overflow. Reduced-motion
+  and no-JavaScript content behavior are implemented progressively in CSS/JS.
+- **Limitations:** No real institution, course offering, admission outcome, or payment is shown.
+  The illustrative Pexels image requires an internet connection. No dedicated social preview image
+  is included.
+
 ## 2026-10-11 — consent-gated adaptive text discovery
 
 - **Change:** Expanded the fictional seed catalog to 28 complete sample offerings across five

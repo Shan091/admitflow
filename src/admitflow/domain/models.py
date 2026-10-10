@@ -23,7 +23,7 @@ class Course:
 
 @dataclass(frozen=True, slots=True)
 class DiscoveryTurn:
-    """Catalog-bounded interpretation of one consented chat message."""
+    """Catalog-bounded interpretation of one chat message."""
 
     intent: Literal[
         "discovery", "course_lookup", "knowledge_question", "staff_request", "out_of_scope", "other"

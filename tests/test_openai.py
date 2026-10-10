@@ -1,4 +1,4 @@
-"""Offline contract tests for consented OpenAI structured discovery extraction."""
+"""Offline contract tests for OpenAI structured discovery extraction."""
 
 import json
 from types import SimpleNamespace
