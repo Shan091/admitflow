@@ -12,6 +12,7 @@ from admitflow.domain.models import Course
 
 @pytest.mark.asyncio
 async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -> None:
+    assert "learning_goals" in _DiscoveryPayload.model_json_schema()["required"]
     adapter = OpenAIAdapter("test-key", "test-model", "test-embedding")
     parsed = _DiscoveryPayload(
         intent="discovery",
@@ -20,6 +21,7 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
         education_level="diploma",
         interests=["data", "unseeded interest"],
         activities=["making charts", "unseeded activity"],
+        learning_goals=["analyze data", "unseeded goal"],
         unsure=False,
         correct_previous=False,
     )
@@ -36,6 +38,7 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
         field="tech/data",
         interests=("data",),
         activities=("making charts",),
+        learning_goals=("analyze data",),
         prerequisites=("Sample entry requirement",),
     )
 
@@ -45,11 +48,13 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
     assert result.fields == ("tech/data",)
     assert result.interests == ("data",)
     assert result.activities == ("making charts",)
+    assert result.learning_goals == ("analyze data",)
     call = parse.await_args.kwargs
     assert call["store"] is False
     assert call["text_format"] is _DiscoveryPayload
     sent = json.loads(call["input"])
     assert sent["current_user_message"] == "I enjoy charts and want a diploma in data"
+    assert sent["allowed_learning_goals"] == ["analyze data"]
     assert "telegram_user_id" not in call["input"]
     assert "transcript" not in call["input"]
     assert "untrusted data" in call["instructions"]

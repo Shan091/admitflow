@@ -132,6 +132,11 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply = admissions.set_ai_processing_enabled(lead_id, False)
     elif data.startswith("path:"):
         reply = admissions.begin_path(lead_id, data.removeprefix("path:"))
+    elif data.startswith("guidance:goal:"):
+        goal_slug = data.removeprefix("guidance:goal:")
+        reply = await admissions.choose_guidance_goal(
+            lead_id, None if goal_slug == "skip" else goal_slug
+        )
     elif data.startswith("guidance:activity:"):
         reply = await admissions.choose_guidance_signal(
             lead_id, activity_slug=data.removeprefix("guidance:activity:")

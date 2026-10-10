@@ -131,6 +131,7 @@ class Repository:
                 "prerequisites": "TEXT NOT NULL DEFAULT '[]'",
                 "medium": "TEXT NOT NULL DEFAULT 'English'",
                 "language_support": "TEXT NOT NULL DEFAULT '[]'",
+                "learning_goals": "TEXT NOT NULL DEFAULT '[]'",
             }
             for column, declaration in course_migrations.items():
                 if column not in course_columns:
@@ -177,8 +178,8 @@ class Repository:
                     """INSERT INTO courses
                     (id, tenant_id, name, description, minimum_marks_percent, application_fee_paise,
                      education_level, field, interests, activities, prerequisites, medium,
-                     language_support)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     language_support, learning_goals)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(id) DO UPDATE SET
                     tenant_id=excluded.tenant_id, name=excluded.name,
                     description=excluded.description,
@@ -187,7 +188,8 @@ class Repository:
                     education_level=excluded.education_level, field=excluded.field,
                     interests=excluded.interests, activities=excluded.activities,
                     prerequisites=excluded.prerequisites, medium=excluded.medium,
-                    language_support=excluded.language_support""",
+                    language_support=excluded.language_support,
+                    learning_goals=excluded.learning_goals""",
                     (
                         course["id"],
                         catalog["tenant_id"],
@@ -202,6 +204,7 @@ class Repository:
                         json.dumps(course["prerequisites"], ensure_ascii=False),
                         course["medium"],
                         json.dumps(course["language_support"], ensure_ascii=False),
+                        json.dumps(course["learning_goals"], ensure_ascii=False),
                     ),
                 )
             for faq in faqs:
@@ -277,6 +280,7 @@ class Repository:
                 prerequisites=tuple(json.loads(row["prerequisites"])),
                 medium=str(row["medium"]),
                 language_support=tuple(json.loads(row["language_support"])),
+                learning_goals=tuple(json.loads(row["learning_goals"])),
             )
             for row in rows
         ]

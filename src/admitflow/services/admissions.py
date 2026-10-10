@@ -112,10 +112,35 @@ class AdmissionsService:
         )
         return await self._handle_discovery_turn(lead_id, turn, "")
 
+    async def choose_guidance_goal(self, lead_id: int, goal_slug: str | None) -> Reply:
+        """Accept only study goals present in the fictional course catalog."""
+        if goal_slug is None:
+            return self._present_guidance(lead_id)
+        goals = {
+            goal
+            for course in self.repository.list_courses(self.tenant_id)
+            for goal in course.learning_goals
+            if _goal_slug(goal) == goal_slug
+        }
+        if not goals:
+            return Reply("That study goal is not in the sample catalog. Please choose again.")
+        turn = DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=(),
+            education_level=None,
+            interests=(),
+            activities=(),
+            unsure=False,
+            correct_previous=False,
+            learning_goals=tuple(sorted(goals)),
+        )
+        return await self._handle_discovery_turn(lead_id, turn, "")
+
     async def confirm_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
         """Accept only the currently pending summary, never a stale Telegram button."""
-        interests, activities, level = self._student_guidance_context(lead_id)
-        signature = _guidance_signature(interests, activities, level)
+        interests, activities, level, goals = self._student_guidance_context(lead_id)
+        signature = _guidance_signature(interests, activities, level, goals)
         pending = self._fact_value(lead_id, "guidance_pending_signature")
         if not pending:
             return Reply("That confirmation has expired. Your current course path is unchanged.")
@@ -123,7 +148,7 @@ class AdmissionsService:
             pending == signature
             and confirmation_token == _guidance_token(signature)
             and has_sufficient_guidance_context(
-                interests=interests, activities=activities, level=level
+                interests=interests, activities=activities, level=level, learning_goals=goals
             )
         ):
             self.repository.save_fact(lead_id, "guidance_confirmed_signature", signature, "student")
@@ -136,8 +161,8 @@ class AdmissionsService:
 
     async def revise_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
         """Keep the learner's facts but ask what they want to correct or add."""
-        interests, activities, level = self._student_guidance_context(lead_id)
-        signature = _guidance_signature(interests, activities, level)
+        interests, activities, level, goals = self._student_guidance_context(lead_id)
+        signature = _guidance_signature(interests, activities, level, goals)
         pending = self._fact_value(lead_id, "guidance_pending_signature")
         if not pending:
             return Reply("That change prompt has expired. Your current course path is unchanged.")
@@ -154,8 +179,8 @@ class AdmissionsService:
     @staticmethod
     def _guidance_revision_prompt() -> Reply:
         return Reply(
-            "What should I change or add? You can correct an interest, activity, or study level, "
-            "or mention another detail that matters to your choice.",
+            "What should I change or add? You can correct an interest, activity, study goal, or "
+            "study level, or mention another detail that matters to your choice.",
             (
                 ("Choose a field", "path:field"),
                 ("Browse sample courses", "path:browse"),
@@ -170,7 +195,9 @@ class AdmissionsService:
         )
         return str(fact["fact_value"]) if fact else None
 
-    def _student_guidance_context(self, lead_id: int) -> tuple[set[str], set[str], str | None]:
+    def _student_guidance_context(
+        self, lead_id: int
+    ) -> tuple[set[str], set[str], str | None, set[str]]:
         facts = {
             str(item["fact_key"]): str(item["fact_value"])
             for item in self.repository.list_facts(lead_id)
@@ -184,8 +211,10 @@ class AdmissionsService:
             activities.add(facts["interest_activity_student"])
         activities.discard("")
         interests.discard("")
+        goals = set(facts.get("learning_goals_student", "").split("|"))
+        goals.discard("")
         level = facts.get("education_level_student") or None
-        return interests, activities, level
+        return interests, activities, level, goals
 
     def _guidance_reflection(
         self,
@@ -193,6 +222,7 @@ class AdmissionsService:
         interests: set[str],
         activities: set[str],
         level: str | None,
+        goals: set[str],
         signature: str,
     ) -> Reply:
         self.repository.save_fact(lead_id, "guidance_pending_signature", signature, "student")
@@ -202,6 +232,8 @@ class AdmissionsService:
         details = [f"you are interested in {', '.join(sorted(interests))}"]
         if activities:
             details.append(f"you enjoy {', '.join(sorted(activities))}")
+        if goals:
+            details.append(f"you hope to {', '.join(sorted(goals))}")
         if level == "any":
             details.append("you are open to all listed study levels")
         elif level:
@@ -579,7 +611,10 @@ class AdmissionsService:
         if step == "guidance_confirmation":
             context = self._student_guidance_context(lead_id)
             if not has_sufficient_guidance_context(
-                interests=context[0], activities=context[1], level=context[2]
+                interests=context[0],
+                activities=context[1],
+                level=context[2],
+                learning_goals=context[3],
             ):
                 self.repository.delete_fact(lead_id, "guidance_pending_signature")
                 self.repository.update_lead(lead_id, discovery_step="explore")
@@ -588,6 +623,8 @@ class AdmissionsService:
                 )
             signature = _guidance_signature(*context)
             return self._guidance_reflection(lead_id, *context, signature)
+        if step == "guidance_goal":
+            return self._guidance_goal_prompt(lead_id)
         if step == "guidance_revision":
             return self._guidance_revision_prompt()
         if step == "course":
@@ -964,6 +1001,7 @@ class AdmissionsService:
                 "interest_terms",
                 "activity_terms",
                 "interest_activity",
+                "learning_goals",
             ):
                 self.repository.delete_fact(lead_id, f"{key}_{speaker}")
             if speaker == "student":
@@ -974,6 +1012,7 @@ class AdmissionsService:
             or turn.education_level
             or turn.interests
             or turn.activities
+            or turn.learning_goals
         ):
             self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
         if turn.fields:
@@ -1045,15 +1084,49 @@ class AdmissionsService:
                 ),
                 speaker,
             )
+        if turn.learning_goals:
+            goals_key = f"learning_goals_{speaker}"
+            existing_goals = next(
+                (
+                    f["fact_value"]
+                    for f in self.repository.list_facts(lead_id)
+                    if f["fact_key"] == goals_key
+                ),
+                "",
+            )
+            allowed_goals = {goal for course in courses for goal in course.learning_goals}
+            merged_goals = dict.fromkeys(
+                [
+                    *(item for item in existing_goals.split("|") if item),
+                    *(item for item in turn.learning_goals if item in allowed_goals),
+                ]
+            )
+            if merged_goals:
+                self.repository.save_fact(lead_id, goals_key, "|".join(merged_goals), speaker)
         if speaker == "parent" and (
-            turn.fields or turn.interests or turn.activities or turn.education_level
+            turn.fields
+            or turn.interests
+            or turn.activities
+            or turn.education_level
+            or turn.learning_goals
         ):
             return Reply(
                 "I've recorded those as the parent's preferences. The learner's own interests "
                 "should guide recommendations; invite them to share or confirm their preferences.",
                 (("Learner sharing now", "speaker:student"),),
             )
-        if turn.unsure and not (turn.fields or turn.interests or turn.activities):
+        current_interests, current_activities, _, current_goals = self._student_guidance_context(
+            lead_id
+        )
+        if turn.unsure and not (
+            turn.fields
+            or turn.interests
+            or turn.activities
+            or turn.learning_goals
+            or current_interests
+            or current_activities
+            or current_goals
+        ):
             return Reply(
                 "That's okay. What kinds of topics or activities do you enjoy, even outside "
                 "school? You can also choose a field below.",
@@ -1073,6 +1146,7 @@ class AdmissionsService:
                 or turn.education_level
                 or turn.interests
                 or turn.activities
+                or turn.learning_goals
             )
         ):
             return self._guidance_revision_prompt()
@@ -1080,10 +1154,13 @@ class AdmissionsService:
 
     def _present_guidance(self, lead_id: int) -> Reply:
         courses = self.repository.list_courses(self.tenant_id)
-        interests, activities, level = self._student_guidance_context(lead_id)
+        interests, activities, level, goals = self._student_guidance_context(lead_id)
         if interests or activities:
             if not has_sufficient_guidance_context(
-                interests=interests, activities=activities, level=level
+                interests=interests,
+                activities=activities,
+                level=level,
+                learning_goals=goals,
             ):
                 self.repository.delete_fact(lead_id, "guidance_pending_signature")
                 if interests:
@@ -1126,18 +1203,75 @@ class AdmissionsService:
                         for field in sorted({course.field for course in courses})
                     ),
                 )
-            signature = _guidance_signature(interests, activities, level)
+            if not goals:
+                candidates = recommend_courses(
+                    courses,
+                    interests=interests,
+                    activities=activities,
+                    level=None if level == "any" else level,
+                    limit=100,
+                )
+                goal_options = tuple(
+                    dict.fromkeys(
+                        goal for match in candidates for goal in match.course.learning_goals
+                    )
+                )
+                base_signature = _guidance_signature(interests, activities, level)
+                asked_signature = self._fact_value(lead_id, "guidance_goal_prompted_signature")
+                needs_goal = len(candidates) > 3 and len(goal_options) > 1
+                if needs_goal and asked_signature != base_signature:
+                    self.repository.save_fact(
+                        lead_id,
+                        "guidance_goal_prompted_signature",
+                        base_signature,
+                        "student",
+                    )
+                    self.repository.update_lead(lead_id, discovery_step="guidance_goal")
+                    return self._goal_question_reply(goal_options)
+            signature = _guidance_signature(interests, activities, level, goals)
             confirmed = self._fact_value(lead_id, "guidance_confirmed_signature")
             if confirmed == signature:
                 return self._guidance_recommendation_reply(
-                    lead_id, courses, interests, activities, level
+                    lead_id, courses, interests, activities, level, goals
                 )
-            return self._guidance_reflection(lead_id, interests, activities, level, signature)
+            return self._guidance_reflection(
+                lead_id, interests, activities, level, goals, signature
+            )
         self.repository.delete_fact(lead_id, "guidance_pending_signature")
         return Reply(
             "I have not got enough detail to suggest a course yet. What topic or activity would "
             "you like to explore? You can mention a study level too.",
             (("Choose a field", "path:field"), ("Browse sample courses", "path:browse")),
+        )
+
+    def _guidance_goal_prompt(self, lead_id: int) -> Reply:
+        courses = self.repository.list_courses(self.tenant_id)
+        interests, activities, level, goals = self._student_guidance_context(lead_id)
+        if goals:
+            return self._present_guidance(lead_id)
+        candidates = recommend_courses(
+            courses,
+            interests=interests,
+            activities=activities,
+            level=None if level == "any" else level,
+            limit=100,
+        )
+        goal_options = tuple(
+            dict.fromkeys(goal for match in candidates for goal in match.course.learning_goals)
+        )
+        if len(candidates) <= 3 or len(goal_options) <= 1:
+            return self._present_guidance(lead_id)
+        return self._goal_question_reply(goal_options)
+
+    @staticmethod
+    def _goal_question_reply(goal_options: tuple[str, ...]) -> Reply:
+        buttons = tuple(
+            (goal.capitalize(), f"guidance:goal:{_goal_slug(goal)}") for goal in goal_options[:3]
+        ) + (("Skip this question", "guidance:goal:skip"),)
+        return Reply(
+            "What would you most like to learn or be able to do through your studies? "
+            "Choose an example or answer in your own words.",
+            buttons,
         )
 
     def _guidance_recommendation_reply(
@@ -1147,11 +1281,13 @@ class AdmissionsService:
         interests: set[str],
         activities: set[str],
         level: str | None,
+        goals: set[str],
     ) -> Reply:
         matches = recommend_courses(
             courses,
             interests=interests,
             activities=activities,
+            learning_goals=goals,
             level=None if level == "any" else level,
             limit=3,
         )
@@ -1175,11 +1311,17 @@ class AdmissionsService:
         )
 
 
-def _guidance_signature(interests: set[str], activities: set[str], level: str | None) -> str:
+def _guidance_signature(
+    interests: set[str],
+    activities: set[str],
+    level: str | None,
+    learning_goals: set[str] | None = None,
+) -> str:
     context = {
         "interests": sorted(item.casefold() for item in interests),
         "activities": sorted(item.casefold() for item in activities),
         "level": level,
+        "learning_goals": sorted(item.casefold() for item in learning_goals or set()),
     }
     return hashlib.sha256(json.dumps(context, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -1332,6 +1474,10 @@ def _is_accommodation_question(text: str) -> bool:
 
 def _activity_slug(activity: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", activity.casefold()).strip("-")
+
+
+def _goal_slug(goal: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", goal.casefold()).strip("-")
 
 
 def _activity_label(activity: str) -> str:

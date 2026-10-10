@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — add optional catalog-grounded study goals
+
+- **Change:** Add sample learning-goal tags to the 28 fictional courses and an additive SQLite
+  migration. For broad candidate sets with more than one represented learning goal, ask one optional
+  follow-up; learners can skip or resume it. Explicit goals are validated against course metadata,
+  included in stale-confirmation fingerprints, used to filter matches, and shown as fit reasons.
+  Known-course routing remains direct. No job or occupation predictions were added.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 96 tests;
+  `git diff --check` passed. Tests use fictional data and fake OpenAI responses only; no paid API
+  call was made. Commit/push and matching GitHub Actions result are pending.
+- **Reason:** Give undecided learners one more relevant way to distinguish a broad set of sample
+  courses while keeping the question optional, course-bounded, and based on explicit preferences.
+
 ## 2026-10-11 — reflect and confirm preferences before recommendations
 
 - **Change:** Require a brief reflection and explicit confirmation before showing matches from both

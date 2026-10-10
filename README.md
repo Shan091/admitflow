@@ -4,8 +4,9 @@ AdmitFlow is a hackathon demo of an admissions assistant. In Telegram, a student
 OpenAI-assisted free-text discovery, name a known course, describe interests, explore through short
 prompts, or browse/ask a question. OpenAI processing is disclosed at the start and can be switched
 off or back on at any time; button-based exploration remains usable while it is off. Recommendations
-stay inside the fictional catalog and use no aptitude
-score. Eligible undergraduate demo applicants can choose whether to request a Razorpay test-mode fee
+stay inside the fictional catalog, may ask one skippable study-goal question when it can narrow a
+broad set of matches, and use no aptitude score. Eligible undergraduate demo applicants can choose
+whether to request a Razorpay test-mode fee
 link. FAQ answers use seeded institution content, OpenAI embeddings, and local vector search. Staff
 can inspect leads, attributed discovery facts, and handoffs in a dashboard.
 
@@ -102,10 +103,11 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
 ## Demo walkthrough
 
 1. Register the Telegram webhook as described above, then send `/start` to the configured bot.
-2. Read the OpenAI processing notice and use fictional demo text only. Free-text course discovery
-   is enabled by default; describe a known course, interest, activity, or study level, or use the
-   shortcuts. Turn OpenAI processing off to continue with buttons only; it can be turned back on.
-   A learner can pause with the inline action and resume with `/resume`.
+2. Read the OpenAI processing notice and use fictional demo text only; no separate consent step is
+   required. Free-text course discovery is enabled by default; describe a known course, interest,
+   activity, study goal, or study level, or use the shortcuts. Turn OpenAI processing off to
+   continue with buttons only; it can be turned back on. A learner can pause with the inline action
+   and resume with `/resume`.
 3. Select a course. Sample undergraduate options can continue through the code-computed eligibility
    check; other levels show sample prerequisites and create a staff handoff instead of using a
    Grade 12 rule that may not apply.

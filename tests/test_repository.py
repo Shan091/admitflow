@@ -24,7 +24,10 @@ def test_catalog_seeding_is_idempotent_and_fees_are_structured(tmp_path: Path) -
         "undergraduate",
         "postgraduate",
     }
-    assert all(course.field and course.prerequisites and course.medium for course in after)
+    assert all(
+        course.field and course.prerequisites and course.medium and course.learning_goals
+        for course in after
+    )
 
 
 def test_catalog_has_broad_fictional_options_with_complete_sample_facts(
@@ -57,6 +60,7 @@ def test_catalog_has_broad_fictional_options_with_complete_sample_facts(
         and course.activities
         and course.prerequisites
         and course.medium
+        and course.learning_goals
         and course.application_fee_paise > 0
         for course in courses
     )
@@ -127,6 +131,7 @@ def test_initialize_adds_discovery_columns_without_replacing_existing_rows(tmp_p
     with sqlite3.connect(path) as connection:
         columns = {row[1] for row in connection.execute("PRAGMA table_info(courses)")}
     assert "education_level" in columns
+    assert "learning_goals" in columns
 
 
 def test_lead_and_messages_persist_and_duplicate_update_is_ignored(tmp_path: Path) -> None:

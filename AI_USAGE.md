@@ -3,6 +3,22 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — optional study-goal signal for broad course matches
+
+- **Task:** Make course exploration adapt when several offerings match, without expanding into job
+  predictions or requiring every learner to answer the same prompts.
+- **Assistance:** Codex added sample course-owned goal tags, an additive database migration,
+  current-message structured extraction with allowlist validation, a one-time optional goal prompt
+  for broad matches, skip/resume handling, and goal-aware ranking/explanations. Corrections update
+  the confirmation fingerprint. OpenAI processing remains enabled by default, with the existing
+  user-controlled opt-out.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 96 tests;
+  `git diff --check` passed. All test inputs were fictional and OpenAI calls were mocked. No
+  applicant data or API credits were used. Commit/push and GitHub Actions result are pending.
+- **Human review:** Recommendations remain within the fictional course catalog. Goal tags are demo
+  metadata, not independently validated career or employment outcomes. Production quality and
+  privacy reviews remain open.
+
 ## 2026-10-11 — confirm the learner's summary before showing matches
 
 - **Task:** Extend adaptive discovery so every interest-led route reflects facts before course cards

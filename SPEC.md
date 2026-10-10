@@ -17,7 +17,8 @@ admissions system and uses a clearly fictional institution and seeded data.
   free-text discovery is enabled by default and a persistent control can turn it off or back on.
   Opting out preserves button-based browsing and prevents external AI calls for the text. While
   enabled, a stateless structured extraction sees only the current message and allowlisted fictional
-  catalog vocabulary; code validates facts, asks the next question, and ranks at most three
+  catalog vocabulary, including course-owned learning-goal tags; code validates facts, asks an
+  optional goal question only when a broad match can be usefully narrowed, and ranks at most three
   catalog-only matches. Known-course, known-field, unsure/explore, and browse paths remain
   available. No aptitude score or personality label is created.
 - **Qualification:** Undergraduate sample rules are checked by Python. Other levels show their

@@ -5,7 +5,7 @@ import pytest
 from admitflow.adapters.sqlite import Repository
 from admitflow.adapters.vector_store import VectorStore
 from admitflow.domain.models import Course, DiscoveryTurn
-from admitflow.services.admissions import AdmissionsService
+from admitflow.services.admissions import AdmissionsService, Reply
 from admitflow.services.retrieval import RetrievalService
 
 
@@ -32,6 +32,14 @@ class FakeDiscoveryInterpreter:
 class FailingDiscoveryInterpreter:
     async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
         raise RuntimeError("synthetic extraction failure")
+
+
+async def _skip_optional_goal_prompt(
+    service: AdmissionsService, lead_id: int, reply: Reply
+) -> Reply:
+    if any(data == "guidance:goal:skip" for _, data in reply.buttons):
+        return await service.choose_guidance_goal(lead_id, None)
+    return reply
 
 
 @pytest.mark.parametrize(
@@ -313,6 +321,108 @@ async def test_student_can_describe_multiple_facts_without_consent_step(
 
 
 @pytest.mark.asyncio
+async def test_broad_match_gets_optional_goal_question_and_goal_filters_results(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level=None,
+            interests=("technology",),
+            activities=("working with numbers",),
+            unsure=False,
+            correct_previous=False,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    prompt = await service.free_text(lead_id, "I enjoy technology and numbers", None)
+
+    assert "What would you most like to learn" in prompt.text
+    assert any(data.startswith("guidance:goal:") for _, data in prompt.buttons)
+    assert any(data == "guidance:goal:skip" for _, data in prompt.buttons)
+    service.pause_discovery(lead_id)
+    resumed = service.resume_discovery(lead_id)
+    assert resumed.text == prompt.text
+    assert resumed.buttons == prompt.buttons
+    goal_reply = await service.choose_guidance_goal(lead_id, "analyze-data")
+    assert "Did I get that right" in goal_reply.text
+    assert "analyze data" in goal_reply.text
+    old_confirm = next(
+        data for _, data in goal_reply.buttons if data.startswith("guidance:confirm:")
+    )
+    interpreter.turn = DiscoveryTurn(
+        intent="discovery",
+        course_id=None,
+        fields=("tech/data",),
+        education_level=None,
+        interests=("technology",),
+        activities=("working with numbers",),
+        unsure=False,
+        correct_previous=True,
+        learning_goals=("create digital products",),
+    )
+    corrected = await service.free_text(lead_id, "I changed my study goal", None)
+    assert "create digital products" in corrected.text
+    new_confirm = next(
+        data for _, data in corrected.buttons if data.startswith("guidance:confirm:")
+    )
+    assert new_confirm != old_confirm
+    stale = await service.confirm_guidance(lead_id, old_confirm.removeprefix("guidance:confirm:"))
+    assert "create digital products" in stale.text
+
+    results = await service.confirm_guidance(lead_id, new_confirm.removeprefix("guidance:confirm:"))
+    assert "Web Application Development Diploma" in results.text
+    assert "Applied Data Analytics Diploma" not in results.text
+    assert "Supports your study goal: create digital products" in results.text
+
+
+@pytest.mark.asyncio
+async def test_skipping_goal_question_does_not_ask_it_again(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="discovery",
+            course_id=None,
+            fields=("tech/data",),
+            education_level=None,
+            interests=("technology",),
+            activities=("working with numbers",),
+            unsure=False,
+            correct_previous=False,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    prompt = await service.free_text(lead_id, "I like technology and numbers", None)
+    assert "What would you most like to learn" in prompt.text
+
+    reply = await service.choose_guidance_goal(lead_id, None)
+
+    assert "Did I get that right" in reply.text
+    assert "What would you most like to learn" not in reply.text
+
+
+@pytest.mark.asyncio
 async def test_vague_interest_gets_targeted_follow_up_before_recommendations(
     tmp_path: Path,
 ) -> None:
@@ -351,6 +461,7 @@ async def test_vague_interest_gets_targeted_follow_up_before_recommendations(
     reflection = await service.choose_guidance_signal(
         lead_id, activity_slug=activity_choice.removeprefix("guidance:activity:")
     )
+    reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
 
     assert "Did I get that right" in reflection.text
     assert "Digital Design Diploma" not in reflection.text
@@ -389,6 +500,7 @@ async def test_changed_preferences_make_an_old_confirmation_button_stale(
     old_reflection = await service.choose_guidance_signal(
         lead_id, activity_slug=activity_choice.removeprefix("guidance:activity:")
     )
+    old_reflection = await _skip_optional_goal_prompt(service, lead_id, old_reflection)
     old_confirmation = next(
         data for _, data in old_reflection.buttons if data.startswith("guidance:confirm:")
     )
@@ -406,6 +518,7 @@ async def test_changed_preferences_make_an_old_confirmation_button_stale(
     corrected = await service.free_text(
         lead_id, "Actually, business and planning projects fit me better", None
     )
+    corrected = await _skip_optional_goal_prompt(service, lead_id, corrected)
     new_confirmation = next(
         data for _, data in corrected.buttons if data.startswith("guidance:confirm:")
     )
@@ -446,6 +559,7 @@ async def test_guidance_reflection_resumes_and_confirmation_is_path_bound(
     reflection = await service.choose_guidance_signal(
         lead_id, activity_slug=activity_choice.removeprefix("guidance:activity:")
     )
+    reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
     token = next(
         data.removeprefix("guidance:confirm:")
         for _, data in reflection.buttons
@@ -498,6 +612,7 @@ async def test_preference_correction_requires_confirmation_even_if_facts_return_
     )
     lead_id, _ = service.start("123", "student")
     initial = await service.free_text(lead_id, "I like design and making visuals", None)
+    initial = await _skip_optional_goal_prompt(service, lead_id, initial)
     first_token = next(
         data.removeprefix("guidance:confirm:")
         for _, data in initial.buttons
@@ -517,6 +632,7 @@ async def test_preference_correction_requires_confirmation_even_if_facts_return_
         True,
     )
     reconfirm = await service.free_text(lead_id, "I want to reconsider my choices", None)
+    reconfirm = await _skip_optional_goal_prompt(service, lead_id, reconfirm)
 
     assert "Did I get that right" in reconfirm.text
     assert "Digital Design Diploma" not in reconfirm.text
@@ -542,6 +658,7 @@ async def test_guidance_revision_prompt_survives_pause_and_resume(tmp_path: Path
     reflection = await service.choose_guidance_signal(
         lead_id, activity_slug=activity.removeprefix("guidance:activity:")
     )
+    reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
     token = next(
         data.removeprefix("guidance:revise:")
         for _, data in reflection.buttons
@@ -778,6 +895,7 @@ async def test_known_field_recommends_only_complete_catalog_courses_and_persists
     level_reply = service.recommend_field(lead_id, "tech/data")
     assert any(data == "level:any" for _, data in level_reply.buttons)
     reflection = service.choose_level(lead_id, "any")
+    reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
     assert "open to all listed study levels" in reflection.text
     pending = next(data for _, data in reflection.buttons if data.startswith("guidance:confirm:"))
     reply = await service.confirm_guidance(lead_id, pending.removeprefix("guidance:confirm:"))
@@ -896,6 +1014,7 @@ async def test_fixed_catalog_evaluation_matrix_returns_expected_complete_course(
     service.begin_path(lead_id, "explore")
     service.recommend_field(lead_id, field)
     reflection = service.choose_level(lead_id, level)
+    reflection = await _skip_optional_goal_prompt(service, lead_id, reflection)
     assert "Did I get that right" in reflection.text
     confirmation = next(
         data for _, data in reflection.buttons if data.startswith("guidance:confirm:")

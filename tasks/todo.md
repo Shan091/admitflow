@@ -60,8 +60,9 @@ See `tasks/features/conversational-guidance-agent.md`. This extends course disco
 adaptive, evidence-grounded, multi-turn guidance experience; do not treat lifecycle stages as a
 mandatory linear interview.
 
-- [ ] Confirm whether the earlier institution-only boundary still holds or is expanded to discuss
-  occupations/pathways; confirm youngest learner age and any catalog fields to add.
+- [x] Confirm institution-course-only recommendations, with goal exploration and staff referral for
+  out-of-catalog requests; no job or occupation predictions. Production age/privacy policy remains
+  an open gate; hackathon testing uses fictional data only.
 - [ ] Map current conversation behavior and v1 lifecycle semantics to a turn-by-turn adaptive
   interaction model; define the user's open-question start, known-course fast path, exploration,
   recommendation comparison, interrupts, and safe handoffs.
@@ -77,6 +78,9 @@ mandatory linear interview.
 - [ ] Define and test coverage for contradictory/corrected preferences, mixed interests, constraints,
   parent/student conflict, unknown/out-of-catalog requests, sensitive disclosures, provider/RAG
   failures, language switching, deletion, and concurrent/duplicate updates.
+- [ ] Add a catalog-grounded optional study-goal signal for broad/ambiguous interest matches:
+  persist only explicit goals, ask at most one useful follow-up, allow skip, and include goals in
+  correction/confirmation fingerprints and transparent recommendation reasons.
 - [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
   retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
 

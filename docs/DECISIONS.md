@@ -74,6 +74,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     questions, recommendations, fees, and eligibility. No user name, chat ID, or transcript is sent
     as context; privacy/legal review remains a production gate.
 
+18. **Study goals are catalog-owned evidence.** Every fictional course carries a small set of sample
+    learning-goal tags. Extract only goals explicitly stated by the learner and validated against
+    those tags. Ask one optional goal question only when a broad candidate set contains materially
+    different goals; skip it when it is not useful or the learner declines. A stated goal filters
+    recommendations and appears as an explanation. Do not infer a job, occupation, or outcome.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

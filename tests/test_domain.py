@@ -66,6 +66,7 @@ def _course(
     *,
     level: str = "diploma",
     activities: tuple[str, ...] = ("making charts",),
+    learning_goals: tuple[str, ...] = (),
 ) -> Course:
     return Course(
         id=course_id,
@@ -81,6 +82,7 @@ def _course(
         prerequisites=("basic reading",),
         medium="English",
         language_support=("Malayalam discussion support",),
+        learning_goals=learning_goals,
     )
 
 
@@ -102,6 +104,23 @@ def test_recommendations_are_explainable_and_match_only_explicit_preferences() -
         "Matches your interest in data",
         "Includes activities you chose: making charts",
     )
+
+
+def test_explicit_study_goal_filters_and_explains_course_matches() -> None:
+    courses = [
+        _course("data", ("technology",), learning_goals=("analyze data",)),
+        _course("design", ("technology",), learning_goals=("create visual work",)),
+    ]
+
+    matches = recommend_courses(
+        courses,
+        interests={"technology"},
+        activities={"making charts"},
+        learning_goals={"analyze data"},
+    )
+
+    assert [match.course.id for match in matches] == ["data"]
+    assert "Supports your study goal: analyze data" in matches[0].reasons
 
 
 def test_recommendations_filter_by_level_and_exclude_incomplete_catalog_items() -> None:

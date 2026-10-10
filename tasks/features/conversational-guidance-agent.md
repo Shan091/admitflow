@@ -41,11 +41,18 @@ human escalation, and operational requirements are verified.
 - The service now asks for one complementary signal when context is thin, then reflects the
   learner's stated interests/activity/level and waits for confirmation before showing course cards.
   Confirmation is tied to a fingerprint of the current facts, so corrections and path changes make
-  old buttons stale. It still does not explore goals, learning experiences, expected outcomes,
+  old buttons stale. A broad match may now receive one optional follow-up based on fictional
+  course learning-goal tags. It still does not explore learning experiences, expected outcomes,
   constraints, or barriers in a coherent adaptive dialogue.
-- The extractor currently classifies career/profession requests outside the institution catalog as
-  `out_of_scope`. That matches the earlier product decision but may conflict with the newer request
-  for broader career guidance. Resolve this boundary before changing that behavior.
+- The user confirmed institution-course guidance only, using career-guidance conversation methods
+  to explore interests and study goals. Requests beyond the fictional catalog remain out of scope
+  and are referred to the staff handoff; do not add occupation or job predictions.
+- No affirmative consent step is required. Typed messages are disclosed as OpenAI-processed, and
+  the learner can still turn that processing off.
+- Current follow-up implementation adds fictional course-owned learning-goal tags and one optional
+  question when a broad candidate set differs on those tags. It can be skipped or resumed and is
+  evidence of only a small adaptive slice, not a complete goals/barriers exploration or production
+  quality evaluation.
 - Course matching uses direct overlap with seeded interests and activities. It has a first
   deterministic sufficiency/confirmation policy, but that policy still needs evaluation against a
   human-reviewed golden set; there is no validated general-career evidence corpus.
@@ -83,10 +90,8 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 
 ## Existing decisions to preserve
 
-- The earlier explicit scope is institution-course recommendations only, with unsupported needs
-  handed to a counsellor. The newer “career guidance” wording may supersede that; keep the scope
-  change open until clarified. Planning default: use career-guidance conversation techniques while
-  recommending only verified institution offerings.
+- Scope is institution-course recommendations only, with unsupported needs handed to staff. Use
+  career-guidance conversation techniques while recommending only verified institution offerings.
 - Use conversation and optional taps; no aptitude score, personality label, or single objectively
   “right” course.
 - Support vocational/certificate, diploma, undergraduate, and postgraduate learners; the fictional
@@ -113,6 +118,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   known course, known field, exploration, and browsing/questions.
 - A learner can answer in natural language over multiple turns. The next question uses the learner's
   existing facts and asks only for information that can change the next recommendation or action.
+- For a broad match with materially different catalog learning goals, ask at most one optional
+  catalog-grounded goal question. Skip it when a course is known, the learner has already stated a
+  goal, or available matches do not differ on supported goal tags.
 - A known-course learner can jump directly to that offering; ambiguous/unlisted names are clarified
   without inventing a match.
 - An unsure learner receives a short, low-pressure prompt anchored in things they enjoy, have tried,
@@ -136,6 +144,8 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 
 - Add turn-sequence tests rather than testing only isolated extractions: vague opening, follow-up,
   correction, known-course shortcut, interest change, recommendation, interruption, and resume.
+- Add study-goal extraction, metadata completeness, skip, correction, signature freshness, and
+  expected-course ranking tests for the optional goal question.
 - Evaluate fixed fictional dialogues in English, Hindi, Malayalam, and Hinglish; test code-switching,
   short/empty answers, spelling variation, ambiguity, contradictions, prompt injection, parent-child
   disagreement, and unsupported/regulated interests.
@@ -150,14 +160,11 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 
 ## Production gates and open decisions
 
-- **Scope conflict:** earlier institution-only decision vs. newer career-guidance wording. Resolve
-  whether occupation/pathway discussion is in scope; course recommendations can remain catalog-only.
 - **Age policy:** youngest user, treatment of minors, guardian participation and privacy obligations.
 - **Catalog:** new domains/courses, first real institution's catalog, official source ownership,
   completeness and update cadence. Fictional seed data is demo-only.
-- **Guidance data:** authoritative source for occupations, qualifications, and pathway facts if the
-  broader scope is approved; provenance, effective date, review process, licensing, stale-data
-  behavior, and referral when absent.
+- **Guidance data:** complete source ownership and review for the first real institution's course
+  facts; provenance, effective date, update cadence, stale-data behavior, and referral when absent.
 - **People and operations:** real counsellor contact, escalation SLA, business hours, staff takeover,
   monitoring, audit, incident response, and model/provider outage policy.
 - **Privacy/security:** documented purpose and lawful processing basis, age-appropriate notice,

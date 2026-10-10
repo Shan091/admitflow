@@ -26,6 +26,9 @@ class _DiscoveryPayload(BaseModel):
     activities: list[str] = Field(
         description="Exact activity vocabulary explicitly stated by the user."
     )
+    learning_goals: list[str] = Field(
+        description="Exact catalog learning-goal labels the user explicitly wants to pursue."
+    )
     unsure: bool = Field(
         description="Whether the user explicitly says they are unsure or exploring."
     )
@@ -80,6 +83,7 @@ class OpenAIAdapter:
         ]
         interest_values = sorted({item for course in courses for item in course.interests})
         activity_values = sorted({item for course in courses for item in course.activities})
+        goal_values = sorted({item for course in courses for item in course.learning_goals})
         request = {
             "current_user_message": text,
             "catalog_course_ids_and_names": course_options,
@@ -93,6 +97,7 @@ class OpenAIAdapter:
             ],
             "allowed_interest_terms": interest_values,
             "allowed_activity_terms": activity_values,
+            "allowed_learning_goals": goal_values,
         }
         response = await self.client.responses.parse(
             model=self.decisions_model,
@@ -102,9 +107,10 @@ class OpenAIAdapter:
                 "supplied fictional catalog and vocabularies. Select a course ID only when the "
                 "user clearly names that offered course; never infer a course from demographics. "
                 "Do not infer ability, personality, marks, age, gender, income, caste, admission "
-                "eligibility, career outcome, or job prospects. Only record interests or "
-                "activities the user states. If they correct an earlier preference, set "
-                "correct_previous true. "
+                "eligibility, career outcome, or job prospects. Only record interests, activities, "
+                "and study goals the user explicitly states; a goal must exactly match the "
+                "supplied course goal vocabulary. If they correct an earlier preference, set "
+                "correct_previous true. Do not infer job outcomes or occupations. "
                 "Classify unrelated career/profession requests outside the institution catalog as "
                 "out_of_scope. Do not generate user-facing advice or a recommendation."
             ),
@@ -124,6 +130,7 @@ class OpenAIAdapter:
         valid_fields = set(field_values)
         valid_interests = {value.casefold(): value for value in interest_values}
         valid_activities = {value.casefold(): value for value in activity_values}
+        valid_goals = {value.casefold(): value for value in goal_values}
         levels = {
             "vocational_certificate",
             "diploma",
@@ -150,6 +157,11 @@ class OpenAIAdapter:
             ),
             unsure=extracted.unsure,
             correct_previous=extracted.correct_previous,
+            learning_goals=tuple(
+                value
+                for raw in extracted.learning_goals
+                if (value := valid_goals.get(raw.casefold())) is not None
+            ),
         )
 
     async def embed(self, texts: list[str]) -> list[list[float]]:

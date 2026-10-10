@@ -19,6 +19,7 @@ class Course:
     prerequisites: tuple[str, ...] = ()
     medium: str = "English"
     language_support: tuple[str, ...] = ()
+    learning_goals: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,6 +36,7 @@ class DiscoveryTurn:
     activities: tuple[str, ...]
     unsure: bool
     correct_previous: bool
+    learning_goals: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
