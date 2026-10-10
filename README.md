@@ -88,7 +88,10 @@ CI runs on pushes and pull requests; its status applies to the exact commit show
 3. Ask a seeded FAQ question; if retrieval is unavailable or uncertain, the bot says so.
 4. Open the local dashboard, log in, and view the same lead and conversation.
 5. If Razorpay test credentials and a reachable webhook are configured, complete the demo fee
-   link and confirm the dashboard shows `paid` only after the webhook arrives.
+   link. The verified `payment_link.paid` webhook marks the payment as paid and sends one
+   Telegram confirmation with the next step. If Telegram delivery fails, the student can ask “Has
+   my payment gone through?” to check the stored status. Course access is not provisioned
+   automatically; staff can review the application in the dashboard and share the next steps.
 
 ## Current status
 

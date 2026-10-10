@@ -109,3 +109,56 @@ async def test_qualification_sends_test_payment_link_when_enabled(tmp_path: Path
     stored_messages = repository.list_messages(lead_id)
     assert stored_messages[-1]["direction"] == "outbound"
     assert "https://rzp.io/i/test123" in stored_messages[-1]["body"]
+
+
+@pytest.mark.parametrize(
+    ("payment_status", "expected_text"),
+    [
+        ("missing", "don't see a demo application payment link"),
+        ("created", "payment is still pending"),
+        ("paid", "payment is confirmed as paid"),
+    ],
+)
+@pytest.mark.asyncio
+async def test_payment_status_question_uses_persisted_state(
+    tmp_path: Path, payment_status: str, expected_text: str
+) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("42", "sample")
+    admissions.select_course(lead_id, "foundations-computing")
+    admissions.answer_grade12(lead_id, True)
+    admissions.answer_marks(lead_id, "75")
+
+    if payment_status != "missing":
+        payment, created = repository.get_or_create_payment_intent(
+            repository.tenant_id, lead_id, "AF-status-test"
+        )
+        assert created and payment is not None
+        repository.save_payment_link(payment["id"], "plink_status_test", "https://rzp.io/test")
+        if payment_status == "paid":
+            event = {
+                "payload": {
+                    "payment_link": {
+                        "entity": {
+                            "id": "plink_status_test",
+                            "reference_id": "AF-status-test",
+                            "status": "paid",
+                            "amount": 50000,
+                            "amount_paid": 50000,
+                            "currency": "INR",
+                        }
+                    }
+                }
+            }
+            assert repository.apply_razorpay_paid_event("evt-status-test", event) == "applied"
+
+    message = FakeMessage("Has my payment gone through?")
+    update = SimpleNamespace(
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=103,
+    )
+
+    await text_handler(update, context)
+
+    assert expected_text in message.sent[0][0]

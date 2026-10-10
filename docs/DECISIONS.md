@@ -24,8 +24,10 @@ Record consequential choices here. Each entry is short; update it when evidence 
    before RAG; send unknown tuition/hostel charges and refund requests to an explicit safe response.
    Exclude amounts from free-form FAQ chunks. Qualified demo applicants may receive a Razorpay
    Payment Link created in test mode from the server-owned course fee. Never accept a client amount
-   or mark a payment paid from a browser redirect; accept only signature-verified webhooks. Live
-   payments, refunds, uploads, and production finance workflows are deferred.
+   or mark a payment paid from a browser redirect; accept only signature-verified webhooks. The
+   first applied paid event sends one Telegram confirmation; duplicate events do not repeat it.
+   Course access is not automatically provisioned. Live payments, refunds, uploads, and production
+   finance workflows are deferred.
 8. **Staff dashboard access.** Protect dashboard routes with one environment-configured staff
    username/password and a signed, HTTP-only, SameSite=Lax session cookie. No self-registration,
    roles, or production identity provider in the hackathon demo. Missing credentials fail closed.

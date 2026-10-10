@@ -3,6 +3,21 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — Telegram payment confirmation and status lookup
+
+- **Task:** Notify a student after Razorpay confirms a test payment and let them query their
+  persisted payment status.
+- **Assistance:** Codex traced the signed webhook flow, added the one-time Telegram confirmation,
+  read-only payment status response, repository lookup, tests, and documentation. The confirmation
+  states that staff can review the application and share course access steps; it also clarifies that
+  the demo does not provision access automatically.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/formatting, strict mypy, and 41 tests;
+  `git diff --check` passed. Tests used a fake Telegram bot and local database. No live API or
+  notification was triggered.
+- **Human review:** Confirm the next-step wording suits the hackathon demo. The notification is
+  best-effort; if delivery fails, the student can ask “Has my payment gone through?” in Telegram
+  and read the persisted status.
+
 ## 2026-10-11 — live FAQ retrieval calibration
 
 - **Task:** Improve the fixed seeded FAQ retrieval using live OpenAI embeddings, calibrate the

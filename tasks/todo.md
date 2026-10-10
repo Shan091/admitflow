@@ -76,6 +76,12 @@ acceptance criteria pass and the corresponding milestone is committed.
 
 ## Final verification and submission
 
+- [ ] Send a one-time, truthful Telegram confirmation after a verified paid webhook; add a
+  payment-status lookup backed only by persisted Razorpay state and cover the flows with tests.
+- [ ] Run the full verification gate, update feature/docs/logs, commit and push the milestone, and
+  record the matching GitHub Actions result.
+- [ ] Finalize the hackathon submission metadata and demo access details.
+
 - [x] Run `bash scripts/verify.sh`; record actual output and results in `CHANGELOG.md` and `SUBMISSION.md`.
 - [x] Review diff, claims, credentials, and AI usage record; ensure no real applicant data is seeded.
 - [x] Confirm GitHub Actions result for the pushed build commit and record its exact SHA/results.

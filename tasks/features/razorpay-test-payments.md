@@ -12,6 +12,10 @@ Payment Link for the selected course's application fee and show staff the verifi
   request.
 - [x] Only a valid Razorpay webhook signature and matching known payment-link ID/reference/amount
   can transition payment state to paid; duplicate events are idempotent.
+- [ ] The first verified paid webhook sends one Telegram confirmation with a truthful next step;
+  duplicate webhooks do not send duplicate confirmations.
+- [ ] Students can ask for payment status and receive only the status persisted from the verified
+  webhook/payment-link lifecycle.
 - [x] Payment-link creation errors do not claim payment succeeded or break qualification results.
 - [x] Fake HTTP/webhook tests make no live Razorpay requests.
 
@@ -25,6 +29,7 @@ Payment Link for the selected course's application fee and show staff the verifi
 - [x] Add payment schema and repository methods.
 - [x] Add Razorpay Payment Link adapter and wire it to successful qualification.
 - [x] Add signed webhook handling and dashboard payment status.
+- [ ] Notify the student after a verified payment and provide a Telegram payment-status lookup.
 - [x] Add fake-based tests and document test-mode credentials/webhook setup.
 
 ## Verification

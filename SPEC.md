@@ -24,7 +24,8 @@ admissions system and uses a clearly fictional institution and seeded data.
 - **Money boundary:** Application-fee answers come from structured course data; unknown tuition or
   hostel charges and refunds receive a safe response. No model calculates or negotiates fees.
   Qualified demo users can receive a Razorpay test-mode Payment Link using the server-owned
-  application fee; verified webhooks update payment status.
+  application fee; verified webhooks update payment status and send one Telegram confirmation
+  with the next step. Course access is not provisioned automatically.
 
 ## Demo success criteria
 

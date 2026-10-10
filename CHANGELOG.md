@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-11 — Telegram payment confirmation and status lookup
+
+- **Change:** After a signature-verified Razorpay paid event is applied, send one Telegram
+  confirmation describing the next step. Add a student-facing status query backed by the stored
+  payment state, and link a Razorpay Payment Link back to its Telegram user for notification.
+- **Why:** Students need confirmation after checkout and a truthful next action. The demo does not
+  automatically provision course access, so the message says staff can review the application and
+  share the steps.
+- **Files:** `src/admitflow/`, `tests/`, `README.md`, `SPEC.md`, `docs/DECISIONS.md`, `tasks/`, and
+  `AI_USAGE.md`.
+- **Validation:** `bash scripts/verify.sh` passed: Ruff lint and format checks, strict mypy, and
+  41 pytest tests. `git diff --check` passed. Tests use a fake Telegram bot and local SQLite; no
+  live payment or notification was triggered.
+- **Limitations:** If Telegram delivery fails after payment is recorded, the webhook remains
+  accepted; the student can ask the bot “Has my payment gone through?” to read the saved status.
+  Course access is a staff follow-up and is not provisioned by the demo.
+- **Push/CI:** To be recorded after this milestone is pushed and its Actions result is confirmed.
+
 ## 2026-10-11 — live calibration of seeded FAQ retrieval
 
 - **Time:** 01:14 IST

@@ -1,6 +1,8 @@
 import hashlib
 import hmac
+import json
 from pathlib import Path
+from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
 
@@ -93,6 +95,78 @@ def test_razorpay_webhook_endpoint_checks_signature_and_accepts_test_event(tmp_p
         response = client.post("/api/v1/webhooks/razorpay", content=body, headers=headers)
         assert response.status_code == 200
         assert response.json() == {"status": "ignored"}
+
+
+def test_paid_webhook_sends_one_telegram_confirmation_with_next_step(tmp_path: Path) -> None:
+    settings = Settings(
+        telegram_bot_token=None,
+        openai_api_key=None,
+        openai_decisions_model="gpt-6-luna",
+        openai_embedding_model="text-embedding-3-small",
+        database_path=tmp_path / "demo.sqlite3",
+        rag_min_similarity=0.72,
+        rag_min_margin=0.05,
+        razorpay_key_id="rzp_test_key",
+        razorpay_key_secret="test-api-secret",
+        razorpay_webhook_secret="test-webhook-secret",
+    )
+    app = create_app(settings)
+
+    class FakeBot:
+        def __init__(self) -> None:
+            self.sent: list[tuple[int, str]] = []
+
+        async def send_message(self, *, chat_id: int, text: str) -> None:
+            self.sent.append((chat_id, text))
+
+    bot = FakeBot()
+    body = json.dumps(
+        {
+            "event": "payment_link.paid",
+            "payload": {
+                "payment_link": {
+                    "entity": {
+                        "id": "plink_test_123",
+                        "reference_id": "AF-test-reference",
+                        "status": "paid",
+                        "amount": 50000,
+                        "amount_paid": 50000,
+                        "currency": "INR",
+                    }
+                }
+            },
+        }
+    ).encode()
+    signature = hmac.new(b"test-webhook-secret", body, hashlib.sha256).hexdigest()
+
+    with TestClient(app) as client:
+        repository = app.state.repository
+        lead_id = repository.upsert_lead(repository.tenant_id, "42", "sample")
+        repository.update_lead(lead_id, selected_course_id="foundations-computing", eligible=True)
+        payment, created = repository.get_or_create_payment_intent(
+            repository.tenant_id, lead_id, "AF-test-reference"
+        )
+        assert created and payment is not None
+        repository.save_payment_link(payment["id"], "plink_test_123", "https://rzp.io/i/test123")
+        app.state.telegram_application = SimpleNamespace(bot=bot)
+        headers = {
+            "X-Razorpay-Event-Id": "evt-paid-confirmation",
+            "X-Razorpay-Signature": signature,
+        }
+
+        response = client.post("/api/v1/webhooks/razorpay", content=body, headers=headers)
+        assert response.status_code == 200
+        assert response.json() == {"status": "applied"}
+        assert len(bot.sent) == 1
+        chat_id, message = bot.sent[0]
+        assert chat_id == 42
+        assert "Payment successful" in message
+        assert "share course access steps" in message
+        assert "not provisioned automatically" in message
+
+        duplicate = client.post("/api/v1/webhooks/razorpay", content=body, headers=headers)
+        assert duplicate.json() == {"status": "duplicate"}
+        assert len(bot.sent) == 1
 
 
 def test_settings_read_tokens_paths_and_rag_thresholds_from_environment(

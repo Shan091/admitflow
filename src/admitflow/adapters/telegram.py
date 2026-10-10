@@ -1,6 +1,7 @@
 """Telegram handlers and asyncio-compatible bot lifecycle."""
 
 import logging
+import re
 from typing import Any, cast
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -113,7 +114,23 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     repository.add_message(lead_id, "inbound", message.text, update.update_id)
     lead_before = repository.get_lead(lead_id)
-    reply = await admissions.free_text(lead_id, message.text, intent_router)
+    if _is_payment_status_question(message.text):
+        payment = repository.get_payment_for_lead(admissions.tenant_id, lead_id)
+        if payment is None:
+            reply = Reply("I don't see a demo application payment link for you yet.")
+        elif payment["status"] == "paid":
+            reply = Reply("Your demo application payment is confirmed as paid.")
+        elif payment["status"] == "created":
+            reply = Reply(
+                "Your demo application payment is still pending. Complete the Razorpay test-mode "
+                "payment link, then ask again after the webhook is received."
+            )
+        elif payment["status"] == "failed":
+            reply = Reply("Your demo payment link could not be created. Please contact staff.")
+        else:
+            reply = Reply("Your demo payment is still being set up. Please check again shortly.")
+    else:
+        reply = await admissions.free_text(lead_id, message.text, intent_router)
     lead_after = repository.get_lead(lead_id)
     if (
         payment_service is not None
@@ -137,6 +154,22 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         elif lead_after.get("eligible") == 1:
             reply = Reply(f"{reply.text}\n\nThe demo payment link is not available right now.")
     await _send_reply(update, reply, repository, lead_id)
+
+
+def _is_payment_status_question(text: str) -> bool:
+    normalized = re.sub(r"[^a-z0-9]+", " ", text.casefold()).strip()
+    phrases = (
+        "payment status",
+        "payment received",
+        "payment confirmed",
+        "payment go through",
+        "payment gone through",
+        "payment completed",
+        "did i pay",
+        "have i paid",
+        "paid yet",
+    )
+    return any(phrase in normalized for phrase in phrases)
 
 
 async def start_application(

@@ -358,6 +358,16 @@ class Repository:
             ).fetchone()
         return dict(row) if row else None
 
+    def get_telegram_user_for_payment_link(self, link_id: str) -> str | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """SELECT leads.telegram_user_id FROM payments
+                JOIN leads ON leads.id=payments.lead_id AND leads.tenant_id=payments.tenant_id
+                WHERE payments.razorpay_link_id=?""",
+                (link_id,),
+            ).fetchone()
+        return str(row["telegram_user_id"]) if row else None
+
     def apply_razorpay_paid_event(self, event_id: str, event: dict[str, Any]) -> str:
         """Apply a validated event once, only when link, reference, and full amount match."""
         payload = event.get("payload")

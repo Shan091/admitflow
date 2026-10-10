@@ -7,11 +7,11 @@
   seeded eligibility rules in code, answers institution FAQs with fail-closed vector search,
   and supports staff login plus Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `e19bd2be7f8e401a3bfa21e9e4ddd97f01dfeedf`
+- **Verified implementation commit SHA:** To be updated after the payment-notification milestone is pushed.
 - **Working demo:** Local `/health` and the public HTTPS tunnel returned 200. The Telegram
   webhook is registered and healthy; the user confirmed the live bot flow. The authenticated
   staff dashboard reports FAQ retrieval ready and shows the verified Razorpay test payment as
-  paid. The bot username can be added after the final demo rehearsal.
+  paid. The Telegram demo bot is [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
   account and bot token for the live conversation; OpenAI API key for FAQ retrieval; optional
   Razorpay test API keys and webhook secret for the test payment. Do not include credential values.
@@ -20,7 +20,7 @@
 
 | Participant name | GitHub handle | Contribution |
 | --- | --- | --- |
-| TODO | TODO | TODO |
+| shan | Shan091 | Solo builder; designed and implemented AdmitFlow. |
 
 ## Run and demonstrate
 
@@ -31,12 +31,13 @@
   `OPENAI_EMBEDDING_MODEL`, `DATABASE_PATH`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`,
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
-- **Demo walkthrough:** Telegram qualification and the Razorpay test payment were completed;
-  confirm common FAQ phrasings in the live bot before the presentation. See `README.md`.
+- **Demo walkthrough:** In Telegram, send `/start`, select a course, answer the qualification
+  prompts, and ask a seeded FAQ. Complete the Razorpay test link to see the one-time success message;
+  ask “Has my payment gone through?” to check stored status. Staff can log in to the dashboard and
+  review the paid lead. See `README.md` for the full setup.
 - **Checks performed and results:** `bash scripts/verify.sh` passed locally (Ruff lint, formatting,
-  strict mypy, and 37 pytest tests); `git diff --check` passed. GitHub Actions run
-  [38081259866](https://github.com/Shan091/admitflow/actions/runs/38081259866) passed for the
-  verified implementation SHA above.
+  strict mypy, and 41 pytest tests); `git diff --check` passed. GitHub Actions result for the new
+  payment-notification commit will be added after the push.
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.
