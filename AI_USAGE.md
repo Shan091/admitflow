@@ -12,7 +12,8 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   counsellor-validated recommendation set.
 - **Checks:** Focused `pytest tests/test_guidance_golden.py -q` passed 23 tests. The full
   `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 150 tests; `git diff --check`
-  passed. No live or paid API calls were made.
+  passed. Commit `b0de768f4d12766451719c5ab1a314492ef6a252` was pushed and GitHub Actions `CI` run
+  `38094176481` passed. No live or paid API calls were made.
 - **Human review:** No counselor reviewed these cases. The static expected IDs were checked against
   the fictional seed data, and the feature brief labels independent guidance evaluation as open.
 

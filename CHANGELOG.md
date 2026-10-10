@@ -9,6 +9,8 @@
   by a catalog-grounded reason.
 - **Validation:** Focused evaluation passed 23 cases. `bash scripts/verify.sh` passed Ruff lint and
   formatting, strict mypy, and all 150 tests. No live or paid API calls were made.
+- **Delivery:** Pushed as `b0de768f4d12766451719c5ab1a314492ef6a252`; GitHub Actions `CI` run
+  [38094176481](https://github.com/Shan091/admitflow/actions/runs/38094176481) passed.
 - **Reason:** Catch course leakage across fields/levels and unsafe fallback when a preference cannot
   be supported by the fictional catalog. This is catalog consistency evidence, not a counsellor-
   reviewed or production recommendation evaluation.

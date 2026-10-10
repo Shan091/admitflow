@@ -129,12 +129,15 @@ mandatory linear interview.
   `67472c5b4fb2d6a538dfe141c663779ee93d053f`; GitHub Actions `CI` run `38091855872` passed.
 - [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
   retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
-- [ ] Current slice: add a fixed, catalog-verified fictional evaluation matrix for every
+- [x] Add a fixed, catalog-verified fictional evaluation matrix for every
   agreed field/education-level pair, including empty catalog cells, mixed-field preferences, and
   out-of-catalog abstention. **AC:** expected catalog IDs are explicit in the fixture; matching
   returns only the expected complete offerings with catalog-grounded reasons; unsupported/empty
-  cases return no recommendations. Run the full verification gate and record results before
-  marking complete.
+  cases return no recommendations. `bash scripts/verify.sh` passed Ruff lint/format, strict mypy,
+  and 150 tests; `git diff --check` passed. Pushed as
+  `b0de768f4d12766451719c5ab1a314492ef6a252`; GitHub Actions `CI` run
+  `38094176481` passed. This verifies catalog consistency, not counselor-reviewed production
+  guidance quality.
 
 ## AI-assisted adaptive intake and larger catalog
 
