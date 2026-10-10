@@ -86,6 +86,14 @@ Record consequential choices here. Each entry is short; update it when evidence 
     question was already used for that fact set. A stated preference filters to courses that list it;
     no-match recovery can reopen the set. Never infer proficiency or promise unlisted services.
 
+20. **Project lifecycle from verified events.** Keep lifecycle stage separate from qualitative
+    readiness, discovery step, hard eligibility, and payment status. Enter `payment_pending` only
+    after a qualified learner explicitly requests and the app persists a Razorpay test link; enter
+    `under_review` only after a signed event matches the stored link, reference, currency, and full
+    amount. A dashboard handoff means queued for staff, not staff acceptance. Leave v1 form,
+    enrollment, rejection, waitlist, and cold-lead stages unclaimed until those workflows exist.
+    Numeric System-1 readiness scoring is not part of the hackathon demo.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

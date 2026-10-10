@@ -3,6 +3,19 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — align lifecycle stages with payment events
+
+- **Task:** Keep the v1 lifecycle projection consistent with actual persisted qualification and
+  payment events; map implemented and deferred stages for the adaptive Telegram demo.
+- **Assistance:** Codex updated test-mode link creation and verified webhook persistence to advance
+  `payment_pending` and `under_review` respectively, and documented the lifecycle/readiness
+  boundaries, pending staff handoff semantics, and stages not implemented by the hackathon demo.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 117 tests;
+  `git diff --check` passed. CI is pending. Tests use local SQLite, fake HTTP, and signed synthetic
+  webhook data; no live or paid API call was made.
+- **Human review:** No new external claims were added; sample paid status remains distinct from
+  admission and enrollment.
+
 ## 2026-10-11 — broaden the sample course catalog
 
 - **Task:** Add 12 complete fictional offerings so the existing five catalog fields each contain

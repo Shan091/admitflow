@@ -54,6 +54,10 @@ async def test_payment_link_uses_server_fee_and_stores_razorpay_result(tmp_path:
     assert payment is not None
     assert payment["status"] == "created"
     assert payment["razorpay_link_id"] == "plink_test_123"
+    assert repository.get_lead(lead_id)["lifecycle_stage"] == "payment_pending"  # type: ignore[index]
+    assert repository.get_lead(lead_id)["readiness_status"] == "unknown"  # type: ignore[index]
+    assert await service.create_for_qualified_lead(lead_id) == offer
+    assert len(requested) == 1
 
 
 @pytest.mark.asyncio
@@ -76,6 +80,7 @@ async def test_link_creation_failure_does_not_change_qualification(tmp_path: Pat
     assert payment is not None
     assert payment["status"] == "failed"
     assert repository.get_lead(lead_id)["eligible"] == 1  # type: ignore[index]
+    assert repository.get_lead(lead_id)["lifecycle_stage"] == "new"  # type: ignore[index]
 
 
 def test_paid_webhook_requires_signature_link_reference_and_full_amount(tmp_path: Path) -> None:
@@ -83,6 +88,7 @@ def test_paid_webhook_requires_signature_link_reference_and_full_amount(tmp_path
     repository.initialize()
     repository.seed_catalog()
     lead_id = make_qualified_lead(repository)
+    repository.update_lead(lead_id, lifecycle_stage="payment_pending")
     payment, created = repository.get_or_create_payment_intent(
         repository.tenant_id, lead_id, "AF-test-reference"
     )
@@ -111,15 +117,35 @@ def test_paid_webhook_requires_signature_link_reference_and_full_amount(tmp_path
     with pytest.raises(ValueError, match="signature"):
         service.apply_webhook(body, "wrong", "event-invalid")
     assert repository.get_payment_for_lead(repository.tenant_id, lead_id)["status"] == "created"  # type: ignore[index]
+    assert repository.get_lead(lead_id)["lifecycle_stage"] == "payment_pending"  # type: ignore[index]
+    for field, value in (
+        ("id", "plink-unknown"),
+        ("reference_id", "AF-wrong-reference"),
+        ("amount", 49999),
+        ("currency", "USD"),
+    ):
+        mismatched_event = json.loads(body)
+        mismatched_event["payload"]["payment_link"]["entity"][field] = value
+        mismatched_body = json.dumps(mismatched_event).encode()
+        mismatched_signature = hmac.new(
+            b"webhook-secret", mismatched_body, hashlib.sha256
+        ).hexdigest()
+        assert (
+            service.apply_webhook(mismatched_body, mismatched_signature, f"event-mismatch-{field}")
+            == "ignored"
+        )
+        assert repository.get_lead(lead_id)["lifecycle_stage"] == "payment_pending"  # type: ignore[index]
     partial_event = json.loads(body)
     partial_event["payload"]["payment_link"]["entity"]["amount_paid"] = 10000
     partial_body = json.dumps(partial_event).encode()
     partial_signature = hmac.new(b"webhook-secret", partial_body, hashlib.sha256).hexdigest()
     assert service.apply_webhook(partial_body, partial_signature, "event-partial") == "ignored"
     assert repository.get_payment_for_lead(repository.tenant_id, lead_id)["status"] == "created"  # type: ignore[index]
+    assert repository.get_lead(lead_id)["lifecycle_stage"] == "payment_pending"  # type: ignore[index]
     assert service.apply_webhook(body, signature, "event-1") == "applied"
     assert service.apply_webhook(body, signature, "event-1") == "duplicate"
     assert repository.get_payment_for_lead(repository.tenant_id, lead_id)["status"] == "paid"  # type: ignore[index]
+    assert repository.get_lead(lead_id)["lifecycle_stage"] == "under_review"  # type: ignore[index]
 
 
 def test_live_mode_key_is_rejected(tmp_path: Path) -> None:

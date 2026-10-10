@@ -30,6 +30,7 @@ class PaymentService:
             return None
         if not created:
             if payment["status"] == "created" and payment["short_url"]:
+                self.repository.update_lead(lead_id, lifecycle_stage="payment_pending")
                 return str(payment["short_url"]), int(payment["amount_paise"])
             return None
         course = self.repository.get_course(self.tenant_id, str(payment["course_id"]))
@@ -48,6 +49,7 @@ class PaymentService:
             self.repository.fail_payment_creation(int(payment["id"]))
             raise
         self.repository.save_payment_link(int(payment["id"]), link_id, short_url)
+        self.repository.update_lead(lead_id, lifecycle_stage="payment_pending")
         return short_url, int(payment["amount_paise"])
 
     def apply_webhook(self, body: bytes, signature: str, event_id: str) -> str:

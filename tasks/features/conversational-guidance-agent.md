@@ -63,6 +63,28 @@ human escalation, and operational requirements are verified.
   deterministic sufficiency/confirmation policy, but that policy still needs evaluation against a
   human-reviewed golden set; there is no validated general-career evidence corpus.
 
+## v1 lifecycle mapping
+
+The v1 spec describes lifecycle as a record of observed progress rather than a mandatory dialogue.
+The Telegram demo keeps that idea while not importing v1's WhatsApp, numeric System-1 readiness
+score, application-form, or re-engagement machinery:
+
+| v1 lifecycle stage | AdmitFlow demo meaning and transition |
+| --- | --- |
+| `new` | Lead exists, but the learner has not chosen a path yet. |
+| `discovering` | Learner has entered browsing or course exploration; pauses are separately recorded as the demo-only `paused` stage and `/resume` restores the saved step. |
+| `qualifying` | Learner selected an undergraduate sample whose eligibility rule is configured in code; collecting Grade 12 and marks answers stays here. |
+| `admission_ready` | Code confirms the fictional undergraduate sample rule. It is not an admissions decision. |
+| `payment_pending` | A qualified learner explicitly continued and a valid Razorpay test link was persisted. A failed/unconfigured creation does not advance here. |
+| `under_review` | A matching paid event passed signature, link/reference, currency, and full-amount checks and was saved. Staff review is still required; this does not enroll the learner. |
+| `handed_off` | A request is queued in the staff dashboard with `handoff_status=pending`; the demo does not track a staff acceptance, so this does not mean a counsellor has responded. |
+| `form_collecting`, `enrolled`, `rejected`, `waitlisted`, `cold` | Not implemented. The demo must not claim these states or infer them from conversational tone or a payment. |
+
+`readiness_status` remains a separate qualitative operational hint (`unknown`, `exploring`,
+`considering`, `ready_to_apply`, or `needs_staff`); hard eligibility stays in the code-owned
+qualification result. The numeric readiness score and automatic cold-lead transitions in v1 are not
+part of this hackathon slice.
+
 ## Proposed turn model
 
 Each incoming turn should use the same loop, while selecting the next action from current context:

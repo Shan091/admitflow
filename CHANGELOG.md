@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-11 — align lifecycle with verified payment progress
+
+- **Change:** Project the lead lifecycle to `payment_pending` only after a valid Razorpay test link
+  is stored, and to `under_review` only in the transaction that records a signature-verified paid
+  webhook whose link, reference, currency, and full amount match. Retried links reuse the same
+  persisted link. The feature brief maps the v1 stages and calls out deferred states and the
+  pending-versus-accepted staff handoff distinction.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 117 tests;
+  `git diff --check` passed. New assertions cover successful/retried and failed link creation,
+  invalid/mismatched/partial webhook events, valid payment, duplicate event, and lifecycle/readiness
+  separation. CI is pending.
+- **Delivery:** Commit and push details will be recorded after delivery.
+- **Reason:** Keep the lifecycle dashboard truthful to verified progress and the v1 event-based
+  stage semantics without letting a payment or conversational tone claim enrollment.
+
 ## 2026-10-11 — expand fictional course catalog to 40 offerings
 
 - **Change:** Add 12 complete fictional offerings, bringing the catalog to exactly 40 with eight

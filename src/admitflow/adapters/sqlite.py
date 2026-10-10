@@ -550,6 +550,11 @@ class Repository:
                 "UPDATE payments SET status='paid', updated_at=? WHERE id=?",
                 (now, row["id"]),
             )
+            connection.execute(
+                "UPDATE leads SET lifecycle_stage='under_review', updated_at=? "
+                "WHERE id=? AND tenant_id=?",
+                (now, row["lead_id"], row["tenant_id"]),
+            )
         return "applied"
 
     def get_unembedded_faqs(self, tenant_id: str, model: str) -> list[dict[str, str]]:

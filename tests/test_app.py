@@ -331,7 +331,12 @@ def test_paid_webhook_sends_one_telegram_confirmation_with_next_step(tmp_path: P
     with TestClient(app) as client:
         repository = app.state.repository
         lead_id = repository.upsert_lead(repository.tenant_id, "42", "sample")
-        repository.update_lead(lead_id, selected_course_id="foundations-computing", eligible=True)
+        repository.update_lead(
+            lead_id,
+            selected_course_id="foundations-computing",
+            eligible=True,
+            lifecycle_stage="payment_pending",
+        )
         payment, created = repository.get_or_create_payment_intent(
             repository.tenant_id, lead_id, "AF-test-reference"
         )
@@ -346,6 +351,7 @@ def test_paid_webhook_sends_one_telegram_confirmation_with_next_step(tmp_path: P
         response = client.post("/api/v1/webhooks/razorpay", content=body, headers=headers)
         assert response.status_code == 200
         assert response.json() == {"status": "applied"}
+        assert repository.get_lead(lead_id)["lifecycle_stage"] == "under_review"  # type: ignore[index]
         assert len(bot.sent) == 1
         chat_id, message = bot.sent[0]
         assert chat_id == 42
