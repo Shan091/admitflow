@@ -572,10 +572,10 @@ class AdmissionsService:
 
     async def free_text(self, lead_id: int, text: str, intent_router: IntentRouter | None) -> Reply:
         lead = self.repository.get_lead(lead_id)
-        if lead and lead["state"] == "awaiting_marks":
-            return self.answer_marks(lead_id, text)
         if _is_ai_opt_out(text):
             return self.set_ai_processing_consent(lead_id, False)
+        if lead and lead["state"] == "awaiting_marks":
+            return self.answer_marks(lead_id, text)
         if _is_deletion_request(text):
             handoff = self.handoff(lead_id, "Student asked staff to delete their local data.")
             return Reply(
@@ -969,8 +969,12 @@ def _is_ai_opt_out(text: str) -> bool:
             "revoke ai consent",
             "revoke consent",
             "do not send to openai",
+            "do not send openai",
             "dont send to openai",
+            "dont send openai",
             "don't send to openai",
+            "don t send to openai",
+            "don t send openai",
             "no ai processing",
         }
     )

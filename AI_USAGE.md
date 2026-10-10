@@ -23,6 +23,9 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   adversarial multilingual evaluations, and production privacy review remain outstanding.
 - **Push/CI:** Pushed as `0e45565fe4dbbd434435bf264bc8ce8e8d86a7b8`; matching GitHub Actions CI run
   [38087034051](https://github.com/Shan091/admitflow/actions/runs/38087034051) passed.
+- **Follow-up:** Moved textual opt-out before the marks state handler and normalized apostrophe
+  spacing variants, then verified the in-progress consent can be revoked from that state. The full
+  73-test local gate passed; this follow-up's push and CI result are pending.
 
 ## 2026-10-11 — interest-led discovery first slice
 

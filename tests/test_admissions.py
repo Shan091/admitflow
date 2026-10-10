@@ -127,6 +127,32 @@ async def test_discovery_requires_openai_consent_and_still_allows_tap_only_mode(
     assert consent["fact_value"] == "no"
 
 
+@pytest.mark.asyncio
+async def test_openai_opt_out_takes_priority_while_waiting_for_marks(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    service.set_ai_processing_consent(lead_id, True)
+    repository.update_lead(lead_id, state="awaiting_marks")
+
+    reply = await service.free_text(lead_id, "Don't send to OpenAI", UnexpectedRouter())
+
+    assert repository.get_lead(lead_id)["state"] == "awaiting_marks"  # type: ignore[index]
+    consent = next(
+        fact
+        for fact in repository.list_facts(lead_id)
+        if fact["fact_key"] == "openai_processing_consent"
+    )
+    assert consent["fact_value"] == "no"
+    assert "buttons" in reply.text.casefold()
+
+
 def test_consent_grant_opens_open_ended_discovery_and_can_be_revoked(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
