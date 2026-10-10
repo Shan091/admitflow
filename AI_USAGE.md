@@ -11,7 +11,9 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   Existing direct known-course selection remains unchanged. The decision and acceptance criteria
   were recorded in `docs/DECISIONS.md` and the conversational-guidance feature brief.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 168 tests;
-  `git diff --check` passed. No live or paid API calls were made.
+  `git diff --check` passed. Commit `6d66e2744b19607c78d49012f8a32982114f4732` was pushed, and
+  GitHub Actions `CI` run [38095745687](https://github.com/Shan091/admitflow/actions/runs/38095745687)
+  passed. No live or paid API calls were made.
 - **Human review:** Details are clearly labeled fictional sample data and do not imply admission,
   course availability, or access. The real catalog and staff process remain unconfigured.
 

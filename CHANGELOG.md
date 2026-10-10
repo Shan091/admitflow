@@ -12,6 +12,8 @@
 - **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 168 tests;
   `git diff --check` passed. Tests cover the detail/continue boundary, stale callbacks, resume, and
   Telegram dispatch. No live or paid API calls were made.
+- **Delivery:** Pushed as `6d66e2744b19607c78d49012f8a32982114f4732`; GitHub Actions `CI` run
+  [38095745687](https://github.com/Shan091/admitflow/actions/runs/38095745687) passed.
 - **Reason:** Exploring an option is not a commitment to apply. Learners can compare course facts
   before the app starts qualification or staff review.
 
