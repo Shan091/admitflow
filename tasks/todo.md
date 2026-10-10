@@ -93,6 +93,13 @@ mandatory linear interview.
   recovery, parent attribution, and bounded language claims. `bash scripts/verify.sh` passed
   Ruff lint/format, strict mypy, and 105 tests; pushed as
   `aed4f92f65eab558f3c06ef3fc42e5694e9a0f72`; GitHub Actions `CI` run `38091126893` passed.
+- [x] Expand the fictional demo catalog from 28 to 40 complete offerings, with eight in each
+  agreed field and examples across certificate/vocational, diploma, undergraduate, and postgraduate
+  levels. Added only fictional, non-regulated sample subjects. **Verified:** exact catalog count,
+  unique IDs, idempotent seeding, field/level coverage, complete attributes, allowed support tags,
+  and expected retrieval for every new course; `bash scripts/verify.sh` passed (117 tests), and
+  `git diff --check` passed. Pushed as `c540d11c4c0c26ff3bcb6df2e3e783e05476b3b3`; GitHub Actions
+  `CI` run `38091492125` passed.
 - [ ] Establish production gates for real institution/catalog onboarding, age-appropriate privacy,
   retention/deletion, localization review, human escalation, monitoring, and independent evaluation.
 

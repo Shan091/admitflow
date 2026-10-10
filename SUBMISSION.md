@@ -8,7 +8,7 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `aed4f92f65eab558f3c06ef3fc42e5694e9a0f72`
+- **Verified implementation commit SHA:** `c540d11c4c0c26ff3bcb6df2e3e783e05476b3b3`
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
   test payment were verified during earlier milestones; the user confirmed the live bot flow. The
   adaptive language-support preference in this SHA passed local tests and CI, including a
@@ -49,9 +49,13 @@
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
 - **Checks performed and results:** On `aed4f92f65eab558f3c06ef3fc42e5694e9a0f72`,
-  `bash scripts/verify.sh` passed locally (Ruff lint/format, strict mypy, and 105 pytest tests);
-  `git diff --check` passed. GitHub Actions run
-  [38091126893](https://github.com/Shan091/admitflow/actions/runs/38091126893) passed for this SHA.
+  the prior milestone passed `bash scripts/verify.sh` (Ruff lint/format, strict mypy, and 105
+  pytest tests) with `git diff --check` passing; GitHub Actions run
+  [38091126893](https://github.com/Shan091/admitflow/actions/runs/38091126893) passed. The current
+  40-course catalog commit `c540d11c4c0c26ff3bcb6df2e3e783e05476b3b3` also passed
+  `bash scripts/verify.sh` (Ruff lint/format, strict mypy, and 117 pytest tests), `git diff --check`,
+  and GitHub Actions `CI` run
+  [38091492125](https://github.com/Shan091/admitflow/actions/runs/38091492125).
 - **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.

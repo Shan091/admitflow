@@ -11,7 +11,8 @@ run, and any corrections. Do not paste full chat transcripts or claim unperforme
   idempotent seeding, supported language-support tags, and retrieval of each added offering from
   its explicit sample learning goal. No real institution data or student data was used.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 117 tests;
-  `git diff --check` passed. CI is pending. No live or paid API call was made.
+  `git diff --check` passed. Commit `c540d11c4c0c26ff3bcb6df2e3e783e05476b3b3` was pushed, and
+  GitHub Actions `CI` run `38091492125` passed. No live or paid API call was made.
 - **Human review:** Confirm the catalog remains fictional; the new records do not create eligibility
   rules for non-undergraduate programs, job guarantees, or regulated-program claims.
 
