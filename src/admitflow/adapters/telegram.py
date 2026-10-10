@@ -140,6 +140,10 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply = await admissions.choose_guidance_signal(
             lead_id, level=data.removeprefix("guidance:level:")
         )
+    elif data.startswith("guidance:confirm:"):
+        reply = await admissions.confirm_guidance(lead_id, data.removeprefix("guidance:confirm:"))
+    elif data.startswith("guidance:revise:"):
+        reply = await admissions.revise_guidance(lead_id, data.removeprefix("guidance:revise:"))
     elif data.startswith("speaker:"):
         reply = admissions.choose_speaker(lead_id, data.removeprefix("speaker:"))
     elif data.startswith("course:confirm:"):

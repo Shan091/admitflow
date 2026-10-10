@@ -38,14 +38,17 @@ human escalation, and operational requirements are verified.
 - The seed contains 28 fictional course offerings in five fields and four education levels.
 - Discovery extraction currently records course, field, education level, interest, activity,
   uncertainty, and correction. The extractor sees the current message and the allowlisted catalog.
-- The service accumulates these facts but recommends as soon as any interest/activity matches. It
-  does not yet explore goals, learning experiences, expected outcomes, constraints, or barriers in
-  a coherent adaptive dialogue.
+- The service now asks for one complementary signal when context is thin, then reflects the
+  learner's stated interests/activity/level and waits for confirmation before showing course cards.
+  Confirmation is tied to a fingerprint of the current facts, so corrections and path changes make
+  old buttons stale. It still does not explore goals, learning experiences, expected outcomes,
+  constraints, or barriers in a coherent adaptive dialogue.
 - The extractor currently classifies career/profession requests outside the institution catalog as
   `out_of_scope`. That matches the earlier product decision but may conflict with the newer request
   for broader career guidance. Resolve this boundary before changing that behavior.
-- Course matching uses direct overlap with seeded interests and activities. It has no calibrated
-  conversational sufficiency policy or validated general-career evidence corpus.
+- Course matching uses direct overlap with seeded interests and activities. It has a first
+  deterministic sufficiency/confirmation policy, but that policy still needs evaluation against a
+  human-reviewed golden set; there is no validated general-career evidence corpus.
 
 ## Proposed turn model
 
@@ -114,8 +117,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   without inventing a match.
 - An unsure learner receives a short, low-pressure prompt anchored in things they enjoy, have tried,
   want to learn, or hope study will help them do. No formal assessment or score is produced.
-- Before a material recommendation, the system can reflect its understanding and accept corrections
-  without erasing unrelated valid facts.
+- Before a material recommendation, the system reflects its understanding and requires a clear
+  confirmation; typed corrections or stale tap replies cannot surface recommendations from old
+  facts, while unrelated valid facts remain intact.
 - A recommendation is based on complete catalog records, includes provenance/fit reasons and real
   trade-offs, and does not imply admission, employment, earnings, or that one option is objectively
   best.

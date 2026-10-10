@@ -1,11 +1,13 @@
 """Admissions flow orchestration with deterministic eligibility and fee answers."""
 
+import hashlib
+import json
 import re
 from dataclasses import dataclass
 
 from admitflow.adapters.sqlite import Repository
 from admitflow.domain.discovery import has_sufficient_guidance_context, recommend_courses
-from admitflow.domain.models import DiscoveryTurn
+from admitflow.domain.models import Course, DiscoveryTurn
 from admitflow.domain.pricing import format_inr_from_paise
 from admitflow.domain.qualification import assess_eligibility
 from admitflow.services.contracts import DiscoveryInterpreter, IntentRouter
@@ -110,6 +112,115 @@ class AdmissionsService:
         )
         return await self._handle_discovery_turn(lead_id, turn, "")
 
+    async def confirm_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
+        """Accept only the currently pending summary, never a stale Telegram button."""
+        interests, activities, level = self._student_guidance_context(lead_id)
+        signature = _guidance_signature(interests, activities, level)
+        pending = self._fact_value(lead_id, "guidance_pending_signature")
+        if not pending:
+            return Reply("That confirmation has expired. Your current course path is unchanged.")
+        if (
+            pending == signature
+            and confirmation_token == _guidance_token(signature)
+            and has_sufficient_guidance_context(
+                interests=interests, activities=activities, level=level
+            )
+        ):
+            self.repository.save_fact(lead_id, "guidance_confirmed_signature", signature, "student")
+            self.repository.delete_fact(lead_id, "guidance_pending_signature")
+        return await self._handle_discovery_turn(
+            lead_id,
+            DiscoveryTurn("discovery", None, (), None, (), (), False, False),
+            "",
+        )
+
+    async def revise_guidance(self, lead_id: int, confirmation_token: str) -> Reply:
+        """Keep the learner's facts but ask what they want to correct or add."""
+        interests, activities, level = self._student_guidance_context(lead_id)
+        signature = _guidance_signature(interests, activities, level)
+        pending = self._fact_value(lead_id, "guidance_pending_signature")
+        if not pending:
+            return Reply("That change prompt has expired. Your current course path is unchanged.")
+        if pending != signature or confirmation_token != _guidance_token(signature):
+            return await self._handle_discovery_turn(
+                lead_id,
+                DiscoveryTurn("discovery", None, (), None, (), (), False, False),
+                "",
+            )
+        self.repository.delete_fact(lead_id, "guidance_pending_signature")
+        self.repository.update_lead(lead_id, discovery_step="guidance_revision")
+        return self._guidance_revision_prompt()
+
+    @staticmethod
+    def _guidance_revision_prompt() -> Reply:
+        return Reply(
+            "What should I change or add? You can correct an interest, activity, or study level, "
+            "or mention another detail that matters to your choice.",
+            (
+                ("Choose a field", "path:field"),
+                ("Browse sample courses", "path:browse"),
+                ("Choose a known course", "path:course"),
+            ),
+        )
+
+    def _fact_value(self, lead_id: int, key: str) -> str | None:
+        fact = next(
+            (item for item in self.repository.list_facts(lead_id) if item["fact_key"] == key),
+            None,
+        )
+        return str(fact["fact_value"]) if fact else None
+
+    def _student_guidance_context(self, lead_id: int) -> tuple[set[str], set[str], str | None]:
+        facts = {
+            str(item["fact_key"]): str(item["fact_value"])
+            for item in self.repository.list_facts(lead_id)
+        }
+        interests = set(facts.get("interest_terms_student", "").split("|"))
+        interests.update(facts.get("interest_fields_student", "").split("|"))
+        if facts.get("interest_field_student"):
+            interests.add(facts["interest_field_student"])
+        activities = set(facts.get("activity_terms_student", "").split("|"))
+        if facts.get("interest_activity_student"):
+            activities.add(facts["interest_activity_student"])
+        activities.discard("")
+        interests.discard("")
+        level = facts.get("education_level_student") or None
+        return interests, activities, level
+
+    def _guidance_reflection(
+        self,
+        lead_id: int,
+        interests: set[str],
+        activities: set[str],
+        level: str | None,
+        signature: str,
+    ) -> Reply:
+        self.repository.save_fact(lead_id, "guidance_pending_signature", signature, "student")
+        self.repository.update_lead(
+            lead_id, discovery_step="guidance_confirmation", lifecycle_stage="discovering"
+        )
+        details = [f"you are interested in {', '.join(sorted(interests))}"]
+        if activities:
+            details.append(f"you enjoy {', '.join(sorted(activities))}")
+        if level == "any":
+            details.append("you are open to all listed study levels")
+        elif level:
+            details.append(f"you are considering the {level.replace('_', ' ')} level")
+        else:
+            details.append("your study level is still open")
+        token = _guidance_token(signature)
+        return Reply(
+            f"Before I show options, I heard that {'; '.join(details)}. Did I get that right?",
+            (
+                ("Yes, show matching courses", f"guidance:confirm:{token}"),
+                ("I'd like to change or add something", f"guidance:revise:{token}"),
+            ),
+        )
+
+    def _clear_guidance_confirmation(self, lead_id: int) -> None:
+        self.repository.delete_fact(lead_id, "guidance_pending_signature")
+        self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
+
     def _discovery_prompt(self, language: str = "en") -> Reply:
         copy = {
             "en": "This is fictional demo guidance, not an admissions decision. Typed messages "
@@ -211,6 +322,7 @@ class AdmissionsService:
         )
 
     def begin_path(self, lead_id: int, path: str) -> Reply:
+        self._clear_guidance_confirmation(lead_id)
         self.repository.update_lead(
             lead_id,
             discovery_path=path,
@@ -351,7 +463,14 @@ class AdmissionsService:
         )
         speaker = str(active["fact_value"]) if active else "student"
         self.repository.save_fact(lead_id, f"education_level_{speaker}", level, speaker)
-        return self._activity_choices(lead_id)
+        if speaker == "parent":
+            return Reply(
+                "I've recorded that as the parent's preferred study level. The learner's own "
+                "preference should guide course recommendations; ask them to share or confirm it.",
+                (("Learner sharing now", "speaker:student"),),
+            )
+        self.repository.update_lead(lead_id, discovery_step="results")
+        return self._present_guidance(lead_id)
 
     def _activity_choices(self, lead_id: int) -> Reply:
         facts = self.repository.list_facts(lead_id)
@@ -423,42 +542,10 @@ class AdmissionsService:
         return self._recommendation_results(lead_id, activity)
 
     def _recommendation_results(self, lead_id: int, activity: str | None = None) -> Reply:
-        facts = self.repository.list_facts(lead_id)
-        field_fact = next(
-            (fact for fact in facts if fact["fact_key"] == "interest_field_student"), None
-        )
-        if field_fact is None:
-            return self._field_choices(lead_id, "Which field would you like to explore?")
-        lead = self.repository.get_lead(lead_id)
-        level = str(lead["education_level"]) if lead and lead["education_level"] else None
-        matches = recommend_courses(
-            self.repository.list_courses(self.tenant_id),
-            interests={str(field_fact["fact_value"])},
-            activities={activity} if activity else set(),
-            level=level,
-            limit=3,
-        )
-        if not matches:
-            return self.handoff(
-                lead_id, "No complete sample course matched the learner's selections."
-            )
-        buttons = tuple((item.course.name, f"course:{item.course.id}") for item in matches)
-        summaries = "\n".join(
-            f"• {item.course.name} ({item.course.education_level.replace('_', ' ')}): "
-            f"{', '.join(item.reasons)}. "
-            f"Sample entry: {'; '.join(item.course.prerequisites)}. "
-            f"Sample medium: {item.course.medium}. "
-            f"Sample language support: "
-            f"{', '.join(item.course.language_support) or 'not specified'}."
-            for item in matches
-        )
+        if activity:
+            self.repository.save_fact(lead_id, "interest_activity_student", activity, "student")
         self.repository.update_lead(lead_id, discovery_step="results")
-        return Reply(
-            "Here are sample options from the catalog, based on the field you chose:\n"
-            f"{summaries}\n\n"
-            "These are examples, not an admission decision. Which would you like to explore?",
-            buttons,
-        )
+        return self._present_guidance(lead_id)
 
     def pause_discovery(self, lead_id: int) -> Reply:
         self.repository.update_lead(lead_id, lifecycle_stage="paused")
@@ -489,6 +576,20 @@ class AdmissionsService:
                 None,
             )
             return self._recommendation_results(lead_id, str(fact["fact_value"]) if fact else None)
+        if step == "guidance_confirmation":
+            context = self._student_guidance_context(lead_id)
+            if not has_sufficient_guidance_context(
+                interests=context[0], activities=context[1], level=context[2]
+            ):
+                self.repository.delete_fact(lead_id, "guidance_pending_signature")
+                self.repository.update_lead(lead_id, discovery_step="explore")
+                return self._field_choices(
+                    lead_id, "Let's continue. What field or topic would you like to explore?"
+                )
+            signature = _guidance_signature(*context)
+            return self._guidance_reflection(lead_id, *context, signature)
+        if step == "guidance_revision":
+            return self._guidance_revision_prompt()
         if step == "course":
             return self.begin_path(lead_id, "course")
         return self.browse(lead_id)
@@ -572,6 +673,7 @@ class AdmissionsService:
                 "to explore it.",
                 (("Learner wants to explore this", f"course:confirm:{course.id}"),),
             )
+        self._clear_guidance_confirmation(lead_id)
         self.repository.save_fact(lead_id, "course_choice_student", course.id, "student")
         if course.education_level != "undergraduate" or course.minimum_marks_percent <= 0:
             self.repository.update_lead(
@@ -766,6 +868,11 @@ class AdmissionsService:
                 "pricing, and terms are not confirmed. "
                 f"{handoff.text}"
             )
+        if self._fact_value(lead_id, "guidance_pending_signature") and _is_guidance_confirmation(
+            text
+        ):
+            pending = self._fact_value(lead_id, "guidance_pending_signature")
+            return await self.confirm_guidance(lead_id, _guidance_token(pending or ""))
         if not self.ai_processing_enabled(lead_id):
             return self._tap_only_prompt()
         if self.discovery_interpreter is not None:
@@ -856,10 +963,19 @@ class AdmissionsService:
                 "education_level",
                 "interest_terms",
                 "activity_terms",
+                "interest_activity",
             ):
                 self.repository.delete_fact(lead_id, f"{key}_{speaker}")
             if speaker == "student":
                 self.repository.update_lead(lead_id, education_level=None)
+        if speaker == "student" and (
+            turn.correct_previous
+            or turn.fields
+            or turn.education_level
+            or turn.interests
+            or turn.activities
+        ):
+            self.repository.delete_fact(lead_id, "guidance_confirmed_signature")
         if turn.fields:
             fields_key = f"interest_fields_{speaker}"
             existing_fields = next(
@@ -947,38 +1063,29 @@ class AdmissionsService:
                 )
                 + (("Browse courses", "path:browse"),),
             )
-        student_facts = self.repository.list_facts(lead_id)
-        field = next(
-            (f["fact_value"] for f in student_facts if f["fact_key"] == "interest_field_student"),
-            None,
-        )
-        fields_fact = next(
-            (f["fact_value"] for f in student_facts if f["fact_key"] == "interest_fields_student"),
-            None,
-        )
-        interests_fact = next(
-            (f["fact_value"] for f in student_facts if f["fact_key"] == "interest_terms_student"),
-            None,
-        )
-        activities_fact = next(
-            (f["fact_value"] for f in student_facts if f["fact_key"] == "activity_terms_student"),
-            None,
-        )
-        level_fact = next(
-            (f["fact_value"] for f in student_facts if f["fact_key"] == "education_level_student"),
-            None,
-        )
-        interests = set(str(interests_fact).split("|")) if interests_fact else set()
-        if fields_fact:
-            interests.update(str(fields_fact).split("|"))
-        if field:
-            interests.add(str(field))
-        activities = set(str(activities_fact).split("|")) if activities_fact else set()
+        lead = self.repository.get_lead(lead_id)
+        if (
+            lead
+            and lead["discovery_step"] == "guidance_revision"
+            and not (
+                turn.correct_previous
+                or turn.fields
+                or turn.education_level
+                or turn.interests
+                or turn.activities
+            )
+        ):
+            return self._guidance_revision_prompt()
+        return self._present_guidance(lead_id)
+
+    def _present_guidance(self, lead_id: int) -> Reply:
+        courses = self.repository.list_courses(self.tenant_id)
+        interests, activities, level = self._student_guidance_context(lead_id)
         if interests or activities:
-            level = str(level_fact) if level_fact else None
             if not has_sufficient_guidance_context(
                 interests=interests, activities=activities, level=level
             ):
+                self.repository.delete_fact(lead_id, "guidance_pending_signature")
                 if interests:
                     candidate_courses = recommend_courses(
                         courses, interests=interests, activities=set(), limit=10
@@ -1019,31 +1126,97 @@ class AdmissionsService:
                         for field in sorted({course.field for course in courses})
                     ),
                 )
-            matches = recommend_courses(
-                courses,
-                interests=interests,
-                activities=activities,
-                level=level,
-                limit=3,
-            )
-            if matches:
-                buttons = tuple((m.course.name, f"course:{m.course.id}") for m in matches)
-                summaries = "\n".join(
-                    f"• {m.course.name} ({m.course.education_level.replace('_', ' ')}): "
-                    f"{', '.join(m.reasons)}. Sample entry: {'; '.join(m.course.prerequisites)}."
-                    for m in matches
+            signature = _guidance_signature(interests, activities, level)
+            confirmed = self._fact_value(lead_id, "guidance_confirmed_signature")
+            if confirmed == signature:
+                return self._guidance_recommendation_reply(
+                    lead_id, courses, interests, activities, level
                 )
-                return Reply(
-                    "Based on what you shared, here are matching fictional sample courses:\n"
-                    f"{summaries}\n\nThese are examples, not an admission decision. Which "
-                    "would you like to explore?",
-                    buttons,
-                )
+            return self._guidance_reflection(lead_id, interests, activities, level, signature)
+        self.repository.delete_fact(lead_id, "guidance_pending_signature")
         return Reply(
             "I have not got enough detail to suggest a course yet. What topic or activity would "
             "you like to explore? You can mention a study level too.",
             (("Choose a field", "path:field"), ("Browse sample courses", "path:browse")),
         )
+
+    def _guidance_recommendation_reply(
+        self,
+        lead_id: int,
+        courses: list[Course],
+        interests: set[str],
+        activities: set[str],
+        level: str | None,
+    ) -> Reply:
+        matches = recommend_courses(
+            courses,
+            interests=interests,
+            activities=activities,
+            level=None if level == "any" else level,
+            limit=3,
+        )
+        if not matches:
+            return self.handoff(
+                lead_id, "No complete sample course matched the learner's confirmed preferences."
+            )
+        self.repository.update_lead(
+            lead_id, discovery_step="results", lifecycle_stage="discovering"
+        )
+        summaries = "\n".join(
+            f"• {match.course.name} ({match.course.education_level.replace('_', ' ')}): "
+            f"{', '.join(match.reasons)}. Sample entry: {'; '.join(match.course.prerequisites)}."
+            for match in matches
+        )
+        return Reply(
+            "Based on what you confirmed, here are matching fictional sample courses:\n"
+            f"{summaries}\n\nThese are examples, not an admission decision. Which would you "
+            "like to explore?",
+            tuple((match.course.name, f"course:{match.course.id}") for match in matches),
+        )
+
+
+def _guidance_signature(interests: set[str], activities: set[str], level: str | None) -> str:
+    context = {
+        "interests": sorted(item.casefold() for item in interests),
+        "activities": sorted(item.casefold() for item in activities),
+        "level": level,
+    }
+    return hashlib.sha256(json.dumps(context, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _guidance_token(signature: str) -> str:
+    return signature[:12]
+
+
+def _is_guidance_confirmation(text: str) -> bool:
+    normalized = re.sub(r"[^\w]+", " ", text.casefold()).strip()
+    return normalized in {
+        "yes",
+        "yes show",
+        "yes show me",
+        "yes show courses",
+        "yes that sounds right",
+        "that sounds right",
+        "sounds right",
+        "looks right",
+        "correct show options",
+        "show options",
+        "show courses",
+        "go ahead",
+        "haan",
+        "haan dikhao",
+        "haan sahi hai",
+        "sahi hai",
+        "हाँ",
+        "हां",
+        "हाँ सही है",
+        "हां सही है",
+        "हाँ विकल्प दिखाएँ",
+        "അതെ",
+        "ശരിയാണ്",
+        "അതെ ശരിയാണ്",
+        "ഓപ്ഷനുകൾ കാണിക്കൂ",
+    }
 
 
 def _is_fee_question(text: str) -> bool:

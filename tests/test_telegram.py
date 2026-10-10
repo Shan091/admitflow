@@ -191,15 +191,23 @@ async def test_exploration_callbacks_recommend_and_language_choice_persists(tmp_
     update.callback_query = SimpleNamespace(answer=answer_level, data="level:any")
     update.update_id = 112
     await callback_handler(update, context)
-    assert "activity sounds most interesting" in message.sent[-1][0]
+    assert "Did I get that right" in message.sent[-1][0]
+    confirmation_markup = message.sent[-1][1]
+    assert confirmation_markup is not None
+    confirm_callback = next(
+        button.callback_data
+        for row in confirmation_markup.inline_keyboard
+        for button in row
+        if button.callback_data and button.callback_data.startswith("guidance:confirm:")
+    )
 
-    async def answer_skip_activity() -> None:
+    async def answer_confirm_guidance() -> None:
         return None
 
-    update.callback_query = SimpleNamespace(answer=answer_skip_activity, data="activity:skip")
+    update.callback_query = SimpleNamespace(answer=answer_confirm_guidance, data=confirm_callback)
     update.update_id = 113
     await callback_handler(update, context)
-    assert "Here are sample options" in message.sent[-1][0]
+    assert "matching fictional sample courses" in message.sent[-1][0]
 
     async def answer_language() -> None:
         return None

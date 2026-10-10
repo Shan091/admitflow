@@ -71,6 +71,9 @@ mandatory linear interview.
   next questions, reflects understanding for correction, and preserves path switching/resume.
 - [x] Current slice: require a complementary signal before recommending from broad interests;
   when context is thin, ask one tailored follow-up and preserve the known-course fast path.
+- [ ] Current slice: reflect the learner's stated interests, activity, and level before surfacing
+  recommendations; show options only after explicit confirmation, and reject stale confirmations
+  after the learner changes their preferences.
 - [ ] Define and test coverage for contradictory/corrected preferences, mixed interests, constraints,
   parent/student conflict, unknown/out-of-catalog requests, sensitive disclosures, provider/RAG
   failures, language switching, deletion, and concurrent/duplicate updates.

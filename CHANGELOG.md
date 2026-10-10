@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-11 — reflect and confirm preferences before recommendations
+
+- **Change:** Require a brief reflection and explicit confirmation before showing matches from both
+  free-text discovery and field/level buttons. Learners can revise, pause, and resume; confirmation
+  buttons are tied to current preferences and become stale after changes or path switches. A known
+  course still enters selection immediately.
+- **Validation:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 93 tests;
+  `git diff --check` passed. Includes tests for correction-to-same-values, stale callbacks,
+  path-switch invalidation, pause/resume, and Telegram callback routing.
+- **Reason:** Give learners a chance to correct the bot's understanding before it displays options,
+  and prevent a confirmation for one set of preferences from authorizing another.
+
 ## 2026-10-11 — require more than a broad interest before recommending
 
 - **Change:** Add a domain policy requiring an expressed interest plus an activity or study level

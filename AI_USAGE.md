@@ -3,6 +3,19 @@
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 
+## 2026-10-11 — confirm the learner's summary before showing matches
+
+- **Task:** Extend adaptive discovery so every interest-led route reflects facts before course cards
+  appear, and stale confirmations cannot expose recommendations for changed preferences.
+- **Assistance:** Codex persisted a digest of the learner's confirmed interest/activity/level,
+  connected the confirmation and revision actions to the same policy for typed and button-led
+  discovery, and preserved pending/recommendation state across pause/resume. A known-course lookup
+  remains direct.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 93 tests;
+  `git diff --check` passed. Fake interpreters only; no live API call or student data.
+- **Human review:** Existing product scope remains course guidance within the fictional institution
+  catalog; occupation/job advice stays out of scope until explicitly changed.
+
 ## 2026-10-11 — adaptive follow-up before a course recommendation
 
 - **Task:** Make free-text course guidance multi-turn when a learner has shared only a broad

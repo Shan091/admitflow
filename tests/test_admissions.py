@@ -259,6 +259,9 @@ async def test_student_can_describe_multiple_facts_without_consent_step(
     reply = await service.free_text(lead_id, "I enjoy charts and want a diploma in data", None)
 
     assert len(interpreter.calls) == 1
+    assert "Did I get that right" in reply.text
+    pending = next(data for _, data in reply.buttons if data.startswith("guidance:confirm:"))
+    reply = await service.confirm_guidance(lead_id, pending.removeprefix("guidance:confirm:"))
     assert "Applied Data Analytics Diploma" in reply.text
     assert "\\n" not in reply.text
     assert "courses:\n" in reply.text
@@ -345,13 +348,212 @@ async def test_vague_interest_gets_targeted_follow_up_before_recommendations(
     )
     assert activity_choice is not None
 
-    recommendation = await service.choose_guidance_signal(
+    reflection = await service.choose_guidance_signal(
         lead_id, activity_slug=activity_choice.removeprefix("guidance:activity:")
     )
+
+    assert "Did I get that right" in reflection.text
+    assert "Digital Design Diploma" not in reflection.text
+    assert any(data.startswith("guidance:confirm:") for _, data in reflection.buttons)
+
+    recommendation = await service.free_text(lead_id, "Yes, that sounds right", None)
 
     assert "Digital Design Diploma" in recommendation.text
     assert "Matches your interest in design" in recommendation.text
     assert "Includes activities you chose" in recommendation.text
+    assert len(interpreter.calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_changed_preferences_make_an_old_confirmation_button_stale(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("discovery", None, ("design/media",), None, ("design",), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    follow_up = await service.free_text(lead_id, "I like design", None)
+    activity_choice = next(
+        data for _, data in follow_up.buttons if data.startswith("guidance:activity:")
+    )
+    old_reflection = await service.choose_guidance_signal(
+        lead_id, activity_slug=activity_choice.removeprefix("guidance:activity:")
+    )
+    old_confirmation = next(
+        data for _, data in old_reflection.buttons if data.startswith("guidance:confirm:")
+    )
+
+    interpreter.turn = DiscoveryTurn(
+        "discovery",
+        None,
+        ("business/accounting",),
+        None,
+        ("business",),
+        ("planning projects",),
+        False,
+        True,
+    )
+    corrected = await service.free_text(
+        lead_id, "Actually, business and planning projects fit me better", None
+    )
+    new_confirmation = next(
+        data for _, data in corrected.buttons if data.startswith("guidance:confirm:")
+    )
+
+    assert "business/accounting" in corrected.text
+    assert "Digital Design Diploma" not in corrected.text
+    assert new_confirmation != old_confirmation
+
+    stale_reply = await service.confirm_guidance(
+        lead_id, old_confirmation.removeprefix("guidance:confirm:")
+    )
+
+    assert "business/accounting" in stale_reply.text
+    assert "Digital Design Diploma" not in stale_reply.text
+
+
+@pytest.mark.asyncio
+async def test_guidance_reflection_resumes_and_confirmation_is_path_bound(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("discovery", None, ("design/media",), None, ("design",), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    follow_up = await service.free_text(lead_id, "I like design", None)
+    activity_choice = next(
+        data for _, data in follow_up.buttons if data.startswith("guidance:activity:")
+    )
+    reflection = await service.choose_guidance_signal(
+        lead_id, activity_slug=activity_choice.removeprefix("guidance:activity:")
+    )
+    token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:confirm:")
+    )
+
+    service.pause_discovery(lead_id)
+    resumed = service.resume_discovery(lead_id)
+
+    assert "Did I get that right" in resumed.text
+    assert token in {data.removeprefix("guidance:confirm:") for _, data in resumed.buttons}
+    accepted = await service.confirm_guidance(lead_id, token)
+    assert "Digital Design Diploma" in accepted.text
+    service.pause_discovery(lead_id)
+    resumed_results = service.resume_discovery(lead_id)
+    assert "Digital Design Diploma" in resumed_results.text
+    assert "Did I get that right" not in resumed_results.text
+
+    service.begin_path(lead_id, "browse")
+    stale = await service.confirm_guidance(lead_id, token)
+
+    assert "confirmation has expired" in stale.text
+    assert "Digital Design Diploma" not in stale.text
+
+
+@pytest.mark.asyncio
+async def test_preference_correction_requires_confirmation_even_if_facts_return_to_old_values(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            "discovery",
+            None,
+            ("design/media",),
+            None,
+            ("design",),
+            ("making visuals",),
+            False,
+            False,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    initial = await service.free_text(lead_id, "I like design and making visuals", None)
+    first_token = next(
+        data.removeprefix("guidance:confirm:")
+        for _, data in initial.buttons
+        if data.startswith("guidance:confirm:")
+    )
+    shown = await service.confirm_guidance(lead_id, first_token)
+    assert "Digital Design Diploma" in shown.text
+
+    interpreter.turn = DiscoveryTurn(
+        "discovery",
+        None,
+        ("design/media",),
+        None,
+        ("design",),
+        ("making visuals",),
+        False,
+        True,
+    )
+    reconfirm = await service.free_text(lead_id, "I want to reconsider my choices", None)
+
+    assert "Did I get that right" in reconfirm.text
+    assert "Digital Design Diploma" not in reconfirm.text
+
+
+@pytest.mark.asyncio
+async def test_guidance_revision_prompt_survives_pause_and_resume(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("discovery", None, ("design/media",), None, ("design",), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+    follow_up = await service.free_text(lead_id, "I like design", None)
+    activity = next(data for _, data in follow_up.buttons if data.startswith("guidance:activity:"))
+    reflection = await service.choose_guidance_signal(
+        lead_id, activity_slug=activity.removeprefix("guidance:activity:")
+    )
+    token = next(
+        data.removeprefix("guidance:revise:")
+        for _, data in reflection.buttons
+        if data.startswith("guidance:revise:")
+    )
+
+    revision = await service.revise_guidance(lead_id, token)
+    service.pause_discovery(lead_id)
+    resumed = service.resume_discovery(lead_id)
+
+    assert "What should I change or add" in revision.text
+    assert resumed.text == revision.text
 
 
 @pytest.mark.asyncio
@@ -551,7 +753,8 @@ def test_browse_path_does_not_force_qualification(tmp_path: Path) -> None:
     assert repository.get_lead(lead_id)["state"] == "browsing"  # type: ignore[index]
 
 
-def test_known_field_recommends_only_complete_catalog_courses_and_persists_path(
+@pytest.mark.asyncio
+async def test_known_field_recommends_only_complete_catalog_courses_and_persists_path(
     tmp_path: Path,
 ) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -574,9 +777,10 @@ def test_known_field_recommends_only_complete_catalog_courses_and_persists_path(
     service.begin_path(lead_id, "field")
     level_reply = service.recommend_field(lead_id, "tech/data")
     assert any(data == "level:any" for _, data in level_reply.buttons)
-    activity_reply = service.choose_level(lead_id, "any")
-    assert any(data.startswith("activity:") for _, data in activity_reply.buttons)
-    reply = service.choose_activity(lead_id, "skip")
+    reflection = service.choose_level(lead_id, "any")
+    assert "open to all listed study levels" in reflection.text
+    pending = next(data for _, data in reflection.buttons if data.startswith("guidance:confirm:"))
+    reply = await service.confirm_guidance(lead_id, pending.removeprefix("guidance:confirm:"))
 
     lead = repository.get_lead(lead_id)
     facts = repository.list_facts(lead_id)
@@ -676,7 +880,8 @@ def test_parent_course_suggestion_requires_student_confirmation(tmp_path: Path) 
         ("vocational-skills", "vocational_certificate", "food-service-skills"),
     ],
 )
-def test_fixed_catalog_evaluation_matrix_returns_expected_complete_course(
+@pytest.mark.asyncio
+async def test_fixed_catalog_evaluation_matrix_returns_expected_complete_course(
     tmp_path: Path, field: str, level: str, expected_course: str
 ) -> None:
     repository = Repository(tmp_path / f"{expected_course}.sqlite3")
@@ -690,8 +895,12 @@ def test_fixed_catalog_evaluation_matrix_returns_expected_complete_course(
     lead_id, _ = service.start("123", "student")
     service.begin_path(lead_id, "explore")
     service.recommend_field(lead_id, field)
-    service.choose_level(lead_id, level)
-    result = service.choose_activity(lead_id, "skip")
+    reflection = service.choose_level(lead_id, level)
+    assert "Did I get that right" in reflection.text
+    confirmation = next(
+        data for _, data in reflection.buttons if data.startswith("guidance:confirm:")
+    )
+    result = await service.confirm_guidance(lead_id, confirmation.removeprefix("guidance:confirm:"))
 
     assert any(data == f"course:{expected_course}" for _, data in result.buttons)
 
