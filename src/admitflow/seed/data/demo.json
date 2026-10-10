@@ -1,0 +1,20 @@
+{
+  "tenant_id": "demo-institution",
+  "name": "Demo Admissions Academy",
+  "courses": [
+    {
+      "id": "foundations-computing",
+      "name": "Foundations of Computing",
+      "description": "A fictional sample course for demonstrating course discovery and eligibility.",
+      "minimum_marks_percent": 50,
+      "application_fee_paise": 50000
+    },
+    {
+      "id": "business-analytics",
+      "name": "Business Analytics Basics",
+      "description": "A fictional sample course for demonstrating course discovery and eligibility.",
+      "minimum_marks_percent": 45,
+      "application_fee_paise": 30000
+    }
+  ]
+}

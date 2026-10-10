@@ -1,0 +1,30 @@
+[
+  {
+    "id": "hostel",
+    "title": "Hostel facilities",
+    "question": "Is hostel accommodation available?",
+    "answer": "This fictional demo institution has a sample hostel facility. Contact the admissions team for availability and current details.",
+    "source": "Demo FAQ: hostel facilities"
+  },
+  {
+    "id": "class-format",
+    "title": "Class format",
+    "question": "How are classes conducted?",
+    "answer": "The fictional demo courses use a mix of instructor-led sessions and guided practice. This is sample information for the hackathon demo.",
+    "source": "Demo FAQ: class format"
+  },
+  {
+    "id": "language-support",
+    "title": "Language support",
+    "question": "Which languages can I use?",
+    "answer": "The demo bot is designed for English and simple Hinglish interactions. Language support is limited in this hackathon build.",
+    "source": "Demo FAQ: language support"
+  },
+  {
+    "id": "course-duration",
+    "title": "Course duration",
+    "question": "How long does a course take?",
+    "answer": "Course duration depends on the selected sample course. Please ask staff for confirmed dates and schedules.",
+    "source": "Demo FAQ: course duration"
+  }
+]

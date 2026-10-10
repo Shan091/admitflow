@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="/">← All leads</a></p>
+<h2>{{ lead.telegram_username or lead.telegram_user_id }}</h2>
+<dl>
+  <dt>Course</dt><dd>{{ lead.course_name or "Not selected" }}</dd>
+  <dt>Status</dt><dd>{{ lead.state }}</dd>
+  <dt>Grade 12 completed</dt><dd>{{ "Yes" if lead.completed_grade12 else ("No" if lead.completed_grade12 == 0 else "—") }}</dd>
+  <dt>Overall marks</dt><dd>{{ lead.marks_percent if lead.marks_percent is not none else "—" }}</dd>
+  <dt>Meets sample rules</dt><dd>{{ "Yes" if lead.eligible else ("No" if lead.eligible == 0 else "—") }}</dd>
+</dl>
+<h3>Conversation</h3>
+{% for message in messages %}<div class="msg {{ message.direction }}"><strong>{{ message.direction }}:</strong> {{ message.body }}</div>{% else %}<p>No messages recorded.</p>{% endfor %}
+{% endblock %}

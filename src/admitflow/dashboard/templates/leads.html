@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Leads</h2>
+{% if leads %}
+<table>
+  <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Eligible</th><th>Updated</th></tr></thead>
+  <tbody>
+  {% for lead in leads %}
+    <tr>
+      <td><a href="/leads/{{ lead.id }}">{{ lead.telegram_username or lead.telegram_user_id }}</a></td>
+      <td>{{ lead.course_name or "Not selected" }}</td>
+      <td>{{ lead.state }}</td>
+      <td>{% if lead.eligible is none %}—{% elif lead.eligible %}Meets sample rules{% else %}Does not meet sample rules{% endif %}</td>
+      <td>{{ lead.updated_at }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}<p>No leads yet. Start a conversation with the configured Telegram bot.</p>{% endif %}
+{% endblock %}

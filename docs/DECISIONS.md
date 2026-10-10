@@ -1,0 +1,27 @@
+# Project decisions
+
+Record consequential choices here. Each entry is short; update it when evidence changes a choice.
+
+1. **Demo channel — Telegram long-polling.** It avoids WhatsApp provisioning/webhook setup for
+   the hackathon; a Telegram bot token is required for live interaction.
+2. **Runtime and persistence — one FastAPI process and SQLite.** This is enough for one seeded
+   demo tenant; no Redis, TaskIQ, Postgres, or separate frontend in this scope.
+3. **Architecture — domain/services/adapters.** Keep one real adapter per boundary; introduce a
+   small Protocol only where injection or a test double needs it. No speculative ports framework.
+4. **Eligibility and fees — code-owned.** Structured seed data and Python rules determine
+   eligibility and prices; model output cannot change either.
+5. **Knowledge retrieval — OpenAI embeddings + SQLite vectors + NumPy cosine.** Embed seeded
+   FAQ question/answer chunks with `text-embedding-3-small`; no general upload/parser or vector DB.
+6. **Fail-closed retrieval and initial thresholds.** Begin at cosine `0.72` and top-result margin
+   `0.05`; calibrate against fixed demo cases. These are provisional, not guarantees. Abstain on
+   weak, ambiguous, or unavailable retrieval.
+7. **Fee routing and scope.** Route price questions to structured course data before RAG; exclude
+   amounts from free-form FAQ chunks. Payments, WhatsApp, uploads, and production services are
+   deferred.
+
+## References
+
+- OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings
+- OpenAI Decisions: https://developers.openai.com/api/docs/guides/decisions
+- Python Telegram Bot async lifecycle:
+  https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-requested-design-patterns

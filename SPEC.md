@@ -1,0 +1,39 @@
+# AdmitFlow — Hackathon Demo Spec
+
+## Mission
+
+Help a prospective student explore an institution's courses and get accurate, remembered
+admissions guidance through a conversational channel.
+
+## Product and audience
+
+AdmitFlow is an admissions-engagement assistant for students and parents and a lightweight lead
+view for staff. The hackathon version uses Telegram as its demo channel. It is not a production
+admissions system and uses a clearly fictional institution and seeded data.
+
+## Hackathon capability map
+
+- **Discovery:** Telegram buttons show courses and a no-pressure browse path.
+- **Qualification:** Structured answers are checked by Python against course rules.
+- **Memory:** SQLite persists the Telegram lead, selected course, qualification answers, and chat.
+- **Knowledge:** OpenAI `text-embedding-3-small` embeds seeded FAQ chunks; NumPy cosine search
+  selects relevant chunks; uncertain retrieval fails closed.
+- **Staff view:** A local, read-only FastAPI dashboard shows leads and conversation history.
+- **Money boundary:** Fee answers come from structured course data; no model calculates or
+  negotiates fees.
+
+## Demo success criteria
+
+1. A real Telegram user can browse, select a course, and complete the seeded qualification flow.
+2. Eligibility is a deterministic result of stored rules and answers.
+3. The lead and messages remain after app restart and appear in the dashboard.
+4. A seeded FAQ question retrieves its source; unrelated/ambiguous questions do not fabricate an
+   answer; fee questions bypass RAG.
+5. README setup steps work, `scripts/verify.sh` passes, and the final submitted commit SHA is
+   recorded with actual check results.
+
+## Roadmap
+
+- **Hackathon:** Foundation, Telegram qualification, local dashboard, seeded embedding retrieval.
+- **Deferred:** Payments, staff login, file uploads/PDF parsing, WhatsApp, workers, multi-tenant
+  onboarding, deployment, notification systems, and production privacy controls.

@@ -1,0 +1,29 @@
+"""Environment-backed demo settings."""
+
+import os
+from dataclasses import dataclass
+from pathlib import Path
+
+
+@dataclass(frozen=True, slots=True)
+class Settings:
+    telegram_bot_token: str | None
+    openai_api_key: str | None
+    openai_decisions_model: str
+    openai_embedding_model: str
+    database_path: Path
+    rag_min_similarity: float
+    rag_min_margin: float
+
+
+def get_settings() -> Settings:
+    """Read configuration from environment without exposing secret values."""
+    return Settings(
+        telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN") or None,
+        openai_api_key=os.getenv("OPENAI_API_KEY") or None,
+        openai_decisions_model=os.getenv("OPENAI_DECISIONS_MODEL", "gpt-6-luna"),
+        openai_embedding_model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+        database_path=Path(os.getenv("DATABASE_PATH", "data/admitflow.sqlite3")),
+        rag_min_similarity=float(os.getenv("RAG_MIN_SIMILARITY", "0.72")),
+        rag_min_margin=float(os.getenv("RAG_MIN_MARGIN", "0.05")),
+    )
