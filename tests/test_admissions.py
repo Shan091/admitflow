@@ -2278,6 +2278,30 @@ def test_parent_confirmed_diploma_stays_agent_led_without_staff_handoff(
     assert lead["handoff_status"] == "none"
 
 
+def test_non_undergraduate_eligibility_limit_is_explained_once_per_chat(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    first = service.select_course(lead_id, "digital-design-diploma")
+    second = service.select_course(lead_id, "hospitality-diploma")
+
+    assert "no eligibility rules configured" in first.text
+    assert "Completed Grade 12 or equivalent" in first.text
+    assert "no eligibility rules configured" not in second.text
+    assert "Hospitality and Guest Services Diploma" in second.text
+    assert "Sample prerequisites:" in second.text
+    assert any(data == "path:explore" for _, data in second.buttons)
+
+
 @pytest.mark.parametrize(
     ("field", "level", "expected_course"),
     [

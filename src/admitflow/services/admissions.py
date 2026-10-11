@@ -1151,6 +1151,9 @@ class AdmissionsService:
         self._clear_guidance_confirmation(lead_id)
         self.repository.save_fact(lead_id, "course_choice_student", course.id, "student")
         if course.education_level != "undergraduate" or course.minimum_marks_percent <= 0:
+            eligibility_limit_explained = any(
+                fact["fact_key"] == "eligibility_limit_explained" for fact in facts
+            )
             self.repository.update_lead(
                 lead_id,
                 state="browsing",
@@ -1161,14 +1164,20 @@ class AdmissionsService:
                 marks_percent=None,
                 eligible=None,
             )
+            if not eligibility_limit_explained:
+                self.repository.save_fact(lead_id, "eligibility_limit_explained", "true")
+            limitation = (
+                "\n\nI can show these sample facts, but this demo has no eligibility rules "
+                "configured for this study level, so I can't confirm eligibility or admission. "
+                "Would you like to keep exploring or compare other courses?"
+                if not eligibility_limit_explained
+                else "\n\nWould you like to explore another course or browse the sample catalog?"
+            )
             return Reply(
                 f"{course.name} is a fictional {course.education_level.replace('_', ' ')} sample. "
                 f"Sample prerequisites: {'; '.join(course.prerequisites)}. "
                 f"Sample medium: {course.medium}. Sample language support: "
-                f"{', '.join(course.language_support) or 'not specified'}.\n\n"
-                "I can show these sample facts, but this demo has no eligibility rules "
-                "configured for this study level, so I can't confirm eligibility or admission. "
-                "Would you like to keep exploring or compare other courses?",
+                f"{', '.join(course.language_support) or 'not specified'}.{limitation}",
                 (
                     ("Explore another course", "path:explore"),
                     ("Browse sample courses", "path:browse"),

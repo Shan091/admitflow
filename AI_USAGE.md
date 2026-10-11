@@ -1,5 +1,19 @@
 # AI usage
 
+## 2026-10-11 — avoid repeating course eligibility limitation
+
+- **Task:** The learner screenshot showed the same non-undergraduate eligibility disclaimer after
+  each course selection, making comparison feel repetitive.
+- **Assistance:** Codex updated course selection to explain the missing eligibility rules once per
+  chat. Later course cards continue to show their fictional prerequisites, medium, language support,
+  and exploration actions without repeating that paragraph.
+- **Checks:** The regression and existing parent-confirmed diploma tests passed (2 tests).
+  `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 182 tests; `git diff --check`
+  passed.
+- **Human review:** User shared the screenshot showing the repeated disclaimer. No live Telegram or
+  paid API calls were used.
+- **Delivery:** Commit and push details will be recorded in the task checklist after delivery.
+
 ## 2026-10-11 — keep routine course guidance with the agent
 
 - **Task:** Remove automatic staff escalation from the learner-confirmed Diploma path shown in the

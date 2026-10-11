@@ -589,3 +589,11 @@
   committed and pushed.
 - Verified the implementation milestone: `bash scripts/verify.sh` passed (Ruff lint/format, strict
   mypy, 181 tests); targeted admissions tests passed (92 tests); `git diff --check` passed.
+# 2026-10-11 — avoid repeating course eligibility limitation
+
+- Explain once per chat that the demo has no configured eligibility rules for the learner's selected
+  study level. Subsequent course comparisons retain sample facts and browsing actions without
+  repeating the same limitation paragraph.
+- Added regression coverage for selecting multiple non-undergraduate courses in one conversation.
+- Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 182 tests;
+  `git diff --check` passed.
