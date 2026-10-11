@@ -24,6 +24,16 @@ _EXPLORE_CHOICES_PROMPT = (
 )
 
 
+def _sample_prerequisite_summary(course: Course) -> str:
+    requirements = list(course.prerequisites)
+    marks_label = f"{course.minimum_marks_percent:g}%"
+    if course.minimum_marks_percent > 0 and not any(
+        marks_label in requirement for requirement in requirements
+    ):
+        requirements.append(f"Sample minimum overall marks: {marks_label}")
+    return "; ".join(requirements)
+
+
 @dataclass(frozen=True, slots=True)
 class Reply:
     text: str
@@ -940,7 +950,7 @@ class AdmissionsService:
             f"Field: {course.field}\n"
             f"About: {course.description}\n"
             f"Why it matched: {'; '.join(match.reasons)}\n"
-            f"Sample prerequisites: {'; '.join(course.prerequisites)}\n"
+            f"Sample prerequisites: {_sample_prerequisite_summary(course)}\n"
             f"Teaching medium: {course.medium}\n"
             f"Listed language support: {', '.join(course.language_support) or 'not specified'}\n"
             f"Listed study formats: {study_formats}\n"
@@ -1176,7 +1186,7 @@ class AdmissionsService:
             )
             return Reply(
                 f"{course.name} is a fictional {course.education_level.replace('_', ' ')} sample. "
-                f"Sample prerequisites: {'; '.join(course.prerequisites)}. "
+                f"Sample prerequisites: {_sample_prerequisite_summary(course)}. "
                 f"Sample medium: {course.medium}. Sample language support: "
                 f"{', '.join(course.language_support) or 'not specified'}.{limitation}\n\n"
                 "Do you meet all the sample prerequisites listed above? This self-report is for "

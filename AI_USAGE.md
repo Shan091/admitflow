@@ -1,5 +1,17 @@
 # AI usage
 
+## 2026-10-11 — include seeded marks thresholds in the self-report gate
+
+- **Task:** Review the all-level fee path against the entire seeded catalog to ensure its self-report
+  shows every sample requirement stored for a course.
+- **Assistance:** Codex updated the shared prerequisite summary used by course details and the
+  self-report question to add a course's seeded minimum overall marks when the prerequisite text
+  doesn't already state it. The check remains an unverified self-report for non-undergraduate
+  courses, not an admissions decision.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests;
+  `git diff --check` passed. Targeted self-report tests passed (4 cases). No live payment call.
+- **Delivery:** Commit details will be added to the task checklist after commit.
+
 ## 2026-10-11 — unlock the demo fee step for other catalog levels
 
 - **Task:** The user reported that recommended diploma courses could not reach payment.

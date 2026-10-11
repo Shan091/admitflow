@@ -609,3 +609,10 @@
 - Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests, including
   a fake Telegram-to-payment-link flow. `git diff --check` passed; no live Razorpay call was made.
 - Delivered in commit `ac9e7ba0e3ae8aa109184390664093ab1b50c833`, pushed to `origin/main`.
+
+# 2026-10-11 — include seeded marks in the displayed prerequisites
+
+- Use one shared sample-prerequisite summary in course details and the non-undergraduate self-report
+  gate. It adds the seeded minimum-mark threshold when the course's prerequisite text omits it.
+- Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests; targeted
+  prerequisite tests passed (4 cases); `git diff --check` passed. No live payment call was made.

@@ -2602,6 +2602,10 @@ def test_sample_prerequisite_self_report_is_available_across_levels(
     lead_id, _ = service.start("123", "student")
 
     prompt = service.select_course(lead_id, course_id)
+    course = repository.get_course(repository.tenant_id, course_id)
+    assert course is not None
+    if course.minimum_marks_percent > 0:
+        assert f"{course.minimum_marks_percent:g}%" in prompt.text
     affirmative = next(
         data for _, data in prompt.buttons if data.startswith("sample-prerequisites:yes:")
     )
