@@ -13,7 +13,7 @@
 ---
 
 > [!IMPORTANT]
-> **Hackathon demo.** Course details, entry requirements, and fees are illustrative; AdmitFlow does
+> Course details, entry requirements, and fees are illustrative; AdmitFlow does
 > not submit an application or make admission decisions. Payments use test mode. Use demo inputs
 > only: Telegram identifiers and messages are stored locally. While AI processing is enabled,
 > typed text and up to eight recent chat messages plus saved course preferences may be sent to
