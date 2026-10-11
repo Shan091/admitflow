@@ -379,9 +379,12 @@ courses, no scores, student-first attribution, and truthful staff handoff.
 
 # README observability guide
 
-- [ ] Document Langfuse setup, regional base URL, trace names/contents, live verification path,
+- [x] Document Langfuse setup, regional base URL, trace names/contents, live verification path,
   and separate deletion of Langfuse copies; run the project quality gate and publish only intended
   documentation files.
+
+  Verified on `e38c2c0`: `bash scripts/verify.sh` passed with 194 tests; documentation-only files
+  were committed and pushed.
 
 ## Visual identity: brand kit, landing page, dashboard restyle
 
