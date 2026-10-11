@@ -49,7 +49,7 @@ async def test_retrieval_indexes_seeded_faqs_and_returns_source(tmp_path: Path) 
     answer = await service.answer(repository.tenant_id, "hostel question")
 
     assert answer is not None
-    assert answer[1] == "Fictional seeded FAQ: hostel facilities"
+    assert answer[1] == "Accommodation information"
 
 
 @pytest.mark.asyncio

@@ -34,7 +34,7 @@ def test_catalog_seeding_is_idempotent_and_fees_are_structured(tmp_path: Path) -
     )
 
 
-def test_catalog_has_broad_fictional_options_with_complete_sample_facts(
+def test_catalog_has_broad_options_with_complete_course_facts(
     tmp_path: Path,
 ) -> None:
     repository = make_repository(tmp_path)
@@ -68,7 +68,8 @@ def test_catalog_has_broad_fictional_options_with_complete_sample_facts(
     )
     assert all(
         course.description
-        and "fictional" in course.description.casefold()
+        and "fictional" not in course.description.casefold()
+        and "sample" not in course.description.casefold()
         and course.interests
         and course.activities
         and course.prerequisites

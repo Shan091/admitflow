@@ -30,7 +30,7 @@ def _sample_prerequisite_summary(course: Course) -> str:
     if course.minimum_marks_percent > 0 and not any(
         marks_label in requirement for requirement in requirements
     ):
-        requirements.append(f"Sample minimum overall marks: {marks_label}")
+        requirements.append(f"Minimum overall marks: {marks_label}")
     return "; ".join(requirements)
 
 
@@ -111,7 +111,7 @@ class AdmissionsService:
             "postgraduate",
         }
         if level is not None and level not in valid_levels:
-            return Reply("Please choose one of the listed sample education levels.")
+            return Reply("Please choose one of the listed education levels.")
         activities = {
             activity
             for course in self.repository.list_courses(self.tenant_id)
@@ -119,7 +119,7 @@ class AdmissionsService:
             if activity_slug is not None and _activity_slug(activity) == activity_slug
         }
         if activity_slug is not None and not activities:
-            return Reply("That activity choice is not in the sample catalog. Please choose again.")
+            return Reply("That activity choice is not in the course catalog. Please choose again.")
         turn = DiscoveryTurn(
             intent="discovery",
             course_id=None,
@@ -133,7 +133,7 @@ class AdmissionsService:
         return await self._handle_discovery_turn(lead_id, turn, "")
 
     async def choose_guidance_goal(self, lead_id: int, goal_slug: str | None) -> Reply:
-        """Accept only study goals present in the fictional course catalog."""
+        """Accept only study goals present in the course catalog."""
         if goal_slug is None:
             return self._present_guidance(lead_id)
         goals = {
@@ -143,7 +143,7 @@ class AdmissionsService:
             if _goal_slug(goal) == goal_slug
         }
         if not goals:
-            return Reply("That study goal is not in the sample catalog. Please choose again.")
+            return Reply("That study goal is not in the course catalog. Please choose again.")
         turn = DiscoveryTurn(
             intent="discovery",
             course_id=None,
@@ -211,7 +211,7 @@ class AdmissionsService:
         }
         if not supports:
             return Reply(
-                "That support option is not listed in the sample catalog. Please choose again."
+                "That support option is not listed in the course catalog. Please choose again."
             )
         turn = DiscoveryTurn(
             intent="discovery",
@@ -227,7 +227,7 @@ class AdmissionsService:
         return await self._handle_discovery_turn(lead_id, turn, "")
 
     async def choose_guidance_delivery_mode(self, lead_id: int, mode_slug: str | None) -> Reply:
-        """Apply a delivery-format option shown for the current matching sample courses."""
+        """Apply a delivery-format option shown for the current matching courses."""
         speaker = self._fact_value(lead_id, "active_speaker") or "student"
         if mode_slug is None:
             if speaker != "student" and self._fact_value(
@@ -315,7 +315,7 @@ class AdmissionsService:
             if _delivery_mode_slug(mode) == mode_slug
         }
         if not modes:
-            return Reply("That format is not listed for these sample matches. Please choose again.")
+            return Reply("That format is not listed for these matches. Please choose again.")
         turn = DiscoveryTurn(
             intent="discovery",
             course_id=None,
@@ -385,7 +385,7 @@ class AdmissionsService:
             "study level, or language-support preference, or mention another detail that matters.",
             (
                 ("Choose a field", "path:field"),
-                ("Browse sample courses", "path:browse"),
+                ("Browse courses", "path:browse"),
                 ("Choose a known course", "path:course"),
             ),
         )
@@ -539,41 +539,45 @@ class AdmissionsService:
 
     def _discovery_prompt(self, language: str = "en") -> Reply:
         copy = {
-            "en": "This is fictional demo guidance, not an admissions decision. Typed messages "
-            "and a few recent chat messages are sent to OpenAI to guide the conversation; "
-            "messages are stored locally. Use "
-            "demo text only, not real student or personal data. What are you "
-            "thinking about studying, or what do you enjoy doing? You can type a course or "
-            "interest in your own words, say you're not sure, or choose a shortcut. Most other "
-            "demo replies remain in English; translated copy needs fluent-speaker review. Please "
-            "use demo text only. You can turn OpenAI processing off at any time.",
-            "hi": "यह काल्पनिक डेमो मार्गदर्शन है, प्रवेश निर्णय नहीं। आपके लिखे संदेश नमूना कोर्स "
-            "मिलाने के लिए OpenAI को भेजे जाते हैं और स्थानीय रूप से सहेजे जाते हैं। Recent chat "
-            "context may also be included. केवल डेमो "
-            "जानकारी लिखें, असली छात्र या निजी जानकारी नहीं। आप क्या पढ़ने के बारे में सोच "
-            "रहे हैं, या आपको क्या करना पसंद है? आप अपने शब्दों "
-            "में कोर्स या रुचि लिख सकते हैं, कह सकते हैं कि अभी तय नहीं है, या नीचे विकल्प चुन सकते "
-            "हैं। डेमो के ज़्यादातर जवाब अभी अंग्रेज़ी में हैं; अनुवाद की समीक्षा बाकी है। आप "
-            "केवल डेमो जानकारी लिखें। OpenAI प्रोसेसिंग कभी भी बंद कर सकते हैं।",
-            "ml": "ഇത് സാങ്കൽപ്പിക ഡെമോ മാർഗനിർദ്ദേശമാണ്, പ്രവേശന തീരുമാനം അല്ല. മാതൃകാ കോഴ്സുകൾ "
-            "കണ്ടെത്താൻ നിങ്ങൾ ടൈപ്പ് ചെയ്യുന്ന സന്ദേശങ്ങൾ OpenAI-ലേക്ക് അയയ്ക്കുകയും പ്രാദേശികമായി "
-            "സൂക്ഷിക്കുകയും ചെയ്യും. Recent chat context may also be included. ഡെമോ വിവരങ്ങൾ മാത്രം "
-            "നൽകുക; യഥാർത്ഥ വ്യക്തിഗത വിവരങ്ങൾ "
-            "നൽകരുത്. നിങ്ങൾ എന്താണ് "
-            "പഠിക്കാൻ ആലോചിക്കുന്നത്, അല്ലെങ്കിൽ എന്ത് ചെയ്യാനാണ് ഇഷ്ടം? "
-            "കോഴ്സോ താൽപര്യമോ നിങ്ങളുടെ വാക്കുകളിൽ ടൈപ്പ് ചെയ്യാം, ഉറപ്പില്ലെന്ന് പറയാം, അല്ലെങ്കിൽ "
-            "താഴെയുള്ളൊരു വഴി തിരഞ്ഞെടുക്കാം. ഡെമോയുടെ മിക്ക മറുപടികളും ഇപ്പോൾ ഇംഗ്ലീഷിലാണ്; "
-            "വിവർത്തനത്തിന് വിദഗ്ധ പരിശോധന വേണം. OpenAI പ്രോസസ്സിംഗ് എപ്പോൾ വേണമെങ്കിലും ഓഫ് "
-            "ചെയ്യാം. ഡെമോ ടെക്സ്റ്റ് മാത്രം ഉപയോഗിക്കുക.",
-            "hinglish": "Yeh fictional demo guidance hai, admission decision nahi. Sample courses "
-            "match karne ke liye typed messages OpenAI ko bheje aur locally save kiye jaate hain. "
-            "Recent chat context may also be included. "
-            "Sirf demo text use karein; real student ya personal details nahi. Aap kya study "
-            "karne ka soch rahe hain, ya aapko kya karna pasand hai? "
-            "Course ya interest apne words mein likhein, unsure bol sakte hain, ya neeche shortcut "
-            "chunein. Demo ke most replies abhi English mein hain; translation ko fluent speaker "
-            "review karega. Sirf demo text use karein. OpenAI processing kabhi bhi off kar "
-            "sakte hain.",
+            "en": (
+                "Welcome to AdmitFlow. I can help you explore courses and entry requirements. "
+                "Course details and fees are for demonstration. This build does not submit an "
+                "application, and payment links use test mode. Your message and recent chat "
+                "context "
+                "are sent to OpenAI and stored locally. Please don't share real student or "
+                "personal details. What are you thinking about studying, or what do you enjoy? "
+                "You can type freely or choose a shortcut below. Most replies are in English; "
+                "other translations are still being reviewed. You can turn off OpenAI processing "
+                "at any time."
+            ),
+            "hi": (
+                "AdmitFlow में आपका स्वागत है। मैं कोर्स और प्रवेश की शर्तें देखने में आपकी मदद "
+                "करूँगा। यह डेमो है: यहाँ दिए गए कोर्स और शुल्क प्रदर्शन के लिए हैं; आवेदन जमा "
+                "नहीं होगा और भुगतान टेस्ट मोड में होगा। आपके संदेश और हाल की बातचीत OpenAI को "
+                "भेजी जाती है और स्थानीय रूप से सहेजी जाती है। कृपया असली छात्र या निजी जानकारी "
+                "साझा न करें। आप क्या पढ़ना चाहते हैं, या आपको क्या करना पसंद है? अपने शब्दों में "
+                "लिखें या नीचे विकल्प चुनें। ज़्यादातर जवाब अंग्रेज़ी में हैं। OpenAI प्रोसेसिंग "
+                "कभी भी बंद कर सकते हैं।"
+            ),
+            "ml": (
+                "AdmitFlow-ലേക്ക് സ്വാഗതം. കോഴ്സുകളും പ്രവേശന ആവശ്യകതകളും കണ്ടെത്താൻ ഞാൻ "
+                "സഹായിക്കാം. ഇത് ഒരു ഡെമോയാണ്: കോഴ്സ് വിവരങ്ങളും ഫീസും ഡെമോ ആവശ്യത്തിനുള്ളതാണ്; "
+                "അപേക്ഷ സമർപ്പിക്കില്ല, പേയ്മെന്റുകൾ ടെസ്റ്റ് മോഡിലാണ്. നിങ്ങളുടെ സന്ദേശവും സമീപകാല "
+                "ചാറ്റും OpenAI-ലേക്ക് അയയ്ക്കുകയും പ്രാദേശികമായി സൂക്ഷിക്കുകയും ചെയ്യും. യഥാർത്ഥ വിദ്യാർത്ഥികളുടെയോ "
+                "വ്യക്തിപരമോ ആയ വിവരങ്ങൾ "
+                "പങ്കിടരുത്. എന്താണ് പഠിക്കാൻ ആഗ്രഹിക്കുന്നത്? ഇവിടെ എഴുതുകയോ താഴെയുള്ളൊരു വഴി "
+                "തിരഞ്ഞെടുക്കുകയോ ചെയ്യാം. OpenAI പ്രോസസ്സിംഗ് എപ്പോൾ വേണമെങ്കിലും ഓഫ് ചെയ്യാം."
+            ),
+            "hinglish": (
+                "AdmitFlow mein welcome. Main courses aur entry requirements explore karne mein "
+                "help karunga. Yeh demo hai: course details aur fees demo ke liye hain; "
+                "application submit nahi hota aur payments test mode mein hain. Aapka message aur "
+                "recent chat OpenAI ko bheje aur locally store kiye jaate hain. Real student ya "
+                "personal details "
+                "share na karein. Aap kya study karna chahte hain, ya aapko kya karna pasand hai? "
+                "Apne words mein likhein ya neeche shortcut chunein. OpenAI processing kabhi bhi "
+                "off kar sakte hain."
+            ),
         }
         return Reply(
             copy.get(language, copy["en"]),
@@ -594,7 +598,7 @@ class AdmissionsService:
                 "details because messages are stored locally.",
                 "Explore by field",
                 "Explore with choices",
-                "Browse sample courses",
+                "Browse courses",
                 "Choose a known course",
                 "Turn on OpenAI processing",
             ),
@@ -604,7 +608,7 @@ class AdmissionsService:
                 "हैं।",
                 "विषय चुनें",
                 "विकल्पों से खोजें",
-                "नमूना कोर्स देखें",
+                "कोर्स देखें",
                 "कोर्स चुनें",
                 "OpenAI प्रोसेसिंग चालू करें",
             ),
@@ -614,7 +618,7 @@ class AdmissionsService:
                 "നൽകരുത്; സന്ദേശങ്ങൾ പ്രാദേശികമായി സൂക്ഷിക്കും.",
                 "മേഖല തിരഞ്ഞെടുക്കുക",
                 "ഓപ്ഷനുകളിലൂടെ കണ്ടെത്തുക",
-                "മാതൃകാ കോഴ്സുകൾ കാണുക",
+                "കോഴ്സുകൾ കാണുക",
                 "കോഴ്സ് തിരഞ്ഞെടുക്കുക",
                 "OpenAI പ്രോസസ്സിംഗ് ഓൺ ചെയ്യുക",
             ),
@@ -624,7 +628,7 @@ class AdmissionsService:
                 "bhejein; messages local database mein save hote hain.",
                 "Field se explore karein",
                 "Choices se explore karein",
-                "Sample courses dekhein",
+                "Courses dekhein",
                 "Course choose karein",
                 "OpenAI processing chalu karein",
             ),
@@ -654,7 +658,7 @@ class AdmissionsService:
         if path == "course":
             courses = self.repository.list_courses(self.tenant_id)
             return Reply(
-                "Choose a course. These are fictional sample offerings.",
+                "Which course would you like to explore?",
                 tuple((course.name, f"course:{course.id}") for course in courses),
             )
         if path == "field":
@@ -720,7 +724,7 @@ class AdmissionsService:
             "class or outside school? Pick an example or tell me in your own words.",
             activity_buttons
             + field_buttons
-            + (("Browse sample courses", "path:browse"), ("Pause for now", "discovery:pause")),
+            + (("Browse courses", "path:browse"), ("Pause for now", "discovery:pause")),
         )
 
     def _uncertainty_recovery_reply(self, lead_id: int) -> Reply:
@@ -730,7 +734,7 @@ class AdmissionsService:
             "to explore, or pause for now. No course will be suggested "
             "until you share something to guide it.",
             (
-                ("Browse sample courses", "path:browse"),
+                ("Browse courses", "path:browse"),
                 ("Choose a field to explore", "path:field"),
                 ("Pause for now", "discovery:pause"),
             ),
@@ -741,12 +745,11 @@ class AdmissionsService:
         selected = next((course.field for course in courses if course.field == field), None)
         if selected is None:
             return Reply(
-                "That field isn't part of this fictional catalog, so I can't recommend a course "
-                "in it. I can show the fields that are offered or help you find the closest "
-                "sample option.",
+                "I don't see a course in that field in our current catalog. I can show the "
+                "available fields or help you find a similar option.",
                 (
                     ("Choose an offered field", "path:explore"),
-                    ("Browse sample courses", "path:browse"),
+                    ("Browse courses", "path:browse"),
                 ),
             )
         speaker_fact = next(
@@ -793,7 +796,7 @@ class AdmissionsService:
     def choose_level(self, lead_id: int, level: str) -> Reply:
         valid_levels = {"vocational_certificate", "diploma", "undergraduate", "postgraduate", "any"}
         if level not in valid_levels:
-            return Reply("Please choose one of the listed sample education levels.")
+            return Reply("Please choose one of the listed education levels.")
         active = next(
             (
                 fact["fact_value"]
@@ -887,7 +890,7 @@ class AdmissionsService:
             )
             if activity is None:
                 return Reply(
-                    "That activity choice is not in the sample catalog. Please choose again."
+                    "That activity choice is not in the course catalog. Please choose again."
                 )
             self.repository.save_fact(lead_id, "interest_activity_student", activity, "student")
         self.repository.update_lead(lead_id, discovery_step="results")
@@ -903,7 +906,7 @@ class AdmissionsService:
         """Return the current confirmed comparison set, refreshing it if it became stale."""
         lead = self.repository.get_lead(lead_id)
         if lead is None:
-            return Reply("Send /start to begin a new demo conversation.")
+            return Reply("Send /start to begin.")
         if lead["discovery_step"] != "results" or not self._guidance_is_currently_confirmed(
             lead_id
         ):
@@ -924,10 +927,10 @@ class AdmissionsService:
         )
 
     def explore_guidance_course(self, lead_id: int, course_id: str) -> Reply:
-        """Show verified sample details without treating interest as course selection."""
+        """Show verified details without treating interest as course selection."""
         lead = self.repository.get_lead(lead_id)
         if lead is None:
-            return Reply("Send /start to begin a new demo conversation.")
+            return Reply("Send /start to begin.")
         matches = self._current_guidance_matches(lead_id)
         is_current = lead["discovery_step"] == "results" and self._guidance_is_currently_confirmed(
             lead_id
@@ -945,23 +948,22 @@ class AdmissionsService:
             ", ".join(mode.replace("_", " ") for mode in course.delivery_modes) or "not specified"
         )
         details = (
-            f"Fictional sample details — {course.name}\n"
+            f"Course details — {course.name}\n"
             f"Level: {course.education_level.replace('_', ' ')}\n"
             f"Field: {course.field}\n"
             f"About: {course.description}\n"
             f"Why it matched: {'; '.join(match.reasons)}\n"
-            f"Sample prerequisites: {_sample_prerequisite_summary(course)}\n"
+            f"Entry requirements: {_sample_prerequisite_summary(course)}\n"
             f"Teaching medium: {course.medium}\n"
             f"Listed language support: {', '.join(course.language_support) or 'not specified'}\n"
             f"Listed study formats: {study_formats}\n"
-            f"Sample application fee: {format_inr_from_paise(course.application_fee_paise)}\n\n"
-            "This is fictional sample catalog data, not an admission decision or a promise of "
-            "availability. You can compare the other matches before choosing whether to continue."
+            f"Application fee: {format_inr_from_paise(course.application_fee_paise)}\n\n"
+            "You can compare other courses before deciding whether to continue."
         )
         action_label = (
-            "Check sample eligibility"
+            "Check eligibility"
             if course.education_level == "undergraduate" and course.minimum_marks_percent > 0
-            else "Check sample prerequisites"
+            else "Check entry requirements"
         )
         return Reply(
             details,
@@ -972,10 +974,10 @@ class AdmissionsService:
         )
 
     def continue_guidance_course(self, lead_id: int, course_id: str) -> Reply:
-        """Continue only a current match into supported qualification or sample exploration."""
+        """Continue only a current match into supported qualification or exploration."""
         lead = self.repository.get_lead(lead_id)
         if lead is None:
-            return Reply("Send /start to begin a new demo conversation.")
+            return Reply("Send /start to begin.")
         if lead["discovery_step"] != "results":
             return Reply(
                 "That course comparison has expired. Your current course path is unchanged."
@@ -1020,14 +1022,14 @@ class AdmissionsService:
     def pause_discovery(self, lead_id: int) -> Reply:
         self.repository.update_lead(lead_id, lifecycle_stage="paused")
         return Reply(
-            "Paused. Your selected demo facts are saved locally; send /resume when you want "
+            "Paused. Your course preferences are saved locally; send /resume when you want "
             "to continue."
         )
 
     def resume_discovery(self, lead_id: int) -> Reply:
         lead = self.repository.get_lead(lead_id)
         if lead is None:
-            return Reply("Send /start to begin a new demo conversation.")
+            return Reply("Send /start to begin.")
         step = str(lead.get("discovery_step") or "")
         self.repository.update_lead(lead_id, lifecycle_stage="discovering")
         if step == "field":
@@ -1089,7 +1091,7 @@ class AdmissionsService:
     def choose_language(self, lead_id: int, language: str) -> Reply:
         labels = {"en": "English", "ml": "Malayalam", "hi": "Hindi", "hinglish": "Hinglish"}
         if language not in labels:
-            return Reply("Please choose one of the listed demo languages.")
+            return Reply("Please choose one of the listed languages.")
         self.repository.update_lead(lead_id, preferred_language=language)
         self.repository.save_fact(lead_id, "preferred_language", language)
         processing = self.ai_processing_enabled(lead_id)
@@ -1100,11 +1102,11 @@ class AdmissionsService:
     def language_menu(self, lead_id: int | None = None) -> Reply:
         language = self.preferred_language(lead_id) if lead_id is not None else "en"
         messages = {
-            "en": "Choose a demo language. Most replies are currently English; other copy "
+            "en": "Choose a language. Most replies are currently English; other copy "
             "needs fluent-speaker review.",
             "hi": "डेमो की भाषा चुनें। ज़्यादातर जवाब अभी अंग्रेज़ी में हैं; बाकी अनुवाद की समीक्षा बाकी है।",
             "ml": "ഡെമോ ഭാഷ തിരഞ്ഞെടുക്കുക. മിക്ക മറുപടികളും ഇപ്പോൾ ഇംഗ്ലീഷിലാണ്; മറ്റ് വിവർത്തനങ്ങൾ പരിശോധിക്കണം.",
-            "hinglish": "Demo language chunein. Most replies abhi English mein hain; baaki copy "
+            "hinglish": "Language chunein. Most replies abhi English mein hain; baaki copy "
             "ko fluent speaker review karega.",
         }
         return Reply(
@@ -1126,7 +1128,7 @@ class AdmissionsService:
         )
         self.repository.save_fact(lead_id, "handoff_reason", reason)
         return Reply(
-            "I've added a staff handoff to the demo dashboard. Live contact and response-time "
+            "I've added this to the staff dashboard. Live contact and response-time "
             "details are not configured."
         )
 
@@ -1137,16 +1139,14 @@ class AdmissionsService:
         courses = self.repository.list_courses(self.tenant_id)
         descriptions = "\n".join(f"• {course.name}: {course.description}" for course in courses)
         return Reply(
-            f"Here are the fictional sample courses:\n{descriptions}\n\n"
+            f"Here are the courses:\n{descriptions}\n\n"
             "You can ask a question or select a course whenever you're ready."
         )
 
     def select_course(self, lead_id: int, course_id: str) -> Reply:
         course = self.repository.get_course(self.tenant_id, course_id)
         if course is None:
-            return Reply(
-                "That course is not available in this demo. Please choose a listed course."
-            )
+            return Reply("That course is no longer available. Please choose a listed course.")
         facts = self.repository.list_facts(lead_id)
         active = next((fact for fact in facts if fact["fact_key"] == "active_speaker"), None)
         speaker = str(active["fact_value"]) if active else "student"
@@ -1178,19 +1178,16 @@ class AdmissionsService:
             if not eligibility_limit_explained:
                 self.repository.save_fact(lead_id, "eligibility_limit_explained", "true")
             limitation = (
-                "\n\nI can show these sample facts, but this demo has no eligibility rules "
-                "configured for this study level. The next step is a self-report, not a verified "
-                "eligibility or admission decision."
+                "\n\nI can't verify eligibility here; I'll record your answer as a self-report."
                 if not eligibility_limit_explained
                 else ""
             )
             return Reply(
-                f"{course.name} is a fictional {course.education_level.replace('_', ' ')} sample. "
-                f"Sample prerequisites: {_sample_prerequisite_summary(course)}. "
-                f"Sample medium: {course.medium}. Sample language support: "
+                f"{course.name} is listed as a {course.education_level.replace('_', ' ')} course. "
+                f"Entry requirements: {_sample_prerequisite_summary(course)}. "
+                f"Teaching medium: {course.medium}. Language support: "
                 f"{', '.join(course.language_support) or 'not specified'}.{limitation}\n\n"
-                "Do you meet all the sample prerequisites listed above? This self-report is for "
-                "the fictional demo only and does not verify admission.",
+                "Do you meet these entry requirements?",
                 (
                     ("Yes, I meet them", f"sample-prerequisites:yes:{course.id}"),
                     ("No / not sure", f"sample-prerequisites:no:{course.id}"),
@@ -1219,7 +1216,7 @@ class AdmissionsService:
     ) -> Reply:
         lead = self.repository.get_lead(lead_id)
         if lead is None or lead["state"] != "awaiting_sample_prerequisites":
-            return Reply("Please choose a course and review its sample prerequisites first.")
+            return Reply("Please choose a course and review its entry requirements first.")
         course_id = str(lead["selected_course_id"] or "")
         if expected_course_id is not None and expected_course_id != course_id:
             return Reply(
@@ -1227,7 +1224,7 @@ class AdmissionsService:
             )
         course = self.repository.get_course(self.tenant_id, course_id)
         if course is None:
-            return Reply("That sample course is no longer available. Please browse courses again.")
+            return Reply("That course is no longer available. Please browse courses again.")
         if meets_prerequisites:
             self.repository.save_fact(
                 lead_id, "sample_prerequisites_self_reported", course.id, "student"
@@ -1240,11 +1237,11 @@ class AdmissionsService:
                 eligible=True,
             )
             return Reply(
-                f"I've recorded your self-report that you meet the sample prerequisites for "
-                f"{course.name}. This is not verified eligibility or an admission decision. "
-                f"Would you like to continue to the fictional application fee of "
-                f"{format_inr_from_paise(course.application_fee_paise)}?",
-                (("Continue to demo fee", "payment:yes"), ("Browse courses", "path:browse")),
+                f"Thanks, I've noted your self-reported answer for {course.name}. "
+                "The listed application fee is "
+                f"{format_inr_from_paise(course.application_fee_paise)}. "
+                "Would you like to continue to payment?",
+                (("Continue to payment", "payment:yes"), ("Browse courses", "path:browse")),
             )
         self.repository.save_fact(
             lead_id, "sample_prerequisites_self_reported", course.id, "student"
@@ -1257,9 +1254,9 @@ class AdmissionsService:
             eligible=False,
         )
         return Reply(
-            "No problem. I won't continue this course to the demo fee step. You can explore "
-            "another course or browse the sample catalog.",
-            (("Explore another course", "path:explore"), ("Browse sample courses", "path:browse")),
+            "No problem. I won't continue to payment for this course. You can explore "
+            "another course or browse the course catalog.",
+            (("Explore another course", "path:explore"), ("Browse courses", "path:browse")),
         )
 
     def answer_grade12(
@@ -1275,7 +1272,7 @@ class AdmissionsService:
             or course.education_level != "undergraduate"
             or course.minimum_marks_percent <= 0
         ):
-            return Reply("That sample course does not use the Grade 12 check.")
+            return Reply("That course does not use the Grade 12 check.")
         if expected_course_id is not None and expected_course_id != course_id:
             return Reply("That Grade 12 check is out of date. Please review your current course.")
         if not completed:
@@ -1286,8 +1283,8 @@ class AdmissionsService:
                 state="not_eligible",
             )
             return Reply(
-                "The sample requirements need Grade 12 completion, so you do not need to send "
-                "marks. This is not a real admission decision."
+                "The listed requirements need Grade 12 completion, so you do not need to send "
+                "marks. This does not confirm admission."
             )
         self.repository.update_lead(
             lead_id,
@@ -1317,7 +1314,7 @@ class AdmissionsService:
             or course.education_level != "undergraduate"
             or course.minimum_marks_percent <= 0
         ):
-            return Reply("The selected demo course is no longer available. Please start again.")
+            return Reply("The selected course is no longer available. Please start again.")
         result = assess_eligibility(
             completed_grade12=bool(lead["completed_grade12"]),
             marks_percent=marks,
@@ -1333,14 +1330,13 @@ class AdmissionsService:
         )
         if result.eligible:
             return Reply(
-                f"Your answers meet the sample requirements for {course.name}. "
-                "This is not an admission decision; staff must confirm any real application. "
-                "Would you like to continue with the fictional demo application fee?",
-                (("Continue to demo fee", "payment:yes"), ("Browse courses", "path:browse")),
+                f"Your answers meet the listed requirements for {course.name}. "
+                "Would you like to continue to the application fee?",
+                (("Continue to payment", "payment:yes"), ("Browse courses", "path:browse")),
             )
         return Reply(
-            f"Based on the sample rules for {course.name}, {result.reason} "
-            "This is not a real admission decision."
+            f"Based on the rules for {course.name}, {result.reason} "
+            "This does not confirm admission."
         )
 
     async def free_text(self, lead_id: int, text: str, intent_router: IntentRouter | None) -> Reply:
@@ -1354,8 +1350,8 @@ class AdmissionsService:
             if normalized in {"no", "not sure", "no i don't", "no i do not"}:
                 return self.answer_sample_prerequisites(lead_id, False)
             return Reply(
-                "Please choose whether you meet all the sample prerequisites. This is only a "
-                "self-report for the fictional demo.",
+                "Please choose whether you meet all the entry requirements. This is only a "
+                "self-report.",
                 (
                     (
                         "Yes, I meet them",
@@ -1370,7 +1366,7 @@ class AdmissionsService:
             handoff = self.handoff(lead_id, "Student asked staff to delete their local data.")
             return Reply(
                 "I've recorded your request for staff-mediated deletion of your local "
-                "demo profile, "
+                "profile, "
                 "messages, and payment record. Staff must review and perform the deletion. "
                 f"{handoff.text}"
             )
@@ -1379,17 +1375,16 @@ class AdmissionsService:
                 lead_id, "Student asked about a refund policy not configured in the demo."
             )
             return Reply(
-                "Refunds are not supported in this fictional demo, and the institution's real "
-                f"refund policy is not confirmed. {handoff.text}"
+                f"I don't have a confirmed refund policy for this institution. {handoff.text}"
             )
         if _is_fee_question(text):
             if _is_unconfigured_fee_category(text):
                 return Reply(
-                    "The sample data only confirms application fees. Tuition and "
+                    "The course information here only lists application fees. Tuition and "
                     "hostel/accommodation charges aren't listed, so I won't guess or treat them "
                     "as included. I can show the confirmed application fee or browse course "
                     "details.",
-                    (("Browse sample courses", "path:browse"),),
+                    (("Browse courses", "path:browse"),),
                 )
             course_id = (
                 str(lead["selected_course_id"]) if lead and lead["selected_course_id"] else ""
@@ -1400,15 +1395,15 @@ class AdmissionsService:
                     course_id = courses[0].id
                 else:
                     buttons = tuple((course.name, f"course:{course.id}") for course in courses)
-                    return Reply("Which course's demo application fee do you mean?", buttons)
+                    return Reply("Which course's application fee do you mean?", buttons)
             fee = self.repository.get_fee_paise(self.tenant_id, course_id)
             course = self.repository.get_course(self.tenant_id, course_id)
             if fee is None or course is None:
-                return Reply("I don't have a confirmed fee for that sample course.")
+                return Reply("I don't have a confirmed fee for that course.")
             return Reply(
-                f"The sample application fee for {course.name} is "
-                f"{format_inr_from_paise(fee)}. This fictional demo amount "
-                "is stored in course data."
+                f"The application fee for {course.name} is "
+                f"{format_inr_from_paise(fee)}. Payment links use Razorpay test mode and "
+                "do not submit an application."
             )
         if _is_language_concern(text):
             course_id = (
@@ -1418,24 +1413,24 @@ class AdmissionsService:
             if course is None:
                 return Reply(
                     "Language requirements depend on the course. I can help you weigh the "
-                    "trade-offs, but the sample catalog only lists teaching medium and discussion "
+                    "trade-offs, but the course catalog only lists teaching medium and discussion "
                     "support; it doesn't set proficiency rules. Choose a course to see those "
-                    "listed sample facts.",
-                    (("Browse sample courses", "path:browse"),),
+                    "listed course details.",
+                    (("Browse courses", "path:browse"),),
                 )
-            support = ", ".join(course.language_support) or "not specified in the sample catalog"
+            support = ", ".join(course.language_support) or "not specified in the course catalog"
             return Reply(
-                f"For this fictional sample, the listed medium for {course.name} is "
-                f"{course.medium}, and listed discussion support is {support}. The sample catalog "
+                f"The listed teaching medium for {course.name} is "
+                f"{course.medium}, and listed discussion support is {support}. The course catalog "
                 "does not specify a required proficiency level or guarantee an accommodation. "
                 "I can help compare the listed options, but I won't infer those requirements."
             )
         if _is_accommodation_question(text):
             return Reply(
-                "The fictional sample mentions a hostel, but actual availability, eligibility, "
-                "pricing, and terms aren't confirmed, so I won't guess. I can still help compare "
-                "sample courses or answer questions covered by the demo information.",
-                (("Browse sample courses", "path:browse"),),
+                "I don't have confirmed accommodation details for this course, so I won't guess. "
+                "I can still help compare courses or answer questions about the listed "
+                "information.",
+                (("Browse courses", "path:browse"),),
             )
         if self._fact_value(lead_id, "guidance_pending_signature") and _is_guidance_confirmation(
             text
@@ -1454,13 +1449,13 @@ class AdmissionsService:
             except Exception:
                 return Reply(
                     "I couldn't understand that safely just now. You can continue with the "
-                    "buttons, browse sample courses, or try a shorter message.",
+                    "buttons, browse courses, or try a shorter message.",
                     (("Choose a path", "menu:start"), ("Browse courses", "path:browse")),
                 )
             return await self._handle_discovery_turn(lead_id, turn, text)
         if intent_router is None:
             return Reply(
-                "I can help you explore courses or check a sample FAQ. Send /start to begin."
+                "I can help you explore courses or check a course FAQ. Send /start to begin."
             )
         try:
             route = await intent_router.route(text)
@@ -1472,10 +1467,10 @@ class AdmissionsService:
             result = await self.retrieval.answer(self.tenant_id, text)
             if result is None:
                 return Reply(
-                    "I couldn't find a reliable answer in the fictional demo information, so I "
-                    "won't guess. Try rephrasing, ask about a listed course, or browse the sample "
-                    "catalog.",
-                    (("Browse sample courses", "path:browse"),),
+                    "I couldn't find a reliable answer in the course information, so I "
+                    "won't guess. Try rephrasing, ask about a listed course, or browse "
+                    "the catalog.",
+                    (("Browse courses", "path:browse"),),
                 )
             answer, source = result
             return Reply(f"{answer}\n\nSource: {source}")
@@ -1486,7 +1481,7 @@ class AdmissionsService:
         if route == "course_browse":
             return self.browse(lead_id)
         return Reply(
-            "I can help with the sample courses, eligibility, or FAQs. Send /start to see options."
+            "I can help with the courses, eligibility, or FAQs. Send /start to see options."
         )
 
     async def _handle_discovery_turn(self, lead_id: int, turn: DiscoveryTurn, text: str) -> Reply:
@@ -1508,10 +1503,10 @@ class AdmissionsService:
             result = await self.retrieval.answer(self.tenant_id, text)
             if result is None:
                 return Reply(
-                    "I couldn't find a reliable answer in the fictional demo information, so I "
-                    "won't guess. Try rephrasing, ask about a listed course, or browse the sample "
+                    "I couldn't find a reliable answer in the course information, so I "
+                    "won't guess. Try rephrasing, ask about a listed course, or browse the "
                     "catalog.",
-                    (("Browse sample courses", "path:browse"),),
+                    (("Browse courses", "path:browse"),),
                 )
             answer, source = result
             return Reply(f"{answer}\n\nSource: {source}")
@@ -1526,7 +1521,7 @@ class AdmissionsService:
             return self.select_course(lead_id, turn.course_id)
         if turn.intent == "course_lookup" and not turn.course_id:
             return Reply(
-                "I couldn't match that wording to an exact course in the fictional catalog. "
+                "I couldn't match that wording to an exact course in the course catalog. "
                 "Try its full name, choose a field, or browse.",
                 (("Choose a course", "path:course"), ("Browse courses", "path:browse")),
             )
@@ -1763,7 +1758,7 @@ class AdmissionsService:
                         "or have tried; their own interests should guide the suggestions.",
                         (
                             ("Learner sharing now", "speaker:student"),
-                            ("Browse sample courses", "path:browse"),
+                            ("Browse courses", "path:browse"),
                         ),
                     ),
                     turn.assistant_message,
@@ -1821,29 +1816,29 @@ class AdmissionsService:
             return self._with_ai_conversation_copy(
                 Reply(
                     "Got it. Your earlier course preferences are still here whenever you'd like "
-                    "to continue, adjust them, or look through sample courses.",
+                    "to continue, adjust them, or look through courses.",
                     (
                         (
                             "Continue with my current answers",
                             f"guidance:confirm:{_guidance_token(pending)}",
                         ),
                         ("Change or add answers", f"guidance:revise:{_guidance_token(pending)}"),
-                        ("Browse sample courses", "path:browse"),
+                        ("Browse courses", "path:browse"),
                     ),
                 ),
                 assistant_message,
             )
         fallback = (
-            "Hi! I'm AdmitFlow's AI course-guidance assistant for a fictional course catalog. "
+            "Hi! I'm AdmitFlow's AI course-guidance assistant for a course catalog. "
             "What are you curious about studying?"
             if intent == "conversation"
-            else "I can help explore the fictional course catalog. What would you like to know?"
+            else "I can help explore the course catalog. What would you like to know?"
         )
         return self._with_ai_conversation_copy(
             Reply(
                 fallback,
                 (
-                    ("Browse sample courses", "path:browse"),
+                    ("Browse courses", "path:browse"),
                     ("Choose a course-guidance path", "menu:start"),
                 ),
             ),
@@ -2127,7 +2122,7 @@ class AdmissionsService:
         return Reply(
             "I have not got enough detail to suggest a course yet. What topic or activity would "
             "you like to explore? You can mention a study level too.",
-            (("Choose a field", "path:field"), ("Browse sample courses", "path:browse")),
+            (("Choose a field", "path:field"), ("Browse courses", "path:browse")),
         )
 
     def _guidance_goal_prompt(self, lead_id: int) -> Reply:
@@ -2217,9 +2212,9 @@ class AdmissionsService:
             (labels[mode], f"guidance:mode:{mode}") for mode in modes[:3] if mode in labels
         ) + (("Leave format open", "guidance:mode:open"),)
         return Reply(
-            "The sample catalog lists different study formats for these courses. Does in-person, "
+            "The course catalog lists different study formats for these courses. Does in-person, "
             "online, or hybrid study matter to you, or should I leave format open? These are "
-            "sample catalog labels, not a promise about a specific schedule or access needs.",
+            "course catalog labels, not a promise about a specific schedule or access needs.",
             buttons,
         )
 
@@ -2280,32 +2275,32 @@ class AdmissionsService:
         if not matches:
             if delivery_mode:
                 return Reply(
-                    "No complete matching sample course lists "
+                    "No complete matching course lists "
                     f"{delivery_mode.replace('_', ' ')} study. Would you like to leave format "
                     "open and see other matches, or browse the catalog?",
                     (
                         ("Leave format open", "guidance:mode:open"),
-                        ("Browse sample courses", "path:browse"),
+                        ("Browse courses", "path:browse"),
                     ),
                 )
             if language_support:
                 return Reply(
-                    "No complete matching sample course lists "
+                    "No complete matching course lists "
                     f"{language_support}. Would you like to leave language open and see the "
                     "other matches, or browse the catalog?",
                     (
                         ("Leave language open", "guidance:language:open"),
-                        ("Browse sample courses", "path:browse"),
+                        ("Browse courses", "path:browse"),
                     ),
                 )
             self.repository.update_lead(lead_id, discovery_step="guidance_revision")
             return Reply(
-                "I couldn't find a complete sample course that matches all those preferences. "
+                "I couldn't find a complete course that matches all those preferences. "
                 "I can broaden the search if you change or remove a preference, or show every "
-                "sample course so you can compare them.",
+                "course so you can compare them.",
                 (
                     ("Change my preferences", "path:explore"),
-                    ("Browse sample courses", "path:browse"),
+                    ("Browse courses", "path:browse"),
                 ),
             )
         self.repository.update_lead(
@@ -2318,13 +2313,12 @@ class AdmissionsService:
             f"{', '.join(match.course.language_support) or 'not specified'}. "
             f"Study format listed: "
             f"{', '.join(match.course.delivery_modes).replace('_', ' ') or 'not specified'}. "
-            f"Sample entry: {'; '.join(match.course.prerequisites)}."
+            f"Entry requirements: {'; '.join(match.course.prerequisites)}."
             for match in matches
         )
         return Reply(
-            "Based on what you confirmed, here are matching fictional sample courses:\n"
-            f"{summaries}\n\nThese are examples, not an admission decision. Which would you "
-            "like to explore?",
+            "Based on what you confirmed, here are matching courses:\n"
+            f"{summaries}\n\nWhich would you like to explore?",
             tuple((match.course.name, f"guidance:course:{match.course.id}") for match in matches),
         )
 

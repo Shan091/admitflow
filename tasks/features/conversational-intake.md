@@ -12,18 +12,18 @@ prediction, or guarantee of admission or employment.
 
 ## Settled boundaries
 
-- The fictional demo catalog is sample data. The initial expansion target of 28 offerings has
+- The demo catalog contains illustrative course data. The initial expansion target of 28 offerings has
   since been superseded by the current 50-offering catalog, with ten per agreed field
   and examples across certificate/vocational, diploma, undergraduate, and postgraduate levels.
 - Use conversation-only exploration: no numerical aptitude/readiness-to-fit score or personality
   label.
 - OpenAI-assisted text processing is enabled by default for this hackathon demo. At `/start`, clearly
   explain that typed messages are sent to OpenAI and stored locally, and instruct users to enter only
-  fictional demo text. Provide persistent controls to turn processing off or back on. While off,
+  demo text. Provide persistent controls to turn processing off or back on. While off,
   button-based course exploration remains usable and typed text must not be sent to any AI provider.
   This is the product behavior chosen for the demo, not a legal/privacy determination.
 - For each AI-led turn, send the current message, at most the previous eight text messages, safe
-  catalog-allowlisted saved preferences, stage, selected language, and fictional catalog facts.
+  catalog-allowlisted saved preferences, stage, selected language, and catalog facts.
   Do not send names, chat IDs, usernames, or contact details. Use stateless Responses API requests
   (`store=false`) and never call the API when processing is off. Do not claim this alone makes the
   demo production-safe.
@@ -47,7 +47,7 @@ prediction, or guarantee of admission or employment.
 
 1. `/start` discloses current-message and bounded recent-context processing plus local storage,
    then starts discovery without a consent prompt. “I like numbers and helping people” is
-   processed only with fictional demo text.
+   processed only with demo text.
 2. “I enjoy organizing data and making charts; I want a diploma” extracts only
    matching catalog facts, persists them as student-attributed facts, and recommends only complete
    matching diploma entries or asks one relevant follow-up if evidence is insufficient.
@@ -74,7 +74,7 @@ prediction, or guarantee of admission or employment.
   explicit proof that no external AI provider receives text while processing is off.
 - Test extraction schema, unknown/ambiguous values, parent attribution, multilingual paraphrase
   fixtures, prompt-injection text, OpenAI failure, and dynamic one-question selection with fake APIs.
-- Run `bash scripts/verify.sh` and `git diff --check`. A live smoke test may use synthetic fictional
+- Run `bash scripts/verify.sh` and `git diff --check`. A live smoke test may use synthetic
   prompts only; never use real student chat data.
 - Rehearse the disclosed adaptive Telegram flow and opt-out controls before describing them as a
   live demo.

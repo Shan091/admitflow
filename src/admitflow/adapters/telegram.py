@@ -221,9 +221,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     elif data == "payment:yes":
         lead = repository.get_lead(lead_id)
         if lead is None or lead["eligible"] != 1:
-            reply = Reply("I can only offer a sample payment link after the sample rules are met.")
+            reply = Reply("Complete the course eligibility check before requesting a payment link.")
         elif payment_service is None:
-            reply = Reply("The demo payment link is not configured right now.")
+            reply = Reply("Payment links aren't available right now. Please try again later.")
         else:
             repository.update_lead(lead_id, readiness_status="ready_to_apply")
             try:
@@ -236,19 +236,21 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                 if payment and payment.get("short_url"):
                     url, amount_paise = payment["short_url"], payment["amount_paise"]
                     reply = Reply(
-                        f"Demo application fee: {format_inr_from_paise(amount_paise)}. "
-                        f"Complete the Razorpay test-mode payment here: {url}"
+                        f"Application fee: {format_inr_from_paise(amount_paise)}. "
+                        f"This is a test payment and won't submit an application: {url}"
                     )
                 else:
-                    reply = Reply("The demo payment link is not available right now.")
+                    reply = Reply(
+                        "Payment links aren't available right now. Please try again later."
+                    )
             else:
                 url, amount_paise = offer
                 reply = Reply(
-                    f"Demo application fee: {format_inr_from_paise(amount_paise)}. "
-                    f"Complete the Razorpay test-mode payment here: {url}"
+                    f"Application fee: {format_inr_from_paise(amount_paise)}. "
+                    f"This is a test payment and won't submit an application: {url}"
                 )
     else:
-        reply = Reply("Please send /start to see the demo options.")
+        reply = Reply("Send /start to explore courses.")
     repository.add_message(lead_id, "outbound", reply.text)
     message = update.effective_message
     if message is not None:
@@ -275,21 +277,25 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     if _is_payment_status_question(message.text):
         payment = repository.get_payment_for_lead(admissions.tenant_id, lead_id)
         if payment is None:
-            reply = Reply("I don't see a demo application payment link for you yet.")
+            reply = Reply("I don't see an application payment link for you yet.")
         elif payment["status"] == "paid":
-            reply = Reply("Your demo application payment is confirmed as paid.")
+            reply = Reply(
+                "Your Razorpay test payment is confirmed as paid. This does not submit an "
+                "application or confirm admission."
+            )
         elif payment["status"] == "created":
             reply = Reply(
-                "Your demo application payment is still pending. Complete the Razorpay test-mode "
+                "Your application-fee test payment is still pending. Complete the Razorpay "
+                "test-mode "
                 "payment link, then ask again after the webhook is received."
             )
         elif payment["status"] == "failed":
             reply = Reply(
-                "Your demo payment link could not be created. Staff support details are not "
+                "Your payment link could not be created. Staff support details are not "
                 "configured; try again later."
             )
         else:
-            reply = Reply("Your demo payment is still being set up. Please check again shortly.")
+            reply = Reply("Your payment is still being set up. Please check again shortly.")
     else:
         if admissions.ai_processing_enabled(lead_id):
             try:

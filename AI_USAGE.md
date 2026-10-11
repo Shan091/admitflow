@@ -1,5 +1,16 @@
 # AI usage
 
+## 2026-10-11 — revise learner-facing admissions copy
+
+- **Task:** Replace repetitive, stilted course and landing-page wording with copy that reads more
+  like a real course conversation.
+- **Assistance:** Codex rewrote learner-facing course, eligibility, fee, and landing-page text and
+  corrected several catalog-description fragments. The user-facing entry notice still explains that
+  course details and fees are for demonstration, applications are not submitted, and payments use
+  Razorpay test mode. No claim of real admission or enrollment was added.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint, formatting (57 files), strict mypy (31
+  source files), and all 189 tests. `git diff --check` passed. No live API calls were made.
+
 ## 2026-10-11 — include seeded marks thresholds in the self-report gate
 
 - **Task:** Review the all-level fee path against the entire seeded catalog to ensure its self-report

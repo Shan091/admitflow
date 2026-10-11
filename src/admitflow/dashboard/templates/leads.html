@@ -6,7 +6,7 @@
 {% if reset_rejected %}<p role="alert" class="notice">Nothing was deleted. The confirmation phrase or form token was invalid.</p>{% endif %}
 {% if leads %}
 <table>
-  <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Lifecycle</th><th>Handoff</th><th>Sample gate</th><th>Updated</th></tr></thead>
+  <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Lifecycle</th><th>Handoff</th><th>Eligibility check</th><th>Updated</th></tr></thead>
   <tbody>
   {% for lead in leads %}
     <tr>
@@ -26,7 +26,7 @@
 <details class="danger-zone">
   <summary>Delete all demo data</summary>
   <p>This permanently deletes every lead, conversation, payment record, and Razorpay webhook event
-    from this app. Fictional courses and FAQs remain, so the demo keeps working. This does not
+    from this app. Course and FAQ information remains available. This does not
     delete records held by Telegram or Razorpay.</p>
   <form method="post" action="/admin/delete-all-demo-data">
     <input type="hidden" name="csrf_token" value="{{ delete_demo_data_csrf_token }}">

@@ -10,9 +10,9 @@ Record consequential choices here. Each entry is short; update it when evidence 
 3. **Architecture — domain/services/adapters.** Keep one real adapter per boundary; introduce a
    small Protocol only where injection or a test double needs it. No speculative ports framework.
 4. **Eligibility and fees — code-owned gates, honestly labeled.** Structured seed data and Python
-   rules determine undergraduate sample eligibility and all prices; model output cannot change
-   either. For other complete fictional courses, a learner self-report against displayed seeded
-   prerequisites is only an unverified demo payment gate, never a verified eligibility decision.
+   rules determine undergraduate eligibility and all prices; model output cannot change
+   either. For other complete catalog entries, a learner self-report against listed entry
+   requirements is only an unverified test-payment gate, never a verified eligibility decision.
 5. **Knowledge retrieval — OpenAI embeddings + SQLite vectors + NumPy cosine.** Embed each seeded
    FAQ's canonical question plus a few curated search phrasings with `text-embedding-3-small`;
    keep the answer as a separate stored value. Version the cached-vector key when this text profile
@@ -35,12 +35,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
    roles, or production identity provider in the hackathon demo. Missing credentials fail closed.
 9. **Demo data reset.** Provide a staff-only dashboard reset for lead, conversation, payment, and
    webhook-event records, protected by a session-bound CSRF token and typed confirmation. Keep
-   fictional courses and FAQs so the demo can be run again; provider-side records are unaffected.
+   course listings and FAQs so the demo can be run again; provider-side records are unaffected.
 10. **Guidance scope and entry.** Keep guidance within the institution's own course catalog; this
     is interest-led course discovery, not general career counselling. The first turn offers known
     course, known field, guided exploration, and browsing/question paths. A student can change path
     without losing unrelated profile facts.
-11. **Catalog scope.** Seed a clearly fictional Kerala institution with vocational/certificate,
+11. **Catalog scope.** Seed an illustrative Kerala course catalog with vocational/certificate,
     diploma, undergraduate, and postgraduate examples spanning tech/data, business/accounting,
     design/media, hospitality/tourism, and non-regulated vocational skills. Only recommend offerings
     whose required attributes and entry rules are complete. Do not invent regulated-program rules,
@@ -52,7 +52,7 @@ Record consequential choices here. Each entry is short; update it when evidence 
 13. **Language and handoff.** Offer English, Malayalam, Hindi, and Hinglish as selectable
     preferences at any stage. Full translated response coverage and fluent-speaker review are not
     implemented yet; the demo must disclose that most replies remain English. Routine out-of-catalog
-    questions and missing sample facts get an agent-led, fail-closed recovery, not an automatic
+    questions and missing course facts get an agent-led, fail-closed recovery, not an automatic
     staff handoff. Keep staff handoff for explicit human requests, staff-only operations such as
     deletion, and critical real-world matters such as a payment dispute. Never imply a live contact
     or response time is configured.
@@ -60,10 +60,10 @@ Record consequential choices here. Each entry is short; update it when evidence 
     admissions cycle, then expire them under a stated, configurable policy. Students request deletion
     through staff; staff perform the deletion. The exact retention interval and production privacy
     review remain open release gates.
-15. **Level-aware discovery and application boundary.** Rank at most three complete fictional
+15. **Level-aware discovery and application boundary.** Rank at most three complete illustrative
     catalog entries from explicit field, optional study-level, and optional activity choices. Use no
-    aptitude score. Existing undergraduate sample rules remain deterministic. For other levels, show
-    recorded sample prerequisites and ask for a clearly labeled self-report; do not reuse Grade 12
+    aptitude score. Existing undergraduate rules remain deterministic. For other levels, show
+    listed entry requirements and ask for a clearly explained self-report; do not reuse Grade 12
     rules or imply independent verification/admission. A positive response may unlock only the
     explicit demo application-fee step.
 16. **Explicit fee continuation and honest payment follow-up.** Eligibility alone does not create a
@@ -82,7 +82,7 @@ Record consequential choices here. Each entry is short; update it when evidence 
     eligibility, fees, payment, and state transitions. Disable Responses API storage; production
     privacy review remains a release gate.
 
-18. **Study goals are catalog-owned evidence.** Every fictional course carries a small set of sample
+18. **Study goals are catalog-owned evidence.** Every course carries a small set of catalog
     learning-goal tags. Extract only goals explicitly stated by the learner and validated against
     those tags. Ask one optional goal question only when a broad candidate set contains materially
     different goals; skip it when it is not useful or the learner declines. A stated goal filters
@@ -124,11 +124,11 @@ Record consequential choices here. Each entry is short; update it when evidence 
     has more than one recorded delivery mode and no other optional narrowing prompt was used for
     that fact set. A learner may leave it open; an explicit preference filters recommendations and
     appears as a catalog-grounded reason. Do not imply a specific schedule, accessibility, or
-    availability. Widen honestly when no complete sample course matches.
+    availability. Widen honestly when no complete course matches.
 
 25. **Recommendation exploration does not imply course commitment.** Guided match cards open
-    verified fictional course details; the learner can return to the same current match list or
-    explicitly continue to the applicable sample gate (undergraduate code checks or the other-level
+    verified course details; the learner can return to the same current match list or
+    explicitly continue to the applicable eligibility step (undergraduate code checks or the other-level
     prerequisite self-report). Only that explicit continuation sets the selected course. Known-
     course selection stays direct. Stale detail/list callbacks must revalidate current confirmed
     learner facts and ranked matches.
@@ -148,15 +148,15 @@ Record consequential choices here. Each entry is short; update it when evidence 
     matches, eligibility, and fees. Only an explicit staff request creates a staff-request handoff.
 
 28. **Escalate only for a person-requested or critical staff action.** Course exploration, unsupported
-    preferences, out-of-catalog questions, weak FAQ retrieval, and unavailable fictional facts remain
+    preferences, out-of-catalog questions, weak FAQ retrieval, and unavailable course facts remain
     agent-led. The agent must admit uncertainty, never invent a fact, and offer a useful next step.
     Create staff handoffs only when the learner explicitly asks for a person or when a staff-only or
     critical real-world action requires it, such as deletion or a payment dispute. This updates the
     earlier default to refer unsupported or sensitive needs to staff.
 
-29. **Every complete fictional course may reach demo payment through its honest sample gate.**
+29. **Every complete course may reach test payment through its disclosed eligibility step.**
     Undergraduate offerings keep their code-checked Grade 12/marks rules. Other complete offerings
-    ask whether the learner meets that course's displayed fictional prerequisites. Record the
+    ask whether the learner meets that course's listed entry requirements. Record the
     student's self-report with course attribution; a positive response can proceed to the existing
     explicit, server-priced Razorpay test-fee action, while a negative/unsure response cannot. Never
     present a self-report as verified eligibility, admission, or enrollment. Stale prerequisite

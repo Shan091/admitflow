@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdmitFlow - conversational admissions demo</title>
-  <meta name="description" content="AdmitFlow is a fictional, conversational admissions assistant demo: explore courses, check eligibility in code, and pay a test-mode fee, all by chat, in your language.">
+  <title>AdmitFlow - explore admissions by chat</title>
+  <meta name="description" content="AdmitFlow helps students explore courses, understand entry requirements, and find a clear next step through conversation.">
   <link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/tokens.css">
   <link rel="stylesheet" href="/static/landing.css">
@@ -18,7 +18,7 @@
       </a>
       <span class="nav-links">
         <a class="muted" href="#how">How it works</a>
-        <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open the demo on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
+        <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open AdmitFlow on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
       </span>
     </nav>
   </header>
@@ -26,18 +26,18 @@
   <main>
     <section class="wrap hero">
       <div class="hero-copy">
-        <span class="pill">Fictional admissions demo</span>
-        <h1>Explore, qualify, and <span class="em">apply</span> by chat.</h1>
-        <p class="lead">A conversational admissions assistant for a fictional institution. It guides students in their own language, and never invents the facts.</p>
+        <span class="pill">Course guidance by chat</span>
+        <h1>Find a course for your <span class="em">next step</span>.</h1>
+        <p class="lead">Tell AdmitFlow what you want to study and what matters to you. Compare courses, review entry requirements and fees, and ask questions in English, Malayalam, Hindi, or Hinglish.</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open the demo on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
+          <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open AdmitFlow on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
           <a class="btn btn-ghost" href="#how">See how it works</a>
         </div>
       </div>
       <div class="hero-visual reveal">
         <div class="welcome-shell">
-          <aside class="welcome-card" aria-label="The same welcome, in four languages">
-            <p class="cap">One welcome, four languages</p>
+          <aside class="welcome-card" aria-label="The same hello, in four languages">
+          <p class="cap">Start in the language you prefer</p>
             <ul>
               <li><span class="greet">Hello! Shall we find a course together?</span><span class="lang">English</span></li>
               <li><span class="greet">നമസ്കാരം! നമുക്ക് ഒരുമിച്ച് ഒരു കോഴ്‌സ് കണ്ടെത്താം?</span><span class="lang">Malayalam</span></li>
@@ -52,60 +52,60 @@
     <section id="how" class="wrap section reveal">
       <div class="section-head">
         <span class="pill">How it works</span>
-        <h2>A guided path, from first question to application.</h2>
-        <p>Every answer that matters is computed in code, so the conversation stays consistent and honest.</p>
+        <h2>From your question to a clear next step.</h2>
+        <p>Start with a subject, a qualification level, or a question. AdmitFlow uses what you share to narrow the course list and keep the conversation on track.</p>
       </div>
       <div class="steps">
         <div class="step-card">
           <span class="num">01</span>
-          <h3>Discover</h3>
-          <p>Tell the bot what you are curious about, or ask it to help you explore. It remembers what you and your family mention.</p>
+          <h3>Tell us what you want</h3>
+          <p>Share a subject, study level, or goal. You can correct or change your preferences as you go.</p>
         </div>
         <div class="step-card">
           <span class="num">02</span>
-          <h3>Qualify</h3>
-          <p>Eligibility is checked against sample rules in code, so the answer stays consistent and is never guessed by a model.</p>
+          <h3>Compare courses</h3>
+          <p>See why a course matched, along with its entry requirements, study format, language support, and listed fee.</p>
         </div>
         <div class="step-card">
           <span class="num">03</span>
-          <h3>Ask</h3>
-          <p>Admissions questions are answered from a fixed, fictional FAQ. When it is not sure, it says so instead of making something up.</p>
+          <h3>Ask about the details</h3>
+          <p>Ask about courses and admissions. If a detail is missing from the information, AdmitFlow will say it cannot confirm it.</p>
         </div>
         <div class="step-card">
           <span class="num">04</span>
-          <h3>Apply</h3>
-          <p>If you qualify, it shares a test-mode application-fee link in rupees. No real payment is ever taken.</p>
+          <h3>Choose what to do next</h3>
+          <p>Review the requirements and fee before continuing. This build does not submit applications, and payment links use Razorpay test mode.</p>
         </div>
       </div>
     </section>
 
     <section class="wrap section reveal">
       <div class="section-head">
-        <h2>Built to be honest.</h2>
-        <p>AdmitFlow is designed to say less, truthfully, rather than more.</p>
+        <h2>Useful information, without the guesswork.</h2>
+        <p>AdmitFlow works from the course information available in this build and makes gaps clear.</p>
       </div>
       <div class="trust">
         <div class="trust-item">
-          <strong>Facts come from code</strong>
-          <p>Eligibility and fees are computed from seeded, structured data, not written by the language model.</p>
+          <strong>Your preferences stay in context</strong>
+          <p>AdmitFlow uses the course interests you have shared to keep recommendations relevant during the chat.</p>
         </div>
         <div class="trust-item">
-          <strong>It fails closed</strong>
-          <p>If search or indexing is unavailable, AdmitFlow stays quiet rather than answering with a guess.</p>
+          <strong>Missing details stay missing</strong>
+          <p>Dates, documents, accommodation, and other unlisted details are not invented.</p>
         </div>
         <div class="trust-item">
-          <strong>Nothing here is real</strong>
-          <p>The institution, courses, fees, and conversations are fictional samples built for a hackathon.</p>
+          <strong>Review before continuing</strong>
+          <p>Check the course requirements and fee before choosing whether to continue.</p>
         </div>
       </div>
     </section>
 
     <section class="wrap">
       <div class="cta-panel reveal">
-        <h2>Try the demo yourself.</h2>
-        <p>Open a chat with the demo bot and walk through discovery, eligibility, and a test-mode application fee.</p>
-        <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open the demo on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
-        <p class="note">Staff can open the read-only dashboard at <a href="/login">/login</a>, which requires local demo credentials.</p>
+        <h2>Explore your course options</h2>
+        <p>Start a Telegram chat to tell AdmitFlow what you are looking for.</p>
+        <a class="btn btn-primary" href="{{ bot_url }}" rel="noopener">Open AdmitFlow on Telegram <span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span></a>
+        <p class="note">Staff dashboard: <a href="/login">sign in</a>.</p>
       </div>
     </section>
   </main>
@@ -115,7 +115,7 @@
       <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 24 C 11 24, 12 15.5, 16 15.5 S 22 7.5, 27 7.5"/><circle cx="5" cy="24" r="2.1" fill="currentColor" stroke="none"/><circle cx="16" cy="15.5" r="2.1" fill="currentColor" stroke="none"/><circle cx="27" cy="7.5" r="2.1" fill="currentColor" stroke="none"/></svg>
       AdmitFlow
     </a>
-    <p>A fictional demonstration built for the DevDay Exchange Community Hackathon, Kochi. The institution, courses, fees, and conversations shown are not real, and no genuine admissions decision or payment is made.</p>
+    <p>Hackathon build: course details and fees are for demonstration. Applications are not submitted; payment links use Razorpay test mode.</p>
   </footer>
 
   <script src="/static/landing.js"></script>

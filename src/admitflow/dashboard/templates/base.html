@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title or "AdmitFlow Demo" }}</title>
+  <title>{{ title or "AdmitFlow Staff" }}</title>
   <link rel="icon" href="/static/brand/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/tokens.css">
   <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-  <header><h1><a href="/">AdmitFlow</a> <small>fictional demo</small></h1>
+  <header><h1><a href="/">AdmitFlow</a> <small>staff dashboard</small></h1>
   {% if staff_authenticated %}<form method="post" action="/logout"><button type="submit">Log out</button></form>{% endif %}</header>
   {% if not rag_ready %}<p class="notice">FAQ retrieval is unavailable until OpenAI embeddings are configured and indexed.</p>{% endif %}
   {% block content %}{% endblock %}

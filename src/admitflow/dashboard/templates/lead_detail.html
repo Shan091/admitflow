@@ -14,8 +14,8 @@
   <dt>Grade 12 completed</dt><dd>{{ "Yes" if lead.completed_grade12 else ("No" if lead.completed_grade12 == 0 else "—") }}</dd>
   <dt>Overall marks</dt><dd>{{ lead.marks_percent if lead.marks_percent is not none else "—" }}</dd>
   {% set prereq_report = facts | selectattr("fact_key", "equalto", "sample_prerequisites_self_reported") | selectattr("fact_value", "equalto", lead.selected_course_id) | first %}
-  <dt>Sample gate result</dt>
-  <dd>{% if lead.eligible is none %}Not completed{% elif prereq_report %}{% if lead.eligible %}Passed by learner self-report (fictional; unverified){% else %}Not passed by learner self-report (fictional; unverified){% endif %}{% elif lead.eligible %}Passed code-checked sample rules{% else %}Did not meet code-checked sample rules{% endif %}</dd>
+  <dt>Eligibility check</dt>
+  <dd>{% if lead.eligible is none %}Not completed{% elif prereq_report %}{% if lead.eligible %}Requirements self-reported; not verified{% else %}Requirements not met or not confirmed{% endif %}{% elif lead.eligible %}Meets configured course rules{% else %}Does not meet configured course rules{% endif %}</dd>
 </dl>
 <h3>Discovery facts (with speaker)</h3>
 {% if facts %}<dl>{% for fact in facts %}<dt>{{ fact.fact_key }}</dt><dd>{{ fact.fact_value }} <small>({{ fact.speaker }})</small></dd>{% endfor %}</dl>{% else %}<p>No discovery facts recorded.</p>{% endif %}

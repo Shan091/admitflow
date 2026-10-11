@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-11 — make learner-facing copy more natural
+
+- **Change:** Rewrote the landing page's sentimental placeholder copy, removed repeated
+  "fictional/sample" labels from course conversation, and made course descriptions read as complete
+  program summaries. Course requirements and fees are still disclosed as demonstration data at the
+  start; Razorpay test payments are clearly labeled and do not submit applications.
+- **Why:** Repeated caveats interrupted the conversation and made course exploration feel like a
+  fixture browser instead of an admissions conversation.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint, the format check (57 files), strict mypy
+  (31 source files), and all 189 tests. `git diff --check` passed. No live API or payment calls were
+  made.
+
 ## 2026-10-11 07:00 IST — keep routine guidance agent-led
 
 - **Change:** Removed automatic staff handoffs when a learner explores a non-undergraduate sample

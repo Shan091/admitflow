@@ -6,15 +6,15 @@
   <p>
     <a href="https://github.com/Shan091/admitflow/actions/workflows/ci.yml"><img src="https://github.com/Shan091/admitflow/actions/workflows/ci.yml/badge.svg" alt="CI status" /></a>
     <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12" />
-    <img src="https://img.shields.io/badge/demo-fictional%20data-6B4EFF" alt="Fictional-data demo" />
+    <img src="https://img.shields.io/badge/demo-illustrative%20catalog-6B4EFF" alt="Illustrative catalog demo" />
   </p>
 </div>
 
 ---
 
 > [!IMPORTANT]
-> **Hackathon demo only.** The institution, courses, requirements, and fees are fictional sample
-> data. Recommendations and eligibility are not real admission decisions. Use fictional inputs
+> **Hackathon demo.** Course details, entry requirements, and fees are illustrative; AdmitFlow does
+> not submit an application or make admission decisions. Payments use test mode. Use demo inputs
 > only: Telegram identifiers and messages are stored locally. While AI processing is enabled,
 > typed text and up to eight recent chat messages plus saved course preferences may be sent to
 > OpenAI. Telegram IDs and usernames are excluded from model context. The bot explains this at
@@ -22,15 +22,15 @@
 
 ## What it does
 
-AdmitFlow helps prospective learners explore courses offered by a fictional Kerala institution.
-It remembers stated interests, explains why sample courses match, and gives staff a small view of
+AdmitFlow helps prospective learners explore courses from a seeded Kerala course catalog.
+It remembers stated interests, explains why courses match, and gives staff a small view of
 leads and handoffs.
 
 | Learner experience | Staff and system |
 | --- | --- |
 | AI-led free-text discovery with recent chat context; button browsing remains available | Authenticated dashboard for leads, attributed facts, and handoffs |
 | Get up to three catalog-grounded course matches | SQLite persistence for conversations and demo records |
-| Inspect sample requirements, study options, support, and fees before continuing | Code-owned undergraduate gate; self-reported prerequisite gate for other fictional courses |
+| Inspect entry requirements, study options, support, and fees before continuing | Code-owned undergraduate gate; self-reported requirements for other course levels |
 | Ask seeded FAQs; uncertain or unavailable retrieval abstains | OpenAI embeddings with local SQLite storage and NumPy cosine search |
 | Optionally continue to a Razorpay **test-mode** application-fee link | Payment status changes only after a verified Razorpay webhook |
 
@@ -41,8 +41,8 @@ flowchart LR
     S[Student in Telegram] --> D[Explore or browse]
     D --> R[Catalog-grounded matches]
     R --> I[Inspect and compare]
-    I -->|undergraduate| E[Code-checked sample eligibility]
-    I -->|other levels| E2[Self-report listed sample prerequisites]
+    I -->|undergraduate| E[Code-checked eligibility rules]
+    I -->|other levels| E2[Self-report listed entry requirements]
     E -->|eligible and requests fee| P[Razorpay test payment]
     E2 -->|self-reports yes and requests fee| P
     P -->|verified webhook| C[Payment status and confirmation]
@@ -62,21 +62,25 @@ deletion or a real payment dispute.
 
 ```mermaid
 flowchart TB
-    TG[Telegram webhook] --> API[FastAPI app]
+    TG[Telegram] -->|message| API[FastAPI app]
     WEB[Staff browser] --> API
     RP[Razorpay webhook] --> API
     API --> SVC[Admissions and payment services]
+    SVC -->|current message + bounded recent chat| OAI[OpenAI conversation agent]
+    OAI -->|AI-authored reply + structured learner facts| SVC
+    SVC -->|response and code-owned actions| API
+    API -->|reply| TG
     SVC <--> DB[(SQLite: catalog, leads, FAQs, vectors, payments)]
-    SVC -. optional current-message extraction .-> OAI[OpenAI API]
-    SVC -. seeded FAQ embeddings .-> OAI
+    SVC -. FAQ and query embeddings .-> OAI
     SVC -->|cosine search and confidence checks| DB
 ```
 
-The AI conversation lead receives the current message, up to eight recent chat messages, safe saved
-course preferences, current guidance stage, selected language, and fictional catalog vocabulary.
-It does not receive the learner's chat ID, username, or name; API response storage is disabled.
-Python still validates learner facts and owns recommendations, eligibility, and prices. FAQ answers
-come from the seeded local corpus, and retrieval fails closed when a result is weak, ambiguous, or
+The AI conversation agent receives the current message, up to eight recent chat messages, safe
+saved course preferences, current guidance stage, selected language, and catalog vocabulary. It
+authors the conversational reply and returns structured learner facts. It does not receive the
+learner's chat ID, username, or name; API response storage is disabled. Python validates and stores
+allowed facts and owns recommendations, eligibility, fees, and payment actions. FAQ answers come
+from the seeded local corpus, and retrieval fails closed when a result is weak, ambiguous, or
 unavailable.
 
 ## Run it locally
@@ -155,7 +159,7 @@ Configure `RAZORPAY_KEY_ID` (must begin with `rzp_test_`), `RAZORPAY_KEY_SECRET`
 public HTTPS tunnel.
 
 Only an eligible demo applicant who explicitly continues receives a link. The server supplies the
-sample fee; a browser redirect cannot mark payment paid. A valid signed webhook updates local status.
+listed fee; a browser redirect cannot mark payment paid. A valid signed webhook updates local status.
 Do not use live keys. Automated payment tests use fakes and do not contact Razorpay.
 
 </details>
@@ -178,7 +182,7 @@ To evaluate the seeded FAQ corpus with the live embedding API, set `OPENAI_API_K
 uv run python scripts/evaluate_faq_retrieval.py
 ```
 
-This sends only 27 fixed fictional query variants to OpenAI, checks expected matches and refusals,
+This sends only 27 fixed synthetic query variants to OpenAI, checks expected matches and refusals,
 and reports token usage. API usage is billable; applicant messages are never read by the evaluator.
 
 ## Demo walkthrough
@@ -186,12 +190,12 @@ and reports token usage. API usage is billable; applicant messages are never rea
 1. Register the Telegram webhook and send `/start` to the bot.
 2. Read the demo-data and OpenAI notice. Explore by naming a course, activity, interest, goal, or
    study level—or choose a button. Turn AI processing off to keep exploring with buttons only.
-3. Review the matches, inspect a course's sample details, then compare again or explicitly continue.
+3. Review the matches, inspect a course's details, then compare again or explicitly continue.
 4. Try a seeded FAQ; uncertain or unavailable retrieval should produce an abstention.
 5. Sign into the staff dashboard to review the lead and any handoff. Staff can delete one lead or
-   reset all local demo records; fictional courses and FAQs remain seeded.
+   reset all local demo records; course and FAQ information remains seeded.
 6. With Razorpay test credentials configured, complete the undergraduate code-checked path or
-   self-report the displayed sample prerequisites for another fictional level. Then request the
+   self-report the displayed entry requirements for another course level. Then request the
    demo fee link and deliver the signed test webhook.
 
 No live staff contact, response time, or automatic course access is configured. Payment
@@ -199,9 +203,9 @@ confirmation means the demo dashboard records a verified paid status; it is not 
 
 ## Scope and limitations
 
-- Fictional single-institution catalog and seeded FAQs; no general document ingestion.
-- Sample undergraduate eligibility is code-checked. For other levels, the learner may self-report
-  the displayed fictional prerequisites to reach the test-fee step. This is not verified eligibility
+- Illustrative single-tenant course catalog and seeded FAQs; no general document ingestion.
+- Undergraduate eligibility rules are code-checked. For other levels, the learner may self-report
+  the displayed entry requirements to reach the test-fee step. This is not verified eligibility
   or admission; a learner who says no or is unsure cannot proceed to payment.
 - English, Malayalam, Hindi, and Hinglish can be selected, but most bot copy is still English;
   translations need fluent-speaker review.

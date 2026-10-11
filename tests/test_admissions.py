@@ -58,7 +58,7 @@ async def _skip_optional_goal_prompt(
 @pytest.mark.parametrize(
     ("language", "disclosure_phrase", "off_phrase"),
     [
-        ("hi", "OpenAI को भेजे जाते हैं", "OpenAI प्रोसेसिंग बंद"),
+        ("hi", "OpenAI को भेजी जाती है", "OpenAI प्रोसेसिंग"),
         ("ml", "OpenAI-ലേക്ക് അയയ്ക്കുകയും", "OpenAI പ്രോസസ്സിംഗ് ഓഫ്"),
         ("hinglish", "OpenAI ko bheje", "OpenAI processing band"),
     ],
@@ -100,7 +100,7 @@ def test_language_switch_updates_disclosure_and_discovery_prompt(tmp_path: Path)
     lead_id, _ = service.start("123", "student")
     prompt = service.choose_language(lead_id, "hi")
 
-    assert "आप क्या पढ़ने" in prompt.text
+    assert "आप क्या पढ़ना चाहते हैं" in prompt.text
     assert "अंग्रेज़ी में" in prompt.text
 
 
@@ -120,7 +120,7 @@ async def test_fee_question_uses_structured_course_price_before_router(tmp_path:
     reply = await service.free_text(lead_id, "What is the application fee?", UnexpectedRouter())
 
     assert "₹500" in reply.text
-    assert "fictional demo amount" in reply.text
+    assert "Razorpay test mode" in reply.text
 
 
 @pytest.mark.asyncio
@@ -139,7 +139,7 @@ async def test_hostel_fee_question_does_not_claim_application_fee(tmp_path: Path
         lead_id, "Is hostel accommodation included in the course fee?", UnexpectedRouter()
     )
 
-    assert "only confirms application fees" in reply.text
+    assert "only lists application fees" in reply.text
     assert "hostel/accommodation charges aren't listed" in reply.text
     assert "₹" not in reply.text
 
@@ -159,7 +159,7 @@ async def test_hostel_availability_abstains_without_automatic_handoff(tmp_path: 
     reply = await service.free_text(lead_id, "Is hostel accommodation available?", None)
     lead = repository.get_lead(lead_id)
 
-    assert "actual availability" in reply.text
+    assert "confirmed accommodation details" in reply.text
     assert "won't guess" in reply.text.casefold()
     assert lead is not None and lead["handoff_status"] == "none"
 
@@ -241,7 +241,7 @@ def test_no_matching_course_offers_agent_led_broadening(
     )
     lead = repository.get_lead(lead_id)
 
-    assert "couldn't find a complete sample course" in reply.text
+    assert "couldn't find a complete course" in reply.text
     assert "staff" not in reply.text.casefold()
     assert {data for _, data in reply.buttons} == {"path:explore", "path:browse"}
     assert lead is not None and lead["handoff_status"] == "none"
@@ -264,7 +264,7 @@ async def test_discovery_is_enabled_by_default_and_opt_out_keeps_tap_only_mode(
     lead_id, welcome_prompt = service.start("123", "student")
 
     assert "OpenAI" in welcome_prompt.text
-    assert "demo text only" in welcome_prompt.text.casefold()
+    assert "don't share real student" in welcome_prompt.text.casefold()
     assert any(data == "path:explore" for _, data in welcome_prompt.buttons)
     assert service.ai_processing_enabled(lead_id)
 
@@ -371,7 +371,7 @@ async def test_student_can_describe_multiple_facts_without_consent_step(
     assert "\\n" not in reply.text
     assert "courses:\n" in reply.text
     diploma_details = service.explore_guidance_course(lead_id, "data-analytics-diploma")
-    assert any(label == "Check sample prerequisites" for label, _ in diploma_details.buttons)
+    assert any(label == "Check entry requirements" for label, _ in diploma_details.buttons)
     assert all("staff" not in label.casefold() for label, _ in diploma_details.buttons)
     facts = repository.list_facts(lead_id)
     assert any(
@@ -593,7 +593,7 @@ async def test_language_support_question_can_be_skipped_without_repeating(tmp_pa
         if data.startswith("guidance:confirm:")
     )
     results = await service.confirm_guidance(lead_id, token)
-    assert "matching fictional sample courses" in results.text
+    assert "matching courses" in results.text
     assert not any(
         item["fact_key"] == "language_support_preference_student"
         for item in repository.list_facts(lead_id)
@@ -653,7 +653,7 @@ async def test_delivery_mode_is_optional_resumable_and_filters_recommendations(
     )
     results = await service.confirm_guidance(lead_id, token)
 
-    assert "matching fictional sample courses" in results.text
+    assert "matching courses" in results.text
     assert "Study format listed: online" in results.text
     assert "Study format listed: in person" not in results.text
     assert any(
@@ -751,12 +751,12 @@ async def test_guided_match_opens_course_details_before_explicit_eligibility_ste
     assert repository.get_lead(lead_id)["selected_course_id"] is None
     details = service.explore_guidance_course(lead_id, selected_detail_callback)
 
-    assert "Fictional sample details" in details.text
-    assert "Sample prerequisites:" in details.text
+    assert "Course details" in details.text
+    assert "Entry requirements:" in details.text
     assert any(
         data == f"guidance:continue:{selected_detail_callback}" for _, data in details.buttons
     )
-    assert any(label == "Check sample eligibility" for label, _ in details.buttons)
+    assert any(label == "Check eligibility" for label, _ in details.buttons)
     assert any(data == "guidance:matches" for _, data in details.buttons)
     matches_again = service.show_guidance_matches(lead_id)
     assert selected_detail_callback in {
@@ -1098,9 +1098,9 @@ async def test_no_language_support_match_can_be_relaxed_after_confirmation(
 
     no_match = await service.confirm_guidance(lead_id, token)
 
-    assert "No complete matching sample course lists Hindi discussion support" in no_match.text
+    assert "No complete matching course lists Hindi discussion support" in no_match.text
     widened = await service.choose_guidance_language_support(lead_id, None)
-    assert "matching fictional sample courses" in widened.text
+    assert "matching courses" in widened.text
     assert "Lists language support: Hindi discussion support" not in widened.text
 
 
@@ -1745,10 +1745,7 @@ async def test_ai_conversation_copy_uses_bounded_context_without_identifiers(
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
     repository.seed_catalog()
-    assistant_message = (
-        "I'm AdmitFlow's AI course guide for a fictional catalog. What kinds of things do you "
-        "enjoy learning about?"
-    )
+    assistant_message = "I'm AdmitFlow's AI course guide. What would you like to study?"
     interpreter = FakeDiscoveryInterpreter(
         DiscoveryTurn(
             intent="staff_request",
@@ -1885,7 +1882,7 @@ async def test_refund_question_does_not_claim_fee_or_call_router(tmp_path: Path)
         lead_id, "Can I get a refund for the application fee?", UnexpectedRouter()
     )
 
-    assert "Refunds are not supported in this fictional demo" in reply.text
+    assert "I don't have a confirmed refund policy" in reply.text
     assert "₹" not in reply.text
 
 
@@ -1907,7 +1904,7 @@ async def test_language_barrier_uses_seeded_facts_without_automatic_handoff(
     reply = await service.free_text(lead_id, "I am worried my English is not good enough", None)
     lead = repository.get_lead(lead_id)
 
-    assert "listed medium" in reply.text
+    assert "listed teaching medium" in reply.text
     assert "does not specify a required proficiency level" in reply.text
     assert "staff" not in reply.text.casefold()
     assert lead is not None and lead["handoff_status"] == "none"
@@ -1956,7 +1953,7 @@ def test_qualification_flow_persists_result_and_rejects_malformed_marks(tmp_path
     reply = service.answer_marks(lead_id, "50%")
     lead = repository.get_lead(lead_id)
     assert lead is not None
-    assert "meet the sample requirements" in reply.text
+    assert "meet the listed requirements" in reply.text
     assert lead["marks_percent"] == 50
     assert lead["eligible"] == 1
     assert lead["state"] == "qualified"
@@ -1979,7 +1976,7 @@ def test_browse_path_does_not_force_qualification(tmp_path: Path) -> None:
     reply = service.browse(lead_id)
 
     assert ("Just browsing / ask a question", "path:browse") in welcome.buttons
-    assert "fictional sample courses" in reply.text
+    assert "Here are the courses" in reply.text
     assert repository.get_lead(lead_id)["state"] == "browsing"  # type: ignore[index]
 
 
@@ -2296,11 +2293,11 @@ def test_non_undergraduate_eligibility_limit_is_explained_once_per_chat(
     first = service.select_course(lead_id, "digital-design-diploma")
     second = service.select_course(lead_id, "hospitality-diploma")
 
-    assert "no eligibility rules configured" in first.text
+    assert "can't verify eligibility here" in first.text
     assert "Completed Grade 12 or equivalent" in first.text
-    assert "no eligibility rules configured" not in second.text
+    assert "can't verify eligibility here" not in second.text
     assert "Hospitality and Guest Services Diploma" in second.text
-    assert "Sample prerequisites:" in second.text
+    assert "Entry requirements:" in second.text
     assert any(data.startswith("sample-prerequisites:yes:") for _, data in second.buttons)
 
 
@@ -2502,7 +2499,7 @@ def test_unknown_field_gets_agent_led_recovery_without_inventing_course(
     reply = service.recommend_field(lead_id, "aerospace medicine")
     lead = repository.get_lead(lead_id)
 
-    assert "fictional catalog" in reply.text
+    assert "I don't see a course in that field" in reply.text
     assert "staff" not in reply.text.casefold()
     assert any(data == "path:browse" for _, data in reply.buttons)
     assert lead is not None and lead["handoff_status"] == "none"

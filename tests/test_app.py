@@ -42,7 +42,7 @@ def test_health_and_dashboard_require_staff_login(tmp_path: Path) -> None:
         assert "httponly" in signed_in.headers["set-cookie"].casefold()
         dashboard = client.get("/", follow_redirects=True)
         assert dashboard.status_code == 200
-        assert "fictional demo" in dashboard.text
+        assert "staff dashboard" in dashboard.text
         assert "No leads yet" in dashboard.text
         assert "Delete all demo data" in dashboard.text
 
@@ -50,7 +50,7 @@ def test_health_and_dashboard_require_staff_login(tmp_path: Path) -> None:
         lead_id = repository.upsert_lead(repository.tenant_id, "42", "sample")
         repository.update_lead(lead_id, selected_course_id="foundations-computing")
         repository.add_message(lead_id, "inbound", "/start", 123)
-        assert "sample" in client.get("/").text
+        assert "Foundations of Computing" in client.get("/").text
         detail = client.get(f"/leads/{lead_id}")
         assert detail.status_code == 200
         assert "Foundations of Computing" in detail.text
@@ -75,8 +75,8 @@ def test_public_welcome_and_static_design_assets_do_not_require_login(tmp_path: 
     with TestClient(create_app(settings)) as client:
         welcome = client.get("/welcome")
         assert welcome.status_code == 200
-        assert "conversational admissions assistant for a fictional institution" in welcome.text
-        assert "Open the demo on Telegram" in welcome.text
+        assert "Find a course for your" in welcome.text
+        assert "Open AdmitFlow on Telegram" in welcome.text
         assert client.get("/static/tokens.css").status_code == 200
         assert client.get("/static/brand/favicon.svg").status_code == 200
         assert client.get("/", follow_redirects=False).headers["location"] == "/login"

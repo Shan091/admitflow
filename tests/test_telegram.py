@@ -144,10 +144,10 @@ async def test_start_command_discloses_ai_processing_and_starts_discovery(tmp_pa
     assert len(leads) == 1
     assert leads[0]["telegram_user_id"] == "42"
     assert len(repository.list_messages(int(leads[0]["id"]))) == 2
-    assert "fictional demo guidance" in message.sent[0][0]
+    assert "Course details and fees are for demonstration" in message.sent[0][0]
     assert "OpenAI" in message.sent[0][0]
-    assert "recent chat messages" in message.sent[0][0]
-    assert "demo text only" in message.sent[0][0]
+    assert "recent chat context" in message.sent[0][0]
+    assert "don't share real student" in message.sent[0][0]
     assert message.sent[0][1] is not None
     assert any(
         button.callback_data == "path:explore"
@@ -196,7 +196,7 @@ async def test_user_can_turn_openai_processing_off_and_back_on(tmp_path: Path) -
     update.update_id = 141
     await callback_handler(update, context)
     assert admissions.ai_processing_enabled(lead_id)
-    assert "Typed messages and a few recent chat messages are sent to OpenAI" in message.sent[-1][0]
+    assert "recent chat context are sent to OpenAI" in message.sent[-1][0]
     on_markup = message.sent[-1][1]
     assert on_markup is not None
     assert any(
@@ -283,7 +283,7 @@ async def test_guided_course_detail_callback_does_not_enter_qualification(
     )
     await callback_handler(update, context)
 
-    assert "Fictional sample details" in message.sent[-1][0]
+    assert "Course details" in message.sent[-1][0]
     assert repository.get_lead(lead_id)["selected_course_id"] is None
     callbacks = {
         button.callback_data for row in message.sent[-1][1].inline_keyboard for button in row
@@ -294,7 +294,7 @@ async def test_guided_course_detail_callback_does_not_enter_qualification(
     update.callback_query = SimpleNamespace(answer=answer, data="guidance:matches")
     update.update_id = 151
     await callback_handler(update, context)
-    assert "matching fictional sample courses" in message.sent[-1][0]
+    assert "matching courses" in message.sent[-1][0]
     assert any(
         button.callback_data == f"guidance:course:{course_id}"
         for row in message.sent[-1][1].inline_keyboard
@@ -523,7 +523,7 @@ async def test_exploration_callbacks_recommend_and_language_choice_persists(tmp_
     update.callback_query = SimpleNamespace(answer=answer_confirm_guidance, data=confirm_callback)
     update.update_id = 114
     await callback_handler(update, context)
-    assert "matching fictional sample courses" in message.sent[-1][0]
+    assert "matching courses" in message.sent[-1][0]
 
     async def answer_language() -> None:
         return None
@@ -578,7 +578,7 @@ async def test_qualification_sends_test_payment_link_when_enabled(tmp_path: Path
     )
     await callback_handler(payment_update, context)
 
-    assert "Razorpay test-mode" in payment_message.sent[0][0]
+    assert "This is a test payment" in payment_message.sent[0][0]
     assert "₹500" in payment_message.sent[0][0]
     assert "https://rzp.io/i/test123" in payment_message.sent[0][0]
     assert repository.get_lead(lead_id)["readiness_status"] == "ready_to_apply"  # type: ignore[index]
@@ -635,7 +635,7 @@ def _callback_data(message: FakeMessage) -> set[str]:
 @pytest.mark.parametrize(
     ("payment_status", "expected_text"),
     [
-        ("missing", "don't see a demo application payment link"),
+        ("missing", "don't see an application payment link"),
         ("created", "payment is still pending"),
         ("paid", "payment is confirmed as paid"),
     ],

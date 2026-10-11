@@ -8,8 +8,8 @@
       "Do you provide a place to live during the course?",
       "Is accommodation available for learners?"
     ],
-    "answer": "The fictional sample FAQ mentions a hostel, but availability, eligibility, pricing, and accommodation terms are not confirmed. No live staff contact or response time is configured in this demo.",
-    "source": "Fictional seeded FAQ: hostel facilities"
+    "answer": "Accommodation details are not available in the course information here. Please confirm availability, eligibility, pricing, and terms with the institution before making plans.",
+    "source": "Accommodation information"
   },
   {
     "id": "class-format",
@@ -20,8 +20,8 @@
       "Do students get guided practical sessions?",
       "What happens in a typical class?"
     ],
-    "answer": "The fictional demo courses use a mix of instructor-led sessions and guided practice. This is sample information for the hackathon demo.",
-    "source": "Demo FAQ: class format"
+    "answer": "Teaching methods vary by course. Check the course listing for the format and support details available for your selection.",
+    "source": "Class format"
   },
   {
     "id": "language-support",
@@ -32,8 +32,8 @@
       "Can I chat with the bot in Hinglish?",
       "Which languages are supported for questions?"
     ],
-    "answer": "The demo bot is designed for English and simple Hinglish interactions. Language support is limited in this hackathon build.",
-    "source": "Demo FAQ: language support"
+    "answer": "You can write in English, Hindi, Malayalam, or Hinglish. Most prepared course and payment messages are in English, so language support is partial.",
+    "source": "Language support"
   },
   {
     "id": "course-duration",
@@ -43,7 +43,7 @@
       "How many months does a course take?",
       "How long should I expect the course to run?"
     ],
-    "answer": "Course duration depends on the selected sample course. Please ask staff for confirmed dates and schedules.",
-    "source": "Demo FAQ: course duration"
+    "answer": "Duration depends on the selected course. Dates and schedules are not listed here; confirm them with the institution before applying.",
+    "source": "Course duration"
   }
 ]
