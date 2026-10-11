@@ -1,5 +1,15 @@
 # AI usage
 
+## 2026-10-11 — document Langfuse observability
+
+- **Task:** Explain Langfuse configuration and live trace inspection in the README.
+- **Assistance:** Codex documented the configured project-region URL, trace/span names and fields,
+  explicit flush behavior, how to find a real Telegram trace, and the separate Langfuse deletion
+  requirement. Values from `.env` were not copied into documentation.
+- **Checks:** README statements were compared with the running configuration and verified trace.
+  `bash scripts/verify.sh` passed Ruff, format, strict mypy, and all 194 tests; `git diff --check`
+  passed. No live API calls were made.
+
 ## 2026-10-11 — diagnose missing live Telegram traces
 
 - **Task:** Investigate why live Telegram interactions were absent from the Langfuse project.

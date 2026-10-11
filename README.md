@@ -95,7 +95,7 @@ unavailable.
 - [`uv`](https://docs.astral.sh/uv/)
 - Staff username, password, and session secret for dashboard access
 - Optional: Telegram bot credentials, OpenAI API key, and Razorpay **test-mode** credentials
-- Optional: Langfuse project keys for debugging traces (includes conversation content and learner IDs)
+- Optional: Langfuse project keys and the project region URL for observability
 
 ### Install and start
 
@@ -128,11 +128,32 @@ Payments remain disabled unless all Razorpay test credentials are configured.
 | `STAFF_USERNAME`, `STAFF_PASSWORD`, `STAFF_SESSION_SECRET` | Staff dashboard | Required; keep local and use non-default demo values. |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` | Telegram bot | Both are needed for the authenticated webhook. |
 | `OPENAI_API_KEY` | Free-text discovery and FAQ retrieval | Optional; API usage can incur charges. |
-| `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` | Debug traces | Optional; when enabled, sends messages, replies, Telegram IDs, and saved learner facts to Langfuse. |
+| `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` | Observability | Optional; use both project keys and the matching region URL. Sends Telegram messages, replies, IDs, and saved learner facts to Langfuse. |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Demo payments | Optional; test-mode keys only, with key ID starting `rzp_test_`. |
 | `DATABASE_PATH` | SQLite location | Defaults to `data/admitflow.sqlite3`. |
 
 See [`.env.example`](.env.example) for the full list, including model and retrieval settings.
+
+### Langfuse observability
+
+Set `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY` to the keys for your Langfuse project. Set
+`LANGFUSE_BASE_URL` to that project's region URL; for example, use
+`https://jp.cloud.langfuse.com` for a Japan-region project. Keep all three values in `.env` and
+never commit them. Leave both keys blank to disable Langfuse tracing.
+
+When tracing is enabled, each Telegram interaction creates a `telegram-interaction` trace. Its
+input includes the Telegram user and chat IDs, incoming text, and saved learner facts. Its output
+includes the bot reply and updated facts. The OpenAI call is recorded as a child observation (for
+example, `OpenAI-generation`). The app explicitly flushes completed interactions so they appear
+without waiting for a later batch.
+
+To inspect a live turn, open the Langfuse project that issued the configured keys, go to its trace
+list, and search for `telegram-interaction`. Open the trace to view the Telegram span and its
+OpenAI child observation. A live Telegram turn has been verified in the configured project.
+
+Langfuse stores a separate copy of traced content. Deleting demo data from the staff dashboard
+does not delete Langfuse traces; remove those traces separately in the Langfuse project. Use demo
+conversations only, not real applicant data.
 
 <details>
 <summary><strong>Connect Telegram</strong></summary>

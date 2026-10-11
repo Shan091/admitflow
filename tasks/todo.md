@@ -377,6 +377,12 @@ courses, no scores, student-first attribution, and truthful staff handoff.
   commit `9fcf7f7b07b6d7322a38614ef13c69f5486badb8`. The build and completion record are committed
   separately.
 
+# README observability guide
+
+- [ ] Document Langfuse setup, regional base URL, trace names/contents, live verification path,
+  and separate deletion of Langfuse copies; run the project quality gate and publish only intended
+  documentation files.
+
 ## Visual identity: brand kit, landing page, dashboard restyle
 
 Calm editorial / trust-first design, implemented in plain HTML + native CSS + a little vanilla

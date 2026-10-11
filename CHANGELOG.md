@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-11 — document Langfuse observability
+
+- **Change:** Added Langfuse setup guidance for regional project URLs, the `telegram-interaction`
+  trace and OpenAI child span, recorded message/ID/fact fields, immediate flush behavior, trace
+  inspection, and separate deletion of Langfuse copies.
+- **Verification:** README content reviewed against the running configuration and the real trace
+  verified in Langfuse. `bash scripts/verify.sh` passed Ruff, formatting (57 files), strict mypy
+  (31 source files), and all 194 tests. `git diff --check` passed. No live API calls were made.
+
 ## 2026-10-11 — flush completed Telegram traces
 
 - **Change:** Explicitly flush each completed Telegram Langfuse observation and report trace start,
