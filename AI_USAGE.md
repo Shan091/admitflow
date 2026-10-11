@@ -12,8 +12,9 @@
 - **Checks:** `bash scripts/verify.sh` passed (Ruff, format, strict mypy, 194 tests), and
   `git diff --check` passed. A real Telegram interaction produced a Langfuse
   `telegram-interaction` trace with a nested OpenAI generation; API inspection confirmed message
-  and reply fields without displaying their contents. No synthetic trace was used as end-to-end
-  evidence.
+  and reply fields without displaying their contents. GitHub Actions run
+  [38108283109](https://github.com/Shan091/admitflow/actions/runs/38108283109) passed on commit
+  `9fcf7f7b07b6d7322a38614ef13c69f5486badb8`. No synthetic trace was used as end-to-end evidence.
 
 ## 2026-10-11 — add Langfuse conversation traces
 

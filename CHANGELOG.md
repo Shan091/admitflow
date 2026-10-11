@@ -10,6 +10,8 @@
   through the existing webhook with HTTP 200. Langfuse then returned a `telegram-interaction`
   trace with an `OpenAI-generation` child; API inspection confirmed the inbound message and reply
   fields are present, without printing their contents. Public `/health` returned HTTP 200.
+  GitHub Actions run [38108283109](https://github.com/Shan091/admitflow/actions/runs/38108283109)
+  passed on `9fcf7f7b07b6d7322a38614ef13c69f5486badb8`.
 - **Diagnosis:** The previous Uvicorn reload did not replace its old worker. Restarting the updated
   app on port 8001 and pointing the existing ngrok tunnel to it made the real trace appear.
 

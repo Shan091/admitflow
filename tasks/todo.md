@@ -373,7 +373,9 @@ courses, no scores, student-first attribution, and truthful staff handoff.
   the fix complete or committing it.
 
   Verified on build commit `d0a94ef`: 194 tests passed; real Telegram interaction appeared in
-  Langfuse with message and reply fields. The build and completion record are committed separately.
+  Langfuse with message and reply fields. GitHub Actions run `38108283109` passed on completion
+  commit `9fcf7f7b07b6d7322a38614ef13c69f5486badb8`. The build and completion record are committed
+  separately.
 
 ## Visual identity: brand kit, landing page, dashboard restyle
 
