@@ -3,6 +3,20 @@
 Update this checklist at the start of each work slice. A checkbox is complete only after its
 acceptance criteria pass and the corresponding milestone is committed.
 
+## Make learner-facing admissions copy feel natural (complete)
+
+- [x] Replace repeated “fictional” and “sample” phrasing in Telegram, landing, and staff-facing
+  screens with concise admissions language; retain one clear explanation that the demo catalog,
+  fees, and application/payment actions are illustrative and do not submit a real application.
+- [x] Keep course facts, requirements, eligibility, and payment outcomes honest; do not claim
+  real admission, institutional review, or enrollment.
+- [x] Review the changed conversation and dashboard copy in context, update product documentation,
+  and record the actual checks and commit before marking complete. Implementation commit
+  `6ab471f79f4fcf5e850b82d8f0e24f6269804714` passed Ruff lint, formatting (57 files), strict mypy
+  (31 source files), 189 tests, and `git diff --check`. The updated submission records this SHA and
+  distinguishes it from the historical 177-test result. The latest Telegram/payment flow has not
+  been live-rehearsed; payment coverage for this change uses a fake adapter.
+
 ## Display all seeded thresholds before self-report (complete)
 
 - [x] Include each course's seeded minimum-mark threshold in its sample prerequisite summary unless

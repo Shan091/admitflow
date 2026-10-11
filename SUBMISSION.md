@@ -4,20 +4,23 @@
 
 - **Project name:** AdmitFlow
 - **Short description:** A Telegram admissions assistant that remembers student interests,
-  uses contextual OpenAI-led conversation to guide discovery, recommends from a fictional course
-  catalog, checks supported sample eligibility rules in code,
+  uses contextual OpenAI-led conversation to guide discovery, recommends from an illustrative course
+  catalog, checks supported eligibility rules in code,
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `d1fad4115b60d0d9864ca6355d601a3782a133d0`
-- **Sample course catalog:** 50 clearly fictional, complete offerings across the five agreed
+- **Verified implementation commit SHA:** `6ab471f79f4fcf5e850b82d8f0e24f6269804714`
+- **Course catalog:** 50 illustrative, complete listings across the five agreed
   fields, ten per field. The catalog does not offer every education level in every field.
-- **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
-  test payment were verified during earlier milestones; the user confirmed the live bot flow. The
+- **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and an earlier
+  Razorpay test payment were verified during earlier milestones; the user confirmed the live bot
+  flow. That payment proves the earlier integration only; it does not rehearse the latest flow. The
   adaptive language-support, study-format, inspect-before-continue course guidance, unrelated-
-  message recovery, and contextual AI-led replies in this SHA passed local tests and CI. The AI-led
-  changes were live-smoked with synthetic OpenAI inputs, but have not yet been rehearsed through
-  Telegram or deployed to the running tunnel. The agent-led recovery and escalation-boundary
+  message recovery, and contextual AI-led replies are implemented. Earlier milestones passed CI;
+  the current SHA has the local verification recorded below, and its GitHub Actions result has not
+  been independently checked. The AI-led changes were live-smoked with synthetic OpenAI inputs,
+  but have not yet been rehearsed through Telegram or deployed to the running tunnel. The agent-led
+  recovery and escalation-boundary
   agent-led recovery changes in `40cc1ea` and the all-level demo-fee path in `ac9e7ba` passed the
   full local verification gate and were pushed to `main`. The latest commit `d1fad41` also ensures
   every seeded threshold appears in the self-report prompt. The Telegram-to-payment flow passed
@@ -51,17 +54,17 @@
   match may get one optional prompt when catalog goals, listed language support, or study formats
   meaningfully differ. Answer or skip a goal prompt; for a language prompt, choose a listed support
   or leave language open; for format, choose in-person/online/hybrid or leave it open. Then inspect
-  the bounded catalog recommendation; tap a match to inspect its sample prerequisites, listed
-  supports/formats, and fee, then return to compare or explicitly check sample eligibility when
-  that level has configured rules. For other levels, inspect the displayed fictional prerequisites
+  the bounded catalog recommendation; tap a match to inspect its entry requirements, listed
+  supports/formats, and fee, then return to compare or explicitly check eligibility when
+  that level has configured rules. For other levels, inspect the displayed entry requirements
   and choose whether you meet them; clearly label this as an unverified self-report, not admission.
   A positive response offers the existing explicit demo fee action, while no/unsure cannot proceed.
   If a message is unrelated or contains no usable preference, AdmitFlow explains its scope,
   keeps the pending guidance state, and offers a relevant way forward instead of repeating the
-  same question. The learner may pause and `/resume`. Supported sample undergraduate options
+  same question. The learner may pause and `/resume`. Supported undergraduate options
   continue to code-based
   qualification and require an explicit tap before a test payment link. Other course levels use an
-  explicit, course-bound self-report of the displayed sample prerequisites to reach that fee step;
+  explicit, course-bound self-report of the displayed entry requirements to reach that fee step;
   no independent verification or admission decision is claimed. Routine missing facts, retrieval
   abstentions, and no-match preferences receive useful agent-led recovery. Handoff is reserved for
   explicit human requests and
@@ -70,10 +73,12 @@
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
-- **Checks performed and results:** Implementation SHA `d1fad4115b60d0d9864ca6355d601a3782a133d0`
-  passed `bash scripts/verify.sh` (Ruff lint/format, strict mypy, 189 tests), `git diff --check`,
-  and was pushed to `origin/main`. A fake Telegram-to-payment-link test exercised the diploma flow;
-  no live Razorpay payment was created. GitHub Actions was not independently verified for this SHA.
+- **Checks performed and results:** Implementation SHA `6ab471f79f4fcf5e850b82d8f0e24f6269804714`
+  passed `bash scripts/verify.sh` (Ruff lint, formatting: 57 files, strict mypy: 31 source files,
+  189 tests) and `git diff --check`. The earlier 177-test result belongs to historical commit
+  `77bf29931e135289e83e66bbdfec9328443305c4`, not this implementation. A fake
+  Telegram-to-payment-link test exercised the diploma flow; no live Razorpay payment was created
+  for this change. GitHub Actions was not independently verified for this SHA.
   The preceding agent-led recovery SHA `40cc1ea7778431d76b2d71cf645b73531aa5a808` passed the
   full local verification gate with 181 tests. The earlier AI-led implementation SHA
   `ab63f88a7118a435c40a8e848b997b1f851705bf` passed `bash scripts/verify.sh` (Ruff lint/format,
@@ -107,7 +112,7 @@
   50-course catalog commit `d36a221d743081e3000208cc5294c5132f0a2ee2` passed the full local gate
   (160 tests), `git diff --check`, and GitHub Actions `CI` run
   [38094573591](https://github.com/Shan091/admitflow/actions/runs/38094573591).
-- **Live integration checks:** The live FAQ evaluator passed 27/27 fictional cases at the
+- **Live integration checks:** The live FAQ evaluator passed 27/27 synthetic cases at the
   calibrated `0.58`/`0.05` thresholds; the final 27-query batch used 207 OpenAI input tokens.
   Telegram `getWebhookInfo` reports the correct path, zero pending updates, and no delivery error.
   Razorpay test mode reports the existing ₹500 Payment Link as paid; AdmitFlow recorded one
@@ -115,12 +120,12 @@
   used in the OpenAI checks. A separate synthetic extraction smoke across English, Hindi,
   Malayalam, and Hinglish plus known-course, out-of-catalog, and injection cases used 12,308 input
   and 992 output tokens; see `AI_USAGE.md`. No applicant text was used.
-- **Known limitations:** Single fictional tenant, seeded FAQ corpus, one environment-configured
+- **Known limitations:** Single illustrative catalog, seeded FAQ corpus, one environment-configured
   staff account, incomplete localized response copy, self-reported and unverified prerequisites for
   non-undergraduate offerings, no automatic retention expiry, uploads, production hosting, refunds,
   or production privacy controls. Payment
   links work only with Razorpay test keys and payment status requires a reachable webhook. Demo chat
-  identifiers and messages are stored locally; use fictional test inputs only. Payment confirmation
+  identifiers and messages are stored locally; use demo inputs only. Payment confirmation
   delivery is best-effort, no real staff follow-up contact or response time is configured, and
   course access is not enabled automatically; a live rehearsal of the
   new confirmation requires another eligible Telegram demo account and test payment. Reset clears
