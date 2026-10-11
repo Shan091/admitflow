@@ -139,13 +139,13 @@ async def test_hostel_fee_question_does_not_claim_application_fee(tmp_path: Path
         lead_id, "Is hostel accommodation included in the course fee?", UnexpectedRouter()
     )
 
-    assert "only confirms the application fee" in reply.text
-    assert "hostel/accommodation charges or inclusions are not confirmed" in reply.text
+    assert "only confirms application fees" in reply.text
+    assert "hostel/accommodation charges aren't listed" in reply.text
     assert "₹" not in reply.text
 
 
 @pytest.mark.asyncio
-async def test_hostel_availability_is_handed_to_staff_when_not_confirmed(tmp_path: Path) -> None:
+async def test_hostel_availability_abstains_without_automatic_handoff(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
     repository.seed_catalog()
@@ -157,10 +157,94 @@ async def test_hostel_availability_is_handed_to_staff_when_not_confirmed(tmp_pat
     lead_id, _ = service.start("123", "student")
 
     reply = await service.free_text(lead_id, "Is hostel accommodation available?", None)
+    lead = repository.get_lead(lead_id)
 
     assert "actual availability" in reply.text
-    assert "Live contact and response-time details are not configured" in reply.text
-    assert repository.get_lead(lead_id)["handoff_status"] == "pending"  # type: ignore[index]
+    assert "won't guess" in reply.text.casefold()
+    assert lead is not None and lead["handoff_status"] == "none"
+
+
+@pytest.mark.asyncio
+async def test_faq_retrieval_abstention_keeps_recovery_with_agent(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("knowledge_question", None, (), None, (), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(lead_id, "When is the next admission date?", None)
+    lead = repository.get_lead(lead_id)
+
+    assert "won't guess" in reply.text.casefold()
+    assert "staff" not in reply.text.casefold()
+    assert any(data == "path:browse" for _, data in reply.buttons)
+    assert lead is not None and lead["handoff_status"] == "none"
+
+
+@pytest.mark.asyncio
+async def test_misclassified_human_intent_does_not_escalate_without_request(
+    tmp_path: Path,
+) -> None:
+    class FalseHumanRouter:
+        async def route(self, _text: str) -> str:
+            return "human_request"
+
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(
+        lead_id, "Hello, I want to learn about courses", FalseHumanRouter()
+    )
+    lead = repository.get_lead(lead_id)
+
+    assert "staff" not in reply.text.casefold()
+    assert lead is not None and lead["handoff_status"] == "none"
+
+
+def test_no_matching_course_offers_agent_led_broadening(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    monkeypatch.setattr("admitflow.services.admissions.recommend_courses", lambda *a, **kw: [])
+
+    reply = service._guidance_recommendation_reply(
+        lead_id,
+        repository.list_courses(repository.tenant_id),
+        {"data"},
+        set(),
+        "diploma",
+        set(),
+        None,
+    )
+    lead = repository.get_lead(lead_id)
+
+    assert "couldn't find a complete sample course" in reply.text
+    assert "staff" not in reply.text.casefold()
+    assert {data for _, data in reply.buttons} == {"path:explore", "path:browse"}
+    assert lead is not None and lead["handoff_status"] == "none"
 
 
 @pytest.mark.asyncio
@@ -286,6 +370,9 @@ async def test_student_can_describe_multiple_facts_without_consent_step(
     assert "Applied Data Analytics Diploma" in reply.text
     assert "\\n" not in reply.text
     assert "courses:\n" in reply.text
+    diploma_details = service.explore_guidance_course(lead_id, "data-analytics-diploma")
+    assert any(label == "Explore this sample course" for label, _ in diploma_details.buttons)
+    assert all("staff" not in label.casefold() for label, _ in diploma_details.buttons)
     facts = repository.list_facts(lead_id)
     assert any(
         fact["fact_key"] == "interest_field_student" and fact["fact_value"] == "tech/data"
@@ -669,6 +756,7 @@ async def test_guided_match_opens_course_details_before_explicit_eligibility_ste
     assert any(
         data == f"guidance:continue:{selected_detail_callback}" for _, data in details.buttons
     )
+    assert any(label == "Check sample eligibility" for label, _ in details.buttons)
     assert any(data == "guidance:matches" for _, data in details.buttons)
     matches_again = service.show_guidance_matches(lead_id)
     assert selected_detail_callback in {
@@ -966,7 +1054,7 @@ async def test_unlisted_teaching_medium_request_gets_catalog_boundary_not_infere
 
     reply = await service.free_text(lead_id, "I need Malayalam as the medium of instruction", None)
 
-    assert "does not confirm the medium or proficiency rules" in reply.text
+    assert "doesn't set proficiency rules" in reply.text
     assert not any(
         fact["fact_key"] == "language_support_preference_student"
         for fact in repository.list_facts(lead_id)
@@ -1802,7 +1890,7 @@ async def test_refund_question_does_not_claim_fee_or_call_router(tmp_path: Path)
 
 
 @pytest.mark.asyncio
-async def test_language_barrier_uses_seeded_course_facts_and_hands_off_unknown_rules(
+async def test_language_barrier_uses_seeded_facts_without_automatic_handoff(
     tmp_path: Path,
 ) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -1820,8 +1908,9 @@ async def test_language_barrier_uses_seeded_course_facts_and_hands_off_unknown_r
     lead = repository.get_lead(lead_id)
 
     assert "listed medium" in reply.text
-    assert "does not confirm a required proficiency level" in reply.text
-    assert lead is not None and lead["handoff_status"] == "pending"
+    assert "does not specify a required proficiency level" in reply.text
+    assert "staff" not in reply.text.casefold()
+    assert lead is not None and lead["handoff_status"] == "none"
 
 
 @pytest.mark.asyncio
@@ -2022,10 +2111,11 @@ async def test_repeated_uncertainty_changes_prompt_and_resumes_recovery(tmp_path
 
     assert second.text != first.text
     assert "You don't need to decide now" in second.text
+    assert all(data != "handoff:request" for _, data in second.buttons)
     assert {data for _, data in second.buttons} >= {
         "path:browse",
         "discovery:pause",
-        "handoff:request",
+        "path:field",
     }
     service.pause_discovery(lead_id)
     assert service.resume_discovery(lead_id) == second
@@ -2156,6 +2246,36 @@ def test_parent_course_suggestion_requires_student_confirmation(tmp_path: Path) 
     assert "Have you completed Grade 12?" in student_reply.text
     assert any(fact["fact_key"] == "course_choice_parent" for fact in facts)
     assert any(fact["fact_key"] == "course_choice_student" for fact in facts)
+
+
+def test_parent_confirmed_diploma_stays_agent_led_without_staff_handoff(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "parent")
+    service.choose_speaker(lead_id, "parent")
+    service.select_course(lead_id, "data-analytics-diploma")
+
+    reply = service.confirm_parent_course(lead_id, "data-analytics-diploma")
+    lead = repository.get_lead(lead_id)
+
+    assert "Completed Grade 12 or equivalent" in reply.text
+    assert "can't confirm eligibility" in reply.text.casefold()
+    assert "staff" not in reply.text.casefold()
+    assert any(data == "path:explore" for _, data in reply.buttons)
+    assert lead is not None
+    assert lead["selected_course_id"] == "data-analytics-diploma"
+    assert lead["lifecycle_stage"] == "discovering"
+    assert lead["readiness_status"] == "considering"
+    assert lead["eligible"] is None
+    assert lead["handoff_status"] == "none"
 
 
 @pytest.mark.parametrize(
@@ -2340,7 +2460,9 @@ def test_added_catalog_course_is_retrievable_from_its_explicit_goal(
     assert [match.course.id for match in matches] == [expected_course]
 
 
-def test_unknown_field_creates_handoff_instead_of_inventing_course(tmp_path: Path) -> None:
+def test_unknown_field_gets_agent_led_recovery_without_inventing_course(
+    tmp_path: Path,
+) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
     repository.seed_catalog()
@@ -2352,12 +2474,15 @@ def test_unknown_field_creates_handoff_instead_of_inventing_course(tmp_path: Pat
     lead_id, _ = service.start("123", "student")
 
     reply = service.recommend_field(lead_id, "aerospace medicine")
+    lead = repository.get_lead(lead_id)
 
     assert "fictional catalog" in reply.text
-    assert repository.get_lead(lead_id)["handoff_status"] == "pending"  # type: ignore[index]
+    assert "staff" not in reply.text.casefold()
+    assert any(data == "path:browse" for _, data in reply.buttons)
+    assert lead is not None and lead["handoff_status"] == "none"
 
 
-def test_non_undergraduate_selection_does_not_ask_grade12_or_offer_eligibility(
+def test_non_undergraduate_selection_shows_facts_without_escalating(
     tmp_path: Path,
 ) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -2374,11 +2499,13 @@ def test_non_undergraduate_selection_does_not_ask_grade12_or_offer_eligibility(
     lead = repository.get_lead(lead_id)
 
     assert "Completed Grade 10 or equivalent" in reply.text
-    assert "Live contact and response-time details are not configured" in reply.text
+    assert "can't confirm eligibility" in reply.text.casefold()
+    assert "staff" not in reply.text.casefold()
+    assert any(data == "path:explore" for _, data in reply.buttons)
     assert lead is not None
     assert lead["state"] == "browsing"
     assert lead["eligible"] is None
-    assert lead["handoff_status"] == "pending"
+    assert lead["handoff_status"] == "none"
 
 
 def test_language_switch_and_staff_handoff_are_persisted_truthfully(tmp_path: Path) -> None:

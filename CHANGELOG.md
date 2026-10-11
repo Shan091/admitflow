@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-11 07:00 IST — keep routine guidance agent-led
+
+- **Change:** Removed automatic staff handoffs when a learner explores a non-undergraduate sample
+  course, asks an unsupported but routine catalog/FAQ question, or has no complete course match.
+  These cases now state the known facts or uncertainty and offer another agent-led action. The
+  course-detail button now distinguishes supported undergraduate eligibility from exploring other
+  sample levels. Explicit human requests, staff-mediated deletion, and refund/payment disputes
+  remain handoff cases.
+- **Why:** A parent-confirmed Diploma was being treated as a routine staff escalation even though
+  the agent could show its sample prerequisites and continue exploration.
+- **Demo state:** Cleared the one matching stale automatic Diploma handoff from the local fictional
+  demo database; kept the lead and conversation and restored `handoff_status=none`.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 181 tests;
+  focused admissions regression tests passed (92 tests); `git diff --check` passed.
+- **Limitations:** The agent still cannot confirm eligibility where no sample rule exists and must
+  not guess at missing FAQ, fee, housing, or language facts. No live Telegram conversation was sent
+  during this verification.
+
 ## 2026-10-11 — show a Telegram typing indicator during AI replies
 
 - **Change:** Before AI-enabled free-text guidance, the bot sends Telegram's native `typing` chat

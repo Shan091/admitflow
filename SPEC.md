@@ -23,19 +23,23 @@ admissions system and uses a clearly fictional institution and seeded data.
   come from seeded retrieval. Opt-out prevents external AI calls for typed content while preserving
   button-based exploration. No language ability, aptitude score, or personality label is inferred.
 - **Qualification:** Undergraduate sample rules are checked by Python. Other levels show their
-  sample prerequisites and create a staff handoff for confirmation; the app does not reuse a Grade
-  12 rule across every program.
+  recorded sample prerequisites and clearly say eligibility is not configured; they remain in
+  agent-led exploration without an automatic staff handoff. The app does not reuse a Grade 12 rule
+  across every program.
 - **Memory:** SQLite persists lifecycle stage separately from the existing qualification state,
   qualitative readiness, discovery path/step, selected course, attributed facts, language choice,
   messages, and handoffs. `/resume` restores the last discovery question. Most bot copy is still
   English despite saving a language preference; full translation remains outstanding.
 - **Knowledge:** OpenAI `text-embedding-3-small` embeds seeded FAQ questions with curated search
-  phrasings; NumPy cosine search selects relevant chunks; uncertain retrieval fails closed.
+  phrasings; NumPy cosine search selects relevant chunks; uncertain retrieval fails closed with an
+  agent reply that admits the gap and offers rephrasing or catalog browsing, not an automatic
+  staff handoff.
 - **Staff view:** A local FastAPI dashboard with environment-configured staff login shows leads,
   attributed discovery facts, conversation history, pending handoffs, and payment status. Staff can
   delete one lead's local data or reset all demo records while preserving the fictional catalog.
 - **Money boundary:** Application-fee answers come from structured course data; unknown tuition or
-  hostel charges and refunds receive a safe response. No model calculates or negotiates fees.
+  hostel charges receive a safe, non-escalating response. Refunds or actual payment disputes remain
+  staff matters. No model calculates or negotiates fees.
   A code-eligible undergraduate user must explicitly choose to continue before receiving a Razorpay
   test-mode Payment Link using the server-owned application fee; verified webhooks update payment
   status and send one Telegram confirmation. No live follow-up contact or response time is
@@ -63,6 +67,6 @@ admissions system and uses a clearly fictional institution and seeded data.
 
 - **Hackathon:** Foundation, Telegram qualification, authenticated local dashboard, seeded
   embedding retrieval, Razorpay test-mode application fee links and verified payment status,
-  interest-led discovery, staff handoffs, and staff-mediated local deletion.
+  interest-led discovery, explicit/critical staff handoffs, and staff-mediated local deletion.
 - **Deferred:** Live-mode payments, file uploads/PDF parsing, WhatsApp, workers, multi-tenant
   onboarding, deployment, and production privacy controls.

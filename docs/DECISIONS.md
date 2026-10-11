@@ -49,17 +49,20 @@ Record consequential choices here. Each entry is short; update it when evidence 
     trade-offs, and alternatives, then leaves the decision to the student.
 13. **Language and handoff.** Offer English, Malayalam, Hindi, and Hinglish as selectable
     preferences at any stage. Full translated response coverage and fluent-speaker review are not
-    implemented yet; the demo must disclose that most replies remain English. Out-of-catalog or
-    sensitive needs create a staff-dashboard handoff with conversation context. The demo has no
-    live contact or confirmed response time, so it must say those details are not configured.
+    implemented yet; the demo must disclose that most replies remain English. Routine out-of-catalog
+    questions and missing sample facts get an agent-led, fail-closed recovery, not an automatic
+    staff handoff. Keep staff handoff for explicit human requests, staff-only operations such as
+    deletion, and critical real-world matters such as a payment dispute. Never imply a live contact
+    or response time is configured.
 14. **Admissions-cycle memory.** Retain the conversation and confirmed discovery facts through the
     admissions cycle, then expire them under a stated, configurable policy. Students request deletion
     through staff; staff perform the deletion. The exact retention interval and production privacy
     review remain open release gates.
 15. **Level-aware discovery and application boundary.** Rank at most three complete fictional
     catalog entries from explicit field, optional study-level, and optional activity choices. Use no
-    aptitude score. Existing undergraduate sample rules remain deterministic; other levels are
-    handed to staff for eligibility confirmation until course-specific rules are implemented.
+    aptitude score. Existing undergraduate sample rules remain deterministic. For other levels,
+    show only recorded sample prerequisites and keep exploring; do not claim eligibility and do not
+    automatically hand off to staff.
 16. **Explicit fee continuation and honest payment follow-up.** Eligibility alone does not create a
     Razorpay link; the student must tap the demo fee continuation action. Payment confirmation says
     the dashboard shows paid status, while disclosing that live contact, response time, and course
@@ -110,8 +113,9 @@ Record consequential choices here. Each entry is short; update it when evidence 
 
 23. **Repeated uncertainty changes the next move.** Offer an unsure learner a small set of
     catalog-grounded activity/field starting points with no pressure to know a course name. If they
-    remain unsure, stop asking the same open question and offer browse, pause, or staff handoff;
-    never recommend before the learner shares a relevant preference.
+    remain unsure, stop asking the same open question and offer browse, field exploration, or pause;
+    never recommend before the learner shares a relevant preference. Do not surface staff as the
+    default recovery for uncertainty.
 
 24. **Study format is an optional catalog-backed trade-off.** Ask only when a broad comparable set
     has more than one recorded delivery mode and no other optional narrowing prompt was used for
@@ -138,6 +142,13 @@ Record consequential choices here. Each entry is short; update it when evidence 
     questions, and drafts the next response. Python still validates extracted preferences, enforces
     state and stale-callback checks, grounds FAQ answers in retrieval, and calculates course
     matches, eligibility, and fees. Only an explicit staff request creates a staff-request handoff.
+
+28. **Escalate only for a person-requested or critical staff action.** Course exploration, unsupported
+    preferences, out-of-catalog questions, weak FAQ retrieval, and unavailable fictional facts remain
+    agent-led. The agent must admit uncertainty, never invent a fact, and offer a useful next step.
+    Create staff handoffs only when the learner explicitly asks for a person or when a staff-only or
+    critical real-world action requires it, such as deletion or a payment dispute. This updates the
+    earlier default to refer unsupported or sensitive needs to staff.
 
 ## References
 

@@ -46,8 +46,9 @@ human escalation, and operational requirements are verified.
   course learning-goal tags. It still does not explore learning experiences, expected outcomes,
   constraints, or barriers in a coherent adaptive dialogue.
 - The user confirmed institution-course guidance only, using career-guidance conversation methods
-  to explore interests and study goals. Requests beyond the fictional catalog remain out of scope
-  and are referred to the staff handoff; do not add occupation or job predictions.
+  to explore interests and study goals. Requests beyond the fictional catalog remain out of scope;
+  the agent should explain that boundary and offer nearby listed courses rather than automatically
+  handing the chat to staff. Do not add occupation or job predictions.
 - No affirmative consent step is required. Typed messages are disclosed as OpenAI-processed, and
   the learner can still turn that processing off.
 - Current follow-up implementation adds fictional course-owned learning-goal tags and one optional
@@ -77,8 +78,8 @@ human escalation, and operational requirements are verified.
   current slice routes student field choices into the shared adaptive policy, preserves independent
   profile facts when the field changes, and keeps parent suggestions separate.
 - Repeated “not sure” turns previously returned the same open question indefinitely. The current
-  policy gives one concrete catalog-grounded exploration prompt and then switches to browse, pause,
-  or staff options without implying a course match.
+  policy gives one concrete catalog-grounded exploration prompt and then switches to browse, field
+  exploration, or pause without implying a course match or defaulting to staff.
 
 ## v1 lifecycle mapping
 
@@ -121,7 +122,8 @@ Each incoming turn should use the same loop, while selecting the next action fro
    agent understood and invite a correction before relying on a material assumption.
 6. **Compare, do not pronounce a winner:** show at most three complete catalog offerings with
    source-backed fit reasons, meaningful differences, prerequisites, trade-offs, and unknowns.
-   Explain that the learner chooses; provide an ask-more, revise, browse, or staff-handoff action.
+   Explain that the learner chooses; provide an ask-more, revise, or browse action. Do not offer
+   staff handoff as the routine recovery for an unknown or a mismatch.
 7. **Transition only when appropriate:** move to code-owned qualification after a learner selects
    an offering or asks about applying. Eligibility and money remain deterministic. Enrollment
    readiness is soft and separate from hard eligibility.
@@ -130,13 +132,17 @@ Each incoming turn should use the same loop, while selecting the next action fro
 
 This is an adaptive turn loop, not an eight-question script. Greetings, uncertain replies, and
 unsupported media should receive a graceful clarification or available action, not a spurious
-handoff. Repeated ambiguity, unsupported catalog claims, sensitive situations, or user-requested
-human support should produce a truthful staff-dashboard handoff; no contact/SLA may be invented.
+handoff. Repeated ambiguity, unsupported catalog claims, retrieval abstentions, and unknown sample
+facts stay agent-led: explain the limit and offer a useful next action. Only an explicit request
+for a person or a staff-only/critical matter (such as deletion or an actual payment dispute) should
+create a staff-dashboard handoff; no contact/SLA may be invented.
 
 ## Existing decisions to preserve
 
-- Scope is institution-course recommendations only, with unsupported needs handed to staff. Use
-  career-guidance conversation techniques while recommending only verified institution offerings.
+- Scope is institution-course recommendations only. The agent handles unsupported requests by
+  stating its scope, abstaining from unverified claims, and redirecting to offered courses; it does
+  not automatically escalate them. Use career-guidance conversation techniques while recommending
+  only verified institution offerings.
 - Use conversation and optional taps; no aptitude score, personality label, or single objectively
   “right” course.
 - Support vocational/certificate, diploma, undergraduate, and postgraduate learners; the fictional
@@ -150,8 +156,9 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
 - Use complete verified course facts only. Keep fees, hard eligibility, payment, and course facts
   code-owned. Do not invent regulated requirements, institution details, job prospects, or placement
   guarantees.
-- The demo has no real counsellor contact or response-time promise. Human work appears in the staff
-  dashboard; the reply says contact details are not configured.
+- The demo has no real counsellor contact or response-time promise. Only explicit requests and
+  staff-only/critical actions appear as handoffs in the dashboard; the reply never implies that a
+  live contact or response time is configured.
 - OpenAI text processing is disclosed and on by default. The learner is not asked for consent or
   required to complete a consent step; persistent opt-out/re-enable controls remain. The demo uses
   fictional text only. This does not resolve
@@ -191,14 +198,16 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   stale actions cannot select an old course or enter eligibility. The known-course shortcut remains
   direct.
 - Course selection, eligibility, costs, FAQ answers, parent attribution, and payment remain safe and
-  code-verified; unsupported levels or missing data create a truthful handoff.
+  code-verified. For levels without eligibility rules or missing facts, show what is known, state
+  what cannot be confirmed, and continue exploration without an automatic staff handoff.
 - A learner can interrupt discovery to ask an FAQ/fee question, change language/path, pause, resume,
   request staff, or delete data without the bot becoming stuck in a questionnaire.
 - With OpenAI processing enabled, the model receives the current text and at most eight preceding
   text messages, safe profile facts, the current guidance stage, and selected response language.
   Its natural reply uses context and leads one useful next turn. Greetings and questions about
   AdmitFlow itself never become unsupported-FAQ handoffs. Staff handoff is created only for an
-  explicit human request or a verified policy requiring staff.
+  explicit human request or a staff-only/critical matter such as deletion or an actual payment
+  dispute.
 - The `/start` notice discloses that recent conversation context can be sent to OpenAI. Telegram
   identifiers and usernames are excluded; Responses API storage is disabled; opt-out sends no typed
   content or history to OpenAI. Code still owns catalog facts, eligibility, prices, payment, and

@@ -1,5 +1,21 @@
 # AI usage
 
+## 2026-10-11 — keep routine course guidance with the agent
+
+- **Task:** Remove automatic staff escalation from the learner-confirmed Diploma path shown in the
+  Telegram screenshot and apply the same threshold to routine missing facts and no-match recovery.
+- **Assistance:** Codex traced parent course confirmation to the non-undergraduate `select_course`
+  branch, changed it to provide sample facts plus an honest eligibility limit, and kept routine FAQ,
+  catalog, and retrieval gaps agent-led. It also changed the detail CTA so unsupported levels do
+  not say “staff check”. Human-requested and staff-authority/critical handoffs remain.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 181 tests. Targeted
+  admissions regression tests passed (92 tests); `git diff --check` passed.
+- **Human review:** User asked that ordinary conversations be handled by the agent and escalation
+  be reserved for critical reasons. No live Telegram message or payment API was used for this slice.
+- **Demo data:** Cleared the single obsolete automatic course-confirmation handoff from the local
+  fictional database; the lead and conversation were preserved.
+- **Delivery:** Implementation commit SHA will be recorded in `SUBMISSION.md` after committing.
+
 ## 2026-10-11 — add typing feedback while Telegram waits for AI
 
 - **Task:** Show a typing indicator during the gap before an AI-led response arrives.

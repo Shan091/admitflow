@@ -41,15 +41,21 @@ flowchart LR
     S[Student in Telegram] --> D[Explore or browse]
     D --> R[Catalog-grounded matches]
     R --> I[Inspect and compare]
-    I -->|explicit continue| E[Sample eligibility or staff handoff]
+    I -->|undergraduate| E[Code-checked sample eligibility]
+    I -->|other levels or unknown facts| A[Agent-led safe recovery]
     E -->|eligible and requests fee| P[Razorpay test payment]
     P -->|verified webhook| C[Payment status and confirmation]
     S --> F[Seeded FAQ]
-    F -->|uncertain| A[Safe abstention]
+    F -->|uncertain| A[Agent-led safe recovery]
     D -. lead and messages .-> DB[(Local SQLite)]
-    E -. handoff .-> DB
+    D -. explicit/critical handoff .-> DB
     DB --> W[Staff dashboard]
 ```
+
+Routine catalog gaps, unsupported preferences, and low-confidence FAQ results stay with the
+agent: it says what the demo can confirm and offers a next step without queueing staff work. Staff
+handoffs are reserved for explicit requests or staff-only/critical actions, such as local-data
+deletion or a real payment dispute.
 
 ### How the boundaries work
 

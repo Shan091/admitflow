@@ -717,12 +717,11 @@ class AdmissionsService:
         self.repository.update_lead(lead_id, discovery_step="guidance_unsure_support")
         return Reply(
             "You don't need to decide now. You can browse examples without choosing, pick a field "
-            "to explore, pause, or ask staff to review your question. No course will be suggested "
+            "to explore, or pause for now. No course will be suggested "
             "until you share something to guide it.",
             (
                 ("Browse sample courses", "path:browse"),
                 ("Choose a field to explore", "path:field"),
-                ("Ask staff", "handoff:request"),
                 ("Pause for now", "discovery:pause"),
             ),
         )
@@ -731,8 +730,14 @@ class AdmissionsService:
         courses = self.repository.list_courses(self.tenant_id)
         selected = next((course.field for course in courses if course.field == field), None)
         if selected is None:
-            return self.handoff(
-                lead_id, "The requested field is not present in the sample catalog."
+            return Reply(
+                "That field isn't part of this fictional catalog, so I can't recommend a course "
+                "in it. I can show the fields that are offered or help you find the closest "
+                "sample option.",
+                (
+                    ("Choose an offered field", "path:explore"),
+                    ("Browse sample courses", "path:browse"),
+                ),
             )
         speaker_fact = next(
             (
@@ -943,16 +948,21 @@ class AdmissionsService:
             "This is fictional sample catalog data, not an admission decision or a promise of "
             "availability. You can compare the other matches before choosing whether to continue."
         )
+        action_label = (
+            "Check sample eligibility"
+            if course.education_level == "undergraduate" and course.minimum_marks_percent > 0
+            else "Explore this sample course"
+        )
         return Reply(
             details,
             (
-                ("Continue to sample eligibility/staff check", f"guidance:continue:{course.id}"),
+                (action_label, f"guidance:continue:{course.id}"),
                 ("Back to matching courses", "guidance:matches"),
             ),
         )
 
     def continue_guidance_course(self, lead_id: int, course_id: str) -> Reply:
-        """Enter code-owned qualification only for a currently confirmed guided match."""
+        """Continue only a current match into supported qualification or sample exploration."""
         lead = self.repository.get_lead(lead_id)
         if lead is None:
             return Reply("Send /start to begin a new demo conversation.")
@@ -1106,9 +1116,8 @@ class AdmissionsService:
         )
         self.repository.save_fact(lead_id, "handoff_reason", reason)
         return Reply(
-            "I couldn't confirm a suitable option from the fictional catalog. I've flagged this "
-            "conversation for staff in the demo dashboard. Live contact and response-time details "
-            "are not configured."
+            "I've added a staff handoff to the demo dashboard. Live contact and response-time "
+            "details are not configured."
         )
 
     def browse(self, lead_id: int) -> Reply:
@@ -1152,14 +1161,18 @@ class AdmissionsService:
                 marks_percent=None,
                 eligible=None,
             )
-            handoff = self.handoff(
-                lead_id, f"Staff confirmation needed for sample course {course.id}"
-            )
             return Reply(
                 f"{course.name} is a fictional {course.education_level.replace('_', ' ')} sample. "
                 f"Sample prerequisites: {'; '.join(course.prerequisites)}. "
                 f"Sample medium: {course.medium}. Sample language support: "
-                f"{', '.join(course.language_support) or 'not specified'}.\n\n{handoff.text}"
+                f"{', '.join(course.language_support) or 'not specified'}.\n\n"
+                "I can show these sample facts, but this demo has no eligibility rules "
+                "configured for this study level, so I can't confirm eligibility or admission. "
+                "Would you like to keep exploring or compare other courses?",
+                (
+                    ("Explore another course", "path:explore"),
+                    ("Browse sample courses", "path:browse"),
+                ),
             )
         self.repository.update_lead(
             lead_id,
@@ -1260,14 +1273,12 @@ class AdmissionsService:
             )
         if _is_fee_question(text):
             if _is_unconfigured_fee_category(text):
-                handoff = self.handoff(
-                    lead_id,
-                    "Student asked about tuition/hostel charges absent from the sample catalog.",
-                )
                 return Reply(
-                    "The sample data only confirms the application fee. Tuition and "
-                    "hostel/accommodation charges or inclusions are not confirmed; "
-                    f"{handoff.text}"
+                    "The sample data only confirms application fees. Tuition and "
+                    "hostel/accommodation charges aren't listed, so I won't guess or treat them "
+                    "as included. I can show the confirmed application fee or browse course "
+                    "details.",
+                    (("Browse sample courses", "path:browse"),),
                 )
             course_id = (
                 str(lead["selected_course_id"]) if lead and lead["selected_course_id"] else ""
@@ -1294,45 +1305,26 @@ class AdmissionsService:
             )
             course = self.repository.get_course(self.tenant_id, course_id) if course_id else None
             if course is None:
-                handoff = self.handoff(
-                    lead_id,
-                    "Language of instruction and support depend on the specific course; "
-                    "catalog confirmation needed.",
-                )
                 return Reply(
-                    "UNESCO's general guidance discusses how multilingual education can support "
-                    "inclusive, equitable learning. That is not evidence that learning a new "
-                    "language will improve any one student's outcome, and it does not confirm "
-                    "the medium or proficiency rules for a course. The learner can weigh that "
-                    "trade-off and choose; select a course to see its fictional sample facts.\n\n"
-                    f"{handoff.text}"
+                    "Language requirements depend on the course. I can help you weigh the "
+                    "trade-offs, but the sample catalog only lists teaching medium and discussion "
+                    "support; it doesn't set proficiency rules. Choose a course to see those "
+                    "listed sample facts.",
+                    (("Browse sample courses", "path:browse"),),
                 )
-            handoff = self.handoff(
-                lead_id,
-                f"Student asked about course language requirements for {course.id}; "
-                "exact proficiency rule is not seeded.",
-            )
             support = ", ".join(course.language_support) or "not specified in the sample catalog"
             return Reply(
                 f"For this fictional sample, the listed medium for {course.name} is "
                 f"{course.medium}, and listed discussion support is {support}. The sample catalog "
-                "does not confirm a required proficiency level or formal accommodation, so staff "
-                "need to verify those details. UNESCO describes multilingual education as a way "
-                "to support more inclusive, equitable learning; that general guidance does not "
-                "promise an outcome for this course or student. Source: "
-                "https://www.unesco.org/en/articles/languages-matter-global-guidance-multilingual-education\n\n"
-                f"{handoff.text}"
+                "does not specify a required proficiency level or guarantee an accommodation. "
+                "I can help compare the listed options, but I won't infer those requirements."
             )
         if _is_accommodation_question(text):
-            handoff = self.handoff(
-                lead_id,
-                "Student asked about hostel/accommodation availability not confirmed "
-                "in sample facts.",
-            )
             return Reply(
                 "The fictional sample mentions a hostel, but actual availability, eligibility, "
-                "pricing, and terms are not confirmed. "
-                f"{handoff.text}"
+                "pricing, and terms aren't confirmed, so I won't guess. I can still help compare "
+                "sample courses or answer questions covered by the demo information.",
+                (("Browse sample courses", "path:browse"),),
             )
         if self._fact_value(lead_id, "guidance_pending_signature") and _is_guidance_confirmation(
             text
@@ -1368,16 +1360,18 @@ class AdmissionsService:
         if route == "knowledge_question":
             result = await self.retrieval.answer(self.tenant_id, text)
             if result is None:
-                handoff = self.handoff(
-                    lead_id, "Question could not be answered from confirmed sample information."
-                )
                 return Reply(
-                    f"I don't have a confirmed answer in the sample information. {handoff.text}"
+                    "I couldn't find a reliable answer in the fictional demo information, so I "
+                    "won't guess. Try rephrasing, ask about a listed course, or browse the sample "
+                    "catalog.",
+                    (("Browse sample courses", "path:browse"),),
                 )
             answer, source = result
             return Reply(f"{answer}\n\nSource: {source}")
         if route == "human_request":
-            return self.handoff(lead_id, "Student requested a staff member.")
+            if _is_explicit_staff_request(text):
+                return self.handoff(lead_id, "Student requested a staff member.")
+            route = "conversation"
         if route == "course_browse":
             return self.browse(lead_id)
         return Reply(
@@ -1402,8 +1396,11 @@ class AdmissionsService:
         if turn.intent == "knowledge_question":
             result = await self.retrieval.answer(self.tenant_id, text)
             if result is None:
-                return self.handoff(
-                    lead_id, "Question could not be answered from sample information."
+                return Reply(
+                    "I couldn't find a reliable answer in the fictional demo information, so I "
+                    "won't guess. Try rephrasing, ask about a listed course, or browse the sample "
+                    "catalog.",
+                    (("Browse sample courses", "path:browse"),),
                 )
             answer, source = result
             return Reply(f"{answer}\n\nSource: {source}")
@@ -2174,11 +2171,10 @@ class AdmissionsService:
                 return Reply(
                     "No complete matching sample course lists "
                     f"{delivery_mode.replace('_', ' ')} study. Would you like to leave format "
-                    "open and see other matches, browse the catalog, or ask staff?",
+                    "open and see other matches, or browse the catalog?",
                     (
                         ("Leave format open", "guidance:mode:open"),
                         ("Browse sample courses", "path:browse"),
-                        ("Ask staff", "handoff:request"),
                     ),
                 )
             if language_support:
@@ -2189,11 +2185,17 @@ class AdmissionsService:
                     (
                         ("Leave language open", "guidance:language:open"),
                         ("Browse sample courses", "path:browse"),
-                        ("Ask staff", "handoff:request"),
                     ),
                 )
-            return self.handoff(
-                lead_id, "No complete sample course matched the learner's confirmed preferences."
+            self.repository.update_lead(lead_id, discovery_step="guidance_revision")
+            return Reply(
+                "I couldn't find a complete sample course that matches all those preferences. "
+                "I can broaden the search if you change or remove a preference, or show every "
+                "sample course so you can compare them.",
+                (
+                    ("Change my preferences", "path:explore"),
+                    ("Browse sample courses", "path:browse"),
+                ),
             )
         self.repository.update_lead(
             lead_id, discovery_step="results", lifecycle_stage="discovering"
