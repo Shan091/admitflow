@@ -366,11 +366,14 @@ courses, no scores, student-first attribution, and truthful staff handoff.
 
 # Langfuse live Telegram trace export
 
-- [ ] Ensure each completed Telegram interaction explicitly flushes its Langfuse trace and
+- [x] Ensure each completed Telegram interaction explicitly flushes its Langfuse trace and
   logs export failures; cover flush success/failure with fake-client tests.
-- [ ] Run `bash scripts/verify.sh`, record exact results, and inspect the focused diff. Confirm a
+- [x] Run `bash scripts/verify.sh`, record exact results, and inspect the focused diff. Confirm a
   real Telegram message (not a synthetic connectivity check) appears in Langfuse before marking
   the fix complete or committing it.
+
+  Verified on build commit `d0a94ef`: 194 tests passed; real Telegram interaction appeared in
+  Langfuse with message and reply fields. The build and completion record are committed separately.
 
 ## Visual identity: brand kit, landing page, dashboard restyle
 
