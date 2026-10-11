@@ -62,6 +62,9 @@ prediction, or guarantee of admission or employment.
 7. After opt-out, FAQ routing, vector retrieval, and discovery extraction receive no message text;
    an explicit re-enable action restores AI processing. Deterministic local fee,
    payment-status, deletion, and qualification branches continue to work.
+8. While an AI-enabled free-text turn is processing, Telegram shows its native typing status before
+   the reply. Opted-out turns and deterministic payment-status checks do not show the indicator;
+   failure to send the indicator does not block the reply.
 
 ## Verification
 

@@ -13,12 +13,29 @@ from admitflow.services.retrieval import RetrievalService
 
 
 class FakeMessage:
-    def __init__(self, text: str | None = None) -> None:
+    def __init__(
+        self,
+        text: str | None = None,
+        events: list[tuple[object, ...]] | None = None,
+    ) -> None:
         self.text = text
+        self.chat_id: int | None = None
         self.sent: list[tuple[str, object]] = []
+        self.events = events
 
     async def reply_text(self, text: str, reply_markup: object = None) -> None:
         self.sent.append((text, reply_markup))
+        if self.events is not None:
+            self.events.append(("reply", text))
+
+
+class FakeBot:
+    def __init__(self) -> None:
+        self.events: list[tuple[object, ...]] = []
+
+    async def send_chat_action(self, *, chat_id: int | None, action: str) -> bool:
+        self.events.append(("action", chat_id, action))
+        return True
 
 
 def make_runtime(tmp_path: Path) -> tuple[Repository, AdmissionsService, SimpleNamespace]:
@@ -27,12 +44,51 @@ def make_runtime(tmp_path: Path) -> tuple[Repository, AdmissionsService, SimpleN
     repository.seed_catalog()
     retrieval = RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05)
     admissions = AdmissionsService(repository, repository.tenant_id, retrieval)
+    bot = FakeBot()
     context = SimpleNamespace(
+        bot=bot,
         application=SimpleNamespace(
             bot_data={"repository": repository, "admissions": admissions, "intent_router": None}
-        )
+        ),
     )
     return repository, admissions, context
+
+
+@pytest.mark.asyncio
+async def test_ai_text_turn_sends_typing_action_before_reply(tmp_path: Path) -> None:
+    _, _, context = make_runtime(tmp_path)
+    message = FakeMessage("hello", events=context.bot.events)
+    message.chat_id = 42
+    update = SimpleNamespace(
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=199,
+    )
+
+    await text_handler(update, context)
+
+    assert context.bot.events[0] == ("action", 42, "typing")
+    assert context.bot.events[1][0] == "reply"
+    assert len(message.sent) == 1
+
+
+@pytest.mark.asyncio
+async def test_opted_out_text_turn_does_not_send_typing_action(tmp_path: Path) -> None:
+    _, admissions, context = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("42", "sample")
+    admissions.set_ai_processing_enabled(lead_id, False)
+    message = FakeMessage("hello", events=context.bot.events)
+    message.chat_id = 42
+    update = SimpleNamespace(
+        effective_user=SimpleNamespace(id=42, username="sample"),
+        effective_message=message,
+        update_id=200,
+    )
+
+    await text_handler(update, context)
+
+    assert not context.bot.events or context.bot.events[0][0] != "action"
+    assert len(message.sent) == 1
 
 
 @pytest.mark.parametrize(

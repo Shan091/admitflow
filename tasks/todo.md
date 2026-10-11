@@ -32,6 +32,12 @@ acceptance criteria pass and the corresponding milestone is committed.
   passed. Commit `ce29e0904a68fe8ac167d5ac76cde8401dc7f7e9` was pushed; GitHub Actions CI run
   `38098531802` passed.
 
+## Telegram typing indicator
+
+- [ ] Show Telegram’s native typing status while AI-enabled free-text guidance is waiting; skip
+  deterministic payment-status and AI-opt-out turns. Test that typing starts before the response
+  and that opt-out prevents the status; run the full verification gate and record the push/CI.
+
 ## Foundation and repository
 
 - [x] Confirm feature scope, decisions, and dependency order against `SPEC.md` and `docs/DECISIONS.md`.

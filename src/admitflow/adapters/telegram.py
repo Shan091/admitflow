@@ -5,6 +5,7 @@ import re
 from typing import Any, cast
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.constants import ChatAction
 from telegram.ext import (
     Application,
     ApplicationBuilder,
@@ -282,6 +283,15 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         else:
             reply = Reply("Your demo payment is still being set up. Please check again shortly.")
     else:
+        if admissions.ai_processing_enabled(lead_id):
+            try:
+                await context.bot.send_chat_action(
+                    chat_id=message.chat_id,
+                    action=ChatAction.TYPING,
+                )
+            except Exception:
+                # A typing indicator is best-effort and must not block the actual reply.
+                logger.debug("Unable to send Telegram typing indicator", exc_info=True)
         reply = await admissions.free_text(lead_id, message.text, intent_router)
     await _send_reply(update, reply, repository, admissions, lead_id)
 

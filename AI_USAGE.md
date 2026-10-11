@@ -1,5 +1,17 @@
 # AI usage
 
+## 2026-10-11 — add typing feedback while Telegram waits for AI
+
+- **Task:** Show a typing indicator during the gap before an AI-led response arrives.
+- **Assistance:** Codex sends Telegram's native typing action before enabled free-text guidance,
+  while preserving deterministic payment-status and opted-out flows. The indicator is best-effort
+  and won't prevent the actual reply if Telegram's action call fails.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 177 tests.
+  `git diff --check` passed. Fake Telegram tests verify ordering and no action after opt-out.
+- **Human review:** User asked for a typing indicator while the bot is loading. Live Telegram was
+  not redeployed or retested in this work slice.
+- **Delivery:** Pending commit and matching GitHub Actions CI verification.
+
 ## 2026-10-11 — reduce repeated Telegram keyboard controls
 
 - **Task:** Remove the “Turn off OpenAI processing” button from routine bot replies.

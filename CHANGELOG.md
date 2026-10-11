@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-11 — show a Telegram typing indicator during AI replies
+
+- **Change:** Before AI-enabled free-text guidance, the bot sends Telegram's native `typing` chat
+  action. It skips payment-status checks and opted-out messages. Failure to send the optional action
+  is logged at debug level and does not prevent a reply. Feature brief and tests describe/verify it.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 177 tests;
+  `git diff --check` passed. The Telegram regression tests verify action ordering and that opt-out
+  skips the action.
+- **Limitations:** The behavior has not yet been retested through the live Telegram deployment.
+- **Delivery:** Pending commit and matching CI verification.
+
 ## 2026-10-11 — stop repeating the OpenAI opt-out button
 
 - **Change:** Telegram no longer appends the OpenAI-processing control to every message. The opt-out
