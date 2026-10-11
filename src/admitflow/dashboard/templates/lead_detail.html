@@ -29,7 +29,7 @@
 {% for message in messages %}<div class="msg {{ message.direction }}"><strong>{{ message.direction }}:</strong> {{ message.body }}</div>{% else %}<p>No messages recorded.</p>{% endfor %}
 <details class="danger-zone">
   <summary>Delete this lead's local data</summary>
-  <p>This permanently deletes this student's local profile, discovery facts, conversation, and payment record. It does not delete records held by Telegram or Razorpay.</p>
+  <p>This permanently deletes this student's local profile, discovery facts, conversation, and payment record. It does not delete records held by Telegram, Razorpay, or Langfuse. Remove Langfuse traces separately in the Langfuse project.</p>
   <form method="post" action="/admin/leads/{{ lead.id }}/delete">
     <input type="hidden" name="csrf_token" value="{{ delete_lead_csrf_token }}">
     <label for="delete-lead-confirmation">Type <code>DELETE LEAD</code> to confirm</label>

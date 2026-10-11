@@ -3,6 +3,7 @@
 import json
 from typing import Literal
 
+import langfuse.openai  # noqa: F401 — installs Langfuse's OpenAI SDK instrumentation
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
@@ -80,7 +81,12 @@ class _DiscoveryPayload(BaseModel):
 
 
 class OpenAIAdapter:
-    def __init__(self, api_key: str, decisions_model: str, embedding_model: str) -> None:
+    def __init__(
+        self,
+        api_key: str,
+        decisions_model: str,
+        embedding_model: str,
+    ) -> None:
         self.client = AsyncOpenAI(api_key=api_key)
         self.decisions_model = decisions_model
         self.embedding_model = embedding_model
@@ -98,9 +104,18 @@ class OpenAIAdapter:
                     "name": "intent",
                     "instructions": "Classify the student's message by its immediate intent.",
                     "choices": [
-                        {"value": "knowledge_question", "description": "Asks an institution FAQ."},
-                        {"value": "course_browse", "description": "Wants course information."},
-                        {"value": "human_request", "description": "Explicitly asks for staff."},
+                        {
+                            "value": "knowledge_question",
+                            "description": "Asks an institution FAQ.",
+                        },
+                        {
+                            "value": "course_browse",
+                            "description": "Wants course information.",
+                        },
+                        {
+                            "value": "human_request",
+                            "description": "Explicitly asks for staff.",
+                        },
                         {"value": "other", "description": "Anything else or uncertain."},
                     ],
                 }

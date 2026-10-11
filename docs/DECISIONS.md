@@ -162,6 +162,12 @@ Record consequential choices here. Each entry is short; update it when evidence 
     present a self-report as verified eligibility, admission, or enrollment. Stale prerequisite
     buttons must not qualify a different selected course.
 
+30. **Langfuse debugging traces include content and identifiers.** When both Langfuse project
+    keys are configured, trace inbound messages, AI replies, Telegram user/chat IDs, and saved
+    learner facts alongside OpenAI generations. Tell users this at `/start`; this is a third-party
+    transfer, not local-only telemetry. Tracing is optional and failures must not stop admissions
+    behavior. Keep Langfuse credentials in `.env`, out of Git.
+
 ## References
 
 - OpenAI embeddings: https://developers.openai.com/api/docs/guides/embeddings

@@ -8,6 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from langfuse import Langfuse
 
 from admitflow.adapters.openai import OpenAIAdapter
 from admitflow.adapters.razorpay import RazorpayAdapter
@@ -36,9 +37,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        langfuse_client: Langfuse | None = None
         repository = Repository(app_settings.database_path)
         repository.initialize()
         repository.seed_catalog()
+        langfuse_configured = bool(
+            app_settings.langfuse_public_key and app_settings.langfuse_secret_key
+        )
+        if langfuse_configured:
+            try:
+                langfuse_client = Langfuse(
+                    public_key=app_settings.langfuse_public_key,
+                    secret_key=app_settings.langfuse_secret_key,
+                    base_url=app_settings.langfuse_base_url,
+                    tracing_enabled=True,
+                )
+                logger.info("Langfuse tracing enabled")
+            except Exception:
+                logger.warning("Langfuse initialization failed; continuing without tracing")
+        elif app_settings.langfuse_public_key or app_settings.langfuse_secret_key:
+            logger.warning("Langfuse tracing disabled; configure both public and secret keys")
         openai_adapter = (
             OpenAIAdapter(
                 app_settings.openai_api_key,
@@ -62,7 +80,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await retrieval.index_seeded_faqs(repository.tenant_id)
         except Exception:
             logger.exception("FAQ indexing failed; retrieval remains unavailable until indexed")
-        admissions = AdmissionsService(repository, repository.tenant_id, retrieval, openai_adapter)
+        admissions = AdmissionsService(
+            repository,
+            repository.tenant_id,
+            retrieval,
+            openai_adapter,
+            langfuse_enabled=langfuse_client is not None,
+        )
         payment_service = None
         key_id = app_settings.razorpay_key_id
         if (
@@ -93,6 +117,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             repository.tenant_id, embedding_key
         )
         app.state.openai_adapter = openai_adapter
+        app.state.langfuse_client = langfuse_client
         app.state.admissions = admissions
         app.state.payment_service = payment_service
         app.state.telegram_enabled = bool(
@@ -106,6 +131,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 admissions,
                 openai_adapter,
                 payment_service,
+                langfuse_client,
             )
             await start_application(telegram_application)
         elif app_settings.telegram_bot_token:
@@ -120,6 +146,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 await stop_application(telegram_application)
             if openai_adapter is not None:
                 await openai_adapter.close()
+            if langfuse_client is not None:
+                try:
+                    langfuse_client.flush()
+                    langfuse_client.shutdown()
+                except Exception:
+                    logger.warning("Langfuse telemetry flush failed during shutdown")
 
     app = FastAPI(title="AdmitFlow Demo", lifespan=lifespan)
     app.state.settings = app_settings

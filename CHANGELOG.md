@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-11 — add disclosed Langfuse conversation traces
+
+- **Change:** Added optional Langfuse tracing for OpenAI Responses/embedding calls and Telegram
+  free-text turns. Traces include inbound and reply text, Telegram user/chat IDs, and saved learner
+  facts. `/start`, README, and local deletion guidance disclose what is sent and that Langfuse copies
+  must be removed separately. Credentials are read from environment variables and are not committed.
+- **Why:** The user requested these fields in Langfuse to debug the AI-led conversation.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy (31 source files), and all
+  193 tests. `git diff --check` passed. Tests use a fake Langfuse trace client; no live OpenAI or
+  Langfuse calls were made.
+
 ## 2026-10-11 — make learner-facing copy more natural
 
 - **Change:** Rewrote the landing page's sentimental placeholder copy, removed repeated

@@ -1,5 +1,17 @@
 # AI usage
 
+## 2026-10-11 — add Langfuse conversation traces
+
+- **Task:** Add Langfuse observability, explicitly including replies, Telegram identifiers, and
+  saved learner facts.
+- **Assistance:** Codex added optional Langfuse environment configuration, OpenAI SDK tracing, and
+  a parent trace per Telegram free-text turn. Trace input includes the inbound message, Telegram
+  user/chat IDs, and saved facts; trace output includes the actual bot reply and updated facts.
+  `/start` and repository docs disclose the external transfer and warn that local deletion does not
+  erase Langfuse copies. No credentials were written to source or Git.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy (31 source files), and all
+  193 tests; `git diff --check` passed. Fake trace client only; no live OpenAI or Langfuse request.
+
 ## 2026-10-11 — revise learner-facing admissions copy
 
 - **Task:** Replace repetitive, stilted course and landing-page wording with copy that reads more

@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -5,7 +6,14 @@ from types import SimpleNamespace
 import pytest
 
 from admitflow.adapters.sqlite import Repository
-from admitflow.adapters.telegram import callback_handler, keyboard, start_command, text_handler
+from admitflow.adapters.telegram import (
+    _record_trace_reply,
+    _trace_telegram_interaction,
+    callback_handler,
+    keyboard,
+    start_command,
+    text_handler,
+)
 from admitflow.adapters.vector_store import VectorStore
 from admitflow.domain.models import Course, DiscoveryTurn
 from admitflow.services.admissions import AdmissionsService, Reply
@@ -38,6 +46,31 @@ class FakeBot:
         return True
 
 
+class FakeTrace:
+    def __init__(self, *, input: object) -> None:
+        self.input = input
+        self.output: object = None
+
+    def update(self, *, output: object) -> None:
+        self.output = output
+
+
+class FakeLangfuse:
+    def __init__(self) -> None:
+        self.observations: list[FakeTrace] = []
+
+    @contextmanager
+    def start_as_current_observation(self, **kwargs: object):
+        trace = FakeTrace(input=kwargs["input"])
+        self.observations.append(trace)
+        yield trace
+
+
+class FailingLangfuse:
+    def start_as_current_observation(self, **kwargs: object):
+        raise RuntimeError("synthetic Langfuse failure")
+
+
 def make_runtime(tmp_path: Path) -> tuple[Repository, AdmissionsService, SimpleNamespace]:
     repository = Repository(tmp_path / "demo.sqlite3")
     repository.initialize()
@@ -52,6 +85,37 @@ def make_runtime(tmp_path: Path) -> tuple[Repository, AdmissionsService, SimpleN
         ),
     )
     return repository, admissions, context
+
+
+def test_langfuse_trace_records_ids_messages_replies_and_saved_facts(tmp_path: Path) -> None:
+    repository, admissions, _ = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("12345", "student")
+    repository.save_fact(lead_id, "interest", "data analysis")
+    langfuse = FakeLangfuse()
+
+    with _trace_telegram_interaction(
+        langfuse, repository, lead_id, "12345", "67890", "I like data analysis"
+    ) as observation:
+        _record_trace_reply(observation, Reply("Let's explore data courses."), repository, lead_id)
+
+    assert len(langfuse.observations) == 1
+    trace = langfuse.observations[0]
+    assert trace.input["telegram_user_id"] == "12345"
+    assert trace.input["telegram_chat_id"] == "67890"
+    assert trace.input["message_text"] == "I like data analysis"
+    assert trace.input["saved_learner_facts"][0]["fact_value"] == "data analysis"
+    assert trace.output["reply_text"] == "Let's explore data courses."
+    assert trace.output["saved_learner_facts"][0]["fact_value"] == "data analysis"
+
+
+def test_langfuse_trace_failure_does_not_block_the_turn(tmp_path: Path) -> None:
+    repository, admissions, _ = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("12345", "student")
+
+    with _trace_telegram_interaction(
+        FailingLangfuse(), repository, lead_id, "12345", "67890", "hello"
+    ) as observation:
+        assert observation is None
 
 
 @pytest.mark.asyncio

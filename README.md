@@ -18,7 +18,10 @@
 > only: Telegram identifiers and messages are stored locally. While AI processing is enabled,
 > typed text and up to eight recent chat messages plus saved course preferences may be sent to
 > OpenAI. Telegram IDs and usernames are excluded from model context. The bot explains this at
-> `/start`; users can switch AI processing off and continue with buttons.
+> `/start`; users can switch AI processing off and continue with buttons. If Langfuse is enabled,
+> inbound/reply text, Telegram user/chat IDs, and saved learner facts are also sent to Langfuse for
+> debugging, as disclosed at `/start`. Deleting local records does not delete their Langfuse copies;
+> remove those traces separately in the Langfuse project.
 
 ## What it does
 
@@ -48,6 +51,7 @@ flowchart LR
     P -->|verified webhook| C[Payment status and confirmation]
     S --> F[Seeded FAQ]
     F -->|uncertain| A[Agent-led safe recovery]
+    D -. bounded trace: messages, replies, IDs, saved facts .-> LF[Langfuse, when configured]
     D -. lead and messages .-> DB[(Local SQLite)]
     D -. explicit/critical handoff .-> DB
     DB --> W[Staff dashboard]
@@ -91,6 +95,7 @@ unavailable.
 - [`uv`](https://docs.astral.sh/uv/)
 - Staff username, password, and session secret for dashboard access
 - Optional: Telegram bot credentials, OpenAI API key, and Razorpay **test-mode** credentials
+- Optional: Langfuse project keys for debugging traces (includes conversation content and learner IDs)
 
 ### Install and start
 
@@ -123,6 +128,7 @@ Payments remain disabled unless all Razorpay test credentials are configured.
 | `STAFF_USERNAME`, `STAFF_PASSWORD`, `STAFF_SESSION_SECRET` | Staff dashboard | Required; keep local and use non-default demo values. |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` | Telegram bot | Both are needed for the authenticated webhook. |
 | `OPENAI_API_KEY` | Free-text discovery and FAQ retrieval | Optional; API usage can incur charges. |
+| `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` | Debug traces | Optional; when enabled, sends messages, replies, Telegram IDs, and saved learner facts to Langfuse. |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Demo payments | Optional; test-mode keys only, with key ID starting `rzp_test_`. |
 | `DATABASE_PATH` | SQLite location | Defaults to `data/admitflow.sqlite3`. |
 

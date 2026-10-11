@@ -281,6 +281,38 @@ async def test_discovery_is_enabled_by_default_and_opt_out_keeps_tap_only_mode(
     assert consent["fact_value"] == "no"
 
 
+def test_langfuse_disclosure_names_data_sent_when_tracing_is_enabled(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        langfuse_enabled=True,
+    )
+
+    _, reply = service.start("123", "student")
+
+    assert "messages, bot replies, Telegram user/chat IDs" in reply.text
+    assert "saved learner facts are also sent to Langfuse" in reply.text
+
+
+def test_langfuse_disclosure_is_not_shown_when_tracing_is_disabled(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+
+    _, reply = service.start("123", "student")
+
+    assert "Langfuse" not in reply.text
+
+
 @pytest.mark.asyncio
 async def test_openai_opt_out_takes_priority_while_waiting_for_marks(tmp_path: Path) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")

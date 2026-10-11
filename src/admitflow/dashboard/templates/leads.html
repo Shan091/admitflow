@@ -27,7 +27,8 @@
   <summary>Delete all demo data</summary>
   <p>This permanently deletes every lead, conversation, payment record, and Razorpay webhook event
     from this app. Course and FAQ information remains available. This does not
-    delete records held by Telegram or Razorpay.</p>
+    delete records held by Telegram, Razorpay, or Langfuse. Remove Langfuse traces separately in
+    the Langfuse project.</p>
   <form method="post" action="/admin/delete-all-demo-data">
     <input type="hidden" name="csrf_token" value="{{ delete_demo_data_csrf_token }}">
     <label for="confirmation">Type <code>DELETE ALL DEMO DATA</code> to confirm</label>

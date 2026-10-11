@@ -3,6 +3,18 @@
 Update this checklist at the start of each work slice. A checkbox is complete only after its
 acceptance criteria pass and the corresponding milestone is committed.
 
+## Add Langfuse debugging traces (in progress)
+
+- [ ] Enable optional OpenAI Responses and embedding tracing when both Langfuse credentials are
+  configured; keep full Telegram turns grouped with their model calls and keep failures non-blocking.
+- [ ] Include inbound/reply text, Telegram user/chat IDs, and saved learner facts in Langfuse
+  traces as requested; disclose this clearly at `/start`. Keep credentials in local environment,
+  never Git.
+- [ ] Preserve existing English, Malayalam, Hindi, and Hinglish selection and AI reply behavior;
+  do not represent fixed English-only actions as translated.
+- [ ] Explain local versus Langfuse deletion behavior, document environment setup, add fake-client
+  coverage, run the full verification gate, inspect intended files, and commit/push the implementation.
+
 ## Make learner-facing admissions copy feel natural (complete)
 
 - [x] Replace repeated “fictional” and “sample” phrasing in Telegram, landing, and staff-facing

@@ -47,11 +47,14 @@ class AdmissionsService:
         tenant_id: str,
         retrieval: RetrievalService,
         discovery_interpreter: DiscoveryInterpreter | None = None,
+        *,
+        langfuse_enabled: bool = False,
     ) -> None:
         self.repository = repository
         self.tenant_id = tenant_id
         self.retrieval = retrieval
         self.discovery_interpreter = discovery_interpreter
+        self.langfuse_enabled = langfuse_enabled
 
     def start(self, telegram_user_id: str, username: str | None) -> tuple[int, Reply]:
         lead_id = self.repository.upsert_lead(self.tenant_id, telegram_user_id, username)
@@ -579,6 +582,30 @@ class AdmissionsService:
                 "off kar sakte hain."
             ),
         }
+        if self.langfuse_enabled:
+            langfuse_notice = {
+                "en": (
+                    " For debugging, your messages, bot replies, Telegram user/chat IDs, "
+                    "and saved learner facts are also sent to Langfuse. Deleting local data does "
+                    "not remove its Langfuse copy."
+                ),
+                "hi": (
+                    " डिबगिंग के लिए आपके संदेश, बॉट के जवाब, Telegram user/chat IDs और "
+                    "सहेजे गए learner facts Langfuse को भी भेजे जाते हैं। स्थानीय डेटा हटाने से "
+                    "Langfuse की कॉपी नहीं हटती।"
+                ),
+                "ml": (
+                    " ഡീബഗിംഗിനായി നിങ്ങളുടെ സന്ദേശങ്ങളും ബോട്ടിന്റെ മറുപടികളും Telegram "
+                    "user/chat IDs-ഉം സംരക്ഷിച്ച learner facts-ഉം Langfuse-ലേക്കും അയയ്ക്കും. "
+                    "പ്രാദേശിക ഡാറ്റ ഇല്ലാതാക്കിയാലും Langfuse പകർപ്പ് നീങ്ങില്ല."
+                ),
+                "hinglish": (
+                    " Debugging ke liye aapke messages, bot replies, Telegram user/chat IDs, "
+                    "aur saved learner facts Langfuse ko bhi bheje jaate hain. Local data "
+                    "delete karne se Langfuse wali copy delete nahi hoti."
+                ),
+            }
+            copy = {key: value + langfuse_notice[key] for key, value in copy.items()}
         return Reply(
             copy.get(language, copy["en"]),
             (

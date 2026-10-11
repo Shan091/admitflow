@@ -2,8 +2,11 @@
 
 import logging
 import re
+from collections.abc import Iterator
+from contextlib import ExitStack, contextmanager
 from typing import Any, cast
 
+from langfuse import Langfuse, propagate_attributes
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ChatAction
 from telegram.ext import (
@@ -31,12 +34,14 @@ def build_telegram_application(
     admissions: AdmissionsService,
     intent_router: IntentRouter | None,
     payment_service: PaymentService | None = None,
+    langfuse_client: Langfuse | None = None,
 ) -> Application[Any, Any, Any, Any, Any, Any]:
     application = ApplicationBuilder().token(token).build()
     application.bot_data["repository"] = repository
     application.bot_data["admissions"] = admissions
     application.bot_data["intent_router"] = intent_router
     application.bot_data["payment_service"] = payment_service
+    application.bot_data["langfuse"] = langfuse_client
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("resume", resume_command))
     application.add_handler(CallbackQueryHandler(callback_handler))
@@ -79,6 +84,65 @@ def keyboard(
     )
 
 
+@contextmanager
+def _trace_telegram_interaction(
+    langfuse: Langfuse | None,
+    repository: Repository,
+    lead_id: int,
+    telegram_user_id: str,
+    telegram_chat_id: str,
+    message: str,
+) -> Iterator[Any | None]:
+    if langfuse is None:
+        yield None
+        return
+    stack = ExitStack()
+    try:
+        stack.enter_context(
+            propagate_attributes(user_id=telegram_user_id, session_id=telegram_chat_id)
+        )
+        span = stack.enter_context(
+            langfuse.start_as_current_observation(
+                as_type="span",
+                name="telegram-interaction",
+                input={
+                    "telegram_user_id": telegram_user_id,
+                    "telegram_chat_id": telegram_chat_id,
+                    "message_text": message,
+                    "saved_learner_facts": repository.list_facts(lead_id),
+                },
+            )
+        )
+    except Exception:
+        stack.close()
+        logger.debug("Langfuse trace could not be started", exc_info=True)
+        yield None
+        return
+    try:
+        yield span
+    finally:
+        try:
+            stack.close()
+        except Exception:
+            logger.debug("Langfuse trace could not be flushed", exc_info=True)
+
+
+def _record_trace_reply(
+    observation: Any | None, reply: Reply, repository: Repository, lead_id: int
+) -> None:
+    if observation is None:
+        return
+    try:
+        observation.update(
+            output={
+                "reply_text": reply.text,
+                "saved_learner_facts": repository.list_facts(lead_id),
+            }
+        )
+    except Exception:
+        logger.debug("Langfuse reply trace update failed", exc_info=True)
+
+
 def _services(
     context: ContextTypes.DEFAULT_TYPE,
 ) -> tuple[Repository, AdmissionsService, IntentRouter | None, PaymentService | None]:
@@ -92,27 +156,45 @@ def _services(
 
 async def _send_reply(
     update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
     reply: Reply,
     repository: Repository,
     admissions: AdmissionsService,
     lead_id: int,
     *,
     show_ai_processing_control: bool = False,
+    trace_observation: Any | None = None,
 ) -> None:
     message = update.effective_message
     if message is None:
         return
-    repository.add_message(lead_id, "outbound", reply.text)
-    ai_processing_allowed = admissions.ai_processing_enabled(lead_id)
-    await message.reply_text(
-        reply.text,
-        reply_markup=keyboard(
-            reply,
-            ai_processing_allowed=ai_processing_allowed,
-            show_ai_processing_control=show_ai_processing_control,
-            language=admissions.preferred_language(lead_id),
-        ),
-    )
+    user = update.effective_user
+    chat = getattr(update, "effective_chat", None)
+    callback = getattr(update, "callback_query", None)
+    inbound = callback.data if callback is not None else (message.text or "")
+    langfuse = cast(Langfuse | None, context.application.bot_data.get("langfuse"))
+    user_id = str(user.id) if user is not None else "unknown"
+    chat_id = str(chat.id) if chat is not None else user_id
+    with ExitStack() as stack:
+        observation = trace_observation
+        if observation is None:
+            observation = stack.enter_context(
+                _trace_telegram_interaction(
+                    langfuse, repository, lead_id, user_id, chat_id, inbound or ""
+                )
+            )
+        repository.add_message(lead_id, "outbound", reply.text)
+        ai_processing_allowed = admissions.ai_processing_enabled(lead_id)
+        await message.reply_text(
+            reply.text,
+            reply_markup=keyboard(
+                reply,
+                ai_processing_allowed=ai_processing_allowed,
+                show_ai_processing_control=show_ai_processing_control,
+                language=admissions.preferred_language(lead_id),
+            ),
+        )
+        _record_trace_reply(observation, reply, repository, lead_id)
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -123,7 +205,13 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     lead_id, reply = admissions.start(str(user.id), user.username)
     repository.add_message(lead_id, "inbound", "/start", update.update_id)
     await _send_reply(
-        update, reply, repository, admissions, lead_id, show_ai_processing_control=True
+        update,
+        context,
+        reply,
+        repository,
+        admissions,
+        lead_id,
+        show_ai_processing_control=True,
     )
 
 
@@ -251,19 +339,15 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                 )
     else:
         reply = Reply("Send /start to explore courses.")
-    repository.add_message(lead_id, "outbound", reply.text)
-    message = update.effective_message
-    if message is not None:
-        ai_processing_allowed = admissions.ai_processing_enabled(lead_id)
-        await message.reply_text(
-            reply.text,
-            reply_markup=keyboard(
-                reply,
-                ai_processing_allowed=ai_processing_allowed,
-                show_ai_processing_control=data in {"menu:start", "ai:processing:on"},
-                language=admissions.preferred_language(lead_id),
-            ),
-        )
+    await _send_reply(
+        update,
+        context,
+        reply,
+        repository,
+        admissions,
+        lead_id,
+        show_ai_processing_control=data in {"menu:start", "ai:processing:on"},
+    )
 
 
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -274,40 +358,56 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         return
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     repository.add_message(lead_id, "inbound", message.text, update.update_id)
-    if _is_payment_status_question(message.text):
-        payment = repository.get_payment_for_lead(admissions.tenant_id, lead_id)
-        if payment is None:
-            reply = Reply("I don't see an application payment link for you yet.")
-        elif payment["status"] == "paid":
-            reply = Reply(
-                "Your Razorpay test payment is confirmed as paid. This does not submit an "
-                "application or confirm admission."
-            )
-        elif payment["status"] == "created":
-            reply = Reply(
-                "Your application-fee test payment is still pending. Complete the Razorpay "
-                "test-mode "
-                "payment link, then ask again after the webhook is received."
-            )
-        elif payment["status"] == "failed":
-            reply = Reply(
-                "Your payment link could not be created. Staff support details are not "
-                "configured; try again later."
-            )
-        else:
-            reply = Reply("Your payment is still being set up. Please check again shortly.")
-    else:
-        if admissions.ai_processing_enabled(lead_id):
-            try:
-                await context.bot.send_chat_action(
-                    chat_id=message.chat_id,
-                    action=ChatAction.TYPING,
+    langfuse = cast(Langfuse | None, context.application.bot_data.get("langfuse"))
+    with _trace_telegram_interaction(
+        langfuse,
+        repository,
+        lead_id,
+        str(user.id),
+        str(message.chat_id or user.id),
+        message.text,
+    ) as observation:
+        if _is_payment_status_question(message.text):
+            payment = repository.get_payment_for_lead(admissions.tenant_id, lead_id)
+            if payment is None:
+                reply = Reply("I don't see an application payment link for you yet.")
+            elif payment["status"] == "paid":
+                reply = Reply(
+                    "Your Razorpay test payment is confirmed as paid. This does not submit an "
+                    "application or confirm admission."
                 )
-            except Exception:
-                # A typing indicator is best-effort and must not block the actual reply.
-                logger.debug("Unable to send Telegram typing indicator", exc_info=True)
-        reply = await admissions.free_text(lead_id, message.text, intent_router)
-    await _send_reply(update, reply, repository, admissions, lead_id)
+            elif payment["status"] == "created":
+                reply = Reply(
+                    "Your application-fee test payment is still pending. Complete the Razorpay "
+                    "test-mode payment link, then ask again after the webhook is received."
+                )
+            elif payment["status"] == "failed":
+                reply = Reply(
+                    "Your payment link could not be created. Staff support details are not "
+                    "configured; try again later."
+                )
+            else:
+                reply = Reply("Your payment is still being set up. Please check again shortly.")
+        else:
+            if admissions.ai_processing_enabled(lead_id):
+                try:
+                    await context.bot.send_chat_action(
+                        chat_id=message.chat_id,
+                        action=ChatAction.TYPING,
+                    )
+                except Exception:
+                    # A typing indicator is best-effort and must not block the actual reply.
+                    logger.debug("Unable to send Telegram typing indicator", exc_info=True)
+            reply = await admissions.free_text(lead_id, message.text, intent_router)
+        await _send_reply(
+            update,
+            context,
+            reply,
+            repository,
+            admissions,
+            lead_id,
+            trace_observation=observation,
+        )
 
 
 async def resume_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -317,7 +417,14 @@ async def resume_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
     lead_id = repository.upsert_lead(admissions.tenant_id, str(user.id), user.username)
     repository.add_message(lead_id, "inbound", "/resume", update.update_id)
-    await _send_reply(update, admissions.resume_discovery(lead_id), repository, admissions, lead_id)
+    await _send_reply(
+        update,
+        context,
+        admissions.resume_discovery(lead_id),
+        repository,
+        admissions,
+        lead_id,
+    )
 
 
 def _is_payment_status_question(text: str) -> bool:
