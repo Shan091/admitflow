@@ -9,7 +9,8 @@
   `git diff --check` passed. The Telegram regression tests verify action ordering and that opt-out
   skips the action.
 - **Limitations:** The behavior has not yet been retested through the live Telegram deployment.
-- **Delivery:** Pending commit and matching CI verification.
+- **Delivery:** Commit `77bf29931e135289e83e66bbdfec9328443305c4` was pushed; GitHub Actions
+  `CI` run [38100432024](https://github.com/Shan091/admitflow/actions/runs/38100432024) passed.
 
 ## 2026-10-11 — stop repeating the OpenAI opt-out button
 

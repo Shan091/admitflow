@@ -10,7 +10,8 @@
   `git diff --check` passed. Fake Telegram tests verify ordering and no action after opt-out.
 - **Human review:** User asked for a typing indicator while the bot is loading. Live Telegram was
   not redeployed or retested in this work slice.
-- **Delivery:** Pending commit and matching GitHub Actions CI verification.
+- **Delivery:** Commit `77bf29931e135289e83e66bbdfec9328443305c4` was pushed; GitHub Actions
+  `CI` run [38100432024](https://github.com/Shan091/admitflow/actions/runs/38100432024) passed.
 
 ## 2026-10-11 — reduce repeated Telegram keyboard controls
 
