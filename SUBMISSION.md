@@ -9,14 +9,15 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `5d33787eec9aa64bf5b79e36f517847779c68646`
+- **Verified implementation commit SHA:** `ab63f88a7118a435c40a8e848b997b1f851705bf`
 - **Sample course catalog:** 50 clearly fictional, complete offerings across the five agreed
   fields, ten per field. The catalog does not offer every education level in every field.
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
   test payment were verified during earlier milestones; the user confirmed the live bot flow. The
-  adaptive language-support, study-format, inspect-before-continue course guidance, and unrelated-
-  message recovery in this SHA passed local tests and CI. The new guidance changes have not yet
-  been rehearsed live or deployed to the running tunnel. The Telegram demo bot is
+  adaptive language-support, study-format, inspect-before-continue course guidance, unrelated-
+  message recovery, and contextual AI-led replies in this SHA passed local tests and CI. The AI-led
+  changes were live-smoked with synthetic OpenAI inputs, but have not yet been rehearsed through
+  Telegram or deployed to the running tunnel. The Telegram demo bot is
   [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
   account and bot token for the live conversation; OpenAI API key for disclosed discovery and FAQ
@@ -49,15 +50,18 @@
   supports/formats, and fee, then return to compare or explicitly continue to eligibility/staff
   review. If a message is unrelated or contains no usable preference, AdmitFlow explains its scope,
   keeps the pending guidance state, and offers a relevant way forward instead of repeating the
-  same question. The
-  learner may pause and `/resume`. Supported sample undergraduate options continue to code-based
+  same question. The learner may pause and `/resume`. Supported sample undergraduate options
+  continue to code-based
   qualification and require an explicit tap before a test payment link. Other course levels are
   handed to staff for eligibility confirmation. Staff can inspect attributed facts and pending
   handoffs, delete one lead's local data, or reset all local demo data.
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
-- **Checks performed and results:** The current implementation commit
+- **Checks performed and results:** Implementation SHA `ab63f88a7118a435c40a8e848b997b1f851705bf`
+  passed `bash scripts/verify.sh` (Ruff lint/format, strict mypy, 174 tests), `git diff --check`,
+  and GitHub Actions `CI` run [38097802190](https://github.com/Shan091/admitflow/actions/runs/38097802190).
+  Synthetic live OpenAI conversation smoke used 21,990 input and 682 output tokens. Earlier, commit
   `5d33787eec9aa64bf5b79e36f517847779c68646` passed `bash scripts/verify.sh` (Ruff lint/format,
   strict mypy, and 172 pytest tests), `git diff --check`, and GitHub Actions CI run
   [38096405684](https://github.com/Shan091/admitflow/actions/runs/38096405684). No live or paid API

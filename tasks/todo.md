@@ -12,6 +12,18 @@ acceptance criteria pass and the corresponding milestone is committed.
   tests), all 10 relative README links and the logo path resolve; pushed as
   `2dc2cb2dfae32fa8122f0cc7e9e9e15618f0dfb6`; GitHub Actions CI run `38096776690` passed.
 
+## AI-led conversation
+
+- [x] Replace extraction-only, canned free-text replies with contextual AI-led responses. Provide
+  at most the previous 8 text messages, catalog-allowlisted learner facts, active conversational
+  stage, and selected response language; do not send identifiers. OpenAI handles greetings,
+  bot-identity questions, and natural follow-ups without spurious FAQ routing or staff handoffs.
+  Preserve deterministic fee, eligibility, retrieval, payment, and explicit human-request
+  boundaries; keep opt-out effective. Disclose bounded-context processing; synthetic multi-turn
+  fake-API tests and the live smoke passed. `bash scripts/verify.sh` passed (174 tests), and
+  `git diff --check` passed. Implementation `ab63f88a7118a435c40a8e848b997b1f851705bf` was pushed;
+  GitHub Actions CI run `38097802190` passed.
+
 ## Foundation and repository
 
 - [x] Confirm feature scope, decisions, and dependency order against `SPEC.md` and `docs/DECISIONS.md`.

@@ -16,7 +16,9 @@
 - **Limitations:** Live smoke used synthetic messages and fictional course data; Telegram was not
   re-tested or redeployed. One synthetic smoke SQLite file was left under the system temp path
   after Windows denied cleanup: `C:\Users\shanx\AppData\Local\Temp\admitflow-ai-smoke-8onxywm4\smoke.sqlite3`.
-  No real applicant or payment data was used.
+  No real applicant or payment data was used. Implementation commit
+  `ab63f88a7118a435c40a8e848b997b1f851705bf` was pushed; GitHub Actions `CI` run
+  [38097802190](https://github.com/Shan091/admitflow/actions/runs/38097802190) passed.
 
 ## 2026-10-11 — make the project README easier to scan
 
