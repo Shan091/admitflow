@@ -115,7 +115,7 @@ def _trace_telegram_interaction(
         )
     except Exception:
         stack.close()
-        logger.debug("Langfuse trace could not be started", exc_info=True)
+        logger.warning("Langfuse trace could not be started", exc_info=True)
         yield None
         return
     try:
@@ -124,7 +124,13 @@ def _trace_telegram_interaction(
         try:
             stack.close()
         except Exception:
-            logger.debug("Langfuse trace could not be flushed", exc_info=True)
+            logger.warning("Langfuse trace could not be ended", exc_info=True)
+        try:
+            # The demo needs completed Telegram turns to appear immediately. Do not rely
+            # solely on the SDK's periodic background batch flush.
+            langfuse.flush()
+        except Exception:
+            logger.warning("Langfuse trace export failed", exc_info=True)
 
 
 def _record_trace_reply(

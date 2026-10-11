@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-11 — flush completed Telegram traces
+
+- **Change:** Explicitly flush each completed Telegram Langfuse observation and report trace start,
+  end, and export errors at warning level. This addresses SDK background-batch traces not appearing
+  promptly in the live project.
+- **Verification:** `bash scripts/verify.sh` passed (Ruff, formatting, strict mypy on 31 source
+  files, 194 tests); `git diff --check` passed. A real Telegram update reached the restarted app
+  through the existing webhook with HTTP 200. Langfuse then returned a `telegram-interaction`
+  trace with an `OpenAI-generation` child; API inspection confirmed the inbound message and reply
+  fields are present, without printing their contents. Public `/health` returned HTTP 200.
+- **Diagnosis:** The previous Uvicorn reload did not replace its old worker. Restarting the updated
+  app on port 8001 and pointing the existing ngrok tunnel to it made the real trace appear.
+
 ## 2026-10-11 — add disclosed Langfuse conversation traces
 
 - **Change:** Added optional Langfuse tracing for OpenAI Responses/embedding calls and Telegram

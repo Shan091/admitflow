@@ -58,12 +58,21 @@ class FakeTrace:
 class FakeLangfuse:
     def __init__(self) -> None:
         self.observations: list[FakeTrace] = []
+        self.flush_count = 0
+
+    def flush(self) -> None:
+        self.flush_count += 1
 
     @contextmanager
     def start_as_current_observation(self, **kwargs: object):
         trace = FakeTrace(input=kwargs["input"])
         self.observations.append(trace)
         yield trace
+
+
+class FailingFlushLangfuse(FakeLangfuse):
+    def flush(self) -> None:
+        raise RuntimeError("synthetic Langfuse export failure")
 
 
 class FailingLangfuse:
@@ -106,6 +115,7 @@ def test_langfuse_trace_records_ids_messages_replies_and_saved_facts(tmp_path: P
     assert trace.input["saved_learner_facts"][0]["fact_value"] == "data analysis"
     assert trace.output["reply_text"] == "Let's explore data courses."
     assert trace.output["saved_learner_facts"][0]["fact_value"] == "data analysis"
+    assert langfuse.flush_count == 1
 
 
 def test_langfuse_trace_failure_does_not_block_the_turn(tmp_path: Path) -> None:
@@ -116,6 +126,17 @@ def test_langfuse_trace_failure_does_not_block_the_turn(tmp_path: Path) -> None:
         FailingLangfuse(), repository, lead_id, "12345", "67890", "hello"
     ) as observation:
         assert observation is None
+
+
+def test_langfuse_flush_failure_does_not_block_the_turn(tmp_path: Path) -> None:
+    repository, admissions, _ = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("12345", "student")
+
+    with _trace_telegram_interaction(
+        FailingFlushLangfuse(), repository, lead_id, "12345", "67890", "hello"
+    ) as observation:
+        assert observation is not None
+        observation.update(output={"reply_text": "hello back"})
 
 
 @pytest.mark.asyncio

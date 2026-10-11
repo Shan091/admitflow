@@ -364,6 +364,14 @@ courses, no scores, student-first attribution, and truthful staff handoff.
   Verified 32 tests locally and GitHub Actions run 38076997956 passed on
   `182c27689544f21a6536146db870a553b03e14a5` (including the `/api/v1/webhooks/razorpay` alias).
 
+# Langfuse live Telegram trace export
+
+- [ ] Ensure each completed Telegram interaction explicitly flushes its Langfuse trace and
+  logs export failures; cover flush success/failure with fake-client tests.
+- [ ] Run `bash scripts/verify.sh`, record exact results, and inspect the focused diff. Confirm a
+  real Telegram message (not a synthetic connectivity check) appears in Langfuse before marking
+  the fix complete or committing it.
+
 ## Visual identity: brand kit, landing page, dashboard restyle
 
 Calm editorial / trust-first design, implemented in plain HTML + native CSS + a little vanilla

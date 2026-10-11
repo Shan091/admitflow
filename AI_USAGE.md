@@ -1,5 +1,20 @@
 # AI usage
 
+## 2026-10-11 — diagnose missing live Telegram traces
+
+- **Task:** Investigate why live Telegram interactions were absent from the Langfuse project.
+- **Assistance:** Codex checked webhook metadata and aggregate local message counts without
+  reading or printing message content or participant identifiers. It found successful Telegram
+  webhook POSTs and persisted inbound/outbound messages, but only the synthetic connectivity trace
+  in Langfuse. Codex added explicit flush-after-interaction behavior, visible warning logs, and
+  fake-client regression tests. A stale server worker was then found; the updated app was restarted
+  on port 8001 and the existing ngrok tunnel was redirected to it.
+- **Checks:** `bash scripts/verify.sh` passed (Ruff, format, strict mypy, 194 tests), and
+  `git diff --check` passed. A real Telegram interaction produced a Langfuse
+  `telegram-interaction` trace with a nested OpenAI generation; API inspection confirmed message
+  and reply fields without displaying their contents. No synthetic trace was used as end-to-end
+  evidence.
+
 ## 2026-10-11 — add Langfuse conversation traces
 
 - **Task:** Add Langfuse observability, explicitly including replies, Telegram identifiers, and
