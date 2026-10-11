@@ -3,17 +3,20 @@
 Update this checklist at the start of each work slice. A checkbox is complete only after its
 acceptance criteria pass and the corresponding milestone is committed.
 
-## Let all complete fictional courses reach the demo fee step (in progress)
+## Let all complete fictional courses reach the demo fee step (complete)
 
-- [ ] Keep undergraduate Grade 12 and marks checks unchanged; for other levels, ask the learner to
+- [x] Keep undergraduate Grade 12 and marks checks unchanged; for other levels, ask the learner to
   self-report whether they meet the selected course's displayed fictional prerequisites. Make clear
   this is not verified eligibility/admission, and bind each tap to the course that asked it.
-- [ ] Only a positive response may set demo eligibility and expose the existing explicit
+- [x] Only a positive response may set demo eligibility and expose the existing explicit
   Razorpay test-fee continuation; a negative response must not expose payment.
-- [ ] Add regression tests for vocational, diploma, postgraduate, yes/no, and payment gating; update
+- [x] Add regression tests for vocational, diploma, postgraduate, yes/no, and payment gating; update
   SPEC, decisions, feature brief, README/SUBMISSION as needed, CHANGELOG, and AI_USAGE.
-- [ ] Run `bash scripts/verify.sh`, inspect `git diff --check` and secrets, commit and push the
-  verified milestone, then mark this section complete with exact results.
+- [x] Run `bash scripts/verify.sh`, inspect `git diff --check` and secrets, commit and push the
+  verified milestone, then mark this section complete with exact results. Ruff lint/format, strict
+  mypy, and 189 tests passed; `git diff --check` passed. Commit
+  `ac9e7ba0e3ae8aa109184390664093ab1b50c833` is pushed to `origin/main`. Live Telegram/Razorpay
+  rehearsal remains outstanding.
 
 ## Avoid repeating unsupported-level disclaimer (complete)
 

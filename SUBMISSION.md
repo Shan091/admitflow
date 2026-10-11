@@ -9,7 +9,7 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `40cc1ea7778431d76b2d71cf645b73531aa5a808`
+- **Verified implementation commit SHA:** `ac9e7ba0e3ae8aa109184390664093ab1b50c833`
 - **Sample course catalog:** 50 clearly fictional, complete offerings across the five agreed
   fields, ten per field. The catalog does not offer every education level in every field.
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
@@ -18,9 +18,10 @@
   message recovery, and contextual AI-led replies in this SHA passed local tests and CI. The AI-led
   changes were live-smoked with synthetic OpenAI inputs, but have not yet been rehearsed through
   Telegram or deployed to the running tunnel. The agent-led recovery and escalation-boundary
-  changes in `40cc1ea` passed the full local verification gate and were pushed to `main`; the public
-  health endpoint and Telegram webhook configuration were checked, but a new end-to-end Telegram
-  conversation using this commit has not been rehearsed. The Telegram demo bot is
+  agent-led recovery changes in `40cc1ea` and the all-level demo-fee path in `ac9e7ba` passed the
+  full local verification gate and were pushed to `main`. The new all-level Telegram-to-payment flow
+  passed with a fake payment adapter; it has not yet been rehearsed with the live bot or a real
+  Razorpay test link. The Telegram demo bot is
   [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
   account and bot token for the live conversation; OpenAI API key for disclosed discovery and FAQ
@@ -68,10 +69,12 @@
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
-- **Checks performed and results:** Implementation SHA `40cc1ea7778431d76b2d71cf645b73531aa5a808`
-  passed `bash scripts/verify.sh` (Ruff lint/format, strict mypy, 181 tests), targeted admissions
-  tests (92 tests), and `git diff --check`; it was pushed to `origin/main`. GitHub Actions was not
-  independently verified for this SHA. The preceding AI-led implementation SHA
+- **Checks performed and results:** Implementation SHA `ac9e7ba0e3ae8aa109184390664093ab1b50c833`
+  passed `bash scripts/verify.sh` (Ruff lint/format, strict mypy, 189 tests), `git diff --check`,
+  and was pushed to `origin/main`. A fake Telegram-to-payment-link test exercised the diploma flow;
+  no live Razorpay payment was created. GitHub Actions was not independently verified for this SHA.
+  The preceding agent-led recovery SHA `40cc1ea7778431d76b2d71cf645b73531aa5a808` passed the
+  full local verification gate with 181 tests. The earlier AI-led implementation SHA
   `ab63f88a7118a435c40a8e848b997b1f851705bf` passed `bash scripts/verify.sh` (Ruff lint/format,
   strict mypy, 174 tests), `git diff --check`, and GitHub Actions `CI` run
   [38097802190](https://github.com/Shan091/admitflow/actions/runs/38097802190).

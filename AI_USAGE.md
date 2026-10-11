@@ -13,7 +13,8 @@
   a fake Telegram-to-payment-link flow; `git diff --check` passed. No live Razorpay call was made.
 - **Human review:** User's screenshot showed a diploma stopped before the fee step. The live Telegram
   bot has not yet been redeployed or rehearsed with this change.
-- **Delivery:** Commit details will be recorded in the submission and task checklist after commit.
+- **Delivery:** Commit `ac9e7ba0e3ae8aa109184390664093ab1b50c833` was pushed to `origin/main`.
+  The submission and checklist were finalized in a follow-up documentation commit.
 
 ## 2026-10-11 — avoid repeating course eligibility limitation
 

@@ -608,3 +608,4 @@
   course shown; the dashboard distinguishes this self-report from code-checked sample rules.
 - Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests, including
   a fake Telegram-to-payment-link flow. `git diff --check` passed; no live Razorpay call was made.
+- Delivered in commit `ac9e7ba0e3ae8aa109184390664093ab1b50c833`, pushed to `origin/main`.
