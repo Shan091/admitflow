@@ -1,5 +1,16 @@
 # AI usage
 
+## 2026-10-11 — reduce repeated Telegram keyboard controls
+
+- **Task:** Remove the “Turn off OpenAI processing” button from routine bot replies.
+- **Assistance:** Codex changed Telegram keyboard construction so the opt-out control is explicit;
+  `/start` and the AI re-enable reply keep it, while ordinary replies no longer add it.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 175 tests.
+  `git diff --check` passed. Coverage checks routine replies, start, re-enable, and all four labels.
+- **Human review:** User asked to remove the repeated button. The opt-out remains reachable from
+  `/start`, and users can also request it in text.
+- **Delivery:** Pending commit and matching GitHub Actions CI verification.
+
 ## 2026-10-11 — make free-text course guidance AI-led
 
 - **Task:** Fix repeated canned Telegram replies so the AI can lead the conversation naturally.

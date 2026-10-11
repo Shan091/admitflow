@@ -47,6 +47,7 @@ def keyboard(
     reply: Reply,
     *,
     ai_processing_allowed: bool = False,
+    show_ai_processing_control: bool = False,
     language: str = "en",
 ) -> InlineKeyboardMarkup | None:
     buttons = list(reply.buttons)
@@ -58,7 +59,11 @@ def keyboard(
             "hinglish": "Language badlein",
         }.get(language, "Change language")
         buttons.append((f"🌐 {language_label}", "language:menu"))
-    if ai_processing_allowed and not any(data == "ai:processing:off" for _, data in buttons):
+    if (
+        show_ai_processing_control
+        and ai_processing_allowed
+        and not any(data == "ai:processing:off" for _, data in buttons)
+    ):
         opt_out_label = {
             "en": "Turn off OpenAI processing",
             "hi": "OpenAI प्रोसेसिंग बंद करें",
@@ -90,6 +95,8 @@ async def _send_reply(
     repository: Repository,
     admissions: AdmissionsService,
     lead_id: int,
+    *,
+    show_ai_processing_control: bool = False,
 ) -> None:
     message = update.effective_message
     if message is None:
@@ -101,6 +108,7 @@ async def _send_reply(
         reply_markup=keyboard(
             reply,
             ai_processing_allowed=ai_processing_allowed,
+            show_ai_processing_control=show_ai_processing_control,
             language=admissions.preferred_language(lead_id),
         ),
     )
@@ -113,7 +121,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         return
     lead_id, reply = admissions.start(str(user.id), user.username)
     repository.add_message(lead_id, "inbound", "/start", update.update_id)
-    await _send_reply(update, reply, repository, admissions, lead_id)
+    await _send_reply(
+        update, reply, repository, admissions, lead_id, show_ai_processing_control=True
+    )
 
 
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -239,6 +249,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             reply_markup=keyboard(
                 reply,
                 ai_processing_allowed=ai_processing_allowed,
+                show_ai_processing_control=data in {"menu:start", "ai:processing:on"},
                 language=admissions.preferred_language(lead_id),
             ),
         )

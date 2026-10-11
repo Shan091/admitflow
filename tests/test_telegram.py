@@ -47,13 +47,29 @@ def make_runtime(tmp_path: Path) -> tuple[Repository, AdmissionsService, SimpleN
 def test_persistent_openai_opt_out_keyboard_uses_selected_language(
     language: str, opt_out_label: str
 ) -> None:
-    markup = keyboard(Reply("Continue"), ai_processing_allowed=True, language=language)
+    markup = keyboard(
+        Reply("Continue"),
+        ai_processing_allowed=True,
+        show_ai_processing_control=True,
+        language=language,
+    )
 
     assert markup is not None
     labels = {button.text for row in markup.inline_keyboard for button in row}
     callback_data = {button.callback_data for row in markup.inline_keyboard for button in row}
     assert opt_out_label in labels
     assert "ai:processing:off" in callback_data
+
+
+def test_openai_opt_out_control_is_not_added_to_routine_reply() -> None:
+    markup = keyboard(Reply("Continue"), ai_processing_allowed=True)
+
+    assert markup is not None
+    assert all(
+        button.callback_data != "ai:processing:off"
+        for row in markup.inline_keyboard
+        for button in row
+    )
 
 
 @pytest.mark.asyncio
@@ -84,6 +100,11 @@ async def test_start_command_discloses_ai_processing_and_starts_discovery(tmp_pa
     )
     assert any(
         button.callback_data == "language:menu"
+        for row in message.sent[0][1].inline_keyboard
+        for button in row
+    )
+    assert any(
+        button.callback_data == "ai:processing:off"
         for row in message.sent[0][1].inline_keyboard
         for button in row
     )
@@ -461,7 +482,7 @@ async def test_exploration_callbacks_recommend_and_language_choice_persists(tmp_
     assert markup is not None
     callbacks = {button.callback_data for row in markup.inline_keyboard for button in row}
     assert "path:explore" in callbacks
-    assert "ai:processing:off" in callbacks
+    assert "ai:processing:off" not in callbacks
 
 
 @pytest.mark.asyncio

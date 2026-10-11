@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-11 — stop repeating the OpenAI opt-out button
+
+- **Change:** Telegram no longer appends the OpenAI-processing control to every message. The opt-out
+  button appears on `/start` and the reply after AI is turned back on; ordinary text and callback
+  replies show only their relevant controls. Users can still turn processing off by tapping the
+  available opt-out button or using the text command.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 175 tests.
+  `git diff --check` passed. Telegram tests verify the multilingual opt-out button when explicitly
+  requested, its presence on `/start` and re-enable, and its absence from routine replies.
+- **Limitations:** Live Telegram was not redeployed or retested in this slice.
+
 ## 2026-10-11 — make free-text course guidance AI-led
 
 - **Change:** OpenAI now receives the current message and up to eight preceding text messages plus
