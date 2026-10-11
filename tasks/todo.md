@@ -24,6 +24,14 @@ acceptance criteria pass and the corresponding milestone is committed.
   `git diff --check` passed. Implementation `ab63f88a7118a435c40a8e848b997b1f851705bf` was pushed;
   GitHub Actions CI run `38097802190` passed.
 
+## Telegram keyboard cleanup
+
+- [x] Stop appending the OpenAI opt-out button to every reply. Keep it available on `/start` and
+  the AI re-enable confirmation; verify routine text and callback replies omit it while explicit
+  opt-out/re-enable still works. `bash scripts/verify.sh` passed (175 tests), and `git diff --check`
+  passed. Commit `ce29e0904a68fe8ac167d5ac76cde8401dc7f7e9` was pushed; GitHub Actions CI run
+  `38098531802` passed.
+
 ## Foundation and repository
 
 - [x] Confirm feature scope, decisions, and dependency order against `SPEC.md` and `docs/DECISIONS.md`.

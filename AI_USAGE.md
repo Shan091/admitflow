@@ -9,7 +9,8 @@
   `git diff --check` passed. Coverage checks routine replies, start, re-enable, and all four labels.
 - **Human review:** User asked to remove the repeated button. The opt-out remains reachable from
   `/start`, and users can also request it in text.
-- **Delivery:** Pending commit and matching GitHub Actions CI verification.
+- **Delivery:** Commit `ce29e0904a68fe8ac167d5ac76cde8401dc7f7e9` was pushed; GitHub Actions
+  `CI` run [38098531802](https://github.com/Shan091/admitflow/actions/runs/38098531802) passed.
 
 ## 2026-10-11 — make free-text course guidance AI-led
 
