@@ -3,21 +3,24 @@
 Update this checklist at the start of each work slice. A checkbox is complete only after its
 acceptance criteria pass and the corresponding milestone is committed.
 
-## Agent-led recovery and escalation boundary (in progress)
+## Agent-led recovery and escalation boundary (complete)
 
-- [ ] Keep ordinary course exploration with the agent: a confirmed sample course at a level
+- [x] Keep ordinary course exploration with the agent: a confirmed sample course at a level
   without configured eligibility must show its recorded facts, clearly state that eligibility is
   unknown, and offer exploration/browse actions without creating a staff handoff.
-- [ ] For routine unsupported questions, retrieval abstentions, unknown catalog facts, and no-match
+- [x] For routine unsupported questions, retrieval abstentions, unknown catalog facts, and no-match
   preferences, fail closed and offer a useful agent-led next step without changing lifecycle to
   `handed_off` or setting `needs_staff`.
-- [ ] Preserve handoff for explicit human requests and staff-authority/critical cases (for example,
+- [x] Preserve handoff for explicit human requests and staff-authority/critical cases (for example,
   staff-mediated deletion or an actual financial dispute); never imply a configured live contact
   or response time.
-- [ ] Add regression tests for parent-confirmed diploma, routine no-match, and retrieval abstention;
+- [x] Add regression tests for parent-confirmed diploma, routine no-match, and retrieval abstention;
   update SPEC, the decision log, feature brief, submission claims, CHANGELOG, and AI_USAGE.
-- [ ] Run `bash scripts/verify.sh`, check `git diff --check`, review the exact diff/secrets, then
-  commit and push the verified milestone before marking this task complete.
+- [x] Run `bash scripts/verify.sh`, check `git diff --check`, review the exact diff/secrets, then
+  commit and push the verified milestone before marking this task complete. Verification passed
+  (181 tests); implementation commit `40cc1ea7778431d76b2d71cf645b73531aa5a808` is pushed to
+  `origin/main`. Submission and checklist records were finalized in the follow-up documentation
+  commit.
 
 ## Repository presentation
 

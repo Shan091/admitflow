@@ -14,7 +14,9 @@
   be reserved for critical reasons. No live Telegram message or payment API was used for this slice.
 - **Demo data:** Cleared the single obsolete automatic course-confirmation handoff from the local
   fictional database; the lead and conversation were preserved.
-- **Delivery:** Implementation commit SHA will be recorded in `SUBMISSION.md` after committing.
+- **Delivery:** Implementation commit `40cc1ea7778431d76b2d71cf645b73531aa5a808` was pushed to
+  `origin/main`. `SUBMISSION.md` and the task checklist were finalized in a follow-up documentation
+  commit.
 
 ## 2026-10-11 — add typing feedback while Telegram waits for AI
 

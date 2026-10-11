@@ -580,3 +580,12 @@
 - **Why:** Make milestone progress visible and define when a task can be marked complete.
 - **Validation:** Read back the created checklist and confirmed the milestones and completion criteria are present. No application tests were run; there is no application code yet.
 - **Limitations:** All implementation tasks remain unchecked. The checklist is a plan, not evidence that features are implemented.
+# 2026-10-11 — finalize agent-led recovery submission record
+
+- Updated `SUBMISSION.md` to identify the verified implementation SHA, accurately describe
+  agent-led recovery and escalation boundaries, and report the checks for that SHA without claiming
+  an unverified GitHub Actions result or a new Telegram rehearsal.
+- Marked the recovery task complete in `tasks/todo.md` after its implementation milestone was
+  committed and pushed.
+- Verified the implementation milestone: `bash scripts/verify.sh` passed (Ruff lint/format, strict
+  mypy, 181 tests); targeted admissions tests passed (92 tests); `git diff --check` passed.

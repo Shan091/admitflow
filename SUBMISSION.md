@@ -9,7 +9,7 @@
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
-- **Verified implementation commit SHA:** `ab63f88a7118a435c40a8e848b997b1f851705bf`
+- **Verified implementation commit SHA:** `40cc1ea7778431d76b2d71cf645b73531aa5a808`
 - **Sample course catalog:** 50 clearly fictional, complete offerings across the five agreed
   fields, ten per field. The catalog does not offer every education level in every field.
 - **Working demo:** The live Telegram webhook, public HTTPS tunnel, staff dashboard, and Razorpay
@@ -17,7 +17,10 @@
   adaptive language-support, study-format, inspect-before-continue course guidance, unrelated-
   message recovery, and contextual AI-led replies in this SHA passed local tests and CI. The AI-led
   changes were live-smoked with synthetic OpenAI inputs, but have not yet been rehearsed through
-  Telegram or deployed to the running tunnel. The Telegram demo bot is
+  Telegram or deployed to the running tunnel. The agent-led recovery and escalation-boundary
+  changes in `40cc1ea` passed the full local verification gate and were pushed to `main`; the public
+  health endpoint and Telegram webhook configuration were checked, but a new end-to-end Telegram
+  conversation using this commit has not been rehearsed. The Telegram demo bot is
   [@crea34bot](https://t.me/crea34bot).
 - **Demo access requirements:** Local `.env` with staff credentials for dashboard login; Telegram
   account and bot token for the live conversation; OpenAI API key for disclosed discovery and FAQ
@@ -47,20 +50,29 @@
   meaningfully differ. Answer or skip a goal prompt; for a language prompt, choose a listed support
   or leave language open; for format, choose in-person/online/hybrid or leave it open. Then inspect
   the bounded catalog recommendation; tap a match to inspect its sample prerequisites, listed
-  supports/formats, and fee, then return to compare or explicitly continue to eligibility/staff
-  review. If a message is unrelated or contains no usable preference, AdmitFlow explains its scope,
+  supports/formats, and fee, then return to compare or explicitly check sample eligibility when
+  that level has configured rules. For other levels, it explains that eligibility is unknown and
+  offers exploration or browsing without automatically creating a staff handoff. If a message is
+  unrelated or contains no usable preference, AdmitFlow explains its scope,
   keeps the pending guidance state, and offers a relevant way forward instead of repeating the
   same question. The learner may pause and `/resume`. Supported sample undergraduate options
   continue to code-based
-  qualification and require an explicit tap before a test payment link. Other course levels are
-  handed to staff for eligibility confirmation. Staff can inspect attributed facts and pending
+  qualification and require an explicit tap before a test payment link. Other course levels show
+  seeded sample facts while the agent continues exploration; no eligibility decision or automatic
+  staff escalation is made. Routine missing facts, retrieval abstentions, and no-match preferences
+  receive useful agent-led recovery. Handoff is reserved for explicit human requests and
+  staff-authority/critical cases. Staff can inspect attributed facts and pending
   handoffs, delete one lead's local data, or reset all local demo data.
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
   payment was completed before this code change, so the new live notification has not yet been
   rehearsed.
-- **Checks performed and results:** Implementation SHA `ab63f88a7118a435c40a8e848b997b1f851705bf`
-  passed `bash scripts/verify.sh` (Ruff lint/format, strict mypy, 174 tests), `git diff --check`,
-  and GitHub Actions `CI` run [38097802190](https://github.com/Shan091/admitflow/actions/runs/38097802190).
+- **Checks performed and results:** Implementation SHA `40cc1ea7778431d76b2d71cf645b73531aa5a808`
+  passed `bash scripts/verify.sh` (Ruff lint/format, strict mypy, 181 tests), targeted admissions
+  tests (92 tests), and `git diff --check`; it was pushed to `origin/main`. GitHub Actions was not
+  independently verified for this SHA. The preceding AI-led implementation SHA
+  `ab63f88a7118a435c40a8e848b997b1f851705bf` passed `bash scripts/verify.sh` (Ruff lint/format,
+  strict mypy, 174 tests), `git diff --check`, and GitHub Actions `CI` run
+  [38097802190](https://github.com/Shan091/admitflow/actions/runs/38097802190).
   Synthetic live OpenAI conversation smoke used 21,990 input and 682 output tokens. Earlier, commit
   `5d33787eec9aa64bf5b79e36f517847779c68646` passed `bash scripts/verify.sh` (Ruff lint/format,
   strict mypy, and 172 pytest tests), `git diff --check`, and GitHub Actions CI run
