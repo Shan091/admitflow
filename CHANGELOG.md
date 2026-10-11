@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-11 — make free-text course guidance AI-led
+
+- **Change:** OpenAI now receives the current message and up to eight preceding text messages plus
+  allowlisted course preferences, guidance stage, and selected language. It drafts natural
+  conversational replies for discovery, interruptions, greetings, and bot-identity questions.
+  Application code still validates stored facts and controls recommendations, FAQs, fees,
+  eligibility, payments, handoffs, and state. `/start`, README, SPEC, decisions, and feature briefs
+  disclose the bounded context. Responses API storage remains disabled.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 174 tests;
+  `git diff --check` passed. Synthetic live OpenAI service smoke completed three turns ("hello",
+  "what are you?", and a story request): natural greeting and identity replies, polite contextual
+  redirect, no false handoff. Recorded usage was 21,990 input and 682 output tokens. A prior live
+  attempt exposed structured-output truncation at 300 output tokens; the reply budget is now 700.
+- **Limitations:** Live smoke used synthetic messages and fictional course data; Telegram was not
+  re-tested or redeployed. One synthetic smoke SQLite file was left under the system temp path
+  after Windows denied cleanup: `C:\Users\shanx\AppData\Local\Temp\admitflow-ai-smoke-8onxywm4\smoke.sqlite3`.
+  No real applicant or payment data was used.
+
 ## 2026-10-11 — make the project README easier to scan
 
 - **Change:** Reorganized the README into a project landing page with a clear demo-only notice,

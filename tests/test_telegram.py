@@ -74,6 +74,7 @@ async def test_start_command_discloses_ai_processing_and_starts_discovery(tmp_pa
     assert len(repository.list_messages(int(leads[0]["id"]))) == 2
     assert "fictional demo guidance" in message.sent[0][0]
     assert "OpenAI" in message.sent[0][0]
+    assert "recent chat messages" in message.sent[0][0]
     assert "demo text only" in message.sent[0][0]
     assert message.sent[0][1] is not None
     assert any(
@@ -118,7 +119,7 @@ async def test_user_can_turn_openai_processing_off_and_back_on(tmp_path: Path) -
     update.update_id = 141
     await callback_handler(update, context)
     assert admissions.ai_processing_enabled(lead_id)
-    assert "Typed messages are sent to OpenAI" in message.sent[-1][0]
+    assert "Typed messages and a few recent chat messages are sent to OpenAI" in message.sent[-1][0]
     on_markup = message.sent[-1][1]
     assert on_markup is not None
     assert any(
@@ -256,9 +257,26 @@ async def test_unrelated_text_during_confirmation_gets_focused_recovery_not_same
     reflection = admissions._present_guidance(lead_id)
 
     class FixedInterpreter:
-        async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
+        async def extract_discovery(
+            self,
+            text: str,
+            courses: list[Course],
+            conversation_context: dict[str, object] | None = None,
+        ) -> DiscoveryTurn:
             assert text == "no can you write me a story"
-            return DiscoveryTurn("other", None, (), None, (), (), False, False)
+            return DiscoveryTurn(
+                "out_of_scope",
+                None,
+                (),
+                None,
+                (),
+                (),
+                False,
+                False,
+                assistant_message=(
+                    "I can help with course questions. What would you like to explore?"
+                ),
+            )
 
     admissions.discovery_interpreter = FixedInterpreter()
     message = FakeMessage("no can you write me a story")
@@ -272,7 +290,8 @@ async def test_unrelated_text_during_confirmation_gets_focused_recovery_not_same
     response, markup = message.sent[-1]
     assert "Did I get that right" in reflection.text
     assert "Did I get that right" not in response
-    assert "outside this course-guidance demo" in response
+    assert response == "I can help with course questions. What would you like to explore?"
+    assert "staff" not in response.casefold()
     assert repository.get_lead(lead_id)["discovery_step"] == "guidance_confirmation"
     assert markup is not None
     callbacks = {button.callback_data for row in markup.inline_keyboard for button in row}

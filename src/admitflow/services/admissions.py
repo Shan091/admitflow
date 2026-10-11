@@ -3,7 +3,7 @@
 import hashlib
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from admitflow.adapters.sqlite import Repository
 from admitflow.domain.discovery import (
@@ -530,14 +530,16 @@ class AdmissionsService:
     def _discovery_prompt(self, language: str = "en") -> Reply:
         copy = {
             "en": "This is fictional demo guidance, not an admissions decision. Typed messages "
-            "are sent to OpenAI to help match sample courses; messages are stored locally. Use "
+            "and a few recent chat messages are sent to OpenAI to guide the conversation; "
+            "messages are stored locally. Use "
             "demo text only, not real student or personal data. What are you "
             "thinking about studying, or what do you enjoy doing? You can type a course or "
             "interest in your own words, say you're not sure, or choose a shortcut. Most other "
             "demo replies remain in English; translated copy needs fluent-speaker review. Please "
             "use demo text only. You can turn OpenAI processing off at any time.",
             "hi": "यह काल्पनिक डेमो मार्गदर्शन है, प्रवेश निर्णय नहीं। आपके लिखे संदेश नमूना कोर्स "
-            "मिलाने के लिए OpenAI को भेजे जाते हैं और स्थानीय रूप से सहेजे जाते हैं। केवल डेमो "
+            "मिलाने के लिए OpenAI को भेजे जाते हैं और स्थानीय रूप से सहेजे जाते हैं। Recent chat "
+            "context may also be included. केवल डेमो "
             "जानकारी लिखें, असली छात्र या निजी जानकारी नहीं। आप क्या पढ़ने के बारे में सोच "
             "रहे हैं, या आपको क्या करना पसंद है? आप अपने शब्दों "
             "में कोर्स या रुचि लिख सकते हैं, कह सकते हैं कि अभी तय नहीं है, या नीचे विकल्प चुन सकते "
@@ -545,7 +547,8 @@ class AdmissionsService:
             "केवल डेमो जानकारी लिखें। OpenAI प्रोसेसिंग कभी भी बंद कर सकते हैं।",
             "ml": "ഇത് സാങ്കൽപ്പിക ഡെമോ മാർഗനിർദ്ദേശമാണ്, പ്രവേശന തീരുമാനം അല്ല. മാതൃകാ കോഴ്സുകൾ "
             "കണ്ടെത്താൻ നിങ്ങൾ ടൈപ്പ് ചെയ്യുന്ന സന്ദേശങ്ങൾ OpenAI-ലേക്ക് അയയ്ക്കുകയും പ്രാദേശികമായി "
-            "സൂക്ഷിക്കുകയും ചെയ്യും. ഡെമോ വിവരങ്ങൾ മാത്രം നൽകുക; യഥാർത്ഥ വ്യക്തിഗത വിവരങ്ങൾ "
+            "സൂക്ഷിക്കുകയും ചെയ്യും. Recent chat context may also be included. ഡെമോ വിവരങ്ങൾ മാത്രം "
+            "നൽകുക; യഥാർത്ഥ വ്യക്തിഗത വിവരങ്ങൾ "
             "നൽകരുത്. നിങ്ങൾ എന്താണ് "
             "പഠിക്കാൻ ആലോചിക്കുന്നത്, അല്ലെങ്കിൽ എന്ത് ചെയ്യാനാണ് ഇഷ്ടം? "
             "കോഴ്സോ താൽപര്യമോ നിങ്ങളുടെ വാക്കുകളിൽ ടൈപ്പ് ചെയ്യാം, ഉറപ്പില്ലെന്ന് പറയാം, അല്ലെങ്കിൽ "
@@ -554,6 +557,7 @@ class AdmissionsService:
             "ചെയ്യാം. ഡെമോ ടെക്സ്റ്റ് മാത്രം ഉപയോഗിക്കുക.",
             "hinglish": "Yeh fictional demo guidance hai, admission decision nahi. Sample courses "
             "match karne ke liye typed messages OpenAI ko bheje aur locally save kiye jaate hain. "
+            "Recent chat context may also be included. "
             "Sirf demo text use karein; real student ya personal details nahi. Aap kya study "
             "karne ka soch rahe hain, ya aapko kya karna pasand hai? "
             "Course ya interest apne words mein likhein, unsure bol sakte hain, ya neeche shortcut "
@@ -1340,7 +1344,9 @@ class AdmissionsService:
         if self.discovery_interpreter is not None:
             try:
                 turn = await self.discovery_interpreter.extract_discovery(
-                    text, self.repository.list_courses(self.tenant_id)
+                    text,
+                    self.repository.list_courses(self.tenant_id),
+                    self._ai_conversation_context(lead_id, text),
                 )
             except Exception:
                 return Reply(
@@ -1386,9 +1392,13 @@ class AdmissionsService:
         )
         speaker = str(speaker_fact["fact_value"]) if speaker_fact else "student"
         if turn.intent == "staff_request":
-            return self.handoff(lead_id, "Student requested a staff member.")
+            if _is_explicit_staff_request(text):
+                return self.handoff(lead_id, "Student requested a staff member.")
+            turn = replace(turn, intent="conversation")
+        elif _is_assistant_identity_question(text) or _is_simple_greeting(text):
+            turn = replace(turn, intent="conversation")
         if turn.intent == "out_of_scope":
-            return self._noninformative_turn_reply(lead_id, turn.intent)
+            return self._noninformative_turn_reply(lead_id, turn.intent, turn.assistant_message)
         if turn.intent == "knowledge_question":
             result = await self.retrieval.answer(self.tenant_id, text)
             if result is None:
@@ -1413,7 +1423,7 @@ class AdmissionsService:
                 (("Choose a course", "path:course"), ("Browse courses", "path:browse")),
             )
         if not _has_discovery_signal(turn):
-            return self._noninformative_turn_reply(lead_id, turn.intent)
+            return self._noninformative_turn_reply(lead_id, turn.intent, turn.assistant_message)
 
         if turn.correct_previous:
             self._retract_discovery_preferences(
@@ -1476,7 +1486,9 @@ class AdmissionsService:
                 self.repository.update_lead(
                     lead_id, discovery_step="guidance_revision", lifecycle_stage="discovering"
                 )
-            return self._guidance_revision_prompt()
+            return self._with_ai_conversation_copy(
+                self._guidance_revision_prompt(), turn.assistant_message
+            )
         if turn.fields:
             fields_key = f"interest_fields_{speaker}"
             existing_fields = (
@@ -1615,10 +1627,14 @@ class AdmissionsService:
             or turn.delivery_mode_preference
             or turn.retracted_preferences
         ):
-            return Reply(
-                "I've recorded those as the parent's preferences. The learner's own interests "
-                "should guide recommendations; invite them to share or confirm their preferences.",
-                (("Learner sharing now", "speaker:student"),),
+            return self._with_ai_conversation_copy(
+                Reply(
+                    "I've recorded those as the parent's preferences. The learner's own interests "
+                    "should guide recommendations; invite them to share or confirm their "
+                    "preferences.",
+                    (("Learner sharing now", "speaker:student"),),
+                ),
+                turn.assistant_message,
             )
         current_interests, current_activities, _, current_goals, _ = self._student_guidance_context(
             lead_id
@@ -1633,13 +1649,16 @@ class AdmissionsService:
             or current_goals
         ):
             if speaker == "parent":
-                return Reply(
-                    "It's okay if the learner is unsure. Invite them to share what they enjoy or "
-                    "have tried; their own interests should guide the suggestions.",
-                    (
-                        ("Learner sharing now", "speaker:student"),
-                        ("Browse sample courses", "path:browse"),
+                return self._with_ai_conversation_copy(
+                    Reply(
+                        "It's okay if the learner is unsure. Invite them to share what they enjoy "
+                        "or have tried; their own interests should guide the suggestions.",
+                        (
+                            ("Learner sharing now", "speaker:student"),
+                            ("Browse sample courses", "path:browse"),
+                        ),
                     ),
+                    turn.assistant_message,
                 )
             count_fact = f"guidance_unsure_count_{speaker}"
             try:
@@ -1649,8 +1668,10 @@ class AdmissionsService:
             count = min(previous_count + 1, 2)
             self.repository.save_fact(lead_id, count_fact, str(count), speaker)
             if count == 1:
-                return self._unsure_exploration_reply(lead_id)
-            return self._uncertainty_recovery_reply(lead_id)
+                reply = self._unsure_exploration_reply(lead_id)
+            else:
+                reply = self._uncertainty_recovery_reply(lead_id)
+            return self._with_ai_conversation_copy(reply, turn.assistant_message)
         lead = self.repository.get_lead(lead_id)
         if (
             lead
@@ -1666,11 +1687,19 @@ class AdmissionsService:
                 or turn.delivery_mode_preference
             )
         ):
-            return self._guidance_revision_prompt()
-        return self._present_guidance(lead_id)
+            return self._with_ai_conversation_copy(
+                self._guidance_revision_prompt(), turn.assistant_message
+            )
+        reply = self._present_guidance(lead_id)
+        current_lead = self.repository.get_lead(lead_id)
+        if current_lead and current_lead["discovery_step"] != "results":
+            return self._with_ai_conversation_copy(reply, turn.assistant_message)
+        return reply
 
-    def _noninformative_turn_reply(self, lead_id: int, intent: str) -> Reply:
-        """Acknowledge a turn without replaying the question currently on screen."""
+    def _noninformative_turn_reply(
+        self, lead_id: int, intent: str, assistant_message: str | None = None
+    ) -> Reply:
+        """Keep the saved guidance intact while replying naturally to this interruption."""
         lead = self.repository.get_lead(lead_id)
         pending = self._fact_value(lead_id, "guidance_pending_signature")
         if (
@@ -1681,39 +1710,104 @@ class AdmissionsService:
         ):
             pending = None
         if lead and lead["discovery_step"] == "guidance_confirmation" and pending:
-            reason = (
-                "That request is outside this course-guidance demo. "
-                if intent in {"other", "out_of_scope"}
-                else "I couldn't use that message to update your course preferences. "
-            )
-            return Reply(
-                reason
-                + "I saved the details you shared. You can continue with those answers, change "
-                "them, or browse sample courses when you're ready.",
-                (
+            return self._with_ai_conversation_copy(
+                Reply(
+                    "Got it. Your earlier course preferences are still here whenever you'd like "
+                    "to continue, adjust them, or look through sample courses.",
                     (
-                        "Continue with my current answers",
-                        f"guidance:confirm:{_guidance_token(pending)}",
+                        (
+                            "Continue with my current answers",
+                            f"guidance:confirm:{_guidance_token(pending)}",
+                        ),
+                        ("Change or add answers", f"guidance:revise:{_guidance_token(pending)}"),
+                        ("Browse sample courses", "path:browse"),
                     ),
-                    ("Change or add answers", f"guidance:revise:{_guidance_token(pending)}"),
-                    ("Browse sample courses", "path:browse"),
                 ),
+                assistant_message,
             )
-        reason = (
-            "That request is outside this course-guidance demo. "
-            if intent in {"other", "out_of_scope"}
-            else "I couldn't find a course preference in that message. "
+        fallback = (
+            "Hi! I'm AdmitFlow's AI course-guidance assistant for a fictional course catalog. "
+            "What are you curious about studying?"
+            if intent == "conversation"
+            else "I can help explore the fictional course catalog. What would you like to know?"
         )
-        return Reply(
-            reason
-            + "I can help explore sample courses, answer confirmed admissions questions, or flag "
-            "something for staff. Your earlier answers are still saved.",
-            (
-                ("Browse sample courses", "path:browse"),
-                ("Choose a course-guidance path", "menu:start"),
-                ("Ask staff", "handoff:request"),
+        return self._with_ai_conversation_copy(
+            Reply(
+                fallback,
+                (
+                    ("Browse sample courses", "path:browse"),
+                    ("Choose a course-guidance path", "menu:start"),
+                ),
             ),
+            assistant_message,
         )
+
+    @staticmethod
+    def _with_ai_conversation_copy(reply: Reply, assistant_message: str | None) -> Reply:
+        """Use model-authored copy while retaining app-owned buttons and transitions."""
+        if not assistant_message:
+            return reply
+        message = assistant_message.strip()
+        if not message or len(message) > 700:
+            return reply
+        return Reply(message, reply.buttons)
+
+    def _ai_conversation_context(self, lead_id: int, current_text: str) -> dict[str, object]:
+        """Build bounded, identifier-free context from demo chat and allowlisted saved facts."""
+        messages = self.repository.list_messages(lead_id)
+        if (
+            messages
+            and messages[-1]["direction"] == "inbound"
+            and messages[-1]["body"] == current_text
+        ):
+            messages = messages[:-1]
+        recent = [
+            {
+                "role": "user" if item["direction"] == "inbound" else "assistant",
+                "content": str(item["body"])[-800:],
+            }
+            for item in messages[-8:]
+        ]
+        safe_prefixes = (
+            "interest_field_",
+            "interest_fields_",
+            "education_level_",
+            "interest_terms_",
+            "activity_terms_",
+            "interest_activity_",
+            "learning_goals_",
+            "language_support_preference_",
+            "delivery_mode_preference_",
+            "course_choice_parent",
+        )
+        saved_profile = [
+            {"fact": str(item["fact_key"]), "value": str(item["fact_value"])}
+            for item in self.repository.list_facts(lead_id)
+            if str(item["fact_key"]).startswith(safe_prefixes)
+        ]
+        lead = self.repository.get_lead(lead_id)
+        active_speaker = next(
+            (
+                str(item["fact_value"])
+                for item in self.repository.list_facts(lead_id)
+                if item["fact_key"] == "active_speaker"
+            ),
+            "student",
+        )
+        selected_course_name = None
+        if lead and lead["selected_course_id"]:
+            selected_course = self.repository.get_course(
+                self.tenant_id, str(lead["selected_course_id"])
+            )
+            selected_course_name = selected_course.name if selected_course else None
+        return {
+            "recent_conversation": recent,
+            "saved_catalog_preferences": saved_profile,
+            "active_speaker": active_speaker,
+            "guidance_stage": str(lead["discovery_step"]) if lead else "new",
+            "selected_course": selected_course_name,
+            "response_language": self.preferred_language(lead_id),
+        }
 
     def _pending_guidance_matches_current(self, lead_id: int, pending: str) -> bool:
         interests, activities, level, goals, language_support = self._student_guidance_context(
@@ -2226,6 +2320,44 @@ def _is_unconfigured_fee_category(text: str) -> bool:
 def _is_refund_question(text: str) -> bool:
     normalized = re.sub(r"[^\w]+", " ", text.casefold())
     return any(term in normalized for term in {"refund", "refundable", "chargeback"})
+
+
+def _is_simple_greeting(text: str) -> bool:
+    normalized = re.sub(r"[^\w]+", " ", text.casefold()).strip()
+    return normalized in {"hi", "hello", "hey", "good morning", "good afternoon", "good evening"}
+
+
+def _is_assistant_identity_question(text: str) -> bool:
+    normalized = re.sub(r"[^\w]+", " ", text.casefold()).strip()
+    return normalized in {
+        "what are you",
+        "who are you",
+        "are you a bot",
+        "are you ai",
+        "are you human",
+        "what can you do",
+        "who made you",
+    }
+
+
+def _is_explicit_staff_request(text: str) -> bool:
+    normalized = re.sub(r"[^\w]+", " ", text.casefold()).strip()
+    if normalized in {"staff", "human", "counsellor", "counselor", "admissions officer"}:
+        return True
+    requests = (
+        "talk to",
+        "talk with",
+        "speak to",
+        "speak with",
+        "connect me to",
+        "connect me with",
+        "let me talk to",
+        "i want to talk to",
+    )
+    targets = ("staff", "human", "person", "counsellor", "counselor", "admissions officer")
+    return any(request in normalized for request in requests) and any(
+        target in normalized for target in targets
+    )
 
 
 def _is_language_concern(text: str) -> bool:

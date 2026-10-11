@@ -66,13 +66,15 @@ Record consequential choices here. Each entry is short; update it when evidence 
     access are not configured.
 
 17. **Disclosed OpenAI text processing with user controls.** Explain at `/start` that typed
-    messages are sent to OpenAI, locally stored, and must contain demo data only. Enable free-text
-    AI by default; provide persistent opt-out and re-enable controls plus button-only exploration.
-    This supersedes the earlier affirmative-consent gate as the hackathon product behavior; it is
-    not a legal/privacy determination. Use stateless structured extraction of only the current
-    message and fictional allowlisted course vocabulary. Code validates extracted facts and owns
-    questions, recommendations, fees, and eligibility. No user name, chat ID, or transcript is sent
-    as context; privacy/legal review remains a production gate.
+    messages and bounded recent-chat context are sent to OpenAI while processing is enabled,
+    messages are stored locally, and inputs must contain demo data only. Enable free-text AI by
+    default; provide persistent opt-out/re-enable controls plus button-only exploration. This
+    supersedes the earlier affirmative-consent gate as the hackathon product behavior; it is not a
+    legal/privacy determination. Send at most the previous eight text messages, catalog-allowlisted
+    facts, current stage, and selected language; never send a name, Telegram ID, or username. OpenAI
+    leads conversational replies; Python validates facts and owns catalog matching, course details,
+    eligibility, fees, payment, and state transitions. Disable Responses API storage; production
+    privacy review remains a release gate.
 
 18. **Study goals are catalog-owned evidence.** Every fictional course carries a small set of sample
     learning-goal tags. Extract only goals explicitly stated by the learner and validated against
@@ -128,6 +130,14 @@ Record consequential choices here. Each entry is short; update it when evidence 
     acknowledge the request without replaying the same discovery poll. Preserve facts and pending
     state, and offer relevant next actions. When processing the message cannot be classified or
     handled, do not invent a preference.
+
+27. **AI leads free-text conversation; code owns consequential actions.** For AI-enabled turns,
+    provide the model the current message, at most the previous eight chat messages, safe catalog-
+    allowlisted profile facts, current conversation stage, and selected response language. The model
+    handles greetings and assistant-identity questions naturally, uses context to avoid repetitive
+    questions, and drafts the next response. Python still validates extracted preferences, enforces
+    state and stale-callback checks, grounds FAQ answers in retrieval, and calculates course
+    matches, eligibility, and fees. Only an explicit staff request creates a staff-request handoff.
 
 ## References
 

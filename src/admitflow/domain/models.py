@@ -44,7 +44,13 @@ class DiscoveryTurn:
     """Catalog-bounded interpretation of one chat message."""
 
     intent: Literal[
-        "discovery", "course_lookup", "knowledge_question", "staff_request", "out_of_scope", "other"
+        "discovery",
+        "course_lookup",
+        "knowledge_question",
+        "staff_request",
+        "out_of_scope",
+        "conversation",
+        "other",
     ]
     course_id: str | None
     fields: tuple[str, ...]
@@ -57,6 +63,7 @@ class DiscoveryTurn:
     language_support_preference: str | None = None
     delivery_mode_preference: str | None = None
     retracted_preferences: tuple[RetractedPreference, ...] = ()
+    assistant_message: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

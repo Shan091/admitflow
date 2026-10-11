@@ -22,18 +22,20 @@ prediction, or guarantee of admission or employment.
   fictional demo text. Provide persistent controls to turn processing off or back on. While off,
   button-based course exploration remains usable and typed text must not be sent to any AI provider.
   This is the product behavior chosen for the demo, not a legal/privacy determination.
-- For each extraction request, send only the current user message plus the fictional, allowlisted
-  catalog vocabulary needed to normalize it; do not send names, chat IDs, contact details, or the
-  full transcript. Use stateless requests (`store=false`). Do not claim this alone makes the demo
-  production-safe.
+- For each AI-led turn, send the current message, at most the previous eight text messages, safe
+  catalog-allowlisted saved preferences, stage, selected language, and fictional catalog facts.
+  Do not send names, chat IDs, usernames, or contact details. Use stateless Responses API requests
+  (`store=false`) and never call the API when processing is off. Do not claim this alone makes the
+  demo production-safe.
 - Localize the processing disclosure and opt-out control; disclose that most other replies remain in
   English and need fluent-speaker review.
   General course, eligibility, FAQ, and payment copy still requires fluent-speaker review before
   the product can claim complete language support.
-- The model may extract intent and explicit user-stated course, field, study level, interest, or
-  activity from a schema. Code validates every value against the seeded catalog and chooses the
-  next question. Course matches, facts, prerequisites, fees, eligibility, and payment gates stay
-  code-owned. No model-created course or requirement may be displayed.
+- The model extracts intent and explicit user-stated course, field, study level, interest, or
+  activity from a schema, leads the natural-language response, and asks one useful contextual next
+  question. Code validates every value against the seeded catalog and owns state, matches, facts,
+  prerequisites, fees, eligibility, and payment gates. No model-created course or requirement may
+  be displayed.
 - Preserve the direct known-course route, known-field route, unsure/explore route, and browse/FAQ
   route as optional shortcuts; natural-language input may enter/switch between them without
   resetting unrelated student facts.
@@ -43,8 +45,9 @@ prediction, or guarantee of admission or employment.
 
 ## Acceptance examples
 
-1. `/start` discloses processing and local storage, then starts the discovery flow without a consent
-   prompt. “I like numbers and helping people” is processed only with fictional demo text.
+1. `/start` discloses current-message and bounded recent-context processing plus local storage,
+   then starts discovery without a consent prompt. “I like numbers and helping people” is
+   processed only with fictional demo text.
 2. “I enjoy organizing data and making charts; I want a diploma” extracts only
    matching catalog facts, persists them as student-attributed facts, and recommends only complete
    matching diploma entries or asks one relevant follow-up if evidence is insufficient.

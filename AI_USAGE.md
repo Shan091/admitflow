@@ -1,5 +1,20 @@
 # AI usage
 
+## 2026-10-11 — make free-text course guidance AI-led
+
+- **Task:** Fix repeated canned Telegram replies so the AI can lead the conversation naturally.
+- **Assistance:** Codex updated the Responses API structured output and service flow to use
+  identifier-free bounded conversation context and generate free-text replies while Python retains
+  consequential actions and catalog facts. Greeting/identity guards prevent false FAQ/staff routes.
+  The `/start` notice, README, SPEC, decisions, and feature briefs now describe the data sent.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and all 174 tests;
+  `git diff --check` passed. Synthetic live OpenAI service smoke handled three turns; usage was
+  21,990 input and 682 output tokens. The first live attempt found JSON truncation at 300 tokens;
+  response budget was raised to 700 and a retry passed. No real learner or payment data was used.
+- **Human review:** User reported the repeated canned replies and requested AI-led conversation.
+  The current app still enforces catalog and action boundaries. Live Telegram was not redeployed
+  or re-tested in this work slice.
+
 Update this file as work happens. Record the task, AI assistance, human review, checks actually
 run, and any corrections. Do not paste full chat transcripts or claim unperformed checks.
 

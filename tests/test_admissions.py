@@ -1,3 +1,4 @@
+import json
 from dataclasses import replace
 from pathlib import Path
 from typing import Literal
@@ -24,15 +25,25 @@ class UnexpectedEmbedder:
 class FakeDiscoveryInterpreter:
     def __init__(self, turn: DiscoveryTurn) -> None:
         self.turn = turn
-        self.calls: list[tuple[str, list[str]]] = []
+        self.calls: list[tuple[str, list[str], dict[str, object] | None]] = []
 
-    async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
-        self.calls.append((text, [course.id for course in courses]))
+    async def extract_discovery(
+        self,
+        text: str,
+        courses: list[Course],
+        conversation_context: dict[str, object] | None = None,
+    ) -> DiscoveryTurn:
+        self.calls.append((text, [course.id for course in courses], conversation_context))
         return self.turn
 
 
 class FailingDiscoveryInterpreter:
-    async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn:
+    async def extract_discovery(
+        self,
+        text: str,
+        courses: list[Course],
+        conversation_context: dict[str, object] | None = None,
+    ) -> DiscoveryTurn:
         raise RuntimeError("synthetic extraction failure")
 
 
@@ -730,10 +741,7 @@ async def test_non_course_request_does_not_repeat_pending_guidance_confirmation(
     reply = await service.free_text(lead_id, "no can you write me a story", None)
 
     assert "Did I get that right" not in reply.text
-    if intent in {"other", "out_of_scope"}:
-        assert "outside this course-guidance demo" in reply.text
-    else:
-        assert "couldn't use that message to update" in reply.text
+    assert "earlier course preferences are still here" in reply.text
     assert "Did I get that right" in reflection.text
     assert any(data.startswith("guidance:confirm:") for _, data in reply.buttons)
     assert any(data.startswith("guidance:revise:") for _, data in reply.buttons)
@@ -1634,13 +1642,88 @@ async def test_discovery_interpreter_is_called_by_default_and_opt_out_disables_i
     reply = await service.free_text(lead_id, "I like design", None)
 
     assert len(interpreter.calls) == 1
-
     service.set_ai_processing_enabled(lead_id, False)
     reply = await service.free_text(lead_id, "I like design", None)
 
     assert len(interpreter.calls) == 1
     assert "OpenAI processing is off" in reply.text
     assert "buttons" in reply.text.casefold() or "tap" in reply.text.casefold()
+
+
+@pytest.mark.asyncio
+async def test_ai_conversation_copy_uses_bounded_context_without_identifiers(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    assistant_message = (
+        "I'm AdmitFlow's AI course guide for a fictional catalog. What kinds of things do you "
+        "enjoy learning about?"
+    )
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn(
+            intent="staff_request",
+            course_id=None,
+            fields=(),
+            education_level=None,
+            interests=(),
+            activities=(),
+            unsure=False,
+            correct_previous=False,
+            assistant_message=assistant_message,
+        )
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("private-telegram-id", "private-username")
+    repository.save_fact(lead_id, "interest_terms_student", "technology", "student")
+    for index in range(10):
+        direction = "inbound" if index % 2 == 0 else "outbound"
+        repository.add_message(lead_id, direction, f"sample turn {index}", index + 100)
+    repository.add_message(lead_id, "inbound", "what are you", 999)
+
+    reply = await service.free_text(lead_id, "what are you", None)
+
+    assert reply.text == assistant_message
+    assert not any(
+        fact["fact_key"].startswith("handoff_") for fact in repository.list_facts(lead_id)
+    )
+    context = interpreter.calls[0][2]
+    assert context is not None
+    recent = context["recent_conversation"]
+    assert isinstance(recent, list)
+    assert len(recent) == 8
+    assert all("what are you" not in str(item) for item in recent)
+    assert "private-telegram-id" not in json.dumps(context)
+    assert "private-username" not in json.dumps(context)
+    assert context["response_language"] == "en"
+
+
+@pytest.mark.asyncio
+async def test_staff_handoff_requires_an_explicit_human_request(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    interpreter = FakeDiscoveryInterpreter(
+        DiscoveryTurn("staff_request", None, (), None, (), (), False, False)
+    )
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+        interpreter,
+    )
+    lead_id, _ = service.start("123", "student")
+
+    reply = await service.free_text(lead_id, "Please connect me with a counsellor", None)
+
+    assert "not configured" in reply.text
+    assert repository.get_lead(lead_id)["handoff_status"] == "pending"  # type: ignore[index]
 
 
 @pytest.mark.asyncio

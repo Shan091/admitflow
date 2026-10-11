@@ -4,7 +4,8 @@
 
 - **Project name:** AdmitFlow
 - **Short description:** A Telegram admissions assistant that remembers student interests,
-  recommends from a fictional course catalog, checks supported sample eligibility rules in code,
+  uses contextual OpenAI-led conversation to guide discovery, recommends from a fictional course
+  catalog, checks supported sample eligibility rules in code,
   answers institution FAQs with fail-closed vector search, and supports staff handoffs/login plus
   Razorpay test-mode application payments.
 - **Code repository URL:** https://github.com/Shan091/admitflow
@@ -38,7 +39,8 @@
   `RAZORPAY_WEBHOOK_SECRET`
 - **Start command:** `uv run uvicorn admitflow.main:app --reload`
 - **Demo walkthrough:** In Telegram, send `/start` and read the OpenAI processing notice; there is
-  no separate consent step. Free-text discovery is enabled by default; name a known course or
+  no separate consent step. Free-text discovery is enabled by default and recent chat context is
+  included to let the AI lead naturally; name a known course or
   describe interest/activity/goal/language-support preference/level in your own words. A broad
   match may get one optional prompt when catalog goals, listed language support, or study formats
   meaningfully differ. Answer or skip a goal prompt; for a language prompt, choose a listed support

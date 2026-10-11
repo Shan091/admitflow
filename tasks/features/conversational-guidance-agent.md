@@ -194,11 +194,23 @@ human support should produce a truthful staff-dashboard handoff; no contact/SLA 
   code-verified; unsupported levels or missing data create a truthful handoff.
 - A learner can interrupt discovery to ask an FAQ/fee question, change language/path, pause, resume,
   request staff, or delete data without the bot becoming stuck in a questionnaire.
+- With OpenAI processing enabled, the model receives the current text and at most eight preceding
+  text messages, safe profile facts, the current guidance stage, and selected response language.
+  Its natural reply uses context and leads one useful next turn. Greetings and questions about
+  AdmitFlow itself never become unsupported-FAQ handoffs. Staff handoff is created only for an
+  explicit human request or a verified policy requiring staff.
+- The `/start` notice discloses that recent conversation context can be sent to OpenAI. Telegram
+  identifiers and usernames are excluded; Responses API storage is disabled; opt-out sends no typed
+  content or history to OpenAI. Code still owns catalog facts, eligibility, prices, payment, and
+  state transitions.
 - A message that adds no preference, correction, or explicit uncertainty does not silently get
   treated as an answer to the current poll. Acknowledge unrelated/non-informative text, keep saved
   facts and the pending step intact, and offer relevant actions without repeating the same question.
   FAQ, fee, browse, and staff requests continue through their explicit interrupt routes.
 - After AI opt-out, typed content does not go to the discovery model, intent router, or embedder.
+- Add deterministic fake-API coverage for greetings, "who are you?", contextual follow-up,
+  bounded history inclusion/exclusion, selected language, and human-request versus bot-identity
+  routing. Verify that no identifier reaches the model and opt-out prevents model calls.
 - Failure of extraction, retrieval, database, messaging, or the model does not create partial facts,
   fabricate an answer, send duplicate payment actions, or strand the learner without an available
   recovery action.

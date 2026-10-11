@@ -13,15 +13,15 @@ admissions system and uses a clearly fictional institution and seeded data.
 
 ## Hackathon capability map
 
-- **Discovery:** Telegram discloses OpenAI text processing and local message storage at `/start`;
-  free-text discovery is enabled by default and a persistent control can turn it off or back on.
-  Opting out preserves button-based browsing and prevents external AI calls for the text. While
-  enabled, a stateless structured extraction sees only the current message and allowlisted fictional
-  catalog vocabulary, including course-owned learning-goal and language-support labels; code
-  validates facts, asks at most one optional clarification when a broad match differs on those
-  catalog facts, and ranks at most three catalog-only matches. Recorded teaching medium is shown
-  separately from language support. Known-course, known-field, unsure/explore, and browse paths
-  remain available. No language ability, aptitude score, or personality label is inferred.
+- **Discovery:** Telegram discloses OpenAI processing, bounded recent-chat context, and local
+  message storage at `/start`; free-text discovery is enabled by default and a persistent control
+  turns it off or back on. While enabled, OpenAI receives the current message plus at most the
+  previous eight text messages, safe catalog-allowlisted profile facts, current guidance stage, and
+  selected language. No Telegram identifier or username is sent. OpenAI interprets context, leads
+  the natural conversation, and drafts free-text replies. Python validates extracted facts and owns
+  state, catalog matching, course details, eligibility, fees, and payment actions. FAQ answers still
+  come from seeded retrieval. Opt-out prevents external AI calls for typed content while preserving
+  button-based exploration. No language ability, aptitude score, or personality label is inferred.
 - **Qualification:** Undergraduate sample rules are checked by Python. Other levels show their
   sample prerequisites and create a staff handoff for confirmation; the app does not reuse a Grade
   12 rule across every program.
@@ -54,10 +54,10 @@ admissions system and uses a clearly fictional institution and seeded data.
    recorded with actual check results.
 6. Staff must log in before viewing lead details; a verified Razorpay test webhook can update a
    demo payment to paid, while invalid webhook signatures cannot.
-7. `/start` discloses OpenAI processing, local storage, and demo-only input before free-text use.
-   AI is enabled by default; after opt-out, typed discovery/FAQ text causes no OpenAI call and
-   tap-based exploration remains available. Extraction failures and unsupported values never create
-   recommendations outside the sample catalog.
+7. `/start` discloses OpenAI processing, bounded recent-chat context, local storage, and demo-only
+   input before free-text use. AI is enabled by default; after opt-out, typed discovery/FAQ text
+   causes no OpenAI call and tap-based exploration remains available. Extraction failures and
+   unsupported values never create recommendations outside the sample catalog.
 
 ## Roadmap
 

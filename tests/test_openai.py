@@ -13,12 +13,16 @@ from admitflow.domain.models import Course
 @pytest.mark.asyncio
 async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -> None:
     assert "learning_goals" in _DiscoveryPayload.model_json_schema()["required"]
+    assert "assistant_message" in _DiscoveryPayload.model_json_schema()["required"]
     assert "language_support_preference" in _DiscoveryPayload.model_json_schema()["required"]
     assert "delivery_mode_preference" in _DiscoveryPayload.model_json_schema()["required"]
     assert "retracted_preferences" in _DiscoveryPayload.model_json_schema()["required"]
     adapter = OpenAIAdapter("test-key", "test-model", "test-embedding")
     parsed = _DiscoveryPayload(
         intent="discovery",
+        assistant_message=(
+            "You enjoy charts and want to study data. Which level are you considering?"
+        ),
         course_id="not-in-catalog",
         fields=["tech/data", "medicine"],
         education_level="diploma",
@@ -59,7 +63,15 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
         prerequisites=("Sample entry requirement",),
     )
 
-    result = await adapter.extract_discovery("I enjoy charts and want a diploma in data", [course])
+    context: dict[str, object] = {
+        "recent_conversation": [{"role": "assistant", "content": "What do you enjoy?"}],
+        "saved_catalog_preferences": [{"fact": "interest_terms_student", "value": "data"}],
+        "guidance_stage": "guidance_signal",
+        "response_language": "en",
+    }
+    result = await adapter.extract_discovery(
+        "I enjoy charts and want a diploma in data", [course], context
+    )
 
     assert result.course_id is None
     assert result.fields == ("tech/data",)
@@ -68,6 +80,9 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
     assert result.learning_goals == ("analyze data",)
     assert result.language_support_preference == "Malayalam discussion support"
     assert result.delivery_mode_preference == "online"
+    assert result.assistant_message == (
+        "You enjoy charts and want to study data. Which level are you considering?"
+    )
     assert [(item.category, item.value) for item in result.retracted_preferences] == [
         ("field", "tech/data"),
         ("activity", "making charts"),
@@ -78,9 +93,11 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
     ]
     call = parse.await_args.kwargs
     assert call["store"] is False
+    assert call["max_output_tokens"] == 700
     assert call["text_format"] is _DiscoveryPayload
     sent = json.loads(call["input"])
     assert sent["current_user_message"] == "I enjoy charts and want a diploma in data"
+    assert sent["conversation_context"] == context
     assert sent["allowed_learning_goals"] == ["analyze data"]
     assert sent["allowed_language_supports"] == ["Malayalam discussion support"]
     assert sent["allowed_delivery_modes"] == ["online"]
@@ -88,6 +105,9 @@ async def test_extraction_is_stateless_and_filters_values_to_current_catalog() -
     assert "transcript" not in call["input"]
     assert "untrusted data" in call["instructions"]
     assert "do not reset the profile" in call["instructions"]
+    assert "bounded recent conversation" in call["instructions"]
+    assert "never as a FAQ or staff request" in call["instructions"]
+    assert "actual reply shown to the learner" in call["instructions"]
 
     unsupported = parsed.model_copy(
         update={"language_support_preference": "unlisted language coaching"}

@@ -14,4 +14,9 @@ class IntentRouter(Protocol):
 
 
 class DiscoveryInterpreter(Protocol):
-    async def extract_discovery(self, text: str, courses: list[Course]) -> DiscoveryTurn: ...
+    async def extract_discovery(
+        self,
+        text: str,
+        courses: list[Course],
+        conversation_context: dict[str, object] | None = None,
+    ) -> DiscoveryTurn: ...

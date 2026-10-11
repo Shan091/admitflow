@@ -15,9 +15,10 @@
 > [!IMPORTANT]
 > **Hackathon demo only.** The institution, courses, requirements, and fees are fictional sample
 > data. Recommendations and eligibility are not real admission decisions. Use fictional inputs
-> only: Telegram identifiers and messages are stored locally, and typed text is sent to OpenAI
-> while AI processing is enabled. The bot explains this at `/start`; users can switch AI processing
-> off and continue with buttons.
+> only: Telegram identifiers and messages are stored locally. While AI processing is enabled,
+> typed text and up to eight recent chat messages plus saved course preferences may be sent to
+> OpenAI. Telegram IDs and usernames are excluded from model context. The bot explains this at
+> `/start`; users can switch AI processing off and continue with buttons.
 
 ## What it does
 
@@ -27,7 +28,7 @@ leads and handoffs.
 
 | Learner experience | Staff and system |
 | --- | --- |
-| Explore by known course, field, interests, or browsing | Authenticated dashboard for leads, attributed facts, and handoffs |
+| AI-led free-text discovery with recent chat context; button browsing remains available | Authenticated dashboard for leads, attributed facts, and handoffs |
 | Get up to three catalog-grounded course matches | SQLite persistence for conversations and demo records |
 | Inspect sample requirements, study options, support, and fees before continuing | Code-owned undergraduate sample eligibility and fee values |
 | Ask seeded FAQs; uncertain or unavailable retrieval abstains | OpenAI embeddings with local SQLite storage and NumPy cosine search |
@@ -64,10 +65,12 @@ flowchart TB
     SVC -->|cosine search and confidence checks| DB
 ```
 
-OpenAI extraction receives the current message and fictional catalog vocabulary, not the learner's
-chat ID, name, or conversation transcript. Python owns recommendations, eligibility, and prices;
-OpenAI does not decide them. FAQ retrieval searches the seeded local corpus and fails closed when
-the result is weak, ambiguous, or unavailable.
+The AI conversation lead receives the current message, up to eight recent chat messages, safe saved
+course preferences, current guidance stage, selected language, and fictional catalog vocabulary.
+It does not receive the learner's chat ID, username, or name; API response storage is disabled.
+Python still validates learner facts and owns recommendations, eligibility, and prices. FAQ answers
+come from the seeded local corpus, and retrieval fails closed when a result is weak, ambiguous, or
+unavailable.
 
 ## Run it locally
 
