@@ -6,7 +6,7 @@
 {% if reset_rejected %}<p role="alert" class="notice">Nothing was deleted. The confirmation phrase or form token was invalid.</p>{% endif %}
 {% if leads %}
 <table>
-  <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Lifecycle</th><th>Handoff</th><th>Eligible</th><th>Updated</th></tr></thead>
+  <thead><tr><th>Lead</th><th>Course</th><th>Status</th><th>Lifecycle</th><th>Handoff</th><th>Sample gate</th><th>Updated</th></tr></thead>
   <tbody>
   {% for lead in leads %}
     <tr>
@@ -15,7 +15,7 @@
       <td>{{ lead.state }}</td>
       <td>{{ lead.lifecycle_stage }}</td>
       <td>{% if lead.handoff_status == "pending" %}<strong>Pending staff review (contact not configured)</strong>{% else %}{{ lead.handoff_status }}{% endif %}</td>
-      <td>{% if lead.eligible is none %}—{% elif lead.eligible %}Meets sample rules{% else %}Does not meet sample rules{% endif %}</td>
+      <td>{% if lead.eligible is none %}—{% elif lead.eligible %}Passed (demo){% else %}Not passed (demo){% endif %}</td>
       <td>{{ lead.updated_at }}</td>
     </tr>
   {% endfor %}

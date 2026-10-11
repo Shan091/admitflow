@@ -371,7 +371,7 @@ async def test_student_can_describe_multiple_facts_without_consent_step(
     assert "\\n" not in reply.text
     assert "courses:\n" in reply.text
     diploma_details = service.explore_guidance_course(lead_id, "data-analytics-diploma")
-    assert any(label == "Explore this sample course" for label, _ in diploma_details.buttons)
+    assert any(label == "Check sample prerequisites" for label, _ in diploma_details.buttons)
     assert all("staff" not in label.casefold() for label, _ in diploma_details.buttons)
     facts = repository.list_facts(lead_id)
     assert any(
@@ -2267,12 +2267,14 @@ def test_parent_confirmed_diploma_stays_agent_led_without_staff_handoff(
     lead = repository.get_lead(lead_id)
 
     assert "Completed Grade 12 or equivalent" in reply.text
-    assert "can't confirm eligibility" in reply.text.casefold()
+    assert "self-report" in reply.text.casefold()
     assert "staff" not in reply.text.casefold()
-    assert any(data == "path:explore" for _, data in reply.buttons)
+    assert any(
+        data == "sample-prerequisites:yes:data-analytics-diploma" for _, data in reply.buttons
+    )
     assert lead is not None
     assert lead["selected_course_id"] == "data-analytics-diploma"
-    assert lead["lifecycle_stage"] == "discovering"
+    assert lead["lifecycle_stage"] == "qualifying"
     assert lead["readiness_status"] == "considering"
     assert lead["eligible"] is None
     assert lead["handoff_status"] == "none"
@@ -2299,7 +2301,7 @@ def test_non_undergraduate_eligibility_limit_is_explained_once_per_chat(
     assert "no eligibility rules configured" not in second.text
     assert "Hospitality and Guest Services Diploma" in second.text
     assert "Sample prerequisites:" in second.text
-    assert any(data == "path:explore" for _, data in second.buttons)
+    assert any(data.startswith("sample-prerequisites:yes:") for _, data in second.buttons)
 
 
 @pytest.mark.parametrize(
@@ -2506,7 +2508,7 @@ def test_unknown_field_gets_agent_led_recovery_without_inventing_course(
     assert lead is not None and lead["handoff_status"] == "none"
 
 
-def test_non_undergraduate_selection_shows_facts_without_escalating(
+def test_non_undergraduate_selection_shows_facts_and_self_report_step(
     tmp_path: Path,
 ) -> None:
     repository = Repository(tmp_path / "demo.sqlite3")
@@ -2523,13 +2525,113 @@ def test_non_undergraduate_selection_shows_facts_without_escalating(
     lead = repository.get_lead(lead_id)
 
     assert "Completed Grade 10 or equivalent" in reply.text
-    assert "can't confirm eligibility" in reply.text.casefold()
+    assert "self-report" in reply.text.casefold()
     assert "staff" not in reply.text.casefold()
-    assert any(data == "path:explore" for _, data in reply.buttons)
+    assert any(data.startswith("sample-prerequisites:yes:") for _, data in reply.buttons)
     assert lead is not None
-    assert lead["state"] == "browsing"
+    assert lead["state"] == "awaiting_sample_prerequisites"
     assert lead["eligible"] is None
     assert lead["handoff_status"] == "none"
+
+
+@pytest.mark.asyncio
+async def test_non_undergraduate_course_uses_self_reported_sample_prerequisites(
+    tmp_path: Path,
+) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    prompt = service.select_course(lead_id, "hospitality-diploma")
+    lead = repository.get_lead(lead_id)
+    assert lead is not None and lead["eligible"] is None
+    assert any(data == "sample-prerequisites:yes:hospitality-diploma" for _, data in prompt.buttons)
+    assert "Do you meet" in prompt.text
+    assert "self-report" in prompt.text.casefold()
+
+    result = await service.free_text(lead_id, "yes", None)
+    qualified = repository.get_lead(lead_id)
+    assert "self-report" in result.text.casefold()
+    assert any(data == "payment:yes" for _, data in result.buttons)
+    assert qualified is not None and qualified["eligible"] == 1
+    assert qualified["lifecycle_stage"] == "admission_ready"
+
+
+def test_non_undergraduate_prerequisite_no_does_not_unlock_payment(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    service.select_course(lead_id, "digital-design-diploma")
+
+    result = service.answer_sample_prerequisites(lead_id, False)
+    lead = repository.get_lead(lead_id)
+
+    assert "won't continue" in result.text.casefold()
+    assert not any(data == "payment:yes" for _, data in result.buttons)
+    assert lead is not None and lead["eligible"] == 0
+    assert lead["lifecycle_stage"] != "admission_ready"
+
+
+@pytest.mark.parametrize(
+    "course_id",
+    ["business-analytics", "hospitality-diploma", "data-science-masters"],
+)
+def test_sample_prerequisite_self_report_is_available_across_levels(
+    tmp_path: Path, course_id: str
+) -> None:
+    repository = Repository(tmp_path / f"{course_id}.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+
+    prompt = service.select_course(lead_id, course_id)
+    affirmative = next(
+        data for _, data in prompt.buttons if data.startswith("sample-prerequisites:yes:")
+    )
+    result = service.answer_sample_prerequisites(
+        lead_id, True, affirmative.removeprefix("sample-prerequisites:yes:")
+    )
+
+    assert course_id in affirmative
+    assert any(data == "payment:yes" for _, data in result.buttons)
+    assert repository.get_lead(lead_id)["eligible"] == 1  # type: ignore[index]
+
+
+def test_stale_prerequisite_tap_cannot_qualify_a_different_course(tmp_path: Path) -> None:
+    repository = Repository(tmp_path / "demo.sqlite3")
+    repository.initialize()
+    repository.seed_catalog()
+    service = AdmissionsService(
+        repository,
+        repository.tenant_id,
+        RetrievalService(repository, VectorStore(repository), None, "fake", 0.72, 0.05),
+    )
+    lead_id, _ = service.start("123", "student")
+    service.select_course(lead_id, "hospitality-diploma")
+    service.select_course(lead_id, "digital-design-diploma")
+
+    result = service.answer_sample_prerequisites(lead_id, True, "hospitality-diploma")
+    lead = repository.get_lead(lead_id)
+
+    assert "out of date" in result.text
+    assert lead is not None and lead["eligible"] is None
 
 
 def test_language_switch_and_staff_handoff_are_persisted_truthfully(tmp_path: Path) -> None:

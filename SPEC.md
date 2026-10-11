@@ -22,9 +22,10 @@ admissions system and uses a clearly fictional institution and seeded data.
   state, catalog matching, course details, eligibility, fees, and payment actions. FAQ answers still
   come from seeded retrieval. Opt-out prevents external AI calls for typed content while preserving
   button-based exploration. No language ability, aptitude score, or personality label is inferred.
-- **Qualification:** Undergraduate sample rules are checked by Python. Other levels show their
-  recorded sample prerequisites and clearly say eligibility is not configured; they remain in
-  agent-led exploration without an automatic staff handoff. The app does not reuse a Grade 12 rule
+- **Qualification:** Undergraduate sample rules are checked by Python. For other levels, the learner
+  can self-report whether they meet the selected course's displayed fictional prerequisites. A
+  positive response unlocks only the demo fee step; it is not verified eligibility or an admission
+  decision. A negative/unsure response cannot reach payment. The app does not reuse a Grade 12 rule
   across every program.
 - **Memory:** SQLite persists lifecycle stage separately from the existing qualification state,
   qualitative readiness, discovery path/step, selected course, attributed facts, language choice,
@@ -40,17 +41,19 @@ admissions system and uses a clearly fictional institution and seeded data.
 - **Money boundary:** Application-fee answers come from structured course data; unknown tuition or
   hostel charges receive a safe, non-escalating response. Refunds or actual payment disputes remain
   staff matters. No model calculates or negotiates fees.
-  A code-eligible undergraduate user must explicitly choose to continue before receiving a Razorpay
-  test-mode Payment Link using the server-owned application fee; verified webhooks update payment
-  status and send one Telegram confirmation. No live follow-up contact or response time is
-  configured and course access is not provisioned automatically.
+  A code-eligible undergraduate user or a learner who self-reports meeting the sample prerequisites
+  for another level must explicitly choose to continue before receiving a Razorpay test-mode Payment
+  Link using the server-owned application fee; verified webhooks update payment status and send one
+  Telegram confirmation. Self-report is not verification or admission. No live follow-up contact or
+  response time is configured and course access is not provisioned automatically.
 
 ## Demo success criteria
 
 1. A Telegram user can pick an entry path and receive an explainable recommendation from complete,
    structured sample catalog facts, or browse without applying.
 2. Demo undergraduate eligibility is a deterministic result of stored rules and answers; other
-   sample education levels are not misclassified by a generic Grade 12 rule.
+   sample education levels use a clearly labeled, course-bound prerequisite self-report and are not
+   misclassified by a generic Grade 12 rule.
 3. The lead and messages remain after app restart and appear in the dashboard.
 4. A seeded FAQ question retrieves its source; unrelated/ambiguous questions do not fabricate an
    answer; fee questions bypass RAG.

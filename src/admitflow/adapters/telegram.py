@@ -206,10 +206,18 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply = admissions.browse(lead_id)
     elif data.startswith("course:"):
         reply = admissions.select_course(lead_id, data.removeprefix("course:"))
-    elif data == "grade12:yes":
-        reply = admissions.answer_grade12(lead_id, True)
-    elif data == "grade12:no":
-        reply = admissions.answer_grade12(lead_id, False)
+    elif data.startswith("grade12:yes:"):
+        reply = admissions.answer_grade12(lead_id, True, data.removeprefix("grade12:yes:"))
+    elif data.startswith("grade12:no:"):
+        reply = admissions.answer_grade12(lead_id, False, data.removeprefix("grade12:no:"))
+    elif data.startswith("sample-prerequisites:yes:"):
+        reply = admissions.answer_sample_prerequisites(
+            lead_id, True, data.removeprefix("sample-prerequisites:yes:")
+        )
+    elif data.startswith("sample-prerequisites:no:"):
+        reply = admissions.answer_sample_prerequisites(
+            lead_id, False, data.removeprefix("sample-prerequisites:no:")
+        )
     elif data == "payment:yes":
         lead = repository.get_lead(lead_id)
         if lead is None or lead["eligible"] != 1:

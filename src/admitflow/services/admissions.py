@@ -951,7 +951,7 @@ class AdmissionsService:
         action_label = (
             "Check sample eligibility"
             if course.education_level == "undergraduate" and course.minimum_marks_percent > 0
-            else "Explore this sample course"
+            else "Check sample prerequisites"
         )
         return Reply(
             details,
@@ -1149,6 +1149,7 @@ class AdmissionsService:
                 (("Learner wants to explore this", f"course:confirm:{course.id}"),),
             )
         self._clear_guidance_confirmation(lead_id)
+        self.repository.delete_fact(lead_id, "sample_prerequisites_self_reported")
         self.repository.save_fact(lead_id, "course_choice_student", course.id, "student")
         if course.education_level != "undergraduate" or course.minimum_marks_percent <= 0:
             eligibility_limit_explained = any(
@@ -1156,8 +1157,8 @@ class AdmissionsService:
             )
             self.repository.update_lead(
                 lead_id,
-                state="browsing",
-                lifecycle_stage="discovering",
+                state="awaiting_sample_prerequisites",
+                lifecycle_stage="qualifying",
                 readiness_status="considering",
                 selected_course_id=course.id,
                 completed_grade12=None,
@@ -1168,19 +1169,21 @@ class AdmissionsService:
                 self.repository.save_fact(lead_id, "eligibility_limit_explained", "true")
             limitation = (
                 "\n\nI can show these sample facts, but this demo has no eligibility rules "
-                "configured for this study level, so I can't confirm eligibility or admission. "
-                "Would you like to keep exploring or compare other courses?"
+                "configured for this study level. The next step is a self-report, not a verified "
+                "eligibility or admission decision."
                 if not eligibility_limit_explained
-                else "\n\nWould you like to explore another course or browse the sample catalog?"
+                else ""
             )
             return Reply(
                 f"{course.name} is a fictional {course.education_level.replace('_', ' ')} sample. "
                 f"Sample prerequisites: {'; '.join(course.prerequisites)}. "
                 f"Sample medium: {course.medium}. Sample language support: "
-                f"{', '.join(course.language_support) or 'not specified'}.{limitation}",
+                f"{', '.join(course.language_support) or 'not specified'}.{limitation}\n\n"
+                "Do you meet all the sample prerequisites listed above? This self-report is for "
+                "the fictional demo only and does not verify admission.",
                 (
-                    ("Explore another course", "path:explore"),
-                    ("Browse sample courses", "path:browse"),
+                    ("Yes, I meet them", f"sample-prerequisites:yes:{course.id}"),
+                    ("No / not sure", f"sample-prerequisites:no:{course.id}"),
                 ),
             )
         self.repository.update_lead(
@@ -1195,13 +1198,76 @@ class AdmissionsService:
         )
         return Reply(
             f"You selected {course.name}. Have you completed Grade 12?",
-            (("Yes", "grade12:yes"), ("No", "grade12:no")),
+            (("Yes", f"grade12:yes:{course.id}"), ("No", f"grade12:no:{course.id}")),
         )
 
-    def answer_grade12(self, lead_id: int, completed: bool) -> Reply:
+    def answer_sample_prerequisites(
+        self,
+        lead_id: int,
+        meets_prerequisites: bool,
+        expected_course_id: str | None = None,
+    ) -> Reply:
         lead = self.repository.get_lead(lead_id)
-        if lead is None or not lead["selected_course_id"]:
+        if lead is None or lead["state"] != "awaiting_sample_prerequisites":
+            return Reply("Please choose a course and review its sample prerequisites first.")
+        course_id = str(lead["selected_course_id"] or "")
+        if expected_course_id is not None and expected_course_id != course_id:
+            return Reply(
+                "That prerequisite check is out of date. Please review your current course."
+            )
+        course = self.repository.get_course(self.tenant_id, course_id)
+        if course is None:
+            return Reply("That sample course is no longer available. Please browse courses again.")
+        if meets_prerequisites:
+            self.repository.save_fact(
+                lead_id, "sample_prerequisites_self_reported", course.id, "student"
+            )
+            self.repository.update_lead(
+                lead_id,
+                state="qualified",
+                lifecycle_stage="admission_ready",
+                readiness_status="considering",
+                eligible=True,
+            )
+            return Reply(
+                f"I've recorded your self-report that you meet the sample prerequisites for "
+                f"{course.name}. This is not verified eligibility or an admission decision. "
+                f"Would you like to continue to the fictional application fee of "
+                f"{format_inr_from_paise(course.application_fee_paise)}?",
+                (("Continue to demo fee", "payment:yes"), ("Browse courses", "path:browse")),
+            )
+        self.repository.save_fact(
+            lead_id, "sample_prerequisites_self_reported", course.id, "student"
+        )
+        self.repository.update_lead(
+            lead_id,
+            state="not_eligible",
+            lifecycle_stage="qualifying",
+            readiness_status="exploring",
+            eligible=False,
+        )
+        return Reply(
+            "No problem. I won't continue this course to the demo fee step. You can explore "
+            "another course or browse the sample catalog.",
+            (("Explore another course", "path:explore"), ("Browse sample courses", "path:browse")),
+        )
+
+    def answer_grade12(
+        self, lead_id: int, completed: bool, expected_course_id: str | None = None
+    ) -> Reply:
+        lead = self.repository.get_lead(lead_id)
+        if lead is None or lead["state"] != "awaiting_grade12" or not lead["selected_course_id"]:
             return Reply("Please select a course first with /start.")
+        course_id = str(lead["selected_course_id"])
+        course = self.repository.get_course(self.tenant_id, course_id)
+        if (
+            course is None
+            or course.education_level != "undergraduate"
+            or course.minimum_marks_percent <= 0
+        ):
+            return Reply("That sample course does not use the Grade 12 check.")
+        if expected_course_id is not None and expected_course_id != course_id:
+            return Reply("That Grade 12 check is out of date. Please review your current course.")
         if not completed:
             self.repository.update_lead(
                 lead_id,
@@ -1228,10 +1294,19 @@ class AdmissionsService:
         if not 0 <= marks <= 100:
             return Reply("Please send a percentage from 0 to 100.")
         lead = self.repository.get_lead(lead_id)
-        if lead is None or not lead["selected_course_id"] or lead["completed_grade12"] is None:
+        if (
+            lead is None
+            or lead["state"] != "awaiting_marks"
+            or not lead["selected_course_id"]
+            or lead["completed_grade12"] is None
+        ):
             return Reply("Please select a course and answer the Grade 12 question first.")
         course = self.repository.get_course(self.tenant_id, str(lead["selected_course_id"]))
-        if course is None:
+        if (
+            course is None
+            or course.education_level != "undergraduate"
+            or course.minimum_marks_percent <= 0
+        ):
             return Reply("The selected demo course is no longer available. Please start again.")
         result = assess_eligibility(
             completed_grade12=bool(lead["completed_grade12"]),
@@ -1262,6 +1337,23 @@ class AdmissionsService:
         lead = self.repository.get_lead(lead_id)
         if _is_ai_opt_out(text):
             return self.set_ai_processing_enabled(lead_id, False)
+        if lead and lead["state"] == "awaiting_sample_prerequisites":
+            normalized = text.strip().casefold()
+            if normalized in {"yes", "yes i do", "i meet them", "i meet the prerequisites"}:
+                return self.answer_sample_prerequisites(lead_id, True)
+            if normalized in {"no", "not sure", "no i don't", "no i do not"}:
+                return self.answer_sample_prerequisites(lead_id, False)
+            return Reply(
+                "Please choose whether you meet all the sample prerequisites. This is only a "
+                "self-report for the fictional demo.",
+                (
+                    (
+                        "Yes, I meet them",
+                        f"sample-prerequisites:yes:{lead['selected_course_id']}",
+                    ),
+                    ("No / not sure", f"sample-prerequisites:no:{lead['selected_course_id']}"),
+                ),
+            )
         if lead and lead["state"] == "awaiting_marks":
             return self.answer_marks(lead_id, text)
         if _is_deletion_request(text):

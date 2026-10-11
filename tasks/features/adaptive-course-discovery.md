@@ -51,8 +51,8 @@ aptitude test, personality assessment, or promise of a career outcome.
   student/parent fact attribution, staff handoffs/dashboard visibility, per-lead deletion, and an
   explicit pre-payment continuation tap.
 - Not complete: translated discovery and qualification copy (the language preference is saved and
-  can be switched, but most replies remain English); exact course-specific eligibility for every
-  non-undergraduate offering (those currently go to staff); and automatic admissions-cycle expiry.
+  can be switched, but most replies remain English); authoritative verification of any fictional
+  self-reported prerequisite; and automatic admissions-cycle expiry.
 - Production gates still open: exact retention interval, privacy/legal review, and fluent-speaker
   review of all localized copy. Do not imply any of these are finished in the demo.
 
@@ -67,8 +67,10 @@ aptitude test, personality assessment, or promise of a career outcome.
 - [ ] Supported education levels and student/parent speaker roles are persisted distinctly.
 - [ ] A recommendation contains only catalog course IDs and verified attributes; missing facts are
   described as unknown. It explains why options appeared and includes meaningful differences.
-- [ ] Eligibility is evaluated only by course-specific deterministic rules. Changing a course clears
-  answers that no longer apply, but preserves unrelated student-stated interests.
+- [ ] Undergraduate eligibility is evaluated by course-specific deterministic rules. For other
+  levels, the bot clearly labels the learner's prerequisite answer as self-reported and demo-only;
+  it does not call that verification or admission. Changing a course clears answers that no longer
+  apply, but preserves unrelated student-stated interests.
 - [ ] An unsupported interest, missing catalog details, or no plausible match never causes the bot
   to invent an offering or requirement; it creates a staff handoff and truthfully explains that no
   live contact or response time is configured.
@@ -81,7 +83,8 @@ aptitude test, personality assessment, or promise of a career outcome.
 - [ ] Dashboard staff can see lifecycle stage, discovery facts with attribution, the full conversation,
   and pending handoffs. Staff-mediated deletion and admissions-cycle expiration remove the intended
   records without deleting catalog content.
-- [ ] Payment creation remains impossible before code-confirmed eligibility and an explicit choice to
+- [ ] Payment creation remains impossible before the applicable sample gate (code-checked
+  undergraduate rules or positive self-report for another course) and an explicit choice to
   proceed; amounts remain server-owned.
 
 ## Dependencies and decisions

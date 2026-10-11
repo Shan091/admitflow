@@ -51,16 +51,18 @@
   or leave language open; for format, choose in-person/online/hybrid or leave it open. Then inspect
   the bounded catalog recommendation; tap a match to inspect its sample prerequisites, listed
   supports/formats, and fee, then return to compare or explicitly check sample eligibility when
-  that level has configured rules. For other levels, it explains that eligibility is unknown and
-  offers exploration or browsing without automatically creating a staff handoff. If a message is
-  unrelated or contains no usable preference, AdmitFlow explains its scope,
+  that level has configured rules. For other levels, inspect the displayed fictional prerequisites
+  and choose whether you meet them; clearly label this as an unverified self-report, not admission.
+  A positive response offers the existing explicit demo fee action, while no/unsure cannot proceed.
+  If a message is unrelated or contains no usable preference, AdmitFlow explains its scope,
   keeps the pending guidance state, and offers a relevant way forward instead of repeating the
   same question. The learner may pause and `/resume`. Supported sample undergraduate options
   continue to code-based
-  qualification and require an explicit tap before a test payment link. Other course levels show
-  seeded sample facts while the agent continues exploration; no eligibility decision or automatic
-  staff escalation is made. Routine missing facts, retrieval abstentions, and no-match preferences
-  receive useful agent-led recovery. Handoff is reserved for explicit human requests and
+  qualification and require an explicit tap before a test payment link. Other course levels use an
+  explicit, course-bound self-report of the displayed sample prerequisites to reach that fee step;
+  no independent verification or admission decision is claimed. Routine missing facts, retrieval
+  abstentions, and no-match preferences receive useful agent-led recovery. Handoff is reserved for
+  explicit human requests and
   staff-authority/critical cases. Staff can inspect attributed facts and pending
   handoffs, delete one lead's local data, or reset all local demo data.
   See `README.md` for the full setup. The notification is fake-bot tested; the existing live test
@@ -110,9 +112,9 @@
   Malayalam, and Hinglish plus known-course, out-of-catalog, and injection cases used 12,308 input
   and 992 output tokens; see `AI_USAGE.md`. No applicant text was used.
 - **Known limitations:** Single fictional tenant, seeded FAQ corpus, one environment-configured
-  staff account, incomplete localized response copy, incomplete eligibility rules for non-UG
-  offerings, no automatic retention expiry, uploads, production hosting, refunds, or production
-  privacy controls. Payment
+  staff account, incomplete localized response copy, self-reported and unverified prerequisites for
+  non-undergraduate offerings, no automatic retention expiry, uploads, production hosting, refunds,
+  or production privacy controls. Payment
   links work only with Razorpay test keys and payment status requires a reachable webhook. Demo chat
   identifiers and messages are stored locally; use fictional test inputs only. Payment confirmation
   delivery is best-effort, no real staff follow-up contact or response time is configured, and

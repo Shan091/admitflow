@@ -9,8 +9,10 @@ Record consequential choices here. Each entry is short; update it when evidence 
    demo tenant; no Redis, TaskIQ, Postgres, or separate frontend in this scope.
 3. **Architecture — domain/services/adapters.** Keep one real adapter per boundary; introduce a
    small Protocol only where injection or a test double needs it. No speculative ports framework.
-4. **Eligibility and fees — code-owned.** Structured seed data and Python rules determine
-   eligibility and prices; model output cannot change either.
+4. **Eligibility and fees — code-owned gates, honestly labeled.** Structured seed data and Python
+   rules determine undergraduate sample eligibility and all prices; model output cannot change
+   either. For other complete fictional courses, a learner self-report against displayed seeded
+   prerequisites is only an unverified demo payment gate, never a verified eligibility decision.
 5. **Knowledge retrieval — OpenAI embeddings + SQLite vectors + NumPy cosine.** Embed each seeded
    FAQ's canonical question plus a few curated search phrasings with `text-embedding-3-small`;
    keep the answer as a separate stored value. Version the cached-vector key when this text profile
@@ -60,9 +62,10 @@ Record consequential choices here. Each entry is short; update it when evidence 
     review remain open release gates.
 15. **Level-aware discovery and application boundary.** Rank at most three complete fictional
     catalog entries from explicit field, optional study-level, and optional activity choices. Use no
-    aptitude score. Existing undergraduate sample rules remain deterministic. For other levels,
-    show only recorded sample prerequisites and keep exploring; do not claim eligibility and do not
-    automatically hand off to staff.
+    aptitude score. Existing undergraduate sample rules remain deterministic. For other levels, show
+    recorded sample prerequisites and ask for a clearly labeled self-report; do not reuse Grade 12
+    rules or imply independent verification/admission. A positive response may unlock only the
+    explicit demo application-fee step.
 16. **Explicit fee continuation and honest payment follow-up.** Eligibility alone does not create a
     Razorpay link; the student must tap the demo fee continuation action. Payment confirmation says
     the dashboard shows paid status, while disclosing that live contact, response time, and course
@@ -125,9 +128,10 @@ Record consequential choices here. Each entry is short; update it when evidence 
 
 25. **Recommendation exploration does not imply course commitment.** Guided match cards open
     verified fictional course details; the learner can return to the same current match list or
-    explicitly continue to the existing code-owned eligibility/staff path. Only that explicit
-    continuation sets the selected course. Known-course selection stays direct. Stale detail/list
-    callbacks must revalidate the current confirmed learner facts and ranked matches.
+    explicitly continue to the applicable sample gate (undergraduate code checks or the other-level
+    prerequisite self-report). Only that explicit continuation sets the selected course. Known-
+    course selection stays direct. Stale detail/list callbacks must revalidate current confirmed
+    learner facts and ranked matches.
 
 26. **Non-informative turns are interruptions, not answers to the pending prompt.** If text adds
     no explicit preference, correction, or uncertainty and is not a routed FAQ/course/staff action,
@@ -149,6 +153,14 @@ Record consequential choices here. Each entry is short; update it when evidence 
     Create staff handoffs only when the learner explicitly asks for a person or when a staff-only or
     critical real-world action requires it, such as deletion or a payment dispute. This updates the
     earlier default to refer unsupported or sensitive needs to staff.
+
+29. **Every complete fictional course may reach demo payment through its honest sample gate.**
+    Undergraduate offerings keep their code-checked Grade 12/marks rules. Other complete offerings
+    ask whether the learner meets that course's displayed fictional prerequisites. Record the
+    student's self-report with course attribution; a positive response can proceed to the existing
+    explicit, server-priced Razorpay test-fee action, while a negative/unsure response cannot. Never
+    present a self-report as verified eligibility, admission, or enrollment. Stale prerequisite
+    buttons must not qualify a different selected course.
 
 ## References
 

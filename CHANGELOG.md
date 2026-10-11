@@ -598,3 +598,13 @@
 - Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 182 tests;
   `git diff --check` passed.
 - Delivered in commit `efe798ed0552945089fb526f0404cdee0a4484a8`, pushed to `origin/main`.
+
+# 2026-10-11 — allow other fictional courses to reach the demo fee step
+
+- Undergraduate courses keep their code-checked Grade 12 and marks rules. Other complete fictional
+  courses now ask the learner to self-report the displayed course prerequisites. Only a positive
+  response opens the existing explicit Razorpay test-fee action; a negative/unsure response does not.
+- The bot states this is unverified and not an admission decision. Prerequisite taps are bound to the
+  course shown; the dashboard distinguishes this self-report from code-checked sample rules.
+- Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests, including
+  a fake Telegram-to-payment-link flow. `git diff --check` passed; no live Razorpay call was made.

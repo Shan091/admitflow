@@ -72,4 +72,11 @@ class QualificationResult:
     reason: str
 
 
-LeadStatus = Literal["browsing", "awaiting_grade12", "awaiting_marks", "qualified", "not_eligible"]
+LeadStatus = Literal[
+    "browsing",
+    "awaiting_grade12",
+    "awaiting_marks",
+    "awaiting_sample_prerequisites",
+    "qualified",
+    "not_eligible",
+]

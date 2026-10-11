@@ -1,5 +1,20 @@
 # AI usage
 
+## 2026-10-11 — unlock the demo fee step for other catalog levels
+
+- **Task:** The user reported that recommended diploma courses could not reach payment.
+- **Assistance:** Codex traced the payment guard to undergraduate-only qualification and added a
+  course-bound, self-reported prerequisite step for the other complete fictional courses. The flow
+  discloses that this is not verified eligibility or admission; only a positive report reveals the
+  existing explicit fee action. Negative/unsure responses do not. Undergraduate Grade 12/marks
+  checks and server-owned fees remain unchanged. Staff dashboard wording now distinguishes an
+  unverified self-report from code-checked sample rules.
+- **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests, including
+  a fake Telegram-to-payment-link flow; `git diff --check` passed. No live Razorpay call was made.
+- **Human review:** User's screenshot showed a diploma stopped before the fee step. The live Telegram
+  bot has not yet been redeployed or rehearsed with this change.
+- **Delivery:** Commit details will be recorded in the submission and task checklist after commit.
+
 ## 2026-10-11 — avoid repeating course eligibility limitation
 
 - **Task:** The learner screenshot showed the same non-undergraduate eligibility disclaimer after

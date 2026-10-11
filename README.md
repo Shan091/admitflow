@@ -30,7 +30,7 @@ leads and handoffs.
 | --- | --- |
 | AI-led free-text discovery with recent chat context; button browsing remains available | Authenticated dashboard for leads, attributed facts, and handoffs |
 | Get up to three catalog-grounded course matches | SQLite persistence for conversations and demo records |
-| Inspect sample requirements, study options, support, and fees before continuing | Code-owned undergraduate sample eligibility and fee values |
+| Inspect sample requirements, study options, support, and fees before continuing | Code-owned undergraduate gate; self-reported prerequisite gate for other fictional courses |
 | Ask seeded FAQs; uncertain or unavailable retrieval abstains | OpenAI embeddings with local SQLite storage and NumPy cosine search |
 | Optionally continue to a Razorpay **test-mode** application-fee link | Payment status changes only after a verified Razorpay webhook |
 
@@ -42,8 +42,9 @@ flowchart LR
     D --> R[Catalog-grounded matches]
     R --> I[Inspect and compare]
     I -->|undergraduate| E[Code-checked sample eligibility]
-    I -->|other levels or unknown facts| A[Agent-led safe recovery]
+    I -->|other levels| E2[Self-report listed sample prerequisites]
     E -->|eligible and requests fee| P[Razorpay test payment]
+    E2 -->|self-reports yes and requests fee| P
     P -->|verified webhook| C[Payment status and confirmation]
     S --> F[Seeded FAQ]
     F -->|uncertain| A[Agent-led safe recovery]
@@ -189,8 +190,9 @@ and reports token usage. API usage is billable; applicant messages are never rea
 4. Try a seeded FAQ; uncertain or unavailable retrieval should produce an abstention.
 5. Sign into the staff dashboard to review the lead and any handoff. Staff can delete one lead or
    reset all local demo records; fictional courses and FAQs remain seeded.
-6. With Razorpay test credentials configured, complete the sample eligibility path, request the
-   demo fee link, and deliver the signed test webhook.
+6. With Razorpay test credentials configured, complete the undergraduate code-checked path or
+   self-report the displayed sample prerequisites for another fictional level. Then request the
+   demo fee link and deliver the signed test webhook.
 
 No live staff contact, response time, or automatic course access is configured. Payment
 confirmation means the demo dashboard records a verified paid status; it is not enrollment.
@@ -198,8 +200,9 @@ confirmation means the demo dashboard records a verified paid status; it is not 
 ## Scope and limitations
 
 - Fictional single-institution catalog and seeded FAQs; no general document ingestion.
-- Sample undergraduate eligibility is code-checked. Other education levels go to staff for
-  eligibility confirmation until verified course-specific rules exist.
+- Sample undergraduate eligibility is code-checked. For other levels, the learner may self-report
+  the displayed fictional prerequisites to reach the test-fee step. This is not verified eligibility
+  or admission; a learner who says no or is unsure cannot proceed to payment.
 - English, Malayalam, Hindi, and Hinglish can be selected, but most bot copy is still English;
   translations need fluent-speaker review.
 - One environment-configured staff account; no staff roles or production identity provider.

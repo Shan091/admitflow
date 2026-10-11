@@ -587,6 +587,51 @@ async def test_qualification_sends_test_payment_link_when_enabled(tmp_path: Path
     assert "https://rzp.io/i/test123" in stored_messages[-1]["body"]
 
 
+@pytest.mark.asyncio
+async def test_diploma_self_report_can_reach_the_test_payment_link(tmp_path: Path) -> None:
+    repository, admissions, context = make_runtime(tmp_path)
+    lead_id, _ = admissions.start("42", "sample")
+
+    class FakePayments:
+        async def create_for_qualified_lead(self, requested_lead_id: int) -> tuple[str, int]:
+            assert requested_lead_id == lead_id
+            return "https://rzp.io/i/diploma-test", 35000
+
+    context.application.bot_data["payment_service"] = FakePayments()
+
+    async def tap(data: str) -> FakeMessage:
+        message = FakeMessage()
+        update = SimpleNamespace(
+            callback_query=SimpleNamespace(answer=_no_op, data=data),
+            effective_user=SimpleNamespace(id=42, username="sample"),
+            effective_message=message,
+            update_id=104,
+        )
+        await callback_handler(update, context)
+        return message
+
+    course_prompt = await tap("course:hospitality-diploma")
+    assert "sample-prerequisites:yes:hospitality-diploma" in _callback_data(course_prompt)
+
+    confirmation = await tap("sample-prerequisites:yes:hospitality-diploma")
+    assert "payment:yes" in _callback_data(confirmation)
+    assert "self-report" in confirmation.sent[0][0].casefold()
+
+    payment = await tap("payment:yes")
+    assert "https://rzp.io/i/diploma-test" in payment.sent[0][0]
+    assert "₹350" in payment.sent[0][0]
+
+
+async def _no_op() -> None:
+    return None
+
+
+def _callback_data(message: FakeMessage) -> set[str]:
+    markup = message.sent[-1][1]
+    assert markup is not None
+    return {button.callback_data for row in markup.inline_keyboard for button in row}
+
+
 @pytest.mark.parametrize(
     ("payment_status", "expected_text"),
     [
