@@ -597,3 +597,4 @@
 - Added regression coverage for selecting multiple non-undergraduate courses in one conversation.
 - Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 182 tests;
   `git diff --check` passed.
+- Delivered in commit `efe798ed0552945089fb526f0404cdee0a4484a8`, pushed to `origin/main`.

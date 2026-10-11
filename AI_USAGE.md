@@ -12,7 +12,7 @@
   passed.
 - **Human review:** User shared the screenshot showing the repeated disclaimer. No live Telegram or
   paid API calls were used.
-- **Delivery:** Commit and push details will be recorded in the task checklist after delivery.
+- **Delivery:** Commit `efe798ed0552945089fb526f0404cdee0a4484a8` was pushed to `origin/main`.
 
 ## 2026-10-11 — keep routine course guidance with the agent
 

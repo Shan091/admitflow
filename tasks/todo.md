@@ -3,14 +3,15 @@
 Update this checklist at the start of each work slice. A checkbox is complete only after its
 acceptance criteria pass and the corresponding milestone is committed.
 
-## Avoid repeating unsupported-level disclaimer (in progress)
+## Avoid repeating unsupported-level disclaimer (complete)
 
-- [ ] Tell the learner once per chat that eligibility checks are not configured for the selected
+- [x] Tell the learner once per chat that eligibility checks are not configured for the selected
   non-undergraduate level; subsequent course comparisons should show course facts and next actions
   without repeating the same limitation paragraph.
-- [ ] Add a regression test for selecting two unsupported-level courses in one conversation.
-- [ ] Run `bash scripts/verify.sh` and `git diff --check`, review changes/secrets, then commit and
-  push the verified milestone. Full verification passed (182 tests).
+- [x] Add a regression test for selecting two unsupported-level courses in one conversation.
+- [x] Run `bash scripts/verify.sh` and `git diff --check`, review changes/secrets, then commit and
+  push the verified milestone. Full verification passed (182 tests); implementation commit
+  `efe798ed0552945089fb526f0404cdee0a4484a8` is pushed to `origin/main`.
 
 ## Agent-led recovery and escalation boundary (complete)
 
