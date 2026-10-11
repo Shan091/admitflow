@@ -3,13 +3,16 @@
 Update this checklist at the start of each work slice. A checkbox is complete only after its
 acceptance criteria pass and the corresponding milestone is committed.
 
-## Display all seeded thresholds before self-report (in progress)
+## Display all seeded thresholds before self-report (complete)
 
-- [ ] Include each course's seeded minimum-mark threshold in its sample prerequisite summary unless
+- [x] Include each course's seeded minimum-mark threshold in its sample prerequisite summary unless
   that threshold is already stated there; use the same summary in course details and the gate prompt.
-- [ ] Add regression coverage for a vocational course with a 45% threshold and a postgraduate
+- [x] Add regression coverage for a vocational course with a 45% threshold and a postgraduate
   course with a 50% threshold; run full verification and `git diff --check`.
-- [ ] Commit and push the verified correction, then record the exact SHA and results here.
+- [x] Commit and push the verified correction, then record the exact SHA and results here. Full
+  verification passed: Ruff lint/format, strict mypy, 189 tests; targeted prerequisite tests passed
+  (4 cases); `git diff --check` passed. Commit `d1fad4115b60d0d9864ca6355d601a3782a133d0` is
+  pushed to `origin/main`.
 
 ## Let all complete fictional courses reach the demo fee step (complete)
 

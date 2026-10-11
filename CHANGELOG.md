@@ -616,3 +616,4 @@
   gate. It adds the seeded minimum-mark threshold when the course's prerequisite text omits it.
 - Validation: `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests; targeted
   prerequisite tests passed (4 cases); `git diff --check` passed. No live payment call was made.
+- Delivered in commit `d1fad4115b60d0d9864ca6355d601a3782a133d0`, pushed to `origin/main`.

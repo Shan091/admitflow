@@ -10,7 +10,7 @@
   courses, not an admissions decision.
 - **Checks:** `bash scripts/verify.sh` passed Ruff lint/format, strict mypy, and 189 tests;
   `git diff --check` passed. Targeted self-report tests passed (4 cases). No live payment call.
-- **Delivery:** Commit details will be added to the task checklist after commit.
+- **Delivery:** Commit `d1fad4115b60d0d9864ca6355d601a3782a133d0` was pushed to `origin/main`.
 
 ## 2026-10-11 — unlock the demo fee step for other catalog levels
 
