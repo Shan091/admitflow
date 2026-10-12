@@ -12,17 +12,6 @@
 
 ---
 
-> [!IMPORTANT]
-> Course details, entry requirements, and fees are illustrative; AdmitFlow does
-> not submit an application or make admission decisions. Payments use test mode. Use demo inputs
-> only: Telegram identifiers and messages are stored locally. While AI processing is enabled,
-> typed text and up to eight recent chat messages plus saved course preferences may be sent to
-> OpenAI. Telegram IDs and usernames are excluded from model context. The bot explains this at
-> `/start`; users can switch AI processing off and continue with buttons. If Langfuse is enabled,
-> inbound/reply text, Telegram user/chat IDs, and saved learner facts are also sent to Langfuse for
-> debugging, as disclosed at `/start`. Deleting local records does not delete their Langfuse copies;
-> remove those traces separately in the Langfuse project.
-
 ## What it does
 
 AdmitFlow helps prospective learners explore courses from a seeded Kerala course catalog.
