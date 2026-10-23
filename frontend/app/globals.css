@@ -1078,6 +1078,64 @@ td:first-child {
   margin-bottom: 28px;
   flex-wrap: wrap;
 }
+.inquiry-search {
+  margin-bottom: 24px;
+}
+.inquiry-search > label {
+  font-weight: 600;
+}
+.inquiry-search p,
+.export-form > p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 65ch;
+}
+.inquiry-search > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.inquiry-search input {
+  flex: 1 1 220px;
+  min-width: 0;
+  max-width: 420px;
+}
+.inquiry-search input,
+.export-form input {
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  max-width: 100%;
+}
+.export-form .notice {
+  margin-top: 18px;
+}
+.export-form {
+  max-width: 650px;
+}
+.export-form label {
+  display: grid;
+  gap: 8px;
+  margin-block: 22px;
+  max-width: 360px;
+}
+.export-form select {
+  font: inherit;
+  padding: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  max-width: 100%;
+}
+.inquiry-row strong {
+  overflow-wrap: anywhere;
+}
 .inquiry-filters label {
   display: grid;
   gap: 6px;

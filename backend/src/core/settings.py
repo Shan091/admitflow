@@ -71,6 +71,7 @@ class Settings(BaseSettings):
 
     # Institution knowledge workspace and processing limits.
     staff_session_hours: int = Field(default=8, ge=1, le=24)
+    staff_export_max_rows: int = Field(default=10000, ge=1, le=100000)
     staff_allowed_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     upload_max_bytes: int = Field(default=10 * 1024 * 1024, ge=1024)
     upload_batch_max_bytes: int = Field(default=30 * 1024 * 1024, ge=1024)

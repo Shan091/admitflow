@@ -18,10 +18,13 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    event,
+    inspect,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.engine import Connection
+from sqlalchemy.orm import Mapped, Mapper, mapped_column, relationship
 
 from src.db.base import Base, IdMixin, TenantMixin, TimestampMixin
 from src.db.enums import LeadStatus, MessageDirection
@@ -47,6 +50,7 @@ class Lead(IdMixin, TenantMixin, TimestampMixin, Base):
             "(phone_hash IS NULL) = (phone_enc IS NULL)",
             name="phone_contact_pair",
         ),
+        Index("ix_leads_name_search", "name_search_tokens", postgresql_using="gin"),
         Index(
             "ix_leads_followup_due",
             "followup_due_at",
@@ -57,6 +61,9 @@ class Lead(IdMixin, TenantMixin, TimestampMixin, Base):
     phone_hash: Mapped[str | None] = mapped_column(String(64), index=True)
     phone_enc: Mapped[str | None] = mapped_column(Text)
     name_enc: Mapped[str | None] = mapped_column(Text)
+    name_search_tokens: Mapped[list[str]] = mapped_column(
+        ARRAY(String(64)), nullable=False, default=list, server_default="{}"
+    )
     status: Mapped[LeadStatus] = mapped_column(
         Enum(LeadStatus, native_enum=False, length=32),
         nullable=False,
@@ -86,6 +93,20 @@ class Lead(IdMixin, TenantMixin, TimestampMixin, Base):
     messages: Mapped[list[Message]] = relationship(
         back_populates="lead", cascade="all, delete-orphan"
     )
+
+
+@event.listens_for(Lead, "before_insert")
+@event.listens_for(Lead, "before_update")
+def index_known_name(_mapper: Mapper[Lead], _connection: Connection, lead: Lead) -> None:
+    """Keep index updates atomic with encrypted names, including name removal."""
+    state = inspect(lead)
+    if state.pending or state.attrs.name_enc.history.has_changes():
+        from src.core.name_search import name_tokens
+        from src.core.security import decrypt_pii
+
+        lead.name_search_tokens = (
+            name_tokens(lead.tenant_id, decrypt_pii(lead.name_enc)) if lead.name_enc else []
+        )
 
 
 class LeadFact(IdMixin, TenantMixin, TimestampMixin, Base):

@@ -62,6 +62,7 @@ def create_app() -> FastAPI:
     from src.staff.applications import router as applications_router
     from src.staff.auth import router as staff_router
     from src.staff.copilot import router as copilot_router
+    from src.staff.exports import router as exports_router
     from src.staff.leads import router as leads_router
     from src.staff.management import router as management_router
     from src.staff.operations import router as staff_operations_router
@@ -70,6 +71,7 @@ def create_app() -> FastAPI:
     application.add_middleware(UploadBodyLimit)
     application.include_router(staff_router)
     application.include_router(analytics_router)
+    application.include_router(exports_router)
     application.include_router(leads_router)
     application.include_router(management_router)
     application.include_router(applications_router)

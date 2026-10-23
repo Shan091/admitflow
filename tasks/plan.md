@@ -214,6 +214,8 @@ CRM, exports/integrations and the remaining institutional product milestones.
 - [x] Task 22: daily send budgets, durable deferral, warning/settings UI and Redis concurrency evidence.
 - [x] Task 21: explicit follow-up consent, bounded outreach and scheduled recovery; published through PR #5 with green CI.
 - [x] Task 26: truthful cohort analytics, transactional stage history, accessible charts and default Overview; database/browser checks pass.
+- [x] Task 27: tenant-scoped CRM, all lifecycle filters and private known-name/phone search; database and browser checks pass.
+- [x] Task 32 exports: audited CSV/Excel downloads for inquiries, applications and payments; webhook configuration/delivery remains open.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |

@@ -2,10 +2,15 @@
 import StaffControls from "./staff-controls";
 import type { StaffDraft } from "./staff-controls";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Request = (path: string, init?: RequestInit) => Promise<unknown>;
-type Inquiry = { id: string; status: string; course: string | null };
+type Inquiry = {
+  id: string;
+  name?: string | null;
+  status: string;
+  course: string | null;
+};
 type RuleEvidence = {
   field: string;
   operator: string;
@@ -19,7 +24,25 @@ const labels: Record<string, string> = {
   qualifying: "Collecting eligibility details",
   admission_ready: "Eligibility criteria met",
   handed_off: "Staff review requested",
+  form_collecting: "Application in progress",
+  payment_pending: "Fee pending",
+  under_review: "Application under review",
+  enrolled: "Enrolled",
+  rejected: "Rejected",
+  waitlisted: "Waitlisted",
+  cold: "Inactive",
 };
+function statusTone(status: string) {
+  if (["admission_ready", "enrolled"].includes(status)) return "ready";
+  if (status === "rejected") return "failed";
+  if (
+    ["handed_off", "under_review", "payment_pending", "waitlisted"].includes(
+      status,
+    )
+  )
+    return "processing";
+  return "queued";
+}
 function statusLabel(status: string) {
   return labels[status] || status.replaceAll("_", " ");
 }
@@ -70,6 +93,9 @@ export default function Admissions({
   const [courses, setCourses] = useState<{ id: string; name: string }[]>([]);
   const [status, setStatus] = useState("");
   const [course, setCourse] = useState("");
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
+  const refreshVersion = useRef(0);
   const [offset, setOffset] = useState(0);
   const [selected, setSelected] = useState<string | null>(initialLead);
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -81,34 +107,53 @@ export default function Admissions({
   const [olderLoaded, setOlderLoaded] = useState(false);
 
   const refresh = useCallback(async () => {
+    const version = ++refreshVersion.current;
     try {
       const params = new URLSearchParams({ offset: String(offset) });
       if (status) params.set("status", status);
       if (course) params.set("course_id", course);
       const [inquiries, humans, catalog] = await Promise.all([
-        request(`/staff/leads?${params}`),
+        query
+          ? request("/staff/leads/search", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                query,
+                status: status || null,
+                course_id: course || null,
+                offset,
+              }),
+            })
+          : request(`/staff/leads?${params}`),
         request(`/staff/human-requests?offset=${offset}`),
         request("/staff/courses"),
       ]);
+      if (version !== refreshVersion.current) return;
       setRows(inquiries as Inquiry[]);
       setRequests(humans as Human[]);
       setCourses(catalog as { id: string; name: string }[]);
-      if (selected && !olderLoaded)
-        setDetail((await request(`/staff/leads/${selected}`)) as Detail);
+      if (selected && !olderLoaded) {
+        const latest = (await request(`/staff/leads/${selected}`)) as Detail;
+        if (version !== refreshVersion.current) return;
+        setDetail(latest);
+      }
       setError("");
     } catch (error) {
-      setError(onError(error));
+      if (version === refreshVersion.current) setError(onError(error));
     } finally {
-      setLoading(false);
+      if (version === refreshVersion.current) setLoading(false);
     }
-  }, [offset, status, course, selected, olderLoaded, request, onError]);
+  }, [offset, status, course, query, selected, olderLoaded, request, onError]);
 
   useEffect(() => {
     void refresh();
     const timer = setInterval(() => {
       if (document.visibilityState === "visible") void refresh();
     }, 8000);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      refreshVersion.current++;
+    };
   }, [refresh]);
 
   async function select(id: string) {
@@ -197,6 +242,52 @@ export default function Admissions({
         </p>
       )}
       {view === "leads" && (
+        <form
+          className="inquiry-search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setOffset(0);
+            setLoading(true);
+            setQuery(search.trim());
+            if (query === search.trim()) void refresh();
+          }}
+        >
+          <label htmlFor="inquiry-search">Find an inquiry</label>
+          <p id="inquiry-search-help">
+            Use a known name prefix (at least two characters per word) or a full
+            phone with country code. Telegram does not share phone numbers
+            automatically.
+          </p>
+          <div>
+            <input
+              id="inquiry-search"
+              aria-describedby="inquiry-search-help"
+              value={search}
+              maxLength={200}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Name or +91…"
+              type="search"
+            />
+            <button className="primary" type="submit">
+              Search
+            </button>
+            {(search || query) && (
+              <button
+                className="text-button"
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setQuery("");
+                  setOffset(0);
+                }}
+              >
+                Clear search
+              </button>
+            )}
+          </div>
+        </form>
+      )}
+      {view === "leads" && (
         <div className="inquiry-filters">
           <label>
             Status
@@ -208,13 +299,7 @@ export default function Admissions({
               }}
             >
               <option value="">All statuses</option>
-              {[
-                "new",
-                "discovering",
-                "qualifying",
-                "admission_ready",
-                "handed_off",
-              ].map((value) => (
+              {Object.keys(labels).map((value) => (
                 <option key={value} value={value}>
                   {statusLabel(value)}
                 </option>
@@ -265,9 +350,11 @@ export default function Admissions({
                 key={row.id}
                 onClick={() => void select(row.id)}
               >
-                <strong>Inquiry {row.id.slice(0, 8)}</strong>
+                <strong>{row.name || `Inquiry ${row.id.slice(0, 8)}`}</strong>
                 <span>{row.course || "Course not selected"}</span>
-                <span className="status queued">{statusLabel(row.status)}</span>
+                <span className={`status ${statusTone(row.status)}`}>
+                  {statusLabel(row.status)}
+                </span>
               </button>
             ))
           ) : (

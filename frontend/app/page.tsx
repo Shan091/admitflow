@@ -8,6 +8,7 @@ import Applications from "./applications";
 import Payments from "./payments";
 import DeliveryBudget from "./delivery-budget";
 import Analytics from "./analytics";
+import Exports from "./exports";
 
 type Staff = { email: string; role: string; institution: string };
 type Doc = {
@@ -109,6 +110,7 @@ export default function Knowledge() {
     | "management"
     | "applications"
     | "payments"
+    | "exports"
   >("overview");
   const [staff, setStaff] = useState<Staff | null>(null);
   const [inquiryFocus, setInquiryFocus] = useState<string | null>(null);
@@ -407,6 +409,9 @@ export default function Knowledge() {
               ["management", "Institution management"],
               ["applications", "Applications"],
               ["payments", "Payments"],
+              ...(staff.role === "admin"
+                ? ([["exports", "Data exports"]] as const)
+                : []),
             ] as const
           ).map(([key, label]) => (
             <button
@@ -454,7 +459,9 @@ export default function Knowledge() {
                       ? "Applications"
                       : view === "payments"
                         ? "Payments"
-                        : "Staff requests"}
+                        : view === "exports"
+                          ? "Data exports"
+                          : "Staff requests"}
           </span>
           <span className="role">
             {staff.role === "admin" ? "Administrator" : "Staff member"}
@@ -490,6 +497,8 @@ export default function Knowledge() {
                 setView("leads");
               }}
             />
+          ) : view === "exports" ? (
+            <Exports onError={sessionFailure} />
           ) : view !== "knowledge" ? (
             <Admissions
               key={view}

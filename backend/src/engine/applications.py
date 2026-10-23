@@ -150,6 +150,7 @@ async def application_action(
     if course is None:
         return Reply(text="This course is unavailable. Request staff review.")
     values = draft["values"]
+    lead.name_enc = encrypt_pii(values["full_name"])
     application = Application(
         tenant_id=lead.tenant_id,
         lead_id=lead.id,

@@ -327,3 +327,32 @@ change timestamps. No raw contact, fact, form or message data is returned in ana
 The chart also has an exact-count table and accessible lifecycle table. The interface
 shows rates with their denominators, date/timezone coverage, error/retry and empty states.
 It does not claim current-state distribution is complete historical conversion evidence.
+# CRM search and institution downloads
+
+After `uv run alembic upgrade head`, run `uv run python -m src.scripts.reindex_names`
+to populate known names from the latest historical application and rebuild lookup tokens.
+The command commits batches of 200 inquiries, is rerunnable, and prints counts only.
+Run it again after rotating `PHONE_HASH_KEY` (phone hashes also require their existing
+separate rotation procedure). New application submissions update the encrypted known
+name and its blind prefix index atomically; removing/changing a name clears/rebuilds it.
+The maintenance backfill can restore an absent known name from an existing application.
+
+`POST /api/staff/leads/search` accepts `query`, `status`, `course_id`, `offset`. Name
+words match prefixes of at least two Unicode characters; combining marks are retained.
+Phone search requires a full international number beginning with `+`; no contact is
+invented for Telegram users. Query text is excluded from URLs/audit details. Lookup
+tokens are tenant-keyed HMACs, not plaintext. As with any blind prefix index, within-tenant
+prefix equality/length information is visible to a database reader; protect the hash key
+separately from the database. Bulk SQL name changes must rebuild the index explicitly.
+
+`POST /api/staff/exports` is administrator-only and accepts `dataset` (`leads`,
+`applications`, `payments`) and `format` (`csv`, `xlsx`). Inquiry exports also accept
+the search/status/course filters. Downloads are access-audited and `no-store`. CSV
+neutralizes formula prefixes and Excel forces string cells. `STAFF_EXPORT_MAX_ROWS`
+defaults to 10,000; oversized exports fail rather than silently dropping rows. Application
+exports include submitted form fields; payment amounts are database minor units. No
+lookup tokens, ciphertext, webhook payloads or payment URLs are exported.
+
+Rollback: stop processes using the new model, downgrade to `e31b0847c629`, then run
+the previous release. The downgrade drops only the regenerable name index; known
+encrypted names/application forms remain intact.
