@@ -34,8 +34,10 @@ One institution is demonstrated first; tenant isolation remains mandatory.
 Application collection/review, Razorpay payments and discounts, chat takeover and
 co-pilot suggestions, consent-aware follow-ups, course/rule/document management,
 analytics, exports, outbound integrations, notifications, institution settings and
-production operations remain on the roadmap. Model distillation, self-hosting and
-advanced reranking are optional experiments with an evidence gate, not prerequisites.
+production operations remain on the roadmap. The decision layer uses typed OpenAI
+outputs with no fine-tuning or self-hosted model. OpenAI passage reranking is required
+in the current release: rank approved tenant candidates before FAQ quotation and
+staff-search selection, preserving relevance thresholds and safe baseline fallback.
 
 ## 2. Stack and architecture
 

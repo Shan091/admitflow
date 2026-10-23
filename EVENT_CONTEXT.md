@@ -2,7 +2,34 @@
 
 ## Current direction
 
-**Current integration/notification slice:** The primary agent completed Tasks 32/33.
+Adversarial review checked tenant scope, session/setup bypasses, last-admin races,
+provider claims versus deletion, financial retention boundaries, source-ID forgery
+and ranking timeout/refusal fallback. No unresolved critical/important findings
+remain for this group. Nested generated graph output is retained locally and ignored.
+
+**Current staff/privacy and OpenAI slice:** Tasks 25/34/36/37 and 40/42.3 have
+implementation and verification evidence on `codex/institution-access-and-privacy`.
+Administrator-managed staff accounts require private password setup; role/reset/
+deactivation revokes sessions. Explicit inquiry erasure is separate from automatic
+conversation-history retention, which preserves profiles, forms and financial records.
+Migration `c4817a02f59d` is applied locally. Source checks pass 231 default tests and
+strict typing across 110 files. The preceding staff/privacy group passed 84 PostgreSQL
+plus two Redis cases; after the OpenAI changes, all ten affected PostgreSQL document/
+journey cases pass. The final three account/privacy/staff-control browser cases pass;
+the full eleven-scenario frontend suite and lint/build passed during this group.
+
+The user selected OpenAI itself for the decision layer, removed Task 41 model training,
+and required reranking now. Typed interpretation/extraction uses `decide()`;
+code retains eligibility, readiness state and consequential business decisions.
+OpenAI reranks at most twelve approved tenant passages with an eight-second additional
+timeout and safe baseline fallback. Live synthetic checks pass 4/4 ranking cases
+and 24/24 FAQ source/abstention cases, without sends or database writes. The current
+API, worker and scheduler run this source; all five authenticated live retrieval
+checks pass after restart. See
+`docs/event/RERANKING_RESULTS.json` and `EVALUATION_RESULTS.json`.
+
+
+**Published integration/notification slice:** PR #8 passed CI and was squash-merged as `2b3dd6e`. The primary agent completed Tasks 32/33.
 Minimal events/outbox rows commit with source actions; encrypted per-tenant webhook
 configuration, rotating signatures, public-IP-pinned HTTPS, stable deduplication IDs,
 recoverable leases, six-attempt backoff and dead/cancelled monitoring are implemented.

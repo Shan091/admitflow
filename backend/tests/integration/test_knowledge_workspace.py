@@ -2,9 +2,11 @@
 
 import asyncio
 import io
+import json
 import uuid
 from collections.abc import AsyncIterator, Iterator
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -78,6 +80,25 @@ def workspace() -> Iterator[dict[str, Any]]:
             mp.setattr(processing, "embed_chunks", fake_embeddings)
             mp.setattr("src.knowledge.api.embed_chunks", fake_embeddings)
 
+            ranking_inputs: list[list[str]] = []
+
+            async def rank(messages: list[dict[str, str]], **kwargs: Any) -> Any:
+                passages = json.loads(messages[-1]["content"])["passages"]
+                ranking_inputs.append([p["text"] for p in passages])
+                return SimpleNamespace(
+                    choices=[
+                        SimpleNamespace(
+                            message=SimpleNamespace(
+                                content=json.dumps(
+                                    {"ordered_ids": [p["id"] for p in passages[::-1]]}
+                                )
+                            )
+                        )
+                    ]
+                )
+
+            mp.setattr("src.decision.generate_completion", rank)
+
             async def unavailable_queue() -> None:
                 raise ConnectionError("synthetic queue outage")
 
@@ -127,6 +148,7 @@ def workspace() -> Iterator[dict[str, Any]]:
                     "tenants": tenants,
                     "settings": settings,
                     "app": app,
+                    "ranking_inputs": ranking_inputs,
                 }
 
             async def clean() -> None:
@@ -252,6 +274,7 @@ def test_upload_formats_search_duplicates_and_tenant_isolation(workspace: dict[s
         json={"query": "What are the fees?"},
     ).json()["matches"]
     assert {row["source"] for row in matches} == {"courses/fees.txt", "courses/annual.pdf"}
+    assert [row["text"] for row in matches] == workspace["ranking_inputs"][-1][::-1]
     signin(client, "second")
     assert client.get("/api/knowledge/documents").json() == []
     assert (

@@ -50,12 +50,13 @@ separate manual provisioning command documented in backend/README.md.
 
 ## Run the processes
 
-Use separate terminals. The first three commands run from `backend/`:
+Use separate terminals. The following backend commands run from `backend/`:
 
 ```bash
 uv run uvicorn src.main:app --host 127.0.0.1 --port 8000
-uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge src.tasks.followups --workers 1
+uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge src.tasks.followups src.tasks.integrations --workers 1
 uv run python -m src.telegram.receiver --institution-code demo
+uv run python -m src.scripts.scheduler
 ```
 
 From `frontend/`:
@@ -82,6 +83,7 @@ The debug enqueue route is unavailable outside development.
 uv run python -m src.scripts.validate_services --openai --telegram
 uv run python -m src.scripts.evaluate_live
 uv run python -m src.scripts.evaluate_faq
+uv run python -m src.scripts.evaluate_reranking
 uv run pytest -m integration
 # From frontend/; requires local processes, seeded staff and an existing Telegram inquiry.
 npm run test:e2e:live
@@ -95,7 +97,7 @@ through the actual FAQ answering function. It checks expected source quotations 
 explicit abstention, writes docs/event/EVALUATION_RESULTS.json and exits nonzero for
 any failed case. It uses only the fictional demo tenant, reads the database without
 committing changes and sends no Telegram messages. It can make up to 24 embedding,
-12 query-translation and 24 quotation-selection calls, with the configured provider
+12 query-translation 24 quotation-selection and up to 24 bounded reranking calls, with the configured provider
 retry limits. Results do not establish fluency or broad relevance accuracy.
 Default backend checks expect isolated live configuration as documented in backend/README.md.
 

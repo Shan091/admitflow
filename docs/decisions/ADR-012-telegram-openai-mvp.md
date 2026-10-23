@@ -33,9 +33,10 @@ and a minimal staff workflow while retaining the full institutional roadmap.
 7. Use correlated redacted telemetry for model role, usage, latency and errors from
    the start. Langfuse and Sentry are optional implementations; no external telemetry
    vendor or raw-prompt logging is required for this MVP. Keep security/audit controls.
-8. Neysa, SerpAPI, Gemini/Anthropic fallback, self-hosted models and reranker services
-   are not dependencies. Hosting is verified at release planning rather than inferred
-   from credits or prior design documents.
+8. Use OpenAI itself for typed decisions and required passage reranking. No fine-tuning,
+   distillation or self-hosted decision model is planned. Neysa, SerpAPI, Gemini/Anthropic
+   fallback and external reranker services are not dependencies. Hosting is verified
+   at release planning rather than inferred from credits or prior design documents.
 
 ## Supersession and preserved decisions
 
@@ -46,7 +47,9 @@ historical engineering text remains context, not an instruction to add unused se
 ADR-004 persistence, ADR-005 three-layer validation, ADR-006 code-owned decisions and
 ADR-009 PII/audit principles remain applicable. ADR-010's anti-spam intent remains;
 current-state-aware handling takes precedence over resetting every unknown reply to
-discovery. ADR-011 advanced retrieval is deferred pending baseline retrieval evidence.
+discovery. ADR-008 and ADR-011 now reflect the required OpenAI decision/reranking path. Complex
+parsing and full conversational rewriting remain separately tracked; reranking does
+not depend on either.
 
 ## Consequences
 

@@ -18,7 +18,7 @@ async def test_triage_discovery() -> None:
     class MockResponse:
         choices = [MockChoice()]
 
-    with patch("src.engine.nodes.triage.generate_completion", new_callable=AsyncMock) as mock_llm:
+    with patch("src.decision.generate_completion", new_callable=AsyncMock) as mock_llm:
         mock_llm.return_value = MockResponse()
         intent = await detect_intent("What B.Tech courses do you offer?")
         assert intent == "discovery"
@@ -38,7 +38,7 @@ async def test_triage_rag() -> None:
     class MockResponse:
         choices = [MockChoice()]
 
-    with patch("src.engine.nodes.triage.generate_completion", new_callable=AsyncMock) as mock_llm:
+    with patch("src.decision.generate_completion", new_callable=AsyncMock) as mock_llm:
         mock_llm.return_value = MockResponse()
         intent = await detect_intent("What is the average placement package?")
         assert intent == "rag"
@@ -57,7 +57,7 @@ async def test_triage_qualification() -> None:
     class MockResponse:
         choices = [MockChoice()]
 
-    with patch("src.engine.nodes.triage.generate_completion", new_callable=AsyncMock) as mock_llm:
+    with patch("src.decision.generate_completion", new_callable=AsyncMock) as mock_llm:
         mock_llm.return_value = MockResponse()
         intent = await detect_intent("I got 85% in CBSE 12th board.")
         assert intent == "qualification"
@@ -76,7 +76,7 @@ async def test_triage_handoff() -> None:
     class MockResponse:
         choices = [MockChoice()]
 
-    with patch("src.engine.nodes.triage.generate_completion", new_callable=AsyncMock) as mock_llm:
+    with patch("src.decision.generate_completion", new_callable=AsyncMock) as mock_llm:
         mock_llm.return_value = MockResponse()
         intent = await detect_intent("I want to speak to a human agent right now.")
         assert intent == "handoff"
@@ -85,7 +85,7 @@ async def test_triage_handoff() -> None:
 @pytest.mark.asyncio
 async def test_triage_empty_message() -> None:
     """Test routing for empty messages without calling LLM defaults to discovery."""
-    with patch("src.engine.nodes.triage.generate_completion", new_callable=AsyncMock) as mock_llm:
+    with patch("src.decision.generate_completion", new_callable=AsyncMock) as mock_llm:
         intent = await detect_intent("   ")
         assert intent == "discovery"
         mock_llm.assert_not_called()

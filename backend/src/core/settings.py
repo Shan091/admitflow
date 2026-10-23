@@ -79,6 +79,7 @@ class Settings(BaseSettings):
     upload_batch_files: int = Field(default=25, ge=1, le=100)
     ingestion_timeout_seconds: int = Field(default=180, ge=10, le=600)
     knowledge_min_similarity: float = Field(default=0.3, ge=0, le=1)
+    knowledge_rerank_timeout_seconds: float = Field(default=8, ge=0.1, le=30)
     knowledge_recovery_enabled: bool = True
 
 

@@ -11,7 +11,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from src.engine.llm_factory import generate_completion
+from src.decision import decide
+from src.engine.llm_factory import AllProvidersFailedError
 
 TriageIntent = Literal["discovery", "rag", "qualification", "handoff"]
 
@@ -45,8 +46,8 @@ async def detect_intent(text: str) -> TriageIntent:
         # Empty messages (like an image without caption) default to discovery
         return "discovery"
 
-    prompt = f"""
-    You are the triage router for a university admissions WhatsApp bot.
+    prompt = """
+    You are the triage router for a university admissions bot.
     Analyze the following user message and classify it into one of four intents:
     
     - "discovery": Exploring courses or programs.
@@ -58,19 +59,13 @@ async def detect_intent(text: str) -> TriageIntent:
     you MUST classify it as "discovery" so the bot can handle it. DO NOT classify as "handoff" 
     unless the user explicitly demands a human or is angry.
     
-    User message: "{text}"
     """
 
-    response = await generate_completion(
-        messages=[{"role": "user", "content": prompt}],
-        response_format=TriageResponse,
-        temperature=0.0,
-    )
-
-    content = response.choices[0].message.content
-    if not content:
-        # Fail safe to discovery so the AI handles it, not a human
+    try:
+        parsed = await decide(
+            TriageResponse,
+            [{"role": "system", "content": prompt}, {"role": "user", "content": text}],
+        )
+    except AllProvidersFailedError:
         return "discovery"
-
-    parsed = TriageResponse.model_validate_json(content)
     return parsed.intent

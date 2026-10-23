@@ -1,0 +1,28 @@
+{
+  "scope": "Four synthetic ranking cases, original relevant passage at baseline rank 3; not a fluency or production latency claim. No writes or sends.",
+  "provider": "configured OpenAI roles; no fine-tuning",
+  "cases": [
+    {
+      "language": "en",
+      "passed": true,
+      "elapsed_ms": 3082
+    },
+    {
+      "language": "hi",
+      "passed": true,
+      "elapsed_ms": 1804
+    },
+    {
+      "language": "hinglish",
+      "passed": true,
+      "elapsed_ms": 1216
+    },
+    {
+      "language": "ml",
+      "passed": true,
+      "elapsed_ms": 1790
+    }
+  ],
+  "passed": 4,
+  "total": 4
+}
