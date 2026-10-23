@@ -1,0 +1,64 @@
+[project]
+name = "admitflow-backend"
+version = "0.1.0"
+description = "AdmitFlow — AI-native WhatsApp admissions engagement backend (FastAPI + hand-rolled engine)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "sqlalchemy[asyncio]>=2.0",
+    "alembic>=1.13",
+    "asyncpg>=0.30",
+    "pgvector>=0.3",
+    "taskiq>=0.11",
+    "taskiq-redis>=1.0",
+    "redis[hiredis]>=5.0",
+    "cryptography>=43",
+    "httpx2>=2.13",       # Meta Cloud API calls (WhatsApp sender, Task 6)
+    "litellm>=1.104.0",
+    "python-multipart>=0.0.20",
+    "pypdf>=6",
+    "python-docx>=1.2",
+    "tzdata>=2026.5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx2>=2.13.1",   # Starlette TestClient's supported HTTP client (httpx v1 is deprecated)
+    "ruff>=0.7",
+    "mypy>=1.13",
+    "testcontainers[postgres]>=4.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+# Integration tests (real Postgres via testcontainers) are opt-in — the baseline
+# gate and CI run without Docker. Run them with:  uv run pytest -m integration
+addopts = "-q -m 'not integration'"
+markers = [
+    "integration: needs a real database (Docker/testcontainers); excluded by default",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+
+[tool.uv]
+# AdmitFlow backend is a deployable application, not a published library —
+# treat it as a virtual project (no build step, no editable self-install).
+package = false

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# uv
+# (uv.lock IS committed)
+
+# Node / frontend
+node_modules/
+*.tsbuildinfo
+.demo-credentials.json
+test-results/
+playwright-report/
+.next/
+out/
+dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Graphify output (regenerated artifact)
+graphify-out/*
+!graphify-out/GRAPH_REPORT.md
+# graphify local-state sidecars (machine-specific absolute paths)
+graphify-out/.graphify_*
+
+# Logs
+*.log

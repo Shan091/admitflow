@@ -1,5 +1,99 @@
 # AdmitFlow
 
-Admissions engagement through Telegram, with an institution workspace.
+An admissions-engagement platform for institutions. Students explore courses,
+ask questions and share eligibility information through Telegram. Staff inspect
+persisted inquiries, conversation context and code-evaluated eligibility results.
 
-Application changes are published through reviewed feature branches.
+## Product scope
+
+The first release covers Telegram onboarding and language preference, course/batch
+selection, qualification, memory/corrections, grounded institution FAQs and a minimal
+authenticated staff dashboard with a human-request queue. The full roadmap also
+includes applications, payments, co-pilot, follow-ups and institution administration.
+
+The current implementation also includes encrypted application submission/review,
+catalog/settings/discount management, payment monitoring and safe reconciliation.
+Staff transcripts include standalone deliveries and stable pagination. Real Razorpay
+test-card validation, co-pilot/follow-ups and later operations remain in progress;
+see [tasks/todo.md](tasks/todo.md) for verified acceptance and remaining work.
+
+## Stack
+
+Python/FastAPI/Pydantic, PostgreSQL/SQLAlchemy/Alembic/pgvector, Redis/TaskIQ,
+OpenAI, and a Next.js/TypeScript staff knowledge workspace. Only necessary
+services are required; additional AI providers and sponsor infrastructure are optional.
+Business rules, prices and authorization remain code-owned.
+
+## Current status
+
+The backend foundation, AI/domain modules and Telegram identity migration exist.
+The identity change has passed the backend gate and separate PostgreSQL migration/
+isolation tests. Institution staff can now upload individual files/folders, index digital
+PDF/DOCX/text, inspect status, retry/delete and search source passages. The Telegram
+adapter and staff inquiry/request screens are implemented. A real user confirmed
+Telegram replies, and the same inquiry persists in the authenticated staff workspace.
+Live OpenAI structured output, embeddings, document indexing and search have passed.
+After replacing an invalid key, live credential probes pass again and the expanded
+24-case multilingual FAQ evaluation passes. Results use synthetic reference material;
+they are not a fluency or production-readiness claim.
+Live corrections, sourced/unsupported answers and the user-requested staff workflow
+have passed selected checks. Fluent-speaker review and production release work remain.
+Synthetic data is used for development/demonstrations.
+
+Follow the existing [plan](tasks/plan.md) and [task list](tasks/todo.md) for progress,
+[specification](SPEC.md) for behavior, [ADR-012](docs/decisions/ADR-012-telegram-openai-mvp.md)
+for the active stack decision, and [backend instructions](backend/README.md) for setup.
+
+## Development
+
+Read [AGENTS.md](AGENTS.md) and the [development lifecycle](docs/engineering/development-lifecycle.md).
+
+```bash
+cd backend
+uv sync
+uv run uvicorn src.main:app --reload
+bash scripts/verify.sh
+```
+
+Use ignored local configuration for secrets. Current test instructions and known
+environment assumptions are in the backend README. These commands start the
+backend. Full receiver/worker/demo setup is in the backend README below.
+
+For document ingestion, follow the [knowledge workspace setup](backend/README.md#institution-knowledge-workspace).
+Run the API and TaskIQ worker, provision an administrator, then start the frontend:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Open `http://127.0.0.1:3000`. Choose files or a folder, wait for Ready, then search.
+Supported formats: digital PDF, DOCX, TXT, Markdown and CSV. Scanned PDFs need a
+searchable replacement. Live indexing/search requires an OpenAI API key; automated
+tests substitute synthetic embeddings. Original files are encrypted; extracted reference
+text is stored in the institution-scoped database. Upload institution reference material,
+not applicant personal files. All current work remains local until Git publication is authorized.
+
+## Demonstration and submission
+
+Local workspace: `http://127.0.0.1:3000`. Demo staff credentials are in the ignored
+`backend/.demo-credentials.json` created by the seed command. Do not publish it.
+The configured Telegram demonstration bot is `https://t.me/mike0011_bot`; it requires
+the local receiver/worker and is not an independently hosted service.
+
+Use the [demo script](docs/event/DEMO_SCRIPT.md), [six-slide deck copy](docs/event/PITCH_DECK.md)
+and [AI Impact Statement](docs/event/AI_IMPACT_STATEMENT.md). The actual local
+[staff walkthrough](docs/event/artifacts/staff-walkthrough.webm) is recorded;
+the longer [saved student journey](docs/event/artifacts/student-to-staff-walkthrough.webm)
+shows corrections, sourced answers and the staff request in the actual dashboard;
+the final handset/event video and public demo link remain pending. Artifact requirements and outstanding
+organizer inputs are in [submission requirements](docs/event/SUBMISSION_PLAN.md).
+Prior work and verification evidence are preserved in repository records. A license
+must be selected before publication; none is implied by this README.
+
+The [prior-work disclosure](docs/event/PRIOR_WORK_DISCLOSURE.md),
+[language review packet](docs/event/LANGUAGE_REVIEW.md) and
+[expanded evaluation results](docs/event/EVALUATION_RESULTS.json) record remaining
+review and credential requirements. The latest backend gate passes 156 tests and
+the separate PostgreSQL integration suite passes 16 tests.
