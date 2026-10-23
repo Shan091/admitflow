@@ -1,0 +1,27 @@
+# Dedicated synthetic readiness data only; loopback ports, no public data services.
+# From repo root: docker compose -f docs/event/readiness-services.yaml up -d --wait
+name: admitflow-readiness
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    env_file: ../../backend/.env.readiness-db
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - readiness-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admitflow_demo -d admitflow_demo"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+volumes:
+  readiness-postgres:

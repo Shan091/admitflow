@@ -1,0 +1,69 @@
+{
+  "info": {
+    "name": "AdmitFlow - WhatsApp final delivery check",
+    "description": "Run health first, then send hello_world once. HTTP 200 on send means accepted, not delivered. Delivery must be confirmed on the handset or by a signed status webhook. Credentials are placeholders; use local Postman environment values.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{WHATSAPP_ACCESS_TOKEN}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "GRAPH_API_VERSION", "value": "v23.0" },
+    { "key": "WHATSAPP_ACCESS_TOKEN", "value": "" },
+    { "key": "WHATSAPP_PHONE_NUMBER_ID", "value": "" },
+    { "key": "WHATSAPP_TEST_RECIPIENT", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1 - Read sender and account health",
+      "request": {
+        "method": "GET",
+        "url": "https://graph.facebook.com/{{GRAPH_API_VERSION}}/{{WHATSAPP_PHONE_NUMBER_ID}}?fields=health_status",
+        "description": "Read health_status.can_send_message and each entity's errors. BLOCKED is a Meta-side restriction. The collection runner stops here when health reports BLOCKED."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Health request succeeded', function () { pm.response.to.have.status(200); });",
+              "var responseBody = pm.response.json();",
+              "var health = responseBody.health_status;",
+              "pm.test('Meta does not report sending blocked', function () { pm.expect(health).to.be.an('object'); pm.expect(health.can_send_message).not.to.eql('BLOCKED'); });",
+              "if (pm.response.code !== 200 || !health || health.can_send_message === 'BLOCKED') { pm.execution.setNextRequest(null); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Send hello_world once",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "url": "https://graph.facebook.com/{{GRAPH_API_VERSION}}/{{WHATSAPP_PHONE_NUMBER_ID}}/messages",
+        "description": "Sends one message to the configured test recipient. Use digits with country code and verify that the recipient is on this app's test allow-list. A returned message id is submission evidence only. Inspect the delivery-status webhook for sent/delivered/failed and any error codes.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{WHATSAPP_TEST_RECIPIENT}}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"hello_world\",\n    \"language\": { \"code\": \"en_US\" }\n  }\n}",
+          "options": { "raw": { "language": "json" } }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Meta accepted submission (not proof of delivery)', function () { pm.response.to.have.status(200); var responseBody = pm.response.json(); pm.expect(responseBody.messages).to.be.an('array').that.is.not.empty; pm.expect(responseBody.messages[0].id).to.be.a('string'); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

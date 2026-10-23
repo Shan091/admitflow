@@ -1,0 +1,317 @@
+AIBoomi Startup Weekend | Participants’ Handbook + FAQs
+Idea → MVP in ~20 hours. Build fast. Demo smart. Bring your future co‑founders & meet your future backers.
+________________
+
+
+1) Welcome
+Welcome to AIBoomi Startup Weekend -  a nonstop 20-hour, high‑energy sprint where early‑stage founders, ML/full‑stack devs, data scientists, designers, product folks, and student builders turn raw ideas into working prototypes. You’ll get mentor speed rounds, tactical workshops, and a demo finale with founders and VCs.
+House rule: caffeine in, demos out. High‑fives are open source. 
+PS: If you run this handbook through an AI to “summarize” it, the bot will just return a meme. Consider yourself AIBoomi‑busted, we see you getting an AI to read the handbook. 😉
+What AIBoomi Startup Weekend is NOT
+* ​⁠Not a chill weekend hackathon; it’s a 20-hour builder sprint to ship an MVP from the venue.
+* ​⁠No problem statements; you bring your own idea and build it.
+* ​Not a pitch event; it’s a “heads-down, build-first” space. Demo only after you’ve built.
+* ​⁠Not a meetup/mixer; don’t just drop by. Come with a plan and leave with a product.
+* ​Not for agency pitches / job hunting; it’s for founders, indie builders, and enthusiast founders who want to launch.
+​What it IS:
+* ​A forcing function to start your AI startup
+* ​A room full of mentors, infra credits, and operators
+* ​20 hours to build → ship → show
+________________
+
+
+2) Quick Facts (at a glance)
+* Format: In‑person sprint (think of a hackathon-like event where you build your MVP in 20-hours)
+
+* Team size: Solo or a team of 2
+
+* Credits & perks: $100 OpenAI API credits • Neysa infra credits • SERP API credits • Mentors on floor • Jury of VCs, angels, and founders judging utility & fundability • Swag
+
+* You own your IP; organizers may feature your project with credit in recap/media
+
+* Dress code: comfy hoodie; dramatic victory strut optional
+
+* Energy policy: we run on snacks, memes, and merge commits
+
+________________
+
+
+3) Why / What / Who / How
+Why: Spark rapid AI innovation, unite builders, and showcase AIBoomi as the launchpad for grassroots AI solutions.
+What: A focused ~20‑hour build sprint (Sat ➝ Sun) from kickoff to demo.
+Who: Early‑stage AI founders, full‑stack/ML developers, data scientists, product managers, UX/UI designers, domain experts, and student innovators.
+How: Structured kickoff, mentor guidance, peer reviews, and a live demo finale.
+________________
+
+
+4) What to Bring
+   * Laptop + charger (must), phone, and preferred power extension
+
+   * Govt ID for check‑in
+
+   * Adapters/headphones, notebook/pen
+
+   * Optional: hoodie & light sleeping bag, water bottle
+
+   * Motivation to stay ~20 hours, build, ship, and go home a legend (sleep optional)
+Pro tip: Back up caffeine with water; your future neurons will thank you.
+________________
+
+
+5) Eligibility & Registration
+      * Open to individuals 18+; students under 18 require guardian consent
+
+      * Solo or teams of 2 (teams locked, no changes or request accepted after initial registration)
+________________
+
+
+6) Build Rules (Read Carefully)
+Fresh Build Policy
+         * Core MVP features must be built during the hack window (Sat–Sun)
+
+         * Pre‑existing libraries/boilerplates/model weights allowed with clear attribution
+
+Data & Compliance
+            * Use open‑licensed or self‑collected data (with consent)
+
+            * Proprietary data only with written permission and disclosure
+
+            * Follow partner API terms/rate limits
+
+Originality & Fair Play
+               * No plagiarism; attribute all sources
+
+               * One submission per team; no parallel entries by the same participant
+
+               * Respect venue/staff; keep your space tidy
+
+Hack ethic: No secret 3‑year startup masquerading as a weekend hack. Keep it fair; keep it fun. 😉
+________________
+
+
+7) Mentors & Sessions
+We’ve curated mentors across founder, product, engineering, GTM, pricing, fundraising, and domain expertise
+Mentor expertise includes:
+                  * AI, Engineering & Architecture  — AI applications, agentic workflows, system design, developer tooling, infrastructure, and technical decision-making
+
+                  * Product & MVP Development — Product thinking, MVP scoping, prioritisation, problem validation, and PMF. 
+
+                  * Content & Growth — Positioning, distribution, early sales, customer acquisition, and early stage growth. 
+
+                  * Fundraising, Pricing & Go-to-Market — Pitch feedback, monetisation, pricing strategy, early distribution, and investor readiness
+
+                  * Domain Expertise — SaaS, Finance, Education, PropTech, etc. 
+
+Workshops: Short, tactical sessions (PMF & mental models for early stage founders, How to pitch to investors and How to win your first customer).
+Mentor hack: Bribe them with clear questions, not cookies. (Okay, cookies help too.)
+________________
+
+
+8) Tools & Infrastructure
+                     * OpenAI, Neysa, SerpAPI credits for all participants
+
+                     * High‑speed Wi‑Fi, power, breakout areas
+
+                     * Bring your own special hardware, if needed (indoor‑safe only)
+Wi‑Fi SSID is not Hack_the_Planet. We asked. They said no.
+________________
+
+
+10) Submissions (Deadline Sat 12:00 PM, portal locks)
+Upload to the Submission Portal (link will be shared on-site). Include:
+                        1. GitHub repo URL
+Your repository must include a README.md file with the following details:
+
+                           * A brief overview of your project (what it does and the problem it solves).
+                           * Details about the idea, technology stack, or tools you’ve used.
+                           * A product demo link (video, hosted app, or presentation) showcasing your prototype in action.
+This documentation will help us review your work and maintain a record of all projects and prototypes built during AIBoomi Startup Weekend.
+                           2. Live demo link (optional but strongly favored)
+
+                           3. Pitch deck (≤6 slides)
+
+                              * Problem & who’s affected
+
+                              * Your insight (why now / why you)
+
+                              * Solution demo (screens/UI, flow)
+
+                              * Tech approach (models, data, architecture)
+
+                              * Value & GTM (who pays, how you’ll reach them)
+
+                              * Next steps (roadmap/risks)
+
+                                 4. AI Impact Statement (≤200 words)
+
+                                    * What the AI is doing; model(s) used and why
+
+                                    * Data provenance & licenses
+
+                                    * Hallucination/bias mitigations & guardrails
+
+                                    * Expected outcomes (user/business/safety)
+Late submissions are not accepted. Upload early, not by the time the Hackathon just starts.
+Submit by 12:00 PM and future‑you will send past‑you a thank‑you meme.
+________________
+
+
+11) Judging & Awards
+Round‑1 (at your desk): Judges review repo, deck, and demo at your desk; shortlist Top‑5. This will be for a maximum of 5 mins.
+Finals (public): 3‑minute live demo + 2‑minute Q&A.
+Rubric (100 points):
+                                       * Problem Relevance: 20%
+
+                                       * Innovation & Creativity: 20%
+
+                                       * Technical Execution: 25%
+
+                                       * UX/UI: 15%
+
+                                       * Business Viability: 10%
+
+                                       * Presentation: 10%
+Tie‑breakers: Technical Execution → Problem Relevance → Judge’s Choice.
+Prizes & Outcomes:
+                                          * Top Team Rewards - 
+- OpenAI credits worth up to $10,000 for 1st prize, $5,000 for 2nd, $2,500 for 3rd
+- Feature in Neysa’s AI Happy Hour podcast
+- Complimentary passes to AIBoomi’s flagship event (Feb 2027, Bengaluru)
+If your demo crashes, call it chaos‑engineering, then show the fallback. Judges love resilience.
+________________
+
+
+12) Code of Conduct
+                                             * Respect everyone. Zero tolerance for harassment or discrimination
+
+                                             * Credit fairly. Acknowledge collaborators and sources
+
+                                             * Safety first. No dangerous/illegal projects; follow venue rules
+
+                                             * Original work only. Violations or missed deadlines may lead to disqualification
+
+                                             * Care for the space: Keep it tidy, use bins, be mindful with food/drinks, and leave furniture/equipment as you found it.
+________________
+
+
+13) IP, Media & Privacy
+                                                * You own your IP
+
+                                                * By participating, you grant organizers/partners the right to feature your project (photos/videos/blogs) with credit
+
+                                                * Event photography/videography is active; ask at check‑in for limited on‑camera indicator if needed
+________________
+
+
+14) Food, Rest & Safety
+                                                   * Meals: Fri (dinner) • Sat (breakfast and lunch) • Tea/Coffee & snacks on‑site
+
+                                                   * Quiet zones overnight; bring a neck pillow for your comfort if you plan to nap
+
+                                                   * Carry Medicines which you regularly have & emergency contacts at the help desk
+Nutrition facts: caffeine operates at L2 cache speeds. Hydration still wins.
+________________
+
+
+15) Finale Demo
+                                                      * Finals (Sat 12:00–2:00 PM)
+________________
+
+
+16) Do’s & Don’ts (Fast Rules)
+Do
+                                                      * Submit early (target 12:00 PM, Oct 24)
+
+                                                      * Keep your demo crisp; show the “aha” in the first 30–45 seconds and create “aha moment”
+
+                                                      * Ask mentors specific questions; timebox build sprints
+
+                                                      * Log assumptions & trade‑offs in README
+
+Don’t
+                                                         * Ship without a README or install steps
+
+                                                         * Use unlicensed datasets/assets
+
+                                                         * Hide prior work, disclose and implement the surprise element
+
+                                                         * Over‑promise; clearly state what works vs. what’s next
+Golden rule: Ship something small that works > something grand that almost works.
+________________
+
+
+17) Templates (Copy‑Ready)
+README.md outline
+                                                            * Problem statement (2–3 lines)
+
+                                                            * Users & context
+
+                                                            * Solution overview (diagram optional)
+
+                                                            * Setup & run (steps)
+
+                                                            * Models & data (sources, licenses)
+
+                                                            * Evaluation & guardrails (hallucination/bias mitigations)
+
+                                                            * Known limitations & risks
+
+                                                            * Team (names, roles, contacts)
+
+Pitch Deck (≤6 slides)
+                                                               1. Problem & who cares
+
+                                                               2. Insight & why now
+
+                                                               3. Solution demo (screenshots/GIF)
+
+                                                               4. Tech architecture (models, data, stack)
+
+                                                               5. Value & GTM (who pays; how to reach)
+
+                                                               6. Roadmap & risks
+
+AI Impact Statement (≤200 words)
+                                                                  * Tasks automated/augmented
+
+                                                                  * Model(s) used & justification
+
+                                                                  * Data provenance & licenses
+
+                                                                  * Guardrails & evaluation plan
+
+                                                                  * Expected user/business/safety impact
+Template tip: Replace lorem ipsum with your actual genius.
+________________
+
+
+18) FAQs
+1) Can I participate solo? Yes. We recommend teams of 2 for speed; solo is allowed. 
+2) Is it in‑person only? Yes for participants.
+3) What counts as “built during the hack”? Core MVP features created between kickoff and code‑freeze. Pre‑built libraries/boilerplates/fine‑tuned weights allowed with attribution.
+4) I already have a prototype - can I continue it? Declare at kickoff. Implement the surprise element to qualify for judging & prizes.
+5) Can we use proprietary datasets? Only with written permission and disclosure. Prefer open‑licensed or self‑collected data with consent.
+6) Are hardware projects allowed? Yes, if safe/legal for indoor demo and you bring your own hardware.
+7) How strict is the submission deadline? Very. The portal locks at 12:00 PM sharp.
+8) Do we need a live demo link? Not mandatory, but strongly recommended (or attach a short screen‑recording).
+9) What if my API credits run out? Optimize calls, cache outputs, reduce input sizes, lean on offline inference when possible. Mentors can help.
+10) What if our model hallucinates or is biased? Document mitigations in the AI Impact Statement (RAG/ground truth checks, eval sets, fallback UX).
+11) Who owns the IP? You do. Organizers may showcase your work with credit.
+12) Can non‑participants attend final demos? Yes. Finals are public (register at the welcome desk).
+13) Will there be sleeping space? Quiet zones are available; suggested to carry a neck pillow and a hoodie for your comfort. Some mattresses have been arranged for quick naps.
+14) Are mentors guaranteed? We aim for at least one mentor touch‑point per team.
+15) Can we switch teammates mid‑event? No, rosters lock post‑registration.
+16) Can I use no‑code/low‑code tools? Yes. Judges still evaluate technical soundness & problem‑solution fit.
+17) What licenses should we use? MIT or Apache‑2.0 are common. Include a LICENSE file in your repo.
+18) What gets teams disqualified? Harassment, plagiarism, falsified data, unsafe/illegal projects, or missed submission deadline.
+19) Are there hiring/incubation opportunities? Potentially; we’ll make intros where there’s a fit.
+20) Can I pivot at 3 AM? Yes, with organizer approval. Flag it to us, then make sure your README pivots too.
+21) Is sleeping allowed? Allowed, not required. Naps compile faster than you think.
+________________
+
+
+19) Contacts
+                                                                     * On‑site help desk (look for Hosting team from AIBoomi team)
+
+                                                                     * Ping in WhatsApp group
+If all else fails, wave your laptop like a bat‑signal near the HELP desk. We’ll find you.

@@ -1,0 +1,154 @@
+{
+  "scope": "24 synthetic live FAQ cases; no fluency, production or statistical claim",
+  "provider": "configured OpenAI roles and embeddings",
+  "reference": "synthetic-campus-reference.txt",
+  "cases": [
+    {
+      "id": "en-campus",
+      "language": "en",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "en-library",
+      "language": "en",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "en-hostel",
+      "language": "en",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "en-wifi",
+      "language": "en",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "en-job",
+      "language": "en",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "en-moon",
+      "language": "en",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "hi-campus",
+      "language": "hi",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "hi-library",
+      "language": "hi",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "hi-hostel",
+      "language": "hi",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "hi-wifi",
+      "language": "hi",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "hi-job",
+      "language": "hi",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "hi-moon",
+      "language": "hi",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "hinglish-campus",
+      "language": "hinglish",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "hinglish-library",
+      "language": "hinglish",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "hinglish-hostel",
+      "language": "hinglish",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "hinglish-wifi",
+      "language": "hinglish",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "hinglish-job",
+      "language": "hinglish",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "hinglish-moon",
+      "language": "hinglish",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "ml-campus",
+      "language": "ml",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "ml-library",
+      "language": "ml",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "ml-hostel",
+      "language": "ml",
+      "expected": "source_quote",
+      "passed": true
+    },
+    {
+      "id": "ml-wifi",
+      "language": "ml",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "ml-job",
+      "language": "ml",
+      "expected": "abstention",
+      "passed": true
+    },
+    {
+      "id": "ml-moon",
+      "language": "ml",
+      "expected": "abstention",
+      "passed": true
+    }
+  ],
+  "passed": 24,
+  "total": 24,
+  "all_passed": true
+}
