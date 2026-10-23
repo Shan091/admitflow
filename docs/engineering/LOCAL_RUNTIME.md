@@ -132,3 +132,16 @@ license selection or Git publication follows from a successful local demo.
 The repository's `docs/event/BUILD_MANIFEST.json` fingerprints tested code and
 configuration while excluding credentials and runtime data. Regenerate it with
 `uv run python -m src.scripts.record_build` after final source changes.
+
+## Delivery budget operation
+
+Apply migrations through `head` before restarting the API and worker. Institution
+settings now include a daily Telegram send-attempt limit (default 1000). The workspace
+shows current usage and warns near the limit. Zero pauses new deliveries; queued replies
+are retained. Increasing a cap makes budget-deferred work eligible for the normal
+receiver recovery sweep. The cap resets at institution-local midnight. Redis must remain
+shared and persistent for process-independent accounting; do not flush it to reset a cap.
+
+A read of `/api/staff/delivery-budget` under the normal staff session verifies availability
+without sending a Telegram message. See backend/README.md for counting semantics,
+production outage behavior and the limited no-Redis development fallback.

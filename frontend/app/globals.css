@@ -9,6 +9,24 @@
   --danger: #963f35;
   --font: "DM Sans Variable", Arial, sans-serif;
 }
+.delivery-budget {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.delivery-budget.warning {
+  color: #80521d;
+}
+.delivery-budget strong {
+  color: inherit;
+}
 .management-tabs,
 .management-toolbar {
   display: flex;

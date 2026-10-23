@@ -2,18 +2,26 @@
 
 import math
 import uuid
-from datetime import time
+from datetime import datetime, time
 from typing import Any, Literal, Self
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 
 from src.db.audit import write_audit_log
 from src.db.enums import DiscountType, RuleOperator
-from src.db.models import Batch, Course, DiscountCode, Institution, QualificationRule
+from src.db.models import (
+    Batch,
+    ConversationReply,
+    Course,
+    DiscountCode,
+    Institution,
+    OutboundMessage,
+    QualificationRule,
+)
 from src.staff.auth import Db, Staff, require_admin, require_browser_write
 
 router = APIRouter(prefix="/api/staff", tags=["institution management"])
@@ -263,6 +271,7 @@ class SettingsInput(BaseModel):
     timezone: str = Field(max_length=100)
     business_hours: dict[Literal["mon", "tue", "wed", "thu", "fri", "sat", "sun"], Hours]
     reengagement_delay_days: int = Field(ge=1, le=365, strict=True)
+    telegram_daily_send_limit: int = Field(default=1000, ge=0, le=100000, strict=True)
     retention_days: int | None = Field(default=None, ge=1, le=3650, strict=True)
 
     @model_validator(mode="after")
@@ -284,6 +293,7 @@ async def institution_settings(staff: Staff, db: Db) -> dict[str, Any]:
         "timezone": institution.timezone,
         "business_hours": institution.business_hours or {},
         "reengagement_delay_days": institution.reengagement_delay_days,
+        "telegram_daily_send_limit": institution.telegram_daily_send_limit,
         "retention_days": institution.retention_days,
     }
 
@@ -297,12 +307,69 @@ async def save_settings(body: SettingsInput, staff: Staff, db: Db) -> dict[str, 
     if institution is None:
         raise HTTPException(404, "Institution not found.")
     for key, value in body.model_dump().items():
+        if key == "telegram_daily_send_limit" and key not in body.model_fields_set:
+            continue  # Older clients must preserve a configured budget.
         setattr(institution, key, value)
+    if {"telegram_daily_send_limit", "timezone"} & body.model_fields_set:
+        # An administrator can raise a cap or change local days without leaving
+        # already-deferred messages asleep until the old reset time.
+        for delivery in (ConversationReply, OutboundMessage):
+            await db.execute(
+                update(delivery)
+                .where(
+                    delivery.tenant_id == staff.tenant_id,
+                    delivery.status == "queued",
+                    delivery.error_code == "daily_send_budget",
+                )
+                .values(next_attempt_at=None)
+            )
     await write_audit_log(
         db, tenant_id=staff.tenant_id, actor=str(staff.id), action="institution.settings_updated"
     )
     await db.commit()
     return await institution_settings(staff, db)
+
+
+@router.get("/delivery-budget")
+async def delivery_budget(staff: Staff, db: Db) -> dict[str, Any]:
+    from src.telegram.budget import usage
+
+    institution = await db.get(Institution, staff.tenant_id)
+    if institution is None:
+        raise HTTPException(404, "Institution not found.")
+    result = await usage(institution)
+    start = datetime.fromisoformat(result["day"]).replace(tzinfo=ZoneInfo(result["timezone"]))
+    reset = datetime.fromisoformat(result["resets_at"])
+    deferred = 0
+    confirmed = 0
+    for delivery in (ConversationReply, OutboundMessage):
+        deferred += int(
+            await db.scalar(
+                select(func.count())
+                .select_from(delivery)
+                .where(
+                    delivery.tenant_id == staff.tenant_id,
+                    delivery.status == "queued",
+                    delivery.error_code.in_(["daily_send_budget", "send_budget_unavailable"]),
+                )
+            )
+            or 0
+        )
+        confirmed += int(
+            await db.scalar(
+                select(func.count())
+                .select_from(delivery)
+                .where(
+                    delivery.tenant_id == staff.tenant_id,
+                    delivery.status == "sent",
+                    delivery.updated_at >= start,
+                    delivery.updated_at < reset,
+                )
+            )
+            or 0
+        )
+    # Durable completion records remain authoritative if a Redis stats write was lost.
+    return {**result, "confirmed_sent": confirmed, "deferred": deferred}
 
 
 class DiscountInput(BaseModel):

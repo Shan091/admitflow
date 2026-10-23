@@ -13,6 +13,7 @@ from src.db.enums import PaymentStatus
 from src.db.models import (
     ConversationEvent,
     ConversationReply,
+    Institution,
     Lead,
     OutboundMessage,
     PaymentOrder,
@@ -21,6 +22,7 @@ from src.db.models import (
 )
 from src.db.session import get_sessionmaker
 from src.engine.contracts import Reply
+from src.telegram import budget
 from src.telegram.adapter import TelegramAPIError, TelegramClient
 
 
@@ -151,9 +153,18 @@ async def send_outbound(message_id: uuid.UUID) -> None:
         token = decrypt_pii(bot.token_enc)
         chat_id = int(decrypt_pii(identity.chat_id_enc))
         body = Reply.model_validate_json(decrypt_pii(message.payload_enc))
+        institution = await db.get(Institution, lead.tenant_id)
+        if institution is None:
+            return
+        reservation = await budget.reserve(
+            institution, f"o:{message_id}:{message.attempts + 1}", now=now
+        )
+        if not reservation.allowed:
+            message.next_attempt_at, message.error_code = reservation.retry_at, reservation.reason
+            await db.commit()
+            return
         message.status = "sending"
         message.attempts += 1
-        attempts = message.attempts
         tenant_id, lead_id = lead.tenant_id, lead.id
         kind, dedup_key = message.kind, message.dedup_key
         await db.commit()
@@ -163,11 +174,9 @@ async def send_outbound(message_id: uuid.UUID) -> None:
     except TelegramAPIError as failure:
         state = "uncertain" if failure.uncertain else "failed"
         error = f"telegram_{failure.code}"
-        if failure.code == 429 and attempts < 3:
+        if failure.code == 429:
             state = "queued"
-            next_attempt = datetime.now(UTC) + timedelta(
-                seconds=min(max(failure.retry_after, 1), 60)
-            )
+            next_attempt = datetime.now(UTC) + timedelta(seconds=max(failure.retry_after, 1))
     except Exception:
         state, error = "uncertain", "delivery_unknown"
     async with sessions() as db:
@@ -207,6 +216,8 @@ async def send_outbound(message_id: uuid.UUID) -> None:
                     if order.status == PaymentStatus.CREATED:
                         order.status = PaymentStatus.LINK_SENT
         await db.commit()
+        if state == "sent":
+            await budget.record_sent(reservation)
 
 
 async def recover_outbound() -> None:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Enum, Integer, String, Text, UniqueConstraint
+from sqlalchemy import CheckConstraint, Enum, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -24,6 +24,12 @@ class Institution(IdMixin, TimestampMixin, Base):
     """
 
     __tablename__ = "institutions"
+    __table_args__ = (
+        CheckConstraint(
+            "telegram_daily_send_limit BETWEEN 0 AND 100000",
+            name="telegram_daily_send_limit_bounds",
+        ),
+    )
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str | None] = mapped_column(String(64), unique=True)
@@ -33,6 +39,9 @@ class Institution(IdMixin, TimestampMixin, Base):
     timezone: Mapped[str] = mapped_column(String(64), nullable=False, default="Asia/Kolkata")
     business_hours: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     reengagement_delay_days: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
+    telegram_daily_send_limit: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=1000, server_default="1000"
+    )
     retention_days: Mapped[int | None] = mapped_column(Integer)
     # Envelope-encrypted per-tenant credentials (ciphertext only; encryption in Task 4).
     wa_credentials_enc: Mapped[str | None] = mapped_column(Text)

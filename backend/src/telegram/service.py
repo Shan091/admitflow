@@ -13,6 +13,7 @@ from src.core.security import decrypt_pii, encrypt_pii
 from src.db.models import (
     ConversationEvent,
     ConversationReply,
+    Institution,
     Lead,
     OutboundMessage,
     TelegramBot,
@@ -21,6 +22,7 @@ from src.db.models import (
 from src.db.session import get_sessionmaker
 from src.engine.contracts import Event, Reply
 from src.staff.throttle import consume_limit
+from src.telegram import budget
 from src.telegram.adapter import TelegramAPIError, TelegramClient, normalize_update
 from src.telegram.identity import hash_telegram_identifier
 
@@ -223,6 +225,24 @@ async def send_reply(reply_id: uuid.UUID) -> None:
         )
         if earlier:
             return  # Do not let a later response overtake a pending send in this conversation.
+        pending = await db.scalar(
+            select(ConversationReply).where(
+                ConversationReply.id == reply_id,
+                ConversationReply.status == "queued",
+                (ConversationReply.next_attempt_at.is_(None))
+                | (ConversationReply.next_attempt_at <= now),
+            )
+        )
+        institution = await db.get(Institution, reference.tenant_id)
+        if pending is None or institution is None:
+            return
+        reservation = await budget.reserve(
+            institution, f"r:{reply_id}:{pending.attempts + 1}", now=now
+        )
+        if not reservation.allowed:
+            pending.next_attempt_at, pending.error_code = reservation.retry_at, reservation.reason
+            await db.commit()
+            return
         row = (
             await db.execute(
                 update(ConversationReply)
@@ -275,9 +295,9 @@ async def send_reply(reply_id: uuid.UUID) -> None:
             except TelegramAPIError as error:
                 status = "uncertain" if error.uncertain else "failed"
                 code = f"telegram_{error.code}"
-                if error.code == 429 and row.attempts < 3:
+                if error.code == 429:
                     status = "queued"
-                    next_attempt = now + timedelta(seconds=min(max(error.retry_after, 1), 3600))
+                    next_attempt = datetime.now(UTC) + timedelta(seconds=max(error.retry_after, 1))
             except Exception:
                 status, code = "failed", "invalid_reply"
         await db.execute(
@@ -297,6 +317,8 @@ async def send_reply(reply_id: uuid.UUID) -> None:
                 .values(last_outbound_at=datetime.now(UTC))
             )
         await db.commit()
+        if status == "sent":
+            await budget.record_sent(reservation)
 
 
 async def recover_pending() -> None:
