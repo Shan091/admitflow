@@ -11,6 +11,7 @@ def main() -> None:
     for folder in (
         "backend/src",
         "backend/tests",
+        "backend/scripts",
         "backend/migrations",
         "frontend/app",
         "frontend/tests",
@@ -28,6 +29,9 @@ def main() -> None:
         "backend/.dockerignore",
         "backend/alembic.ini",
         "frontend/package.json",
+        "frontend/Dockerfile",
+        "frontend/.dockerignore",
+        "docker-compose.yml",
         "frontend/package-lock.json",
         "frontend/tsconfig.json",
         "frontend/next.config.ts",

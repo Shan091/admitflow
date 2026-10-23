@@ -42,7 +42,7 @@ Baseline also requires:
 | If the change touches… | Add these gates on top of baseline |
 |---|---|
 | **DB schema, engine dispatcher, RAG retrieval, mutex/dedup** | Integration tests against real Postgres (pgvector) + Redis; Alembic migration applies cleanly up **and** down. |
-| **Any LLM call** | Langfuse tracing present on the call; extraction uses a typed structured-output schema (no free-text parsing); model IDs read from settings, not hard-coded. |
+| **Any LLM call** | Shared-provider redacted model/usage/latency telemetry present (ADR-012); extraction uses a typed structured-output schema (no free-text parsing); model IDs read from settings, not hard-coded. |
 | **Payments (Razorpay)** | Replay protection tested (webhook clears the pending order / `payment_link_sent` flag); amounts come from the DB, never the LLM; HMAC verified. |
 | **Any external surface (webhook, HTTP endpoint)** | Signature/HMAC verified; input validated with Pydantic; authn/authz checked; unauthenticated exposure is called out explicitly. |
 | **Anything handling PII** | Application-level encryption on the field; access is audit-logged; tenant scoping (`tenant_id`) enforced. See [security-and-production.md](security-and-production.md). |

@@ -2,6 +2,30 @@
 
 ## Current direction
 
+**Current local-runtime slice:** `codex/full-stack-runtime` implements Task 38 after
+PR #9 was squash-merged as `d4971d1`. The root Compose stack has its own synthetic
+PostgreSQL/Redis/credential volumes and loopback ports 13000/18000; the existing native
+runtime and bot checkpoint are preserved. Migration/seed dependency ordering, API,
+worker, scheduler and standalone nonroot frontend build/start successfully. All nine
+live smoke/restart checks pass, including actual authenticated proxy/WebSocket,
+Redis/TaskIQ result and credential persistence. See `docs/event/COMPOSE_RESULTS.json`
+and `docs/engineering/COMPOSE_RUNTIME.md`. The backend gate passes 234 tests/111 source
+files; all nine affected PostgreSQL journey/account cases pass. The receiver image CLI
+and profile validate; no second live poller or provider calls were started. Legacy
+WhatsApp ingress and preexisting jobs are disabled by default; nondev debug is forced off.
+
+Adversarial review checked private config creation, image/build-context secret exclusion,
+nonroot volume ownership, seed/restart preservation, startup ordering, shared image
+reuse and authenticated proxy/WebSocket paths. The initial duplicate-image export
+race was fixed by building one shared backend image. No open critical/important
+findings remain for this group.
+
+The user says to finish remaining build tasks before choosing production hosting.
+Continue Task 42.1 document structure/semantic chunking and Task 42.2 contextual
+query rewriting next. Actual payment-account and handset-only checks, event identity/
+license/portal confirmation and public hosting remain separately unverified.
+
+
 Adversarial review checked tenant scope, session/setup bypasses, last-admin races,
 provider claims versus deletion, financial retention boundaries, source-ID forgery
 and ranking timeout/refusal fallback. No unresolved critical/important findings

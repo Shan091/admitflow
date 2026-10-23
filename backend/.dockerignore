@@ -7,6 +7,8 @@ __pycache__/
 .env
 .env.*
 .demo-credentials.json
+.demo-*.json
+graphify-out/
 .runtime/
 !.env.example
 tests/

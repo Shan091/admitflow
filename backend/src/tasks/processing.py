@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.core.settings import get_settings
 from src.engine.dispatcher import handle_turn
 from src.tasks.broker import broker
 
@@ -30,4 +31,5 @@ async def process_inbound_message(payload: dict[str, Any]) -> None:
     This is a placeholder for the actual dispatcher that will be built
     in Phase 3. The webhook enqueues messages here after deduplication.
     """
-    await handle_turn(payload)
+    if get_settings().legacy_whatsapp_enabled:
+        await handle_turn(payload)

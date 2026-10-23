@@ -445,3 +445,18 @@ synthetic ranking cases, and `uv run python -m src.scripts.evaluate_faq` for the
 24-case source/abstention check. These make paid OpenAI calls but no Telegram sends or
 database writes. Reports are saved under `docs/event/`; they do not establish broad
 fluency or production latency. CI uses mocked models and disposable test databases.
+
+# Isolated full-stack Compose
+
+See [the runtime runbook](../docs/engineering/COMPOSE_RUNTIME.md). From backend,
+`uv run python -m src.scripts.configure_compose` exclusively creates a private root
+configuration. Then run `docker compose up --build -d --wait` from the root. The UI
+uses loopback port 13000 and the API uses 18000; internal data services have no host
+ports. This is a separate synthetic database, not the existing native demo data.
+
+`uv run python scripts/verify_compose.py --restart` verifies persisted login credentials,
+API proxy, authenticated notifications socket, actual queue/result and scheduler.
+Telegram polling is opt-in through the `telegram` profile; use a separate bot or an
+explicit database/checkpoint migration. Live OpenAI/Telegram keys are never copied.
+Legacy WhatsApp ingress/jobs are off unless `LEGACY_WHATSAPP_ENABLED=true`; this
+compatibility switch is not required for Telegram. Nondevelopment APIs force debug off.

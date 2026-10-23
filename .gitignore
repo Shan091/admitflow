@@ -43,3 +43,5 @@ graphify-out/.graphify_*
 
 # Keep accidental nested graph output local; only the root report is published.
 /backend/graphify-out/
+
+.demo-compose-credentials.json

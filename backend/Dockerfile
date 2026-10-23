@@ -21,7 +21,9 @@ COPY src ./src
 COPY migrations ./migrations
 COPY alembic.ini ./alembic.ini
 
-RUN useradd --create-home --uid 10001 admitflow
+RUN useradd --create-home --uid 10001 admitflow \
+    && mkdir -p /run/admitflow \
+    && chown admitflow:admitflow /run/admitflow
 USER admitflow
 
 EXPOSE 8000

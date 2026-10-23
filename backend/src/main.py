@@ -55,14 +55,15 @@ def create_app() -> FastAPI:
     settings = get_settings()
     application = FastAPI(
         title=settings.app_name,
-        debug=settings.debug,
+        debug=settings.debug and settings.app_env == "dev",
         lifespan=lifespan,
     )
 
     # Wire up routers
     from src.whatsapp.webhook import router as webhook_router
 
-    application.include_router(webhook_router, prefix="/api/webhook")
+    if settings.legacy_whatsapp_enabled:
+        application.include_router(webhook_router, prefix="/api/webhook")
     from src.knowledge.api import router as knowledge_router
     from src.knowledge.limits import UploadBodyLimit
     from src.payments.webhook import router as payments_router

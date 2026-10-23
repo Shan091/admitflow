@@ -220,6 +220,7 @@ CRM, exports/integrations and the remaining institutional product milestones.
 - [x] Institution-managed staff accounts, forced private-password setup and session revocation; PostgreSQL and browser checks pass.
 - [x] Explicit full inquiry erasure and separately scoped conversation-history retention; role, tenant, concurrency and financial-preservation checks pass.
 - [x] Typed OpenAI decisions and required bounded passage reranking; no model training. Unit/database checks and live 4/4 ranking plus 24/24 FAQ checks pass.
+- [x] Task 38: isolated full-stack Compose build/start, real proxy/WebSocket/queue/scheduler checks and credential-preserving restart pass; receiver polling is an explicit profile.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |

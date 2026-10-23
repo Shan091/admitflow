@@ -157,3 +157,5 @@ including during staff takeover. Office hours must be configured before outreach
 run. `FOLLOWUPS_ENABLED=false` is the global configuration switch; reload the worker
 and scheduler after changing it. Do not enable or backdate a real student's inquiry as
 a validation shortcut. Automated tests use disposable synthetic records.
+
+The isolated all-container alternative is documented in [COMPOSE_RUNTIME.md](COMPOSE_RUNTIME.md). It preserves this native runtime and its data.
