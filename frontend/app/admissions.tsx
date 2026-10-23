@@ -1,4 +1,6 @@
 "use client";
+import StaffControls from "./staff-controls";
+import type { StaffDraft } from "./staff-controls";
 
 import { useCallback, useEffect, useState } from "react";
 
@@ -29,11 +31,14 @@ type Human = {
 type Detail = {
   id: string;
   status: string;
+  copilot_mode: boolean;
+  draft_stale: boolean;
   course_id: string | null;
   batch_id: string | null;
   batch_name: string | null;
   memory: {
     language?: string;
+    staff_draft?: StaffDraft;
     facts?: Record<string, unknown>;
     eligibility?: { outcome: string; rules?: RuleEvidence[] };
   };
@@ -412,6 +417,21 @@ export default function Admissions({
                 </details>
               )}
               <h3 className="conversation-heading">Conversation</h3>
+              <StaffControls
+                key={detail.id}
+                leadId={detail.id}
+                active={detail.copilot_mode}
+                draft={detail.memory.staff_draft}
+                stale={detail.draft_stale}
+                request={request}
+                onError={onError}
+                onRefresh={async () => {
+                  setOlderLoaded(false);
+                  setDetail(
+                    (await request(`/staff/leads/${detail.id}`)) as Detail,
+                  );
+                }}
+              />
               {detail.older_cursor && (
                 <button
                   className="secondary"

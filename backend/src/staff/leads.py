@@ -1,6 +1,7 @@
 """Authenticated, audited lead/conversation access and explicit human-request controls."""
 
 import json
+import time
 import uuid
 from typing import Any, Literal
 
@@ -12,20 +13,23 @@ from src.db.audit import write_audit_log
 from src.db.enums import LeadStatus
 from src.db.models import (
     Batch,
+    ConversationEvent,
     ConversationMemory,
     Course,
     HumanRequest,
     Lead,
 )
+from src.engine.timeline import timeline
 from src.staff.auth import Db, Staff, require_browser_write
-from src.staff.transcript import timeline
 
 router = APIRouter(prefix="/api/staff", tags=["staff admissions"])
 
 
 async def get_lead(db: Db, staff: Staff, lead_id: uuid.UUID, *, lock: bool = False) -> Lead:
     statement = select(Lead).where(Lead.id == lead_id, Lead.tenant_id == staff.tenant_id)
-    lead = await db.scalar(statement.with_for_update() if lock else statement)
+    lead = await db.scalar(
+        statement.with_for_update().execution_options(populate_existing=True) if lock else statement
+    )
     if lead is None:
         raise HTTPException(404, "Inquiry not found.")
     return lead
@@ -95,6 +99,28 @@ async def lead_detail(
     )
     memory = json.loads(decrypt_pii(saved.payload_enc)) if saved else {}
     messages, older_cursor = await timeline(db, staff.tenant_id, lead.id, cursor)
+    draft = memory.get("staff_draft", {})
+    latest_event = (
+        await db.scalar(
+            select(ConversationEvent.id)
+            .where(
+                ConversationEvent.tenant_id == staff.tenant_id, ConversationEvent.lead_id == lead.id
+            )
+            .order_by(ConversationEvent.update_id.desc())
+            .limit(1)
+        )
+        if draft
+        else None
+    )
+    draft_stale = bool(
+        draft
+        and (
+            not lead.copilot_mode
+            or draft.get("source_event_id") != str(latest_event)
+            or draft.get("expires_at", 0) <= time.time()
+            or draft.get("revision", 0) != memory.get("staff_revision", 0)
+        )
+    )
     batch_name = await db.scalar(
         select(Batch.name).where(
             Batch.id == lead.current_batch_id, Batch.tenant_id == staff.tenant_id
@@ -111,6 +137,8 @@ async def lead_detail(
     return {
         "id": str(lead.id),
         "status": lead.status.value,
+        "copilot_mode": lead.copilot_mode,
+        "draft_stale": draft_stale,
         "memory": memory,
         "course_id": str(lead.current_course_id) if lead.current_course_id else None,
         "batch_id": str(lead.current_batch_id) if lead.current_batch_id else None,
@@ -162,7 +190,9 @@ async def update_request(
         request.status = destination
         if action == "resume":
             from src.engine.applications import resumed_status
+            from src.staff.operations import finish_takeover
 
+            await finish_takeover(db, lead)
             lead.status = await resumed_status(db, lead)
         await write_audit_log(
             db,

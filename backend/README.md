@@ -189,3 +189,31 @@ Staff lead detail now returns a unified, encrypted-source transcript with `messa
 `kind`, `created_at` and `older_cursor`. Pass the opaque cursor as `?cursor=...` to load
 the next older 50-message page. It includes standalone payment deliveries and their
 actual queued/sent/failed/uncertain status. It replaces event-number-only pagination.
+
+## Staff takeover and reviewed co-pilot
+
+Inquiry detail includes Take over, manual staff replies, co-pilot drafts and Resume AI.
+The staff session and browser-write protection apply to every operation. Takeover pauses
+automatic conversation replies while preserving inbound messages; a currently sending
+bot reply must finish first. Resume waits for queued staff replies and restores saved
+facts plus confirmed delivered conversation history.
+
+Under `/api/staff/leads/<lead-id>`, POST `/takeover` and `/resume` control the mode.
+POST `/messages` accepts `{request_id: <UUID>, text: <reviewed reply>}`; retry with the
+same reference and text after an interrupted response. A changed reply requires a new
+reference. The durable worker sends the reply; an API success means queued, not delivered.
+
+POST `/draft` with `{request_id: <UUID>}` generates one encrypted, expiring draft without
+sending. POST `/draft/<draft-id>` accepts `decision: approve|ignore`; approval requires
+`reviewed: true` and optionally edited `text`. New student messages, staff revisions,
+expiry or inactive routing prevent approval. Generation is bounded and throttled; provider
+failure leaves manual composition available. Resume invalidates an unfinished draft.
+The UI asks staff to review factual claims and confirm the exact text before queuing.
+
+Institution timezone/business hours affect support wording. Immediate staff response is
+never promised. Clear human requests, frustration and urgent safety signals use the staff
+queue; the admissions inbox does not provide emergency support.
+
+Tests ignore implicit local dotenv files. Use explicit environment variables for the Redis
+integration check and `Settings(_env_file=...)` only in dedicated configuration fixtures.
+Runtime CLI configuration still reads the normal ignored local `.env`.
