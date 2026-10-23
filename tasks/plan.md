@@ -204,13 +204,16 @@ send budgets, then the remaining institutional milestones. Task 22 is now implem
 and verified: both Telegram outboxes share an atomic daily attempt budget, capped work
 stays queued, and staff see usage/reset warnings. Task 22 is published through merged PR #4. Consent-aware follow-ups (Task 21)
 now have verified generation, explicit opt-in/out, a two-reminder cap and a running local
-scheduler. Continue analytics and the remaining institutional product milestones.
+scheduler. Task 26 now has a verified Overview with creation-cohort conversions,
+observed lifecycle reach and institution-local daily/weekly inquiry charts. Continue
+CRM, exports/integrations and the remaining institutional product milestones.
 
 - [x] Tasks 20/29: takeover, pause/resume, reviewed drafts and replay-safe staff-send UI.
 - [x] Verify staff behavior against PostgreSQL, live OpenAI and desktop/mobile browser scenarios.
 - [x] Publish the staff slice through merged PR #2 with green backend/frontend CI.
 - [x] Task 22: daily send budgets, durable deferral, warning/settings UI and Redis concurrency evidence.
-- [x] Task 21: explicit follow-up consent, bounded outreach and scheduled recovery; tests and live OpenAI safety checks pass.
+- [x] Task 21: explicit follow-up consent, bounded outreach and scheduled recovery; published through PR #5 with green CI.
+- [x] Task 26: truthful cohort analytics, transactional stage history, accessible charts and default Overview; database/browser checks pass.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |
