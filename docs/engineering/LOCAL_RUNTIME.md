@@ -54,7 +54,7 @@ Use separate terminals. The first three commands run from `backend/`:
 
 ```bash
 uv run uvicorn src.main:app --host 127.0.0.1 --port 8000
-uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge --workers 1
+uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge src.tasks.followups --workers 1
 uv run python -m src.telegram.receiver --institution-code demo
 ```
 
@@ -145,3 +145,13 @@ shared and persistent for process-independent accounting; do not flush it to res
 A read of `/api/staff/delivery-budget` under the normal staff session verifies availability
 without sending a Telegram message. See backend/README.md for counting semantics,
 production outage behavior and the limited no-Redis development fallback.
+
+## Optional reminders and scheduler
+
+The worker must import `src.tasks.followups`; run `uv run python -m src.scripts.scheduler`
+from backend as a separate producer. All inquiries start without consent. `/followups`
+and its explicit signed opt-in button enable up to two reminders; `/stop` disables them,
+including during staff takeover. Office hours must be configured before outreach can
+run. `FOLLOWUPS_ENABLED=false` is the global configuration switch; reload the worker
+and scheduler after changing it. Do not enable or backdate a real student's inquiry as
+a validation shortcut. Automated tests use disposable synthetic records.

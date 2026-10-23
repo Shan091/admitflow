@@ -52,3 +52,14 @@ Malayalam unit cases; no emergency-service or native-speaker certification is cl
 In the synthetic bot: choose the language; select course/batch; provide age 20 and marks 70; correct age to 17 and then 21; decline an answer; ask about campus/library/hostel and an unsupported topic; request /human. Check clarity of buttons and recovery messages. Staff must acknowledge, resolve, then explicitly resume. Confirm the next student message continues normally.
 
 The expanded synthetic FAQ prompts are maintained in backend/src/scripts/evaluate_faq.py. Its report is docs/event/EVALUATION_RESULTS.json. It checks expected quotations/abstention, not translation style or spoken-language quality.
+
+## Reminder consent and outreach copy
+
+The agent reviewed `reminders_prompt`, `reminders_enable`, `reminders_disable`,
+`reminders_on`, `reminders_off`, `reminders_limit`, `reminder_fallback`,
+`reminder_footer` and `reminder_continue` in English, Hindi, Hinglish and Malayalam.
+The text makes opt-in optional, states the two-reminder bound, preserves literal
+`/followups` and `/stop` commands and avoids pressure, prices, deadlines or promises.
+Opt-out wording preserves the student's ability to continue asking questions.
+Generated reminder questions also pass a structured safety check, with reviewed neutral
+copy as fallback. This is agent review, not native-speaker or emergency-service certification.

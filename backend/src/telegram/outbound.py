@@ -128,6 +128,12 @@ async def send_outbound(message_id: uuid.UUID) -> None:
         )
         if older or reply_pending:
             return
+        if message.kind == "followup":
+            from src.outreach.followups import before_send
+
+            if not await before_send(db, lead, message, now):
+                await db.commit()
+                return
         routing = (
             await db.execute(
                 select(TelegramIdentity, TelegramBot)
@@ -163,6 +169,9 @@ async def send_outbound(message_id: uuid.UUID) -> None:
             message.next_attempt_at, message.error_code = reservation.retry_at, reservation.reason
             await db.commit()
             return
+        if message.kind == "followup" and message.attempts == 0:
+            lead.reengagement_attempts += 1
+            lead.followup_due_at = None
         message.status = "sending"
         message.attempts += 1
         tenant_id, lead_id = lead.tenant_id, lead.id
@@ -215,6 +224,10 @@ async def send_outbound(message_id: uuid.UUID) -> None:
                     order.payment_link_sent = True
                     if order.status == PaymentStatus.CREATED:
                         order.status = PaymentStatus.LINK_SENT
+        if kind == "followup":
+            from src.outreach.followups import after_send
+
+            await after_send(db, tenant_id, lead_id, dedup_key, state, datetime.now(UTC))
         await db.commit()
         if state == "sent":
             await budget.record_sent(reservation)

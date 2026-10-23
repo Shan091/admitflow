@@ -11,7 +11,7 @@ preserved in the [baseline archive](../docs/planning/archive/2026-10-23-before-t
 
 The user has assigned **all remaining tasks to the primary agent**. The previous
 proposal to reserve Task 26 for another agent is superseded; nothing is waiting for
-an external analytics handoff. Finish Task 22 publication through PR #4, then Task 21
+an external analytics handoff. Task 22 was published through merged PR #4; continue Task 21
 consent-aware follow-ups and the rest of this existing roadmap, including analytics.
 Group related implementation work, use focused tests during development, and run the
 full applicable gate once each feature group is ready. Keep the repository's review,
@@ -654,10 +654,33 @@ remains local. The remaining handset/payment checks stay open.
 ### Task 21: Cold lead re-engagement worker
 **Description:** Scheduled TaskIQ task that finds stale leads and sends AI-generated, context-aware follow-up hooks.
 **Acceptance criteria:**
-- [ ] Stale leads identified (no reply in X days)
-- [ ] AI generates personalized hook with urgency + tap button
-- [ ] Max 2 follow-ups, then mark `cold`
-**Verification:** Test with artificially aged leads
+- [x] Identify opted-in stale inquiries using the configured delay; new messages, opt-out and staff takeover invalidate pending outreach.
+- [x] Generate a context-aware multilingual reminder with a continue button; no invented urgency, deadlines, prices or admission promises.
+- [x] At most two reminder delivery opportunities; a confirmed second reminder marks a still-inactive early-stage inquiry `cold`.
+**Verification:** The feature-group gate passes lint/format, strict typing over **92
+source files** and **186 default tests** (two pre-existing RAG AsyncMock warnings).
+The full PostgreSQL suite passes **60 cases** and two real Redis cases pass separately:
+**62 integration cases** total. Sixteen follow-up database scenarios cover explicit signed
+consent, opt-out during takeover, fresh-state checks, queued inbound messages, office
+hours/unknown hours, inactive courses, global disable, provider ambiguity, expired leases,
+concurrent jobs and the two-reminder cap. Five unit cases cover eligibility and generated
+copy refusal/provider-failure fallbacks.
+
+Live OpenAI generation plus independent typed safety checks pass in English, Hindi,
+Hinglish and Malayalam (**8 successful structured calls**, no neutral fallbacks).
+No Telegram reminder was sent. Migration `e31b0847c629` is applied locally; existing
+inquiries remain opted out. The API and worker were restarted with the follow-up task
+module, the scheduler's one-shot sweep queued zero jobs, its continuous producer is
+running, and authenticated saved-inquiry reads/readiness pass.
+
+Post-review regression reproduced queued reminders remaining executable after consent
+fields were rolled back. Downgrade now cancels queued reminders and preserves in-flight
+uncertainty; the focused rollback/up-down test passes after the fix. Scoped adversarial
+review covered consent defaults/signatures, source freshness, lock release/leases, send
+opportunity counting, safe provider fallback, tenant boundaries and rollback. No open
+important/critical finding remains. Publication follows the separate PR/CI workflow.
+Reminder copy has agent language review; handset-delivered reminders and native-speaker
+certification are not claimed. Task 26 analytics and the remaining roadmap stay open.
 **Dependencies:** Task 17, 6
 **Estimated scope:** Medium
 

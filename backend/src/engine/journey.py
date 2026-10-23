@@ -547,7 +547,8 @@ async def route(
             text=f"Welcome to {institution.name if institution else 'AdmitFlow'}. "
             "This is a synthetic admissions demonstration. Do not send personal documents. "
             "Choose a language preference; source quotations keep their original language. "
-            "Use /courses to explore or /human to request staff review.",
+            "Use /courses to explore or /human to request staff review. "
+            "Optional reminders are off by default: /followups to choose, /stop to disable them.",
             buttons=[
                 button(label, "language", language, lead, bot)
                 for label, language in [

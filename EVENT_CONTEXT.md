@@ -12,21 +12,26 @@ controls. Published ancestry starts at fresh root `1ac0ffe`; these commits were 
 created during this publication using actual current timestamps. No old Git history was pushed into the replacement. Earlier history
 remains on local branches; earlier publication hashes/PR notes below are historical.
 
-**Current budget slice:** Branch `codex/telegram-send-budgets` is based on fresh
-`origin/main` after PR #3. Task 22 is implemented with per-institution daily send-attempt
-limits, atomic shared Redis reservations, queued deferral, exact provider retry delays,
-usage warnings and administrator settings. Zero pauses new claims; raising a cap wakes
-budget-deferred work. Confirmed counts use durable DB records, including after a lost
-Redis statistics update. The backend gate passes 181 tests/87 strict-typed source files;
-44 PostgreSQL cases and two Redis cases pass, with four budget DB cases rerun after the
-statistics fix; final delivery cases also cover repeated rate limits and the complete
-provider delay measured from rejection. All five browser scenarios pass on the rebuilt/restarted workspace.
-Migration `9c5027e2d614` is applied locally; API and worker use current sources, readiness
-and authenticated budget reads pass. No new Telegram message was sent for this slice.
-Publication uses the separate feature-branch/PR/CI gate; continue Task 21 consent-aware follow-ups and
-the full remaining roadmap. Staff controls are already published through merged PR #2.
-The Razorpay test account remains a user-side prerequisite; owner/team/submission details
-remain deferred. No whole-goal completion claim.
+**Current follow-up slice:** Task 22 is published through merged PR #4 (`ff35eba`).
+Branch `codex/consented-followups` implements Task 21: student opt-in through /followups,
+/stop even during staff takeover, source freshness/cancellation, office hours, recoverable
+generation leases and at most two delivery opportunities. Unsafe/unavailable generation
+uses reviewed neutral copy; a separate typed OpenAI safety check guards generated text.
+The group gate passes 186 default tests, strict typing over 92 source files and 62
+PostgreSQL/Redis integration cases. Live generation/safety checks pass in all four
+languages (8 successful structured calls, no Telegram reminder sent). A focused rollback
+regression was reproduced/fixed: queued reminders cannot remain executable after removal
+of consent fields; in-flight requests remain uncertain. Migration `e31b0847c629` is applied
+locally, existing inquiries remain opted out, API/worker were restarted, the one-shot
+scheduler queued zero jobs and its continuous producer is running. Authenticated saved
+inquiry reads and readiness pass. Publication uses its own PR/CI gate.
+
+The user now assigns all remaining tasks to the primary agent and requests faster grouped
+execution; the earlier analytics handoff proposal is withdrawn. Continue Task 26 analytics
+and the full existing roadmap. Do not repeat unchanged full checks: use focused tests
+during work and one full applicable gate when a feature group is ready. The Razorpay test
+account and final owner/team/submission details remain deferred user-side prerequisites.
+No whole-goal completion claim.
 
 Execute the existing [implementation plan](tasks/plan.md) and track verified work in
 [tasks/todo.md](tasks/todo.md). Use [SPEC.md](SPEC.md) and
