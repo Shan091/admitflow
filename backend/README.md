@@ -217,3 +217,33 @@ queue; the admissions inbox does not provide emergency support.
 Tests ignore implicit local dotenv files. Use explicit environment variables for the Redis
 integration check and `Settings(_env_file=...)` only in dedicated configuration fixtures.
 Runtime CLI configuration still reads the normal ignored local `.env`.
+
+## Telegram delivery budgets
+
+Both conversation replies and standalone staff/payment messages reserve one shared
+send attempt before making a Telegram request. Each institution starts with a daily
+limit of 1000; an administrator can set 0–100000 in Institution settings. Zero pauses
+new sends. The day resets at midnight in the configured institution timezone, including
+daylight-saving changes. This is an operational cap rather than a provider billing limit.
+
+Reservations are atomic in Redis and keyed by internal delivery/attempt references.
+Replaying a database claim does not spend the same reservation twice; failed and
+ambiguous attempts conservatively use budget. Deferred messages retain `queued` status,
+do not increment their delivery attempts and are eligible again at the local reset.
+Increasing the cap or changing timezone wakes budget-deferred work for re-evaluation.
+Telegram's `retry_after` is preserved instead of shortened and measured from rejection.
+Explicit rate-limit rejections remain queued beyond three attempts, subject to the same
+daily cap; they do not become ambiguous retries. Existing ordering/recovery
+and uncertain-delivery handling remain in force.
+
+`GET /api/staff/delivery-budget` is session/tenant scoped. It returns tracked attempts,
+confirmed database deliveries, queued budget deferrals and the next reset. The workspace
+warns at 80% use or when counts cannot be checked. It never presents an unknown budget
+count as zero. Confirmed-delivery totals use durable database records even if a Redis
+statistics update fails. Attempt accounting begins when this feature is activated.
+
+Production requires shared persistent Redis: a failed/unconfigured budget store defers
+sends for a retry instead of bypassing the cap. Development without Redis uses a bounded
+in-process fallback; that fallback is not a cross-process or production guarantee.
+Preserve Redis persistence during restarts. Reservations and statistics expire after
+several days and contain internal identifiers, not student contact data.

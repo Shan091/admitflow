@@ -6,6 +6,7 @@ import Admissions from "./admissions";
 import Management from "./management";
 import Applications from "./applications";
 import Payments from "./payments";
+import DeliveryBudget from "./delivery-budget";
 
 type Staff = { email: string; role: string; institution: string };
 type Doc = {
@@ -455,6 +456,7 @@ export default function Knowledge() {
           </span>
         </header>
         <div className="content">
+          <DeliveryBudget request={api} onError={sessionFailure} />
           {view === "management" ? (
             <Management
               request={api}

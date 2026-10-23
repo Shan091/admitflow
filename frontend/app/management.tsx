@@ -30,6 +30,7 @@ type Settings = {
   timezone: string;
   business_hours: Record<string, { start: string; end: string }>;
   reengagement_delay_days: number;
+  telegram_daily_send_limit: number;
   retention_days: number | null;
 };
 const empty: Course = {
@@ -131,6 +132,7 @@ export default function Management({
           })) as Settings,
         );
         setNotice("Institution settings saved.");
+        window.dispatchEvent(new Event("admitflow:budget-changed"));
       }
     } catch (e) {
       setError(onError(e));
@@ -573,6 +575,27 @@ export default function Management({
                     setSettings({ ...settings, timezone: e.target.value })
                   }
                 />
+              </label>
+              <label>
+                Daily Telegram send attempts
+                <input
+                  type="number"
+                  min="0"
+                  max="100000"
+                  required
+                  value={settings.telegram_daily_send_limit ?? 1000}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      telegram_daily_send_limit: Number(e.target.value),
+                    })
+                  }
+                />
+                <span className="quiet">
+                  Resets at midnight in the institution timezone. Set 0 to pause
+                  sends. Failed or uncertain attempts also use this budget;
+                  replies stay queued at the limit.
+                </span>
               </label>
               <h3>Business hours</h3>
               <p className="quiet">

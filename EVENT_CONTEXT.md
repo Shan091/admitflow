@@ -12,17 +12,21 @@ controls. Published ancestry starts at fresh root `1ac0ffe`; these commits were 
 created during this publication using actual current timestamps. No old Git history was pushed into the replacement. Earlier history
 remains on local branches; earlier publication hashes/PR notes below are historical.
 
-**Current staff slice:** Branch `codex/staff-copilot` is based on the fresh
-`origin/main`. Tasks 20/29 implement takeover/manual Telegram sends, encrypted reviewed
-co-pilot drafts, pause/resume with confirmed staff history, multilingual escalation and
-office-hour wording. The backend gate passes 175 tests and strict typing over 86 source
-files; 41 PostgreSQL/Redis integration cases and all four browser scenarios pass. A live
-OpenAI draft was generated, ignored and AI resumed with unchanged student facts and zero
-new outbound messages. The API was restarted on the current sources and both health
-and database/Redis readiness pass. No new staff-authored handset delivery is claimed. Concurrent
-memory-update and cancelled-generation regressions are covered. The staff slice is published through merged
-PR #2 with both CI checks green. Continue Tasks 21/22 and the entire remaining roadmap;
-the Razorpay test account remains a user-side prerequisite. No whole-goal completion claim.
+**Current budget slice:** Branch `codex/telegram-send-budgets` is based on fresh
+`origin/main` after PR #3. Task 22 is implemented with per-institution daily send-attempt
+limits, atomic shared Redis reservations, queued deferral, exact provider retry delays,
+usage warnings and administrator settings. Zero pauses new claims; raising a cap wakes
+budget-deferred work. Confirmed counts use durable DB records, including after a lost
+Redis statistics update. The backend gate passes 181 tests/87 strict-typed source files;
+44 PostgreSQL cases and two Redis cases pass, with four budget DB cases rerun after the
+statistics fix; final delivery cases also cover repeated rate limits and the complete
+provider delay measured from rejection. All five browser scenarios pass on the rebuilt/restarted workspace.
+Migration `9c5027e2d614` is applied locally; API and worker use current sources, readiness
+and authenticated budget reads pass. No new Telegram message was sent for this slice.
+Publication uses the separate feature-branch/PR/CI gate; continue Task 21 consent-aware follow-ups and
+the full remaining roadmap. Staff controls are already published through merged PR #2.
+The Razorpay test account remains a user-side prerequisite; owner/team/submission details
+remain deferred. No whole-goal completion claim.
 
 Execute the existing [implementation plan](tasks/plan.md) and track verified work in
 [tasks/todo.md](tasks/todo.md). Use [SPEC.md](SPEC.md) and

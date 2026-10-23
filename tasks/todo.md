@@ -7,6 +7,41 @@ there is no parallel roadmap. Prior task IDs and historical results below remain
 baseline evidence, not Telegram end-to-end acceptance. Original dated records are
 preserved in the [baseline archive](../docs/planning/archive/2026-10-23-before-telegram-alignment/README.md).
 
+### Active work ownership and safe parallel work
+
+The current primary agent owns **Task 22** (Telegram send budgets/queuing) and then
+**Task 21** (consent-aware scheduled follow-ups). Task 22 is on
+`codex/telegram-send-budgets`; implementation and local verification are recorded below.
+Do not duplicate either task while this ownership is active.
+
+**Available for another agent: Task 26 — dashboard funnel/time-series analytics.**
+Deliver a session-authenticated, tenant-scoped read-only API router, an analytics UI
+component and isolated tests. Cover all lead lifecycle counts, clearly defined
+conversion denominators and institution-local daily/weekly lead totals, including
+empty data and cross-tenant rejection. Do not imply historical stage conversions from
+current-state counts. Reuse existing models/authentication and the current UI design.
+
+Safe new files: `backend/src/staff/analytics.py`, `frontend/app/analytics.tsx`,
+`frontend/app/analytics.module.css`, `backend/tests/test_analytics.py`,
+`backend/tests/integration/test_analytics.py` and
+`frontend/tests/analytics.e2e.ts`. The primary agent will integrate router/navigation
+registration and run the integrated browser acceptance after the component is ready.
+Task 26 is available, not a claim that another agent has started or finished it.
+
+**Reserved integration files:** existing `backend/src/db/`, `backend/migrations/`,
+`backend/src/telegram/`, `backend/src/engine/`, `backend/src/tasks/`,
+`backend/src/core/settings.py`, `backend/src/staff/management.py`,
+`backend/src/staff/leads.py`, `backend/src/main.py`, `frontend/app/page.tsx`,
+`frontend/app/globals.css`, `frontend/app/management.tsx`, `frontend/app/admissions.tsx`,
+`tasks/plan.md`, this file, `EVENT_CONTEXT.md`, build manifests and graph outputs.
+
+Use a separate branch/worktree of this same repository for Git operations. If sharing
+this checkout, create only the isolated files above; do not switch branches, stage or
+commit, apply migrations, regenerate shared artifacts, restart shared services or
+change local credentials. Report changed paths, test results and integration needs.
+No analytics schema migration is needed for this slice. Retain the full remaining
+roadmap; this partition exists only to avoid overlapping edits.
+
 ### Task 43: Telegram identity and trusted bot-to-institution mapping
 
 **Status:** Published in the fresh repository through merged PR #1; verification below records the original task evidence.
@@ -655,10 +690,34 @@ remains local. The remaining handset/payment checks stay open.
 **Description:** Track institution send volume, honor Telegram retry delays and queue messages when a configured send budget is reached. ADR-012 supersedes the old Meta tier requirements.
 **Acceptance criteria:**
 - [x] Conversation replies and standalone deliveries serialize claims per lead and preserve order in both directions; uncertain delivery is not automatically repeated.
-- [ ] Outbound count tracked in Redis per tenant per day
-- [ ] Warning surfaced when approaching limit
-- [ ] Messages queued instead of dropped when limit reached
-**Verification:** Unit test with simulated high volume
+- [x] Shared Redis reservations count send attempts per institution-local day; confirmed-delivery totals come from durable database records.
+- [x] Workspace warning at 80% usage; authenticated counts, queued totals, reset time and administrator budget control.
+- [x] Both bot and standalone replies stay queued at the cap; zero pauses new claims, raising the cap wakes deferred work, and production budget outages defer safely.
+**Verification:** The backend gate passes **181 tests**, lint/format and strict typing
+across **87 source files**. The full PostgreSQL suite passes **44 cases**; two Redis-only
+cases pass separately (**46 integration cases** total). Six budget unit cases cover local
+midnight/DST, replay, pause and unavailable budget storage. Four budget database cases
+cover both delivery queues, concurrent claims, scoped settings, exact provider retry delay,
+migration up/down and preservation. Rate-limited replies remain queued beyond three
+attempts and wait the full delay measured from rejection. Final review reproduced a lost-statistics-write
+regression; the four budget database cases pass after making confirmed counts DB-owned.
+The real Redis test admits exactly seven of 100 competing reservations, replays without
+spending again and proves tenant isolation. Failed/uncertain attempts consume budget.
+
+Frontend lint/build and **all five browser scenarios** pass, including budget pause/change,
+unavailable statistics, existing staff/payment flows and live OpenAI knowledge search.
+Desktop/mobile screenshots show no overflow; the UI detector reports no findings. The
+local database is at `9c5027e2d614`; API/worker/frontend were restarted on current sources,
+and authenticated budget/readiness reads pass. No synthetic outbound event or unsolicited
+Telegram message was added for this validation. Counts track attempts from activation;
+they are an operational send cap, not a provider billing guarantee. Production requires
+shared persistent Redis; the in-process development fallback is explicitly limited.
+
+Adversarial review covered atomic caps, ambiguous sends, crash/replay reservation safety,
+zero-limit revocation, repeated provider rate limits, tenant/admin boundaries, browser-write protection, local days and
+queue recovery. No open important/critical finding remains in this slice. Publication
+follows the separate feature-branch/PR/CI gate; GitHub records its result. Task 21
+consent-aware follow-ups is next.
 **Dependencies:** Task 6
 **Estimated scope:** Small
 

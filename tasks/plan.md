@@ -200,11 +200,16 @@ database/provider/browser checks cover these paths; the real Razorpay test-accou
 journey remains open. Staff takeover/co-pilot now passes backend, database and browser
 checks. A live OpenAI draft was ignored without adding outbound messages; a new
 handset-confirmed staff send remains separate. Continue Tasks 21/22 follow-ups and
-send budgets, then the remaining institutional milestones.
+send budgets, then the remaining institutional milestones. Task 22 is now implemented
+and verified: both Telegram outboxes share an atomic daily attempt budget, capped work
+stays queued, and staff see usage/reset warnings. Consent-aware follow-ups (Task 21)
+remain the next implementation slice.
 
 - [x] Tasks 20/29: takeover, pause/resume, reviewed drafts and replay-safe staff-send UI.
 - [x] Verify staff behavior against PostgreSQL, live OpenAI and desktop/mobile browser scenarios.
 - [x] Publish the staff slice through merged PR #2 with green backend/frontend CI.
+- [x] Task 22: daily send budgets, durable deferral, warning/settings UI and Redis concurrency evidence.
+- [ ] Task 21: explicit follow-up consent, bounded outreach and scheduled recovery.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |
