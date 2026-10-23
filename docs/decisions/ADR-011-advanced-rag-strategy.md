@@ -24,10 +24,22 @@ FAQ answers still require an exact quotation from a supplied source or abstain.
 
 ## Separate retrieval work
 
-Digital PDF, DOCX and text ingestion remains supported. Complex table/layout parsing,
-semantic chunking and full conversational rewriting remain separate tasks. Existing
-bounded non-ASCII query translation remains in place. The active candidate search is
-pgvector similarity; the compatibility hybrid-search helper is not this runtime path.
+Digital PDF, DOCX and text ingestion remains supported. Complex table/layout parsing
+and semantic chunking remain Task 42.1. Task 42.2 now resolves follow-ups through typed
+OpenAI decisions over six bounded recent completed/sent turns. Uncertain references
+ask for clarification. Standalone questions retain bounded non-ASCII translation and
+the ASCII fast path. Numeric rewrites are compared by normalized decimal value.
+
+Administrators can mark an indexed document as shared or assign it to a tenant-owned
+course. Student retrieval includes shared references plus explicitly named active
+catalog courses, falling back to the selected course. With no course, only shared
+references are eligible. Staff can explicitly filter by course. These metadata
+filters run before candidate ranking; model output never supplies authoritative IDs.
+Application/registration fees use matching database course rows, including explicit
+questions about a different course, without altering the student selection.
+
+The active candidate search is pgvector similarity; the compatibility hybrid-search
+helper is not this runtime path.
 
 ## Verification and tradeoffs
 

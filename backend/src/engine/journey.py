@@ -23,6 +23,7 @@ from src.db.models import (
     Batch,
     ConversationMemory,
     Course,
+    Document,
     DocumentChunk,
     HumanRequest,
     Institution,
@@ -37,7 +38,8 @@ from src.engine.escalation import Reason, escalation_reason, office_open
 from src.engine.llm_factory import AllProvidersFailedError, generate_completion
 from src.knowledge.processing import embed_chunks
 from src.knowledge.reranking import rerank
-from src.knowledge.retrieval import retrieval_query
+from src.knowledge.retrieval import contextual_query
+from src.knowledge.scope import AmbiguousCourseReference, question_courses, reference_scope
 from src.logic.rules import evaluate_rule
 from src.telegram.callbacks import callback_data, parse_callback
 
@@ -335,6 +337,34 @@ async def qualify(
     )
 
 
+APPLICATION_FEE_QUESTION = re.compile(r"\b(application|registration)\s+(fee|cost)s?\b", re.I)
+
+
+async def fee_information(
+    db: AsyncSession, lead: Lead, memory: dict[str, Any], course_ids: list[uuid.UUID]
+) -> Reply:
+    courses = (
+        await db.scalars(
+            select(Course)
+            .where(
+                Course.tenant_id == lead.tenant_id,
+                Course.id.in_(course_ids),
+                Course.is_active.is_(True),
+            )
+            .order_by(Course.name)
+        )
+    ).all()
+    if not courses:
+        return Reply(text=copy("clarify_reference", memory))
+    return Reply(
+        text="\n".join(
+            f"{course.name}: application/registration fee INR {course.application_fee / 100:.2f}. "
+            "This is the configured application fee, not tuition or a seat reservation."
+            for course in courses
+        )
+    )
+
+
 async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], text: str) -> Reply:
     course = await db.scalar(
         select(Course).where(
@@ -343,12 +373,15 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
             Course.is_active.is_(True),
         )
     )
-    if course and re.search(r"\b(application|registration)\s+(fee|cost)\b", text, re.I):
-        return Reply(
-            text=f"{course.name}: application/registration fee "
-            f"INR {course.application_fee / 100:.2f}. "
-            "This is the configured application fee, not tuition or a seat reservation."
+    try:
+        explicit_courses = await question_courses(
+            db, lead.tenant_id, text, course, fallback_to_selection=False
         )
+    except AmbiguousCourseReference:
+        return Reply(text=copy("clarify_reference", memory))
+    scoped_courses = explicit_courses or ([course.id] if course else [])
+    if APPLICATION_FEE_QUESTION.search(text):
+        return await fee_information(db, lead, memory, scoped_courses)
     ready = await db.scalar(
         select(KnowledgeUpload.id)
         .where(KnowledgeUpload.tenant_id == lead.tenant_id, KnowledgeUpload.status == "ready")
@@ -356,12 +389,28 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
     )
     if ready is None:
         return Reply(text=copy("unknown", memory))
-    query = await retrieval_query(text)
+    history = await recent_history(db, lead)
+    query = await contextual_query(text, history, course.name if course else None)
+    if query is None:
+        return Reply(text=copy("clarify_reference", memory))
+    try:
+        scoped_courses = explicit_courses or await question_courses(
+            db, lead.tenant_id, query, course
+        )
+    except AmbiguousCourseReference:
+        return Reply(text=copy("clarify_reference", memory))
+    if APPLICATION_FEE_QUESTION.search(query):
+        return await fee_information(db, lead, memory, scoped_courses)
     vector = (await embed_chunks([f"{course.name}: {query}" if course else query]))[0]
     distance = DocumentChunk.embedding.cosine_distance(vector)
     rows = (
         await db.execute(
             select(DocumentChunk, KnowledgeUpload.relative_path, distance.label("distance"))
+            .join(
+                Document,
+                (Document.id == DocumentChunk.document_id)
+                & (Document.tenant_id == DocumentChunk.tenant_id),
+            )
             .join(
                 KnowledgeUpload,
                 (KnowledgeUpload.document_id == DocumentChunk.document_id)
@@ -372,6 +421,7 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
                 KnowledgeUpload.tenant_id == lead.tenant_id,
                 KnowledgeUpload.status == "ready",
                 DocumentChunk.embedding_model == get_settings().llm_embedding_model,
+                reference_scope(scoped_courses),
             )
             .order_by(distance)
             .limit(12)
@@ -398,10 +448,16 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
                 "Return an EXACT quote "
                 "of at most 1200 characters from ONE passage, with its zero-based passage index. "
                 "If unsupported, set supported=false and quote='' and passage=0. "
-                "Do not infer policies. "
+                "Do not infer policies. The question is a retrieval rewrite; if it changes "
+                "the original question's meaning, set supported=false. "
                 "Never translate or invent the quotation.",
             },
-            {"role": "user", "content": json.dumps({"question": query, "passages": passages})},
+            {
+                "role": "user",
+                "content": json.dumps(
+                    {"question": query, "original_question": text, "passages": passages}
+                ),
+            },
         ],
         response_format=GroundedQuote,
     )

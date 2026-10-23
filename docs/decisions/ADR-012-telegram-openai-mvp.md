@@ -48,8 +48,8 @@ ADR-004 persistence, ADR-005 three-layer validation, ADR-006 code-owned decision
 ADR-009 PII/audit principles remain applicable. ADR-010's anti-spam intent remains;
 current-state-aware handling takes precedence over resetting every unknown reply to
 discovery. ADR-008 and ADR-011 now reflect the required OpenAI decision/reranking path. Complex
-parsing and full conversational rewriting remain separately tracked; reranking does
-not depend on either.
+parsing remains separately tracked. Task 42.2 now provides bounded contextual query
+resolution and code-owned course scopes; reranking does not depend on complex parsing.
 
 ## Consequences
 

@@ -29,6 +29,7 @@ type Doc = {
   error_code: string | null;
   chunk_count: number;
   attempts: number;
+  course_id?: string | null;
 };
 type Match = {
   text: string;
@@ -127,6 +128,11 @@ export default function Knowledge() {
   const [inquiryFocus, setInquiryFocus] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const [docs, setDocs] = useState<Doc[]>([]);
+  const [knowledgeCourses, setKnowledgeCourses] = useState<
+    { id: string; name: string; is_active: boolean }[]
+  >([]);
+  const [searchCourse, setSearchCourse] = useState("");
+  const [knowledgeCoursesReady, setKnowledgeCoursesReady] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -183,6 +189,20 @@ export default function Knowledge() {
     }, 4000);
     return () => clearInterval(timer);
   }, [staff, refresh]);
+  useEffect(() => {
+    if (!staff || staff.must_change_password || view !== "knowledge") return;
+    let active = true;
+    setKnowledgeCourses([]);
+    setKnowledgeCoursesReady(false);
+    setSearchCourse("");
+    api("/staff/catalog")
+      .then((courses) => { if (active) {
+        setKnowledgeCourses(courses);
+        setKnowledgeCoursesReady(true);
+      } })
+      .catch((error) => { if (active) setError(sessionFailure(error)); });
+    return () => { active = false; };
+  }, [staff, view, sessionFailure]);
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -291,6 +311,27 @@ export default function Knowledge() {
     }
   }
 
+  async function assignScope(doc: Doc, courseId: string) {
+    setPending(doc.id);
+    setError("");
+    setNotice("");
+    setMatches(null);
+    try {
+      await api(`/knowledge/documents/${doc.id}/scope`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ course_id: courseId || null }),
+      });
+      setMatches(null);
+      setNotice(`Course scope updated for ${doc.filename}.`);
+      await refresh();
+    } catch (error) {
+      setError(sessionFailure(error));
+    } finally {
+      setPending(null);
+    }
+  }
+
   async function search(event: FormEvent) {
     event.preventDefault();
     setSearching(true);
@@ -301,7 +342,7 @@ export default function Knowledge() {
       const result = await api("/knowledge/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, course_id: searchCourse || null }),
       });
       setMatches(result.matches);
       setSearchMessage(result.message);
@@ -744,6 +785,27 @@ export default function Knowledge() {
                                     )}{" "}
                                     KB
                                   </span>
+                                  {staff.role === "admin" ? (
+                                    <label className="document-course-scope">
+                                      Use this document for
+                                      <select
+                                        aria-label={`Course scope for ${doc.filename}`}
+                                        value={doc.course_id || ""}
+                                        disabled={!knowledgeCoursesReady || pending !== null || doc.status !== "ready"}
+                                        onChange={(event) => void assignScope(doc, event.target.value)}
+                                      >
+                                        <option value="">Shared institution information</option>
+                                        {doc.course_id && !knowledgeCourses.some((course) => course.id === doc.course_id) && (
+                                          <option value={doc.course_id}>{knowledgeCoursesReady ? "Assigned course unavailable" : "Loading assigned course…"}</option>
+                                        )}
+                                        {knowledgeCourses.map((course) => (
+                                          <option key={course.id} value={course.id}>{course.name}</option>
+                                        ))}
+                                      </select>
+                                    </label>
+                                  ) : (
+                                    <span>{doc.course_id ? knowledgeCourses.find((course) => course.id === doc.course_id)?.name || "Assigned course unavailable" : "Shared institution information"}</span>
+                                  )}
                                   {doc.error_code && (
                                     <p className="file-error">
                                       {errors[doc.error_code] ||
@@ -856,6 +918,18 @@ export default function Knowledge() {
                     and where they came from.
                   </p>
                 </div>
+                <label className="knowledge-search-course">
+                  Search course
+                  <select aria-label="Search course" value={searchCourse} disabled={!knowledgeCoursesReady} onChange={(event) => {
+                    setSearchCourse(event.target.value);
+                    setMatches(null);
+                  }}>
+                    <option value="">All documents</option>
+                    {knowledgeCourses.map((course) => (
+                      <option key={course.id} value={course.id}>{course.name} and shared information</option>
+                    ))}
+                  </select>
+                </label>
                 <form className="search-form" onSubmit={search}>
                   <label className="search-box">
                     <Icon kind="search" />

@@ -41,6 +41,8 @@ async def completion(
     schema = response_format.__name__
     if schema == "Interpretation":
         result = {"intent": "question" if "?" in text else "qualification"}
+    elif schema == "ResolvedQuestion":
+        result = {"query": json.loads(text)["question"], "needs_clarification": False}
     elif schema == "PassageRanking":
         result = {"ordered_ids": [row["id"] for row in json.loads(text)["passages"]]}
     elif schema == "Extraction":
@@ -544,7 +546,7 @@ def test_multilingual_quote_selection_uses_translated_question(
             ]
         )
 
-    monkeypatch.setattr("src.engine.journey.retrieval_query", translate)
+    monkeypatch.setattr("src.knowledge.retrieval.retrieval_query", translate)
     monkeypatch.setattr("src.engine.journey.generate_completion", quote)
 
     async def exercise() -> None:

@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, true
 from sqlalchemy.dialects.postgresql import insert
 from starlette.datastructures import UploadFile
 
@@ -15,11 +15,12 @@ from src.core.rag import JAILBREAK_PATTERN
 from src.core.security import EncryptionKeyNotConfiguredError, encrypt_bytes
 from src.core.settings import get_settings
 from src.db.audit import write_audit_log
-from src.db.models import Document, DocumentChunk, KnowledgeUpload
+from src.db.models import Course, Document, DocumentChunk, KnowledgeUpload
 from src.knowledge.extraction import SUPPORTED, ExtractionError, validate_path
 from src.knowledge.processing import dispatch_pending, embed_chunks
 from src.knowledge.reranking import rerank
 from src.knowledge.retrieval import retrieval_query
+from src.knowledge.scope import reference_scope
 from src.staff.auth import Db, Staff, require_admin, require_browser_write
 from src.staff.throttle import consume_limit
 
@@ -36,6 +37,7 @@ class UploadView(BaseModel):
     error_code: str | None
     chunk_count: int
     attempts: int
+    course_id: uuid.UUID | None = None
 
 
 async def get_upload(db: Db, staff: Staff, upload_id: uuid.UUID) -> KnowledgeUpload:
@@ -56,19 +58,80 @@ async def documents(
     response: Response,
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=100, ge=1, le=200),
-) -> list[KnowledgeUpload]:
+) -> list[UploadView]:
     response.headers["Cache-Control"] = "no-store"
-    return list(
-        (
-            await db.scalars(
-                select(KnowledgeUpload)
-                .where(KnowledgeUpload.tenant_id == staff.tenant_id)
-                .order_by(KnowledgeUpload.created_at.desc(), KnowledgeUpload.id)
-                .offset(offset)
-                .limit(limit)
+    rows = (
+        await db.execute(
+            select(KnowledgeUpload, Document.metadata_json)
+            .outerjoin(
+                Document,
+                (Document.id == KnowledgeUpload.document_id)
+                & (Document.tenant_id == KnowledgeUpload.tenant_id),
             )
-        ).all()
+            .where(KnowledgeUpload.tenant_id == staff.tenant_id)
+            .order_by(KnowledgeUpload.created_at.desc(), KnowledgeUpload.id)
+            .offset(offset)
+            .limit(limit)
+        )
+    ).all()
+    result = []
+    for upload, metadata in rows:
+        data = UploadView.model_validate(upload).model_dump()
+        data["course_id"] = (metadata or {}).get("course_id")
+        result.append(UploadView.model_validate(data))
+    return result
+
+
+class ReferenceScope(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    course_id: uuid.UUID | None
+
+
+@router.patch("/documents/{upload_id}/scope", dependencies=[Depends(require_browser_write)])
+async def assign_scope(
+    upload_id: uuid.UUID, payload: ReferenceScope, staff: Staff, db: Db
+) -> dict[str, str]:
+    require_admin(staff)
+    upload = await get_upload(db, staff, upload_id)
+    if upload.status != "ready" or upload.document_id is None:
+        raise HTTPException(409, "Wait until the document is indexed before assigning a course.")
+    if (
+        payload.course_id is not None
+        and await db.scalar(
+            select(Course.id).where(
+                Course.tenant_id == staff.tenant_id,
+                Course.id == payload.course_id,
+            )
+        )
+        is None
+    ):
+        raise HTTPException(404, "Course not found.")
+    document = await db.scalar(
+        select(Document)
+        .where(
+            Document.tenant_id == staff.tenant_id,
+            Document.id == upload.document_id,
+        )
+        .with_for_update()
     )
+    if document is None:
+        raise HTTPException(409, "The document is no longer available.")
+    document.metadata_json = {
+        **(document.metadata_json or {}),
+        "course_id": str(payload.course_id) if payload.course_id else None,
+    }
+    await write_audit_log(
+        db,
+        tenant_id=staff.tenant_id,
+        actor=str(staff.id),
+        action="knowledge.scope_updated",
+        details={
+            "upload_id": str(upload_id),
+            "course_id": str(payload.course_id) if payload.course_id else None,
+        },
+    )
+    await db.commit()
+    return {"status": "saved"}
 
 
 @router.post("/documents", dependencies=[Depends(require_browser_write)])
@@ -213,6 +276,7 @@ async def remove(upload_id: uuid.UUID, staff: Staff, db: Db) -> dict[str, str]:
 
 class Search(BaseModel):
     query: str = Field(min_length=2, max_length=1000)
+    course_id: uuid.UUID | None = None
 
 
 @router.post("/search", dependencies=[Depends(require_browser_write)])
@@ -221,6 +285,17 @@ async def search(payload: Search, staff: Staff, db: Db, response: Response) -> d
     query = payload.query.strip()
     if len(query) < 2:
         raise HTTPException(422, "Enter a question or a few words to search.")
+    if (
+        payload.course_id is not None
+        and await db.scalar(
+            select(Course.id).where(
+                Course.tenant_id == staff.tenant_id,
+                Course.id == payload.course_id,
+            )
+        )
+        is None
+    ):
+        raise HTTPException(404, "Course not found.")
     ready = await db.scalar(
         select(KnowledgeUpload.id)
         .where(KnowledgeUpload.tenant_id == staff.tenant_id, KnowledgeUpload.status == "ready")
@@ -237,6 +312,11 @@ async def search(payload: Search, staff: Staff, db: Db, response: Response) -> d
         await db.execute(
             select(DocumentChunk, KnowledgeUpload, distance.label("distance"))
             .join(
+                Document,
+                (Document.id == DocumentChunk.document_id)
+                & (Document.tenant_id == DocumentChunk.tenant_id),
+            )
+            .join(
                 KnowledgeUpload,
                 (KnowledgeUpload.document_id == DocumentChunk.document_id)
                 & (KnowledgeUpload.tenant_id == DocumentChunk.tenant_id),
@@ -246,6 +326,7 @@ async def search(payload: Search, staff: Staff, db: Db, response: Response) -> d
                 KnowledgeUpload.tenant_id == staff.tenant_id,
                 KnowledgeUpload.status == "ready",
                 DocumentChunk.embedding_model == get_settings().llm_embedding_model,
+                reference_scope([payload.course_id]) if payload.course_id else true(),
             )
             .order_by(distance)
             .limit(12)

@@ -63,3 +63,11 @@ The text makes opt-in optional, states the two-reminder bound, preserves literal
 Opt-out wording preserves the student's ability to continue asking questions.
 Generated reminder questions also pass a structured safety check, with reviewed neutral
 copy as fallback. This is agent review, not native-speaker or emergency-service certification.
+
+## Reference clarification
+
+The agent reviewed `clarify_reference` across English, Hindi, Hinglish and Malayalam.
+Each asks which course/topic is meant and requests its name; none infers eligibility,
+pricing, consent or a selected course. This remains agent review. Eight synthetic live
+query-resolution cases cover four-language pronouns, two ambiguous references, explicit
+topic change and preservation of an off-topic question; they do not establish fluency.

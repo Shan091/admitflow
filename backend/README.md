@@ -460,3 +460,29 @@ Telegram polling is opt-in through the `telegram` profile; use a separate bot or
 explicit database/checkpoint migration. Live OpenAI/Telegram keys are never copied.
 Legacy WhatsApp ingress/jobs are off unless `LEGACY_WHATSAPP_ENABLED=true`; this
 compatibility switch is not required for Telegram. Nondevelopment APIs force debug off.
+
+# Contextual retrieval and reference scope
+
+Student FAQ lookup resolves pronouns/slang from at most six completed/sent recent
+turns through typed OpenAI output; unresolved references ask for clarification.
+Original wording is retained for quotation validation. Unsupported numeric changes
+fail safely, while Unicode digits/Indian grouping/equivalent decimals are accepted.
+No model-generated ID changes course authority, eligibility or prices.
+
+Administrators may `PATCH /api/knowledge/documents/{id}/scope` with `course_id`
+(a tenant-owned course UUID or null for shared information) after indexing. The
+knowledge library exposes this control and an explicit staff course-search selector.
+`POST /api/knowledge/search` accepts an optional `course_id`; that filter includes
+shared and matching-course references. Unfiltered staff search covers all own documents.
+Student retrieval includes explicitly named active catalog courses or the selected
+course plus shared references; without a course it uses shared references only.
+Application fees always use the matching database rows, even when a question names
+a different course. Duplicate active names require an existing matching selection
+or clarification; the code never chooses a fee row by arbitrary ID order.
+No course selection changes as a side effect of asking.
+
+`uv run python -m src.scripts.evaluate_contextual_retrieval` makes eight bounded live
+OpenAI calls without writes or sends and records a synthetic report under docs/event.
+This does not establish general fluency or calibrated confidence. No schema migration
+is needed: scope lives in existing document metadata. Older code ignores scope, so
+keep automated replies paused if rolling back until a scope-aware runtime is restored.
