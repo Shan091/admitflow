@@ -67,6 +67,7 @@ class Settings(BaseSettings):
     razorpay_key_secret: SecretStr | None = None
     razorpay_webhook_secret: SecretStr | None = None
     payments_live_enabled: bool = False
+    followups_enabled: bool = True
 
     # Institution knowledge workspace and processing limits.
     staff_session_hours: int = Field(default=8, ge=1, le=24)

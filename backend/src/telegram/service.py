@@ -109,7 +109,10 @@ async def accept_update(bot_id: uuid.UUID, raw: dict[str, Any]) -> uuid.UUID | N
 
 async def process_event(event_id: uuid.UUID) -> None:
     """Serialize by locked lead, then atomically commit memory, result and one reply."""
-    from src.engine.journey import build_reply
+    import json
+
+    from src.engine.journey import build_reply, load_memory
+    from src.outreach.consent import note_inbound, preference_reply
 
     async with get_sessionmaker()() as db:
         reference = await db.get(ConversationEvent, event_id)
@@ -141,20 +144,27 @@ async def process_event(event_id: uuid.UUID) -> None:
         )
         if earlier:
             return  # Delivery order is recovered by the durable queue sweep.
-        if lead.copilot_mode:
-            # Staff owns the conversation. Persist ingress without generating or sending a reply.
-            event.status = "done"
-            lead.last_inbound_at = datetime.now(UTC)
-            await db.commit()
-            return
         bot = await db.get(TelegramBot, event.bot_id)
         if bot is None or not bot.is_active:
             return
         payload = Event.model_validate_json(decrypt_pii(event.payload_enc))
+        now = datetime.now(UTC)
+        memory_row, memory = await load_memory(db, lead)
+        await note_inbound(db, lead, memory, now)
+        preference = await preference_reply(db, lead, bot, payload, memory, now)
+        memory_row.payload_enc = encrypt_pii(json.dumps(memory, ensure_ascii=False))
+        if lead.copilot_mode and preference is None:
+            # Consent/opt-out commands still apply while staff owns normal replies.
+            event.status = "done"
+            await db.commit()
+            return
         try:
-            await consume_limit(f"telegram-chat:{lead.id}", 30)
-            await consume_limit(f"telegram-tenant:{lead.tenant_id}", 300)
-            reply = await build_reply(db, lead, bot, payload)
+            if preference is not None:
+                reply = preference
+            else:
+                await consume_limit(f"telegram-chat:{lead.id}", 30)
+                await consume_limit(f"telegram-tenant:{lead.tenant_id}", 300)
+                reply = await build_reply(db, lead, bot, payload)
         except HTTPException:
             reply = Reply(
                 text="Please pause and try again in a few minutes. "

@@ -247,3 +247,54 @@ sends for a retry instead of bypassing the cap. Development without Redis uses a
 in-process fallback; that fallback is not a cross-process or production guarantee.
 Preserve Redis persistence during restarts. Reservations and statistics expire after
 several days and contain internal identifiers, not student contact data.
+
+## Consented follow-up reminders
+
+Existing and new inquiries default to no proactive reminders. A student opens
+`/followups` and taps Enable reminders to opt in, or uses `/stop` / No reminders to
+opt out. Preference changes are audited. These controls work while staff takeover
+pauses normal bot replies. Every incoming message cancels queued older reminders and
+moves the next eligible time out by the institution's configured delay.
+
+Only inactive early-stage inquiries are considered: new, discovering, qualifying,
+admission ready or an incomplete application. Payment/review/final states, active
+human requests, staff takeover, inactive courses and pending student/bot work block
+outreach. Explicit configured office hours are required; unknown or closed hours do
+not permit a reminder. A reminder never invents a deadline, scarcity, a fee or approval.
+
+The worker claims a short generation lease in encrypted conversation memory, releases
+the database lock during OpenAI calls and rechecks current state before queuing.
+Only language, public course name and stage are provided for reminder generation,
+with a separate structured safety check. Unsafe/refused/unavailable model output uses
+reviewed neutral copy. No student message, contact, form or fact value is sent for this
+reminder-generation context. The encrypted outbox includes Continue inquiry and No
+reminders controls.
+
+Each inquiry allows at most two reminder delivery opportunities. Queue deferral at the
+daily budget or outside office hours does not spend one; explicit Telegram rate limits
+retry the same reminder. Ambiguous delivery spends its opportunity and stops automatic
+outreach, preserving the unresolved state for staff. A confirmed second reminder marks
+the still-inactive early-stage lead cold. New student activity never loses saved facts.
+An already in-flight Telegram request cannot be recalled by a later opt-out.
+
+Run the worker with the reminder task module and a scheduler producer:
+
+```bash
+uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge src.tasks.followups --workers 1
+uv run python -m src.scripts.scheduler
+# One read/dispatch/recovery sweep, using the same consent rules:
+uv run python -m src.scripts.scheduler --once
+```
+
+The scheduler scans durable due times and recovers queued standalone deliveries.
+Expired generation leases can be reclaimed after restart; duplicate jobs cannot
+publish/send the same reminder twice. `FOLLOWUPS_ENABLED=false` disables new generation
+and cancels pending reminders at send-time checks after processes reload configuration.
+Stopping the scheduler stops new scheduled claims; keep the delivery worker running to
+finish existing explicit work. Never manufacture consent or age a real inquiry to test
+outreach; use disposable synthetic database fixtures.
+
+A migration downgrade cancels queued reminders before removing consent fields, and
+marks in-flight reminder requests uncertain. Older sender code therefore cannot execute
+leftover queued outreach after rollback. A later upgrade again defaults all inquiries
+to no consent; it does not invent or recover an opt-in from historical messages.

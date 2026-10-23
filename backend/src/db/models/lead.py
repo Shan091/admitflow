@@ -13,10 +13,12 @@ from sqlalchemy import (
     Enum,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -45,6 +47,11 @@ class Lead(IdMixin, TenantMixin, TimestampMixin, Base):
             "(phone_hash IS NULL) = (phone_enc IS NULL)",
             name="phone_contact_pair",
         ),
+        Index(
+            "ix_leads_followup_due",
+            "followup_due_at",
+            postgresql_where=text("followup_consent AND followup_due_at IS NOT NULL"),
+        ),
     )
 
     phone_hash: Mapped[str | None] = mapped_column(String(64), index=True)
@@ -64,6 +71,11 @@ class Lead(IdMixin, TenantMixin, TimestampMixin, Base):
     )
     copilot_mode: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     reengagement_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    followup_consent: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    followup_consent_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    followup_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_inbound_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_outbound_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

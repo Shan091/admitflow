@@ -202,14 +202,15 @@ checks. A live OpenAI draft was ignored without adding outbound messages; a new
 handset-confirmed staff send remains separate. Continue Tasks 21/22 follow-ups and
 send budgets, then the remaining institutional milestones. Task 22 is now implemented
 and verified: both Telegram outboxes share an atomic daily attempt budget, capped work
-stays queued, and staff see usage/reset warnings. Consent-aware follow-ups (Task 21)
-remain the next implementation slice.
+stays queued, and staff see usage/reset warnings. Task 22 is published through merged PR #4. Consent-aware follow-ups (Task 21)
+now have verified generation, explicit opt-in/out, a two-reminder cap and a running local
+scheduler. Continue analytics and the remaining institutional product milestones.
 
 - [x] Tasks 20/29: takeover, pause/resume, reviewed drafts and replay-safe staff-send UI.
 - [x] Verify staff behavior against PostgreSQL, live OpenAI and desktop/mobile browser scenarios.
 - [x] Publish the staff slice through merged PR #2 with green backend/frontend CI.
 - [x] Task 22: daily send budgets, durable deferral, warning/settings UI and Redis concurrency evidence.
-- [ ] Task 21: explicit follow-up consent, bounded outreach and scheduled recovery.
+- [x] Task 21: explicit follow-up consent, bounded outreach and scheduled recovery; tests and live OpenAI safety checks pass.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |

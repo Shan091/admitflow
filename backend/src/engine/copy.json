@@ -88,5 +88,59 @@
     "तत्काल खतरे में स्थानीय आपातकालीन सेवा या किसी भरोसेमंद व्यक्ति से संपर्क करें। यह प्रवेश इनबॉक्स आपातकालीन सहायता नहीं दे सकता।",
     "Agar turant khatra ho, local emergency services ya kisi bharosemand vyakti se sampark karein. Yeh admissions inbox emergency support nahi de sakta.",
     "അടിയന്തര അപകടമുണ്ടെങ്കിൽ പ്രാദേശിക അടിയന്തര സേവനങ്ങളെയോ വിശ്വസിക്കുന്ന ഒരാളെയോ ബന്ധപ്പെടുക. ഈ അഡ്മിഷൻ ഇൻബോക്സിന് അടിയന്തര സഹായം നൽകാൻ കഴിയില്ല."
+  ],
+  "reminders_prompt": [
+    "Optional reminders are off unless you enable them. You can receive at most two reminders for this inquiry, only during configured office hours. Use /stop at any time. Would you like reminders?",
+    "आपकी अनुमति के बिना रिमाइंडर नहीं भेजे जाते। इस पूछताछ के लिए अधिकतम दो रिमाइंडर संस्था के निर्धारित कार्यालय समय में भेजे जा सकते हैं। कभी भी /stop भेजें। क्या आप रिमाइंडर चाहते हैं?",
+    "Aapki permission ke bina reminders nahi bheje jaate. Is inquiry ke liye zyada se zyada do reminders configured office hours mein aa sakte hain. Kabhi bhi /stop bhejein. Reminders chahiye?",
+    "നിങ്ങൾ അനുവദിച്ചാൽ മാത്രം ഓർമ്മപ്പെടുത്തലുകൾ അയക്കും. ഈ അന്വേഷണത്തിന് പരമാവധി രണ്ട് ഓർമ്മപ്പെടുത്തലുകൾ സ്ഥാപനത്തിന്റെ നിശ്ചിത ഓഫീസ് സമയത്ത് ലഭിക്കാം. എപ്പോൾ വേണമെങ്കിലും /stop അയച്ച് നിർത്താം. ഓർമ്മപ്പെടുത്തലുകൾ വേണോ?"
+  ],
+  "reminders_enable": [
+    "Enable reminders",
+    "रिमाइंडर चालू करें",
+    "Reminders chalu karein",
+    "ഓർമ്മപ്പെടുത്തലുകൾ വേണം"
+  ],
+  "reminders_disable": [
+    "No reminders",
+    "रिमाइंडर नहीं चाहिए",
+    "Reminders nahi chahiye",
+    "ഓർമ്മപ്പെടുത്തലുകൾ വേണ്ട"
+  ],
+  "reminders_on": [
+    "Reminders enabled for this inquiry, up to two in total. You can continue chatting normally. Use /stop to disable reminders.",
+    "इस पूछताछ के लिए कुल अधिकतम दो रिमाइंडर चालू हैं। आप सामान्य बातचीत जारी रख सकते हैं। बंद करने के लिए /stop भेजें।",
+    "Is inquiry ke liye total zyada se zyada do reminders chalu hain. Aap normal chat kar sakte hain. Band karne ke liye /stop bhejein.",
+    "ഈ അന്വേഷണത്തിന് ആകെ പരമാവധി രണ്ട് ഓർമ്മപ്പെടുത്തലുകൾ അനുവദിച്ചു. സാധാരണ സംഭാഷണം തുടരാം. നിർത്താൻ /stop അയക്കുക."
+  ],
+  "reminders_off": [
+    "Reminders are off. You can still ask questions or continue this inquiry whenever you choose.",
+    "रिमाइंडर बंद हैं। आप जब चाहें सवाल पूछ सकते हैं या पूछताछ जारी रख सकते हैं।",
+    "Reminders band hain. Jab chahein sawaal poochhein ya inquiry continue karein.",
+    "ഓർമ്മപ്പെടുത്തലുകൾ നിർത്തി. നിങ്ങൾക്ക് എപ്പോൾ വേണമെങ്കിലും ചോദ്യങ്ങൾ ചോദിക്കുകയോ അന്വേഷണം തുടരുകയോ ചെയ്യാം."
+  ],
+  "reminders_limit": [
+    "This inquiry has reached its two-reminder limit. No further reminders will be sent. You can message us whenever you choose.",
+    "इस पूछताछ की दो रिमाइंडर की सीमा पूरी हो गई है। अब और रिमाइंडर नहीं भेजे जाएंगे। आप जब चाहें संदेश भेज सकते हैं।",
+    "Is inquiry ki do reminders ki limit poori ho gayi hai. Ab aur reminders nahi aayenge. Jab chahein message karein.",
+    "ഈ അന്വേഷണത്തിന്റെ രണ്ട് ഓർമ്മപ്പെടുത്തലുകളുടെ പരിധി പൂർത്തിയായി. ഇനി ഓർമ്മപ്പെടുത്തലുകൾ അയക്കില്ല. എപ്പോൾ വേണമെങ്കിലും സന്ദേശം അയക്കാം."
+  ],
+  "reminder_fallback": [
+    "Would you like to continue this inquiry or ask a question?",
+    "क्या आप पूछताछ जारी रखना चाहते हैं या कोई सवाल पूछना चाहते हैं?",
+    "Kya aap inquiry continue karna ya koi sawaal poochhna chahenge?",
+    "ഈ അന്വേഷണം തുടരാനോ എന്തെങ്കിലും ചോദിക്കാനോ ആഗ്രഹിക്കുന്നുണ്ടോ?"
+  ],
+  "reminder_footer": [
+    "This is an optional reminder you enabled. Use /stop or No reminders to disable future reminders.",
+    "यह आपकी अनुमति वाला वैकल्पिक रिमाइंडर है। आगे के रिमाइंडर बंद करने के लिए /stop भेजें या रिमाइंडर नहीं चाहिए चुनें।",
+    "Yeh aapke enable kiya hua optional reminder hai. Aage ke reminders band karne ke liye /stop bhejein ya Reminders nahi chahiye chunein.",
+    "നിങ്ങൾ അനുവദിച്ച ഓർമ്മപ്പെടുത്തലാണിത്. ഇനി വേണ്ടെങ്കിൽ /stop അയക്കുക അല്ലെങ്കിൽ ഓർമ്മപ്പെടുത്തലുകൾ വേണ്ട തിരഞ്ഞെടുക്കുക."
+  ],
+  "reminder_continue": [
+    "Continue inquiry",
+    "पूछताछ जारी रखें",
+    "Inquiry continue karein",
+    "അന്വേഷണം തുടരുക"
   ]
 }
