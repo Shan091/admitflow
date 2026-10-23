@@ -626,7 +626,9 @@ Adversarial review reproduced and fixed stale ORM state overwriting a concurrent
 revision, and cancelled draft generations overwriting the staff disposition. Default
 tests now disable implicit developer dotenv loading, including LiteLLM's dotenv import;
 explicit fixture configuration remains supported. No local secrets are moved or exposed.
-Publication of this staff slice is pending its own PR/CI gate.
+Published through fresh repository PR #2 after both backend and frontend CI passed.
+The published ancestry contains only newly created commits; prior repository history
+remains local. The remaining handset/payment checks stay open.
 
 ### Task 20: Human handoff + co-pilot mode
 **Description:** Handoff node for escalation. Co-pilot mode: AI generates suggested replies visible in dashboard.

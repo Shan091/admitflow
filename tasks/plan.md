@@ -204,7 +204,7 @@ send budgets, then the remaining institutional milestones.
 
 - [x] Tasks 20/29: takeover, pause/resume, reviewed drafts and replay-safe staff-send UI.
 - [x] Verify staff behavior against PostgreSQL, live OpenAI and desktop/mobile browser scenarios.
-- [ ] Publish the staff slice through its separate PR and green CI.
+- [x] Publish the staff slice through merged PR #2 with green backend/frontend CI.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |
