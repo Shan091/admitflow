@@ -11,8 +11,9 @@ preserved in the [baseline archive](../docs/planning/archive/2026-10-23-before-t
 
 The user has assigned **all remaining tasks to the primary agent**. The previous
 proposal to reserve Task 26 for another agent is superseded; nothing is waiting for
-an external analytics handoff. Tasks 22 and 21 were published through merged PRs #4 and #5. Continue Task 26
-analytics/reporting and the rest of this existing roadmap.
+an external analytics handoff. Tasks 21/22/26/27/32/33 and staff/privacy/OpenAI work
+were published through merged PRs #4-9. Task 38 now has verified local full-stack
+packaging. Continue document structure/contextual retrieval and remaining release work.
 Group related implementation work, use focused tests during development, and run the
 full applicable gate once each feature group is ready. Keep the repository's review,
 privacy, tenant-isolation and release requirements intact.
@@ -339,24 +340,27 @@ raw-body signatures, lock order, bounded claims and encrypted/audited transcript
 the identified ordering and stale-link defects are fixed. Next: Tasks 20/29 staff
 takeover/co-pilot, followed by the remaining product and operations milestones.
 
-- [ ] Task 44 release: Typed channel-neutral engine events and validated reply boundary.
-- [ ] Task 45: Telegram private-chat receiver, sender and callback acknowledgment.
-- [ ] Task 46: Durable event intake, scoped dedup/locking and restart recovery.
-- [ ] Task 47: OpenAI-only configuration, typed contracts and bounded failure handling.
-- [ ] Task 48: Reproducible synthetic catalog/startup and first live Telegram roundtrip.
-- [ ] Task 49: Recent inbound/outbound history, facts and correction semantics.
-- [ ] Task 50: Validated course/batch selection and availability.
-- [ ] Task 51: State-aware qualification and deterministic eligibility outcomes.
-- [ ] Task 52: Reviewed knowledge ingestion, relevance/abstention and source grounding.
-- [ ] Task 53: Input/retrieval/output validation, language experience and safe sends.
-- [ ] Task 54: Staff provisioning, authentication and tenant authorization.
-- [ ] Task 55: Tenant-scoped lead/conversation and human-request APIs.
-- [ ] Task 56: Staff login, lead list/detail and human-request queue UI.
-- [ ] Task 57: Human-request acknowledgment, resolution and automated-flow resume.
-- [ ] Task 58: Integrated evaluations, security/failure checks and live evidence.
+- [x] Task 44 release: Typed channel-neutral engine events and validated reply boundary.
+- [x] Task 45: Telegram private-chat receiver, sender and callback acknowledgment.
+- [x] Task 46: Durable event intake, scoped dedup/locking and restart recovery.
+- [x] Task 47: OpenAI-only configuration, typed contracts and bounded failure handling.
+- [x] Task 48: Reproducible synthetic catalog/startup and first live Telegram roundtrip.
+- [x] Task 49: Recent inbound/outbound history, facts and correction semantics.
+- [x] Task 50: Validated course/batch selection and availability.
+- [x] Task 51: State-aware qualification and deterministic eligibility outcomes.
+- [x] Task 52: Reviewed knowledge ingestion, relevance/abstention and source grounding.
+- [x] Task 53: Input/retrieval/output validation, language experience and safe sends.
+- [x] Task 54: Staff provisioning, authentication and tenant authorization.
+- [x] Task 55: Tenant-scoped lead/conversation and human-request APIs.
+- [x] Task 56: Staff login, lead list/detail and human-request queue UI.
+- [x] Task 57: Human-request acknowledgment, resolution and automated-flow resume.
+- [x] Task 58: Integrated evaluations, security/failure checks and live evidence.
 - [ ] Task 59: Packaging, runtime choice and selected-host deployment readiness.
 - [ ] Task 60: Final product README, demo recording, deck, AI statement and submission.
 
+Tasks 44-58 recap the published core implementation, not all later product milestones.
+Evidence includes contract/identity tests, PostgreSQL knowledge/journey/staff checks,
+the user-confirmed bot roundtrip and source/abstention evaluation reports above.
 Tick implementation acceptance only with command/result/build evidence. A live
 roundtrip additionally requires a configured Telegram bot and user/device confirmation.
 Applications, payments, co-pilot, follow-ups and other later work retain their original
@@ -763,7 +767,12 @@ consent-aware follow-ups is next.
 **Dependencies:** Task 6
 **Estimated scope:** Small
 
-### Task 23: Langfuse tracing integration
+### Task 23: Langfuse tracing integration (optional, not selected)
+
+**Disposition:** ADR-012 replaces the mandatory vendor requirement with shared-provider
+redacted model/usage/latency telemetry. That baseline is implemented and verified.
+The following vendor-specific acceptance is an optional future integration, not
+unfinished required release work; raw prompt/content logging is not permitted.
 
 **Description:** Add `@observe()` decorators to all LLM-calling functions. Configure Langfuse client in `tracing.py`.
 **Acceptance criteria:**
@@ -985,7 +994,11 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
 
 ## Phase 6: Production Hardening
 
-### Task 35: Sentry error monitoring
+### Task 35: Sentry error monitoring (optional, not selected)
+
+**Disposition:** ADR-012 selects sanitized operational logs and inspectable durable
+failure state without requiring an extra vendor. The Sentry-specific acceptance
+below is optional future work; unredacted full applicant context is not permitted.
 
 **Description:** Integrate Sentry SDK in both FastAPI and TaskIQ worker.
 **Acceptance criteria:**
@@ -1018,19 +1031,24 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
   **Verification:** Artificially aged PostgreSQL data, cutoff/activity/tenant boundaries, preserved financial graph and scheduler outage tests. The local one-shot removed zero histories. No actual data removal is claimed.
   **Dependencies:** Task 4, 34, 36
 
-### Task 38: Docker Compose for local development
+### Task 38: Full local Docker Compose runtime
 
-**Description:** `docker-compose.yml` with all services: FastAPI, TaskIQ worker, PostgreSQL+pgvector, Redis, Langfuse.
+**Description:** One isolated local profile for PostgreSQL/pgvector, persistent Redis, migration/synthetic-seed bootstrap, API, all registered workers, scheduler and standalone Next.js. Telegram polling is explicitly enabled through the `telegram` profile; it is not started against an existing bot by default. No extra telemetry vendor is required by ADR-012.
 **Acceptance criteria:**
 
-- [ ] `docker compose up --build` starts everything
-  **Verification:** Full stack boots from clean state
-  **Dependencies:** All previous tasks
-  **Estimated scope:** Medium
+- [x] Private configuration generator creates fresh keys without reading live credentials or overwriting an existing file
+- [x] `docker compose up --build -d --wait` builds and starts the core services from a fresh isolated database; startup waits for migrations/data readiness
+- [x] API/frontend run as nonroot users; data services have no host ports and UI/API bind only to loopback
+- [x] Actual container login/proxy, authenticated WebSocket, data readiness, Redis/TaskIQ result and scheduler checks pass
+- [x] Stop/start preserves the synthetic credential and successful access; seed reruns preserve existing accounts
+- [x] Receiver profile validates and its image CLI loads; live container polling remains deliberately unclaimed because the existing native receiver owns the demo bot
+  **Verification:** Nine live checks in `backend/scripts/verify_compose.py --restart` pass; `docs/event/COMPOSE_RESULTS.json` records results. Backend gate passes 234 tests/111 strictly typed source files; nine affected PostgreSQL journey/account cases pass. Linux image builds and migrations succeed; the existing native data/bot runtime is untouched.
+  **Runbook:** `docs/engineering/COMPOSE_RUNTIME.md`; bootstrap config from `src.scripts.configure_compose` first.
+  **Dependencies:** Platform/application migrations and Task 25
 
 ### Task 39: Production deployment
 
-**Description:** Deploy Next.js to Vercel; backend API + TaskIQ worker + scheduler to Fly.io (always-on machines); Neon (managed Postgres + pgvector); Redis on Fly; Langfuse Cloud. Per ADR-007.
+**Description:** Deploy the verified application to a selected public host with TLS, correct same-origin WebSocket proxying, protected persistent data, backups and a secret store. The user deferred choosing hosting until remaining build tasks are finished. The earlier Vercel/Fly/Neon list is a proposal, not provisioned infrastructure; optional observability vendors are not dependencies under ADR-012.
 **Acceptance criteria:**
 
 - [ ] Frontend accessible on production URL

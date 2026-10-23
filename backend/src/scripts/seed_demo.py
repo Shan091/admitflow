@@ -4,7 +4,6 @@ import asyncio
 import json
 import os
 import secrets
-from pathlib import Path
 
 from sqlalchemy import select
 
@@ -28,7 +27,7 @@ async def seed() -> None:
         staff = await db.scalar(
             select(StaffUser).where(StaffUser.tenant_id == institution.id, StaffUser.email == email)
         )
-        credential_path = Path(".demo-credentials.json")
+        credential_path = get_settings().demo_credentials_path
         if staff is None:
             if await asyncio.to_thread(credential_path.exists):
                 raise ValueError(
@@ -100,8 +99,8 @@ async def seed() -> None:
         await db.commit()
     await get_engine().dispose()
     print(
-        "Synthetic catalog ready. Staff credentials are in "
-        "backend/.demo-credentials.json (ignored)."
+        "Synthetic catalog ready. Staff credentials are in the private configured "
+        "DEMO_CREDENTIALS_PATH (default .demo-credentials.json); no password was printed."
     )
 
 

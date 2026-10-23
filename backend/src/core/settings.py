@@ -10,6 +10,7 @@ in settings, never in docs or business logic.
 """
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, SecretStr
@@ -52,6 +53,8 @@ class Settings(BaseSettings):
     whatsapp_access_token: str | None = None  # Graph API bearer token
     whatsapp_phone_number_id: str | None = None  # Sender phone number ID
     meta_graph_api_version: str = "v21.0"  # Graph API version prefix
+    legacy_whatsapp_enabled: bool = False
+    demo_credentials_path: Path = Path(".demo-credentials.json")
 
     # --- LLM model roles (config-driven; ADR-007) ---
     # Concrete version strings belong here, not in docs or code.

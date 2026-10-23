@@ -1,0 +1,14 @@
+{
+  "scope": "isolated Compose; no provider calls or sends",
+  "checks": {
+    "restart_preserves_credentials": true,
+    "frontend": true,
+    "authenticated_proxy": true,
+    "synthetic_institution": true,
+    "legacy_ingress_disabled": true,
+    "authenticated_websocket": true,
+    "data_store_readiness": true,
+    "real_worker_queue_roundtrip": true,
+    "scheduler_sweep": true
+  }
+}

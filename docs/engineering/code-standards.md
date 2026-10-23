@@ -51,7 +51,8 @@ the TaskIQ worker — the request path stays thin.
   scattered in feature code.
 - **Structured outputs are the default** for extraction: define a typed schema (Pydantic /
   JSON-schema) and let the model fill it. Do not parse free text with regex.
-- Wrap calls in Langfuse tracing (see [security-and-production.md](security-and-production.md)).
+- Use redacted model/usage/latency telemetry through the shared factory (ADR-012).
+  External tracing vendors are optional; raw prompts/applicant content are not logged.
 - Prompt-cache the static system + institution prefix; keep the volatile part small.
 
 ## Errors
@@ -65,7 +66,8 @@ the TaskIQ worker — the request path stays thin.
 
 - Structured logs, no `print`. Never log secrets, tokens, or raw PII — log a reference
   (lead id, tenant id), not the value.
-- LLM work is traced in Langfuse; errors go to Sentry (see production doc).
+- Model work and operational errors use sanitized telemetry (see production doc).
+  Langfuse/Sentry remain optional integrations under ADR-012.
 
 ## Dependencies
 

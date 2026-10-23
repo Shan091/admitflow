@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env
+.env.*
+test-results/
+playwright-report/
+*.tsbuildinfo
+tests/
+scripts/
+README.md

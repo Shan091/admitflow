@@ -1,8 +1,9 @@
 # Security & Production Readiness
 
 Agent-neutral. AdmitFlow handles applicant PII, payments, and a multi-tenant knowledge base,
-so security is a build-time concern, not a hardening afterthought. The stack is fixed in
-[../decisions/ADR-007-finalized-stack.md](../decisions/ADR-007-finalized-stack.md).
+so security is a build-time concern, not a hardening afterthought. The active channel,
+provider and minimal-service decision is [ADR-012](../decisions/ADR-012-telegram-openai-mvp.md).
+ADR-007 hosting/vendor proposals do not require unused services.
 
 ## Secrets
 
@@ -54,8 +55,10 @@ Any endpoint reachable from outside is a threat surface. For each one:
 
 ## Observability
 
-- **Langfuse** traces every LLM call (prompt, model, latency, cost). No untraced calls.
-- **Sentry** captures backend errors (Task 35).
+- Model calls use the shared factory with redacted role/model, usage and latency telemetry.
+  Do not log raw prompts, provider errors, credentials or applicant content.
+- Operational errors surface through sanitized logs; durable failed work remains inspectable.
+- Langfuse/Sentry are optional vendor integrations (Tasks 23/35), not prerequisites under ADR-012.
 - Health endpoint (`/health`) is the liveness probe; keep it dependency-light.
 
 ## Dependency & secret scanning
@@ -68,22 +71,24 @@ Pin versions; `uv.lock` is committed.
 ## Local full-stack (docker-compose)
 
 Integration tests and manual runs need real Postgres (pgvector) and Redis. A
-`docker-compose.yml` (Task 38) brings up Postgres, Redis, the API, and the worker. Until it
-lands, integration tests use testcontainers or a locally-run pair. Migrations are Alembic;
-they must apply cleanly **up and down**.
+`docker-compose.yml` (Task 38) brings up the isolated full local runtime; see
+[COMPOSE_RUNTIME.md](COMPOSE_RUNTIME.md). Integration tests use disposable testcontainers.
+Migrations are Alembic; they must apply cleanly **up and down**.
 
 ## Deploy & rollback
 
-Production topology (ADR-007): **Fly.io** for the API + worker + scheduler (always-on),
-**Neon** Postgres (+pgvector), **Redis** on Fly, **Vercel** for the Next.js dashboard,
-Langfuse Cloud, Sentry.
+The production destination remains unselected. The user deferred hosting until
+remaining build work is complete. Use an always-on API/worker/scheduler/receiver,
+a TLS same-origin dashboard/API/WebSocket boundary, protected PostgreSQL/Redis,
+backups and a platform secret store. Do not equate a local container build with a
+public deployment or create accounts merely because an earlier ADR proposed them.
 
 Before calling a deploy done:
 
 - [ ] Secrets set in the platform store (not baked into the image).
 - [ ] Migrations applied; verified reversible.
-- [ ] Health check green; a real WhatsApp round-trip works.
-- [ ] Traces (Langfuse) and errors (Sentry) are flowing.
+- [ ] Health check green; a real Telegram round-trip works.
+- [ ] Sanitized model telemetry, operational errors and audit evidence are available.
 - [ ] Rollback is known: how to revert the release and, if a migration ran, how to roll it
       back or forward-fix. Write it in the PR before merging the risky change.
 
@@ -95,5 +100,5 @@ Before calling a deploy done:
 - [ ] Tenant scoping enforced on every new query.
 - [ ] External input validated; signatures verified.
 - [ ] LLM calls traced; amounts DB-sourced.
-- [ ] Errors surface to Sentry; key actions are audit-logged.
+- [ ] Errors surface safely; key actions are audit-logged.
 - [ ] Rollback plan written for anything stateful.

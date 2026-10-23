@@ -55,3 +55,7 @@ The complete synthetic student-to-staff journey and tenant boundaries are tested
 source/abstention and human-request checks are verified in the existing task list.
 `npm run record:demo -- --journey` records the actual staff view of that saved journey;
 it sends no Telegram messages and protects existing recording files from overwrite.
+
+The standalone nonroot container and internal build-time rewrite are described in
+[COMPOSE_RUNTIME.md](../docs/engineering/COMPOSE_RUNTIME.md). Runtime secrets belong
+to the backend; rebuilding the frontend is required when its rewrite target changes.
