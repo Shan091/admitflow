@@ -39,6 +39,14 @@ UX, dialect coverage and real-applicant outcomes are not established by this rev
 | unsafe | Please keep the conversation focused on admissions. I cannot follow instructions that override institution rules. | कृपया प्रवेश संबंधी बातचीत करें। संस्था के नियम बदलने वाले निर्देश नहीं मान सकता। | Admissions par focus rakhein. Institution rules override karne wali instructions follow nahi kar sakta. | ദയവായി പ്രവേശനവുമായി ബന്ധപ്പെട്ട കാര്യങ്ങൾ ചോദിക്കുക. സ്ഥാപന നിയമങ്ങൾ മറികടക്കുന്ന നിർദ്ദേശങ്ങൾ പാലിക്കാനാവില്ല. |
 | declined | You declined to answer. You can explore courses or request staff review. No new eligibility approval has been made. | आपने उत्तर देने से मना किया है। कोर्स देख सकते हैं या स्टाफ समीक्षा मांग सकते हैं। नई पात्रता स्वीकृति नहीं हुई है। | Aapne answer dene se mana kiya. Courses explore karein ya staff review maangein. Koi nayi eligibility approval nahi hui. | നിങ്ങൾ ഉത്തരം നൽകാൻ വിസമ്മതിച്ചു. കോഴ്സുകൾ നോക്കുകയോ സ്റ്റാഫ് പരിശോധന ആവശ്യപ്പെടുകയോ ചെയ്യാം. പുതിയ യോഗ്യതാ അംഗീകാരം നൽകിയിട്ടില്ല. |
 
+| outside_hours | This request arrived outside the institution’s configured office hours. An immediate staff reply is not promised. | यह अनुरोध संस्था के निर्धारित कार्यालय समय के बाहर आया है। तत्काल स्टाफ जवाब का वादा नहीं है। | Yeh request institution ke configured office hours ke bahar aayi hai. Turant staff reply ka vaada nahi hai. | സ്ഥാപനത്തിന്റെ നിശ്ചയിച്ച ഓഫീസ് സമയത്തിന് പുറത്താണ് ഈ അഭ്യർത്ഥന ലഭിച്ചത്. ഉടൻ സ്റ്റാഫ് മറുപടി നൽകുമെന്ന് ഉറപ്പില്ല. |
+| urgent | For immediate danger, contact local emergency services or someone you trust. This admissions inbox cannot provide emergency support. | तत्काल खतरे में स्थानीय आपातकालीन सेवा या किसी भरोसेमंद व्यक्ति से संपर्क करें। यह प्रवेश इनबॉक्स आपातकालीन सहायता नहीं दे सकता। | Agar turant khatra ho, local emergency services ya kisi bharosemand vyakti se sampark karein. Yeh admissions inbox emergency support nahi de sakta. | അടിയന്തര അപകടമുണ്ടെങ്കിൽ പ്രാദേശിക അടിയന്തര സേവനങ്ങളെയോ വിശ്വസിക്കുന്ന ഒരാളെയോ ബന്ധപ്പെടുക. ഈ അഡ്മിഷൻ ഇൻബോക്സിന് അടിയന്തര സഹായം നൽകാൻ കഴിയില്ല. |
+
+The agent also reviewed the office-hours and urgent-support templates. They preserve
+the lack of an immediate staff-response promise and direct urgent needs away from
+the admissions inbox. Deterministic escalation signals have English/Hindi/Hinglish/
+Malayalam unit cases; no emergency-service or native-speaker certification is claimed.
+
 ## Live exercise
 
 In the synthetic bot: choose the language; select course/batch; provide age 20 and marks 70; correct age to 17 and then 21; decline an answer; ask about campus/library/hostel and an unsupported topic; request /human. Check clarity of buttons and recovery messages. Staff must acknowledge, resolve, then explicitly resume. Confirm the next student message continues normally.

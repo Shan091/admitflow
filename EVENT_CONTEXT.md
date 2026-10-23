@@ -2,6 +2,27 @@
 
 ## Current direction
 
+**Latest publication override:** The user deleted the first GitHub repository and
+created a fresh empty `Shan091/admitflow`, explicitly requesting only newly made
+commits in its published history. The verified source tree from local `26f5a3b` was
+imported without its ancestors. The replacement repository's PR #1 passed both CI
+jobs and was squash-merged. Published `main` is `64105a9`, with only two new commits
+(`1ac0ffe`, `64105a9`), both made during this publication. Its tree matches the verified
+source exactly. No old Git history was pushed into the replacement. Earlier history
+remains on local branches; earlier publication hashes/PR notes below are historical.
+
+**Current staff slice:** Branch `codex/staff-copilot` is based on the fresh
+`origin/main`. Tasks 20/29 implement takeover/manual Telegram sends, encrypted reviewed
+co-pilot drafts, pause/resume with confirmed staff history, multilingual escalation and
+office-hour wording. The backend gate passes 175 tests and strict typing over 86 source
+files; 41 PostgreSQL/Redis integration cases and all four browser scenarios pass. A live
+OpenAI draft was generated, ignored and AI resumed with unchanged student facts and zero
+new outbound messages. The API was restarted on the current sources and both health
+and database/Redis readiness pass. No new staff-authored handset delivery is claimed. Concurrent
+memory-update and cancelled-generation regressions are covered. Publication of the staff
+slice is pending its own PR/CI gate. Continue Tasks 21/22 and the entire remaining roadmap;
+the Razorpay test account remains a user-side prerequisite. No whole-goal completion claim.
+
 Execute the existing [implementation plan](tasks/plan.md) and track verified work in
 [tasks/todo.md](tasks/todo.md). Use [SPEC.md](SPEC.md) and
 [ADR-012](docs/decisions/ADR-012-telegram-openai-mvp.md) for product/architecture decisions.

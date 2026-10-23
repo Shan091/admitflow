@@ -1256,3 +1256,32 @@ td:first-child {
 .rule-evidence strong {
   font-weight: 600;
 }
+.staff-panel {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0 24px;
+  margin: 18px 0 24px;
+}
+.staff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin: 14px 0;
+}
+.staff-compose,
+.staff-draft {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+.staff-preview {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.staff-draft h4 {
+  margin: 0;
+}
+.staff-compose > button {
+  justify-self: start;
+}

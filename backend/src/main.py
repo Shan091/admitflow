@@ -60,8 +60,10 @@ def create_app() -> FastAPI:
     from src.payments.webhook import router as payments_router
     from src.staff.applications import router as applications_router
     from src.staff.auth import router as staff_router
+    from src.staff.copilot import router as copilot_router
     from src.staff.leads import router as leads_router
     from src.staff.management import router as management_router
+    from src.staff.operations import router as staff_operations_router
     from src.staff.payments import router as staff_payments_router
 
     application.add_middleware(UploadBodyLimit)
@@ -71,6 +73,8 @@ def create_app() -> FastAPI:
     application.include_router(applications_router)
     application.include_router(payments_router)
     application.include_router(staff_payments_router)
+    application.include_router(staff_operations_router)
+    application.include_router(copilot_router)
     application.include_router(knowledge_router)
 
     # ------------------------------------------------------------------

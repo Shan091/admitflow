@@ -27,3 +27,11 @@ def test_env_overrides_defaults(monkeypatch) -> None:  # type: ignore[no-untyped
     fresh = Settings()
     assert fresh.app_env == "prod"
     assert fresh.llm_fast_model == "some-future-model-id"
+
+
+def test_dotenv_is_explicit_in_tests(tmp_path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    monkeypatch.chdir(tmp_path)
+    dotenv = tmp_path / ".env"
+    dotenv.write_text("APP_NAME=Synthetic dotenv override\n", encoding="utf-8")
+    assert Settings().app_name == "AdmitFlow"
+    assert Settings(_env_file=dotenv).app_name == "Synthetic dotenv override"

@@ -9,7 +9,7 @@ preserved in the [baseline archive](../docs/planning/archive/2026-10-23-before-t
 
 ### Task 43: Telegram identity and trusted bot-to-institution mapping
 
-**Status:** Implemented and locally verified; commit/PR/merge pending.
+**Status:** Published in the fresh repository through merged PR #1; verification below records the original task evidence.
 **Dependencies:** Existing schema, encryption and audit foundation.
 
 - [x] Add institution-owned Telegram bots and encrypted student routing fields.
@@ -19,7 +19,7 @@ preserved in the [baseline archive](../docs/planning/archive/2026-10-23-before-t
 - [x] Add a migration preserving existing rows and refusing destructive identity downgrade.
 - [x] Prove migration up/down, legacy preservation and cross-tenant/duplicate rejection in real PostgreSQL.
 - [x] Pass the full backend gate and complete an adversarial review of the scoped changes.
-- [ ] Commit, PR, CI and merge under the repository workflow before declaring the task shipped.
+- [x] Commit, PR, CI and merge under the repository workflow (fresh repository PR #1).
 
 **Verification:** Test-first regression failed because TelegramBot/TelegramIdentity
 were absent. Focused identity/schema checks passed 16 tests. A first real-database
@@ -56,7 +56,7 @@ PR/CI/merge remain separate release gates. No new roadmap replaces this file.
 - [x] Pass the final backend gate and frontend typecheck/build; complete adversarial review.
 - [x] Confirm mobile/desktop behavior after the responsive fix.
 - [x] Validate live OpenAI requests and the Telegram answer path separately; see current evidence below.
-- [ ] Commit/PR/CI/merge after the user authorizes publication.
+- [x] Publish through the authorized PR/CI workflow (fresh repository PR #1).
 
 **Verification:** Test-first extraction/password imports initially failed; 16 focused tests
 now pass. Regression tests first exposed account-rotation bypass and a missing API-key
@@ -88,7 +88,7 @@ roles, encryption/storage behavior and operational recovery are in backend/READM
 ### Current execution: Telegram/OpenAI student-to-staff implementation
 
 The entries below track implemented acceptance separately from shipping. Git publication
-is now authorized; Task 43's publication gate remains open until the PR workflow completes.
+is authorized; the verified platform was published through fresh repository PR #1.
 
 - [x] Task 44 implementation: Typed channel-neutral events and validated replies, with
   transport length limits and one validation boundary for every reply branch.
@@ -286,6 +286,15 @@ Publication must not tick the remaining roadmap or the PR/CI/merge release gates
 - [x] Push preserved main history (`96b5c75`) and checkpoint (`a4212cb`) to Shan091/admitflow.
 - [x] Open [draft PR #1](https://github.com/Shan091/admitflow/pull/1) from `codex/telegram-admissions-checkpoint`.
 - [ ] Complete CI and adversarial review before merging; full roadmap completion remains open.
+
+**Replacement repository publication:** The user subsequently deleted/recreated the
+remote and explicitly requested fresh commit history. A fresh baseline and verified
+source snapshot were created without old ancestors. New PR #1 passed backend/frontend
+CI and was squash-merged to replacement `main` (`64105a9`). Its complete tree matches
+the verified `26f5a3b` source. Remote main has exactly **2 newly made commits**, with
+old history retained locally only. Earlier publication entries above refer to the
+deleted repository. Current staff-controls work remains local/in progress until its
+complete gate and browser verification pass.
 
 **Credential/retrieval follow-up:** The user saved a valid replacement OpenAI key;
 structured output, 1536-dimensional embeddings and Telegram provisioning pass again.
@@ -593,13 +602,39 @@ test account; no real provider payment is claimed. Live payments remain disabled
 **Dependencies:** Task 17, 6
 **Estimated scope:** Large
 
+### Staff takeover and reviewed co-pilot evidence (Tasks 20 and 29)
+
+The staff dashboard can pause bot replies, compose a manual Telegram reply, generate
+an encrypted OpenAI draft, inspect its reference lookup, edit/approve/ignore it, and
+resume AI. Draft generation never sends a message. Approval checks the latest saved
+student event, staff revision, expiry, reviewed flag and active tenant-owned routing.
+Exact retries reuse one durable outbox entry. Resume preserves facts and includes only
+confirmed delivered replies in AI context. Office-hours and urgent-support copy is
+reviewed in all four supported language variants.
+
+The backend gate passes **175 tests**, lint/format and strict typing over **86 source
+files**; two pre-existing RAG AsyncMock warnings remain. The final PostgreSQL run
+passes **40 cases** (the Redis-only case is skipped there); the explicit Redis check
+passes separately, for **41 integration cases**. These checks cover takeover, scoped access, pause/resume, draft expiry/replay, provider failures,
+concurrent staff edits and cancellation during provider I/O. Frontend lint/build and
+all **4 browser scenarios** pass, including mobile/desktop layout and manual-send retries.
+Live OpenAI generated a 237-character draft from the saved Telegram inquiry; it was
+ignored and AI resumed. Student facts were preserved and **zero outbound messages were
+added**. This does not establish handset receipt of a new staff-authored reply.
+
+Adversarial review reproduced and fixed stale ORM state overwriting a concurrent staff
+revision, and cancelled draft generations overwriting the staff disposition. Default
+tests now disable implicit developer dotenv loading, including LiteLLM's dotenv import;
+explicit fixture configuration remains supported. No local secrets are moved or exposed.
+Publication of this staff slice is pending its own PR/CI gate.
+
 ### Task 20: Human handoff + co-pilot mode
 **Description:** Handoff node for escalation. Co-pilot mode: AI generates suggested replies visible in dashboard.
 **Acceptance criteria:**
-- [ ] Auto-escalation triggers work (anger, human request, safety topics)
-- [ ] Co-pilot mode generates suggestions without sending to user
-- [ ] "Resume AI" re-activates the bot with context continuity
-- [ ] Business hours respected for escalation
+- [x] Escalate clear frustration, explicit human requests and urgent safety signals; ordinary questions/refusals remain in the normal journey.
+- [x] Co-pilot generates encrypted drafts without sending; approval requires explicit review, fresh context and an active takeover.
+- [x] "Resume AI" restores the bot with confirmed staff replies and saved student facts; pending staff sends must finish first.
+- [x] Institution-local office hours affect escalation wording without promising immediate support.
 **Verification:** Integration test with escalation triggers
 **Dependencies:** Task 17
 **Estimated scope:** Large
@@ -696,10 +731,11 @@ inherit the existing staff design; detector checks report no findings.
 **Description:** Messaging interface showing chat history, AI suggested replies, and manual send.
 **Acceptance criteria:**
 - [x] Unified student/bot/standalone-delivery history with payment labels, timestamps and delivery states; stable tenant-scoped cursor pagination includes equal-time messages.
-- [ ] AI-suggested replies shown with approve/edit/ignore buttons
-- [ ] Manual text input sends message via WhatsApp
-- [ ] "Take Over" and "Resume AI" buttons
-**Verification:** Take over a chat and send a manual message
+- [x] AI-suggested replies support review, edit, approve and ignore; stale/expired drafts cannot be approved.
+- [x] Manual text input queues a tenant-scoped Telegram reply with an exact-text confirmation and replay-safe send reference.
+- [x] "Take Over" and "Resume AI" buttons, confirmations and bot-pause status.
+**Verification:** PostgreSQL/API and browser scenarios cover takeover, manual-send retry, reviewed drafts and resume. A handset-confirmed staff-authored delivery is still a separate live check.
+- [ ] Confirm one explicitly authorized staff reply on the Telegram handset.
 **Dependencies:** Task 25, 20
 **Estimated scope:** Large
 

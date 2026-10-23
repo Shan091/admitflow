@@ -139,6 +139,12 @@ async def process_event(event_id: uuid.UUID) -> None:
         )
         if earlier:
             return  # Delivery order is recovered by the durable queue sweep.
+        if lead.copilot_mode:
+            # Staff owns the conversation. Persist ingress without generating or sending a reply.
+            event.status = "done"
+            lead.last_inbound_at = datetime.now(UTC)
+            await db.commit()
+            return
         bot = await db.get(TelegramBot, event.bot_id)
         if bot is None or not bot.is_active:
             return

@@ -55,7 +55,7 @@ authorize the reference material for indexing; extracted text remains untrusted 
 - [x] Prove PDF/DOCX/text indexing and isolation in disposable PostgreSQL/pgvector.
 - [x] Complete the final backend gate, frontend checks and scoped adversarial review.
 - [x] Validate live OpenAI embeddings and connect uploaded material to source-quoted Telegram answers.
-- [ ] Publish the reviewed work through the authorized feature-branch/PR/CI workflow.
+- [x] Publish the reviewed platform through fresh repository PR #1 with green CI.
 
 Detailed command/results and scope limits belong in [todo.md](todo.md). The document
 workspace and student-to-staff implementation have separate acceptance evidence below.
@@ -111,6 +111,12 @@ main baseline and a feature-branch checkpoint, preserving source history. Keep c
 and runtime data local. The full roadmap remains in progress; publication is not a
 claim that all milestones are complete or that this checkpoint is production ready.
 
+Latest override: the user replaced that GitHub repository and requested a fresh commit
+history. The verified source snapshot is now on replacement `main` (`64105a9`) after
+new PR #1 and green CI, with only new publication commits. Previous Git history is
+preserved locally. New work continues on `codex/staff-copilot`; no old ancestry may
+be pushed back into this replacement repository.
+
 ## Milestone 1: Telegram transport and recoverable processing
 
 Tasks 43-48. Outcome: a real Telegram message is accepted durably, processed by the
@@ -160,7 +166,8 @@ Tasks 54-57. Outcome: authenticated staff can inspect and act on the same inquir
 Staff authentication may start alongside Milestone 2 after Task 43. Exit: an authorized
 staff member sees the real persisted conversation/result; a second tenant cannot.
 Human-request controls operate without promising unconfigured staff replies or SLAs.
-Staff-authored Telegram replies and co-pilot remain later work.
+Staff-authored Telegram replies and reviewed co-pilot drafts are implemented under
+Tasks 20/29; their scoped verification and live-check limits are recorded in todo.md.
 
 ## Milestone 4: Verification, reproducibility and event delivery
 
@@ -190,8 +197,15 @@ Payment foundations now include staff monitoring, exact-reference provider looku
 safe bounded retry. Conversation and standalone sends preserve per-lead ordering in
 both directions, and their messages share a cursor-paginated staff transcript. Automated
 database/provider/browser checks cover these paths; the real Razorpay test-account
-journey remains open. Continue Tasks 20/29 staff takeover/co-pilot and the remaining
-institutional milestones without treating this checkpoint as full completion.
+journey remains open. Staff takeover/co-pilot now passes backend, database and browser
+checks. A live OpenAI draft was ignored without adding outbound messages; a new
+handset-confirmed staff send remains separate. Continue Tasks 21/22 follow-ups and
+send budgets, then the remaining institutional milestones.
+
+- [x] Tasks 20/29: takeover, pause/resume, reviewed drafts and replay-safe staff-send UI.
+- [x] Verify staff behavior against PostgreSQL, live OpenAI and desktop/mobile browser scenarios.
+- [ ] Publish the staff slice through its separate PR and green CI.
+- [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |
 | --- | --- |

@@ -4,6 +4,7 @@ import json
 import math
 import re
 import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
@@ -11,7 +12,6 @@ from litellm.exceptions import ContextWindowExceededError
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import undefer
 
 from src.core.rag import JAILBREAK_PATTERN
 from src.core.security import decrypt_pii, encrypt_pii
@@ -21,9 +21,7 @@ from src.db.enums import LeadStatus
 from src.db.models import (
     Application,
     Batch,
-    ConversationEvent,
     ConversationMemory,
-    ConversationReply,
     Course,
     DocumentChunk,
     HumanRequest,
@@ -34,8 +32,8 @@ from src.db.models import (
     TelegramBot,
 )
 from src.engine.contracts import Button, Event, Reply
+from src.engine.escalation import Reason, escalation_reason, office_open
 from src.engine.llm_factory import AllProvidersFailedError, generate_completion
-from src.engine.transcript import event_text
 from src.knowledge.processing import embed_chunks
 from src.knowledge.retrieval import retrieval_query
 from src.logic.rules import evaluate_rule
@@ -80,9 +78,11 @@ def copy(key: str, memory: dict[str, Any]) -> str:
 
 async def load_memory(db: AsyncSession, lead: Lead) -> tuple[ConversationMemory, dict[str, Any]]:
     row = await db.scalar(
-        select(ConversationMemory).where(
+        select(ConversationMemory)
+        .where(
             ConversationMemory.tenant_id == lead.tenant_id, ConversationMemory.lead_id == lead.id
         )
+        .execution_options(populate_existing=True)
     )
     if row is None:
         row = ConversationMemory(
@@ -94,37 +94,52 @@ async def load_memory(db: AsyncSession, lead: Lead) -> tuple[ConversationMemory,
     return row, data
 
 
-async def recent_history(db: AsyncSession, lead: Lead) -> list[dict[str, str]]:
-    rows = list(
-        (
-            await db.scalars(
-                select(ConversationEvent)
-                .options(undefer(ConversationEvent.payload_enc))
-                .where(
-                    ConversationEvent.tenant_id == lead.tenant_id,
-                    ConversationEvent.lead_id == lead.id,
-                    ConversationEvent.status == "done",
-                )
-                .order_by(ConversationEvent.update_id.desc())
-                .limit(10)
-            )
-        ).all()
+async def held_reply(db: AsyncSession, lead: Lead, memory: dict[str, Any]) -> Reply:
+    institution = await db.get(Institution, lead.tenant_id)
+    available = (
+        office_open(institution.timezone, institution.business_hours, datetime.now(UTC))
+        if institution
+        else None
     )
-    history = []
-    for row in reversed(rows):
-        event = Event.model_validate_json(decrypt_pii(row.payload_enc))
-        history.append({"role": "user", "content": await event_text(db, row, event)})
-        reply = await db.scalar(
-            select(ConversationReply)
-            .options(undefer(ConversationReply.payload_enc))
-            .where(
-                ConversationReply.event_id == row.id, ConversationReply.tenant_id == lead.tenant_id
-            )
-        )
-        if reply:
-            body = Reply.model_validate_json(decrypt_pii(reply.payload_enc))
-            history.append({"role": "assistant", "content": body.text})
-    return history
+    text = copy("held", memory)
+    if memory.get("handoff", {}).get("reason") == "safety":
+        text += "\n\n" + copy("urgent", memory)
+    if available is False:
+        text += "\n\n" + copy("outside_hours", memory)
+    return Reply(text=text)
+
+
+async def request_staff(
+    db: AsyncSession, lead: Lead, memory: dict[str, Any], reason: Reason
+) -> Reply:
+    request = HumanRequest(id=uuid.uuid4(), tenant_id=lead.tenant_id, lead_id=lead.id)
+    db.add(request)
+    lead.status = LeadStatus.HANDED_OFF
+    memory["handoff"] = {"request_id": str(request.id), "reason": reason}
+    await write_audit_log(
+        db,
+        tenant_id=lead.tenant_id,
+        actor="conversation-engine",
+        action="human.requested",
+        lead_id=lead.id,
+        details={"reason": reason},
+    )
+    return await held_reply(db, lead, memory)
+
+
+async def recent_history(db: AsyncSession, lead: Lead) -> list[dict[str, str]]:
+    from src.engine.timeline import timeline
+
+    messages, _ = await timeline(db, lead.tenant_id, lead.id, None)
+    return [
+        {
+            "role": "user" if message["direction"] == "inbound" else "assistant",
+            "content": message["text"],
+        }
+        for message in messages
+        if (message["direction"] == "inbound" and message["status"] == "done")
+        or (message["direction"] == "outbound" and message["status"] == "sent")
+    ][-20:]
 
 
 def button(label: str, kind: str, target: str, lead: Lead, bot: TelegramBot) -> Button:
@@ -421,7 +436,7 @@ async def route(
         )
     )
     if held:
-        return Reply(text=copy("held", memory))
+        return await held_reply(db, lead, memory)
     submitted = await db.scalar(
         select(Application)
         .where(Application.tenant_id == lead.tenant_id, Application.lead_id == lead.id)
@@ -543,6 +558,9 @@ async def route(
                 ]
             ],
         )
+    reason = escalation_reason(text)
+    if reason:
+        return await request_staff(db, lead, memory, reason)
     if JAILBREAK_PATTERN.search(text) or "ignore previous instructions" in text.lower():
         return Reply(text=copy("unsafe", memory))
     if text == "/courses":
@@ -576,7 +594,9 @@ async def route(
                 {
                     "role": "system",
                     "content": "Classify admissions intent. "
-                    "handoff only for an explicit human/staff request. "
+                    "handoff for an explicit human/staff request, clear frustration "
+                    "or a safety concern. "
+                    "Do not escalate ordinary questions or refusal to share personal details. "
                     "question for institutional facts/FAQs, "
                     "discovery for course exploration/greetings, "
                     "qualification for answers/corrections to eligibility questions. "
@@ -590,16 +610,7 @@ async def route(
         )
         intent = Interpretation.model_validate_json(response.choices[0].message.content).intent
     if intent == "handoff":
-        db.add(HumanRequest(tenant_id=lead.tenant_id, lead_id=lead.id))
-        lead.status = LeadStatus.HANDED_OFF
-        await write_audit_log(
-            db,
-            tenant_id=lead.tenant_id,
-            actor="conversation-engine",
-            action="human.requested",
-            lead_id=lead.id,
-        )
-        return Reply(text=copy("held", memory))
+        return await request_staff(db, lead, memory, "staff_review")
     if intent == "question":
         try:
             return await answer_question(db, lead, memory, text)
