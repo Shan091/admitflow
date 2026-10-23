@@ -221,6 +221,7 @@ CRM, exports/integrations and the remaining institutional product milestones.
 - [x] Explicit full inquiry erasure and separately scoped conversation-history retention; role, tenant, concurrency and financial-preservation checks pass.
 - [x] Typed OpenAI decisions and required bounded passage reranking; no model training. Unit/database checks and live 4/4 ranking plus 24/24 FAQ checks pass.
 - [x] Task 38: isolated full-stack Compose build/start, real proxy/WebSocket/queue/scheduler checks and credential-preserving restart pass; receiver polling is an explicit profile.
+- [x] Task 42.2: bounded contextual OpenAI query resolution, uncertainty clarification, course-scoped references and matching database fee lookup; unit/database/browser and live evaluations pass.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |
@@ -230,7 +231,7 @@ CRM, exports/integrations and the remaining institutional product milestones.
 | Institution administration | 28 course/batch/rule CRUD; 30 reviewed document uploads; 34 settings/business hours |
 | Reporting and integrations | 26 analytics; 32 export/outbound webhooks; 33 notifications |
 | Reliability and operations | 22 channel-specific rate/send queue; 23 optional Langfuse; 35 optional Sentry; 36 deletion; 37 retention; 38 full Compose; 39 production topology |
-| Evidence-driven AI improvements | 40 typed OpenAI decisions (implemented); 42.3 required OpenAI reranking (implemented); 42.1 complex parsing and 42.2 contextual rewriting remain separately tracked |
+| Evidence-driven AI improvements | 40 typed OpenAI decisions (implemented); 42.3 required OpenAI reranking (implemented); 42.2 contextual resolution/course scopes (implemented); 42.1 complex parsing remains |
 
 Security, auditability, tenant isolation and safe handling remain requirements of the
 first milestone that touches them. Real applicant pilots additionally require verified

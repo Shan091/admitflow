@@ -1,0 +1,47 @@
+{
+  "scope": "Eight synthetic live query-resolution cases; no fluency claim or sends",
+  "cases": [
+    {
+      "case": "en-reference",
+      "passed": true,
+      "clarification": false
+    },
+    {
+      "case": "hi-reference",
+      "passed": true,
+      "clarification": false
+    },
+    {
+      "case": "hinglish-reference",
+      "passed": true,
+      "clarification": false
+    },
+    {
+      "case": "ml-reference",
+      "passed": true,
+      "clarification": false
+    },
+    {
+      "case": "ambiguous-course",
+      "passed": true,
+      "clarification": true
+    },
+    {
+      "case": "ambiguous-hi",
+      "passed": true,
+      "clarification": true
+    },
+    {
+      "case": "explicit-topic-change",
+      "passed": true,
+      "clarification": false
+    },
+    {
+      "case": "off-topic-preserved",
+      "passed": true,
+      "clarification": false
+    }
+  ],
+  "passed": 8,
+  "total": 8
+}

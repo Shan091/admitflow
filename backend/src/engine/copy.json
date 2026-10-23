@@ -142,5 +142,11 @@
     "पूछताछ जारी रखें",
     "Inquiry continue karein",
     "അന്വേഷണം തുടരുക"
+  ],
+  "clarify_reference": [
+    "Which course or topic do you mean? Please name it in your question.",
+    "आप किस कोर्स या विषय की बात कर रहे हैं? कृपया अपने सवाल में उसका नाम बताएं।",
+    "Aap kis course ya topic ki baat kar rahe hain? Apne sawaal mein uska naam batayein.",
+    "ഏത് കോഴ്സിനെയോ വിഷയത്തെയോ കുറിച്ചാണ് ചോദിക്കുന്നത്? ചോദ്യത്തിൽ അതിന്റെ പേര് കൂടി പറയൂ."
   ]
 }

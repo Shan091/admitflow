@@ -2,6 +2,27 @@
 
 ## Current direction
 
+**Current contextual-retrieval slice:** Task 42.2 is implemented on
+`codex/contextual-retrieval`, after full-stack runtime PR #10 merged as `0d5b122`.
+Bounded OpenAI reference resolution asks for clarification when uncertain, preserves
+numeric values across supported formats and never changes authoritative course IDs.
+Document metadata scopes are tenant/admin controlled and applied before ranking.
+Explicit catalog names override a selected course for lookup only. A failing
+cross-course application-fee regression was fixed so the matching database row
+supplies the amount. Duplicate active course names now require a matching explicit
+selection or clarification, with a failing-then-passing database regression.
+Adversarial review covered tenant/admin/CSRF authority, metadata joins, numeric
+fidelity, duplicate/overlapping catalog names and quotation source identity; no
+open critical/important finding remains. Staff scope/search controls pass desktop/mobile checks and
+failure recovery; no live document scope was changed.
+
+The gate passes 240 tests/113 source files; full PostgreSQL passes 86 tests plus two
+actual Redis cases, and all twelve browser scenarios pass. Live resolution improved
+from 7/8 to 8/8 after clarifying the singular-reference rule; 24/24 source/abstention
+cases pass again. Native API/worker/frontend run this source; the container stack also builds/starts with the same code. No Telegram message was sent. Continue Task 42.1
+complex digital-document structure and semantic chunking before final release checks.
+
+
 **Current local-runtime slice:** `codex/full-stack-runtime` implements Task 38 after
 PR #9 was squash-merged as `d4971d1`. The root Compose stack has its own synthetic
 PostgreSQL/Redis/credential volumes and loopback ports 13000/18000; the existing native

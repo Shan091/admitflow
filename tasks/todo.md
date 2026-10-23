@@ -1095,19 +1095,20 @@ This epic is broken down into sub-tasks for focused implementation.
   **Files likely touched:** `backend/pyproject.toml`, `backend/src/core/rag.py`
   **Estimated scope:** Medium
 
-### Task 42.2: Contextual Query Rewriting
+### Task 42.2: Contextual query resolution and course-scoped evidence
 
-**Description:** Add a query resolution step before vector search. Use OpenAI to rewrite the raw Telegram message into a standalone query (resolving slang and pronouns using conversation history).
+**Description:** Resolve follow-up references using typed OpenAI decisions over six recent completed/sent turns (at most 1,000 characters each). Standalone questions keep the existing translation/ASCII fast path. Unresolved references ask for clarification instead of searching. Model output never changes the student's course selection or invents an authoritative course ID.
 **Acceptance criteria:**
 
-- [ ] Query rewriter LLM chain implemented
-- [ ] Uses previous conversation turns to resolve ambiguous intent
-- [ ] Pre-filters search space using metadata tags if a specific course is identified
-  **Verification:**
-- [ ] Unit tests for query resolution given ambiguous user inputs
-  **Dependencies:** Task 13
-  **Files likely touched:** `backend/src/core/rag.py`
-  **Estimated scope:** Medium
+- [x] OpenAI query resolution uses bounded recent conversation; ambiguous references produce reviewed clarification copy in all four languages
+- [x] Rewrites preserve original meaning and cannot introduce unsupported numeric values; Unicode digits and Indian grouping/decimal formatting compare by value
+- [x] Explicit active catalog names override the selected course for the lookup, including comparisons; application fees still come only from the matching database rows
+- [x] Administrators assign an indexed reference to a course or shared institution information; course ownership, tenant scope and browser-write checks are enforced
+- [x] Student retrieval filters approved document metadata before ranking; staff may explicitly search a course plus shared references
+- [x] Staff scope/search controls support loading, unavailable course, failure recovery and desktop/mobile layouts
+  **Verification:** Backend gate 240 tests/113 strict source files; full PostgreSQL suite 86 passed plus two actual Redis tests. Twelve browser scenarios pass, including scope save/search/failure recovery; desktop/mobile QA completed. Live query-resolution evaluation initially passed 7/8 (ambiguous singular reference became a plural request); the clarified prompt passes 8/8. Source/abstention rerun passes 24/24. No student message was sent and no live document scope was changed.
+  **Evidence:** `tests/test_retrieval_query.py`, `tests/integration/test_contextual_retrieval.py`, `frontend/tests/knowledge-scope.e2e.ts`, `docs/event/CONTEXTUAL_RETRIEVAL_RESULTS.json`.
+  **Dependencies:** Task 13, 40, 42.3
 
 ### Task 42.3: Required OpenAI passage reranking
 
