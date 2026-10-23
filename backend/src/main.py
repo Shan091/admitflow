@@ -58,6 +58,7 @@ def create_app() -> FastAPI:
     from src.knowledge.api import router as knowledge_router
     from src.knowledge.limits import UploadBodyLimit
     from src.payments.webhook import router as payments_router
+    from src.staff.analytics import router as analytics_router
     from src.staff.applications import router as applications_router
     from src.staff.auth import router as staff_router
     from src.staff.copilot import router as copilot_router
@@ -68,6 +69,7 @@ def create_app() -> FastAPI:
 
     application.add_middleware(UploadBodyLimit)
     application.include_router(staff_router)
+    application.include_router(analytics_router)
     application.include_router(leads_router)
     application.include_router(management_router)
     application.include_router(applications_router)

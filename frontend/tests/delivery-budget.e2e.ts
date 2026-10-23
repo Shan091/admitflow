@@ -41,6 +41,9 @@ test("delivery warning and an administrator's budget changes remain clear on mob
     await route.fulfill({ json: body });
   });
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Knowledge library", exact: true })
+    .click();
   const summary = page.getByRole("region", {
     name: "Telegram delivery budget",
   });
@@ -50,10 +53,11 @@ test("delivery warning and an administrator's budget changes remain clear on mob
     await page.setViewportSize({ width, height: 1000 });
     await page.evaluate(() => window.scrollTo(0, 0));
     await expect(page.locator("body")).toHaveJSProperty("scrollWidth", width);
-    await page.screenshot({
-      path: `test-results/delivery-budget-${width}.png`,
-      fullPage: true,
-    });
+    if (process.env.CAPTURE_UI === "1")
+      await page.screenshot({
+        path: `test-results/delivery-budget-${width}.png`,
+        fullPage: true,
+      });
   }
   await page
     .getByRole("button", { name: "Institution management", exact: true })

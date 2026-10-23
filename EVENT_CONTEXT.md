@@ -12,8 +12,8 @@ controls. Published ancestry starts at fresh root `1ac0ffe`; these commits were 
 created during this publication using actual current timestamps. No old Git history was pushed into the replacement. Earlier history
 remains on local branches; earlier publication hashes/PR notes below are historical.
 
-**Current follow-up slice:** Task 22 is published through merged PR #4 (`ff35eba`).
-Branch `codex/consented-followups` implements Task 21: student opt-in through /followups,
+**Published follow-up slice:** Task 22 is published through merged PR #4 (`ff35eba`),
+and Task 21 through merged PR #5 (`91f4370`): student opt-in through /followups,
 /stop even during staff takeover, source freshness/cancellation, office hours, recoverable
 generation leases and at most two delivery opportunities. Unsafe/unavailable generation
 uses reviewed neutral copy; a separate typed OpenAI safety check guards generated text.
@@ -24,11 +24,23 @@ regression was reproduced/fixed: queued reminders cannot remain executable after
 of consent fields; in-flight requests remain uncertain. Migration `e31b0847c629` is applied
 locally, existing inquiries remain opted out, API/worker were restarted, the one-shot
 scheduler queued zero jobs and its continuous producer is running. Authenticated saved
-inquiry reads and readiness pass. Publication uses its own PR/CI gate.
+inquiry reads and readiness pass. Both backend and frontend CI passed before the squash merge.
+
+**Current reporting slice:** Branch `codex/institution-reporting` implements Task 26.
+The default Overview shows tenant-scoped creation-cohort conversions, observed stage
+reach/current state counts and local daily/weekly inquiry charts. Real ORM status
+transitions are audited atomically; older stage history is not invented. All aggregates
+share a repeatable-read snapshot. The group gate passes 193 default tests/93 source
+files, 65 PostgreSQL cases plus two Redis cases, frontend lint/build and all six browser
+scenarios. Desktop/mobile layout and two bounded visual passes are complete; the legacy
+table minimum width is overridden only for analytics. Live authenticated metrics for
+the saved demo data have consistent totals (two inquiries, one applicant); readiness
+passes. API/worker/frontend have been restarted on current sources. No Telegram message
+or historical backfill was used. Publication follows its own PR/CI gate. Continue CRM,
+exports/integrations, privacy/retention and the rest of the existing roadmap.
 
 The user now assigns all remaining tasks to the primary agent and requests faster grouped
-execution; the earlier analytics handoff proposal is withdrawn. Continue Task 26 analytics
-and the full existing roadmap. Do not repeat unchanged full checks: use focused tests
+execution; the earlier analytics handoff proposal is withdrawn. Continue the full existing roadmap after the reporting slice. Do not repeat unchanged full checks: use focused tests
 during work and one full applicable gate when a feature group is ready. The Razorpay test
 account and final owner/team/submission details remain deferred user-side prerequisites.
 No whole-goal completion claim.

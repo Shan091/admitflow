@@ -83,3 +83,12 @@ We don't chase a single global number. The bar is: **every branch in the risk-he
 above is exercised**, and every bug fix leaves behind a regression test. When integration
 infra lands, add a coverage floor for `src/` in CI and raise it deliberately, never by
 loosening tests.
+
+### Browser announcement regions
+
+Scope alert/status assertions to the feature's named region. Next.js also creates a
+route-announcer alert; a global alert locator can match both the intended error and
+that framework node. Keep screenshot review bounded separately from functional retries.
+
+Set `CAPTURE_UI=1` only for a bounded desktop/mobile visual pass. Normal browser
+regressions retain layout assertions without repeatedly generating screenshots.

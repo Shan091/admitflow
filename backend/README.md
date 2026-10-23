@@ -298,3 +298,32 @@ A migration downgrade cancels queued reminders before removing consent fields, a
 marks in-flight reminder requests uncertain. Older sender code therefore cannot execute
 leftover queued outreach after rollback. A later upgrade again defaults all inquiries
 to no consent; it does not invent or recover an opt-in from historical messages.
+
+## Admissions analytics
+
+The staff workspace opens on Overview. `GET /api/staff/analytics` derives the institution
+from the authenticated session and accepts `from`, `to` (inclusive local dates) and
+`bucket=day|week`. The default is the last 30 institution-local dates; a request is
+bounded to 366 dates. Weeks begin Monday, partial edge weeks include only the selected
+period and missing buckets are zero-filled. Local midnight/DST boundaries use the
+configured IANA timezone. All aggregates share a repeatable-read snapshot, so concurrent
+arrivals cannot mismatch a numerator and its denominator.
+
+The cohort is inquiries created in the selected period, with progress observed as of
+the report timestamp. Application conversion counts distinct applicants over inquiries;
+fee satisfaction counts applicants with confirmed paid/waived orders over applicants;
+enrollment conversion counts enrolled/approved applicants over applicants. Paid and
+waived totals stay separate. An empty denominator produces an undefined rate rather
+than a fabricated zero or 100 percent.
+
+Current lifecycle counts are distinct from reached-stage counts. Real ORM lead-status
+changes append `lead.stage_changed` audit rows in the same transaction; rollback removes
+both. The reach calculation uses those observed from/to states and current states,
+without inventing earlier transitions for older records. Every inquiry belongs to the
+created-inquiry baseline, and stages can be skipped. Future bulk SQL status writers must
+explicitly retain equivalent stage auditing; the existing bulk delivery updates only
+change timestamps. No raw contact, fact, form or message data is returned in analytics.
+
+The chart also has an exact-count table and accessible lifecycle table. The interface
+shows rates with their denominators, date/timezone coverage, error/retry and empty states.
+It does not claim current-state distribution is complete historical conversion evidence.

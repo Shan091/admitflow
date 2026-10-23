@@ -107,6 +107,15 @@ test("real staff login, live upload/search and persisted Telegram inquiry", asyn
   await page.getByLabel("Password", { exact: true }).fill(credentials.password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(
+    page.getByRole("heading", { name: "Admissions overview", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Application conversion", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Knowledge library", exact: true })
+    .click();
+  await expect(
     page.getByRole("heading", { name: "Knowledge library", exact: true }),
   ).toBeVisible();
 

@@ -15,9 +15,42 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
+from sqlalchemy import event, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
+from src.db.enums import LeadStatus
 from src.db.models.audit import AuditLog
+from src.db.models.lead import Lead
+
+
+def record_stage_changes(session: Session, _flush_context: Any, _instances: Any) -> None:
+    """Record persisted ORM transitions atomically; never infer an earlier stage."""
+    for entity in list(session.dirty):
+        if not isinstance(entity, Lead):
+            continue
+        history = inspect(entity).attrs.status.history
+        if not history.has_changes() or not history.added:
+            continue
+        destination = history.added[0]
+        if not isinstance(destination, LeadStatus):
+            continue
+        previous = history.deleted[0] if history.deleted else None
+        session.add(
+            AuditLog(
+                tenant_id=entity.tenant_id,
+                lead_id=entity.id,
+                actor="domain-state",
+                action="lead.stage_changed",
+                details={
+                    "from": previous.value if isinstance(previous, LeadStatus) else None,
+                    "to": destination.value,
+                },
+            )
+        )
+
+
+event.listen(Session, "before_flush", record_stage_changes)
 
 
 async def write_audit_log(

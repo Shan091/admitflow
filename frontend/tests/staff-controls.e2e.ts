@@ -129,10 +129,11 @@ test("staff reviews drafts and retries a manual send with the same reference", a
     await page.setViewportSize({ width, height: 1000 });
     await page.evaluate(() => window.scrollTo(0, 0));
     await expect(page.locator("body")).toHaveJSProperty("scrollWidth", width);
-    await page.screenshot({
-      path: `test-results/staff-controls-${width}.png`,
-      fullPage: true,
-    });
+    if (process.env.CAPTURE_UI === "1")
+      await page.screenshot({
+        path: `test-results/staff-controls-${width}.png`,
+        fullPage: true,
+      });
   }
   await page
     .getByRole("button", { name: "Approve reply", exact: true })

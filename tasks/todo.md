@@ -11,8 +11,8 @@ preserved in the [baseline archive](../docs/planning/archive/2026-10-23-before-t
 
 The user has assigned **all remaining tasks to the primary agent**. The previous
 proposal to reserve Task 26 for another agent is superseded; nothing is waiting for
-an external analytics handoff. Task 22 was published through merged PR #4; continue Task 21
-consent-aware follow-ups and the rest of this existing roadmap, including analytics.
+an external analytics handoff. Tasks 22 and 21 were published through merged PRs #4 and #5. Continue Task 26
+analytics/reporting and the rest of this existing roadmap.
 Group related implementation work, use focused tests during development, and run the
 full applicable gate once each feature group is ready. Keep the repository's review,
 privacy, tenant-isolation and release requirements intact.
@@ -732,31 +732,63 @@ consent-aware follow-ups is next.
 
 ## Phase 5: Dashboard Frontend (Next.js)
 
-### Task 24: Initialize Next.js + dark mode + glassmorphism
-**Description:** Create `frontend/` with Next.js, Tailwind CSS configured for dark mode and premium glassmorphism aesthetic.
+### Task 24: Initialize the Next.js staff workspace
+**Description:** The current SPEC uses the existing responsive staff design and plain CSS; the archived dark/glass/Tailwind baseline is superseded.
 **Acceptance criteria:**
-- [ ] Next.js app runs on localhost:3000
-- [ ] Dark mode + glassmorphism tokens configured
+- [x] Next.js app runs on localhost:3000; lint/build and browser navigation pass.
+- [x] Current staff-design tokens, responsive layouts and visible focus styles are in place; no dark/glass redesign is claimed.
 **Verification:** Visual inspection of a test page
 **Dependencies:** None
 **Estimated scope:** Small
 
 ### Task 25: Authentication (email + password)
-**Description:** Login page, JWT-based auth, role-based access control (`admin` vs `agent`).
+**Description:** Login with expiring opaque database sessions and administrator/staff roles under the current SPEC; JWT storage from the archived baseline is superseded.
 **Acceptance criteria:**
-- [ ] Staff can register and log in
-- [ ] JWT token stored securely
-- [ ] Route guards based on role
+- [x] Provisioned staff accounts can log in; default Overview and unauthorized access are verified.
+- [ ] Institution-managed staff creation/invitation remains part of the administration milestone; public self-registration is not claimed.
+- [x] Hashed opaque sessions use expiring HttpOnly cookies; passwords are salted hashes.
+- [x] Route guards enforce tenant scope and administrator writes versus staff reads.
 **Verification:** Login flow + unauthorized access blocked
 **Dependencies:** Task 24, Task 2 (backend auth endpoints)
 **Estimated scope:** Medium
 
 ### Task 26: Dashboard home (funnel analytics)
+**Current execution:** Implemented on `codex/institution-reporting`, based on fresh
+`origin/main` after PR #5 (`91f4370`). Real ORM transitions append same-transaction
+`lead.stage_changed` audit records; current counts and known stage reach remain separate.
+Older transitions are not invented. All aggregates use one repeatable-read snapshot,
+creation-cohort date bounds and session-derived tenant scope. Application/payment
+records supply verified conversions; paid and waived remain distinct. The Overview
+home preserves access to knowledge, inquiries, staff requests, management and payments.
 **Description:** Main dashboard page with funnel visualization and time-series lead charts.
 **Acceptance criteria:**
-- [ ] Funnel shows counts and conversion rates for each lifecycle state
-- [ ] Time-series chart shows leads per day/week
-**Verification:** Load with seeded data, verify charts render
+- [x] Lifecycle funnel separates current states from observed reach, with explicit inquiry-cohort denominators; application, fee-satisfaction and enrollment conversions have real numerators/denominators.
+- [x] Institution-local daily/weekly inquiry series, zero-filled gaps, accessible exact counts and bounded date filters.
+**Verification:** The group gate passes lint/format, strict typing over **93 source
+files** and **193 default tests**, with two existing RAG AsyncMock warnings. The full
+PostgreSQL suite passes **65 cases**, and two real Redis cases pass separately:
+**67 integration cases** total. Seven analytics unit cases cover local/DST boundaries,
+Monday buckets, zero/invalid denominators, date limits and calendar extremes. Five
+real-database cases cover scoped counts, corrections/history, empty/weekly data,
+tenant/session controls, transactional/no-op/rollback auditing and consistent metrics
+under a concurrent arrival.
+
+Frontend lint/build and **all six browser scenarios** pass. The new overview case
+covers filter changes, chart/denominator content and error/empty recovery. Real login
+now confirms the Overview data before navigating to live upload/search and the saved
+Telegram inquiry. Desktop/mobile inspection passes after a scoped override of the
+legacy table minimum width; two bounded visual rounds are complete, with captures
+under ignored `frontend/playwright-report/analytics-*.png`. Normal browser runs keep
+layout assertions and make captures opt-in with `CAPTURE_UI=1`. The UI detector reports
+no findings. API/worker/frontend run the current sources; live authenticated analytics
+reports two saved demo inquiries and one applicant, with matching current-state and
+series totals and healthy readiness. No history was backfilled and no Telegram message
+was sent for analytics validation.
+
+Scoped adversarial review covered tenant/session isolation, conversion subset rules,
+concurrent snapshots, audit rollback/no-op behavior, date limits and data freshness
+labels. No open important/critical finding remains in this slice. Publication follows
+the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays open.
 **Dependencies:** Task 25
 **Estimated scope:** Medium
 

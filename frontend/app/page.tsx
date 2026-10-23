@@ -7,6 +7,7 @@ import Management from "./management";
 import Applications from "./applications";
 import Payments from "./payments";
 import DeliveryBudget from "./delivery-budget";
+import Analytics from "./analytics";
 
 type Staff = { email: string; role: string; institution: string };
 type Doc = {
@@ -101,13 +102,14 @@ function Icon({ kind }: { kind: "file" | "upload" | "search" | "folder" }) {
 
 export default function Knowledge() {
   const [view, setView] = useState<
+    | "overview"
     | "knowledge"
     | "leads"
     | "requests"
     | "management"
     | "applications"
     | "payments"
-  >("knowledge");
+  >("overview");
   const [staff, setStaff] = useState<Staff | null>(null);
   const [inquiryFocus, setInquiryFocus] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
@@ -398,6 +400,7 @@ export default function Knowledge() {
         <nav aria-label="Workspace" className="workspace-nav">
           {(
             [
+              ["overview", "Overview"],
               ["knowledge", "Knowledge library"],
               ["leads", "Admissions inquiries"],
               ["requests", "Staff requests"],
@@ -439,17 +442,19 @@ export default function Knowledge() {
         <header className="topbar">
           <span>
             Workspace <span className="slash">/</span>{" "}
-            {view === "knowledge"
-              ? "Knowledge"
-              : view === "leads"
-                ? "Inquiries"
-                : view === "management"
-                  ? "Institution management"
-                  : view === "applications"
-                    ? "Applications"
-                    : view === "payments"
-                      ? "Payments"
-                      : "Staff requests"}
+            {view === "overview"
+              ? "Overview"
+              : view === "knowledge"
+                ? "Knowledge"
+                : view === "leads"
+                  ? "Inquiries"
+                  : view === "management"
+                    ? "Institution management"
+                    : view === "applications"
+                      ? "Applications"
+                      : view === "payments"
+                        ? "Payments"
+                        : "Staff requests"}
           </span>
           <span className="role">
             {staff.role === "admin" ? "Administrator" : "Staff member"}
@@ -457,7 +462,9 @@ export default function Knowledge() {
         </header>
         <div className="content">
           <DeliveryBudget request={api} onError={sessionFailure} />
-          {view === "management" ? (
+          {view === "overview" ? (
+            <Analytics request={api} onError={sessionFailure} />
+          ) : view === "management" ? (
             <Management
               request={api}
               onError={sessionFailure}
