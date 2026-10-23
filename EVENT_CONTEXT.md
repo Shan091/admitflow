@@ -2,6 +2,20 @@
 
 ## Current direction
 
+**Current CRM/export slice:** The primary agent owns all remaining tasks; the user
+requested faster grouped execution without delegation. Task 27 now provides all twelve
+status filters, private Unicode known-name prefix/exact international phone lookup,
+transactional blind indexes and legacy-name backfill. Task 32 CSV/Excel downloads
+are administrator-only, tenant-scoped, audited, formula-safe and explicitly bounded.
+Migration `a82df107e436` is applied locally and both saved inquiries were reindexed.
+Actual authenticated downloads returned two inquiries, one application and no payments.
+The gate passes 200 default tests/97 source files; 69 PostgreSQL and two Redis cases
+pass, including reversible migration, index changes and pagination. Frontend lint/build,
+staff-controls regression and new CRM/download browser checks pass. Outbound webhooks,
+notifications and all remaining milestones are still open. No Telegram message was sent
+for these checks. API/worker/frontend use the updated source; receiver/scheduler remain
+running. Publication will follow the same green-CI reviewed-PR gate.
+
 **Latest publication override:** The user deleted the first GitHub repository and
 created a fresh empty `Shan091/admitflow`, explicitly requesting only newly made
 commits in its published history. The verified source tree from local `26f5a3b` was
@@ -26,7 +40,7 @@ locally, existing inquiries remain opted out, API/worker were restarted, the one
 scheduler queued zero jobs and its continuous producer is running. Authenticated saved
 inquiry reads and readiness pass. Both backend and frontend CI passed before the squash merge.
 
-**Current reporting slice:** Branch `codex/institution-reporting` implements Task 26.
+**Published reporting slice:** Task 26 passed both CI checks and was squash-merged through PR #6 as `ab516b1`.
 The default Overview shows tenant-scoped creation-cohort conversions, observed stage
 reach/current state counts and local daily/weekly inquiry charts. Real ORM status
 transitions are audited atomically; older stage history is not invented. All aggregates

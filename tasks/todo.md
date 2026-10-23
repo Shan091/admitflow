@@ -795,9 +795,14 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
 ### Task 27: Leads CRM page
 **Description:** Table/grid of all leads with status filters, search, and click-to-view detail.
 **Acceptance criteria:**
-- [ ] Leads fetched from FastAPI, filtered by tenant
-- [ ] Status indicators (color-coded by lifecycle state)
-- [ ] Search by name/phone
+- [x] Leads fetched from FastAPI, filtered by tenant
+- [x] Status indicators (color-coded by lifecycle state), all twelve states available as filters
+- [x] Known-name word-prefix search and exact international phone lookup; private POST body, audited access
+**Evidence:** Four real PostgreSQL cases cover tenant boundaries, role access, Unicode
+prefixes, encrypted-name rename/removal, idempotent legacy backfill, bounded 50-row
+pagination and exports. The browser scenario verifies the private query body, all status
+options, name display and 390/1440px layouts. No phone is inferred from Telegram.
+Migration `a82df107e436` applies/reverses; local backfill processed both saved inquiries.
 **Verification:** Load with seeded leads
 **Dependencies:** Task 25
 **Estimated scope:** Medium
@@ -860,10 +865,17 @@ desktop/mobile and opens its inquiry. No Telegram updates were fabricated for th
 ### Task 32: Data export + webhook config
 **Description:** CSV/Excel export for leads, applications, payments. Outbound webhook URL configuration.
 **Acceptance criteria:**
-- [ ] Export buttons generate downloadable CSV/Excel
+- [x] Administrator download buttons generate CSV/Excel for inquiries, applications and payments
 - [ ] Webhook URL configurable per institution
 - [ ] Events pushed to webhook URL in real-time
 **Verification:** Export data + configure a test webhook URL
+**Export evidence:** Tenant-scoped, CSRF-protected, audited downloads pass real database
+checks for all three datasets in both formats. CSV formula-like text is neutralized;
+Excel stores text cells explicitly. Amounts retain database minor units, phone strings
+retain country codes, ciphertext/search indexes are excluded, and exceeding the configured
+row/cell limit fails explicitly. Actual local authenticated CSV downloads returned two
+inquiries, one application and zero payments; browser download and mobile layout pass.
+Outbound webhook configuration/delivery remains the next part of this task.
 **Dependencies:** Task 25
 **Estimated scope:** Medium
 

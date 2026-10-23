@@ -5,7 +5,7 @@ import time
 import uuid
 from typing import Any, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import select
 
 from src.core.security import decrypt_pii
@@ -21,6 +21,7 @@ from src.db.models import (
 )
 from src.engine.timeline import timeline
 from src.staff.auth import Db, Staff, require_browser_write
+from src.staff.crm import LeadFilters, LeadSearch, lead_statement, lead_summary
 
 router = APIRouter(prefix="/api/staff", tags=["staff admissions"])
 
@@ -52,36 +53,39 @@ async def course_options(staff: Staff, db: Db) -> list[dict[str, str]]:
 async def leads(
     staff: Staff,
     db: Db,
+    response: Response,
     status: LeadStatus | None = None,
     course_id: uuid.UUID | None = None,
     offset: int = Query(default=0, ge=0),
 ) -> list[dict[str, Any]]:
-    statement = select(Lead, Course.name).outerjoin(
-        Course, (Course.id == Lead.current_course_id) & (Course.tenant_id == Lead.tenant_id)
-    )
-    statement = statement.where(Lead.tenant_id == staff.tenant_id)
-    if status:
-        statement = statement.where(Lead.status == status)
-    if course_id:
-        statement = statement.where(Lead.current_course_id == course_id)
-    rows = (
-        await db.execute(
-            statement.order_by(Lead.updated_at.desc(), Lead.id).offset(offset).limit(50)
-        )
-    ).all()
+    response.headers["Cache-Control"] = "no-store"
+    statement = lead_statement(staff.tenant_id, LeadFilters(status=status, course_id=course_id))
+    rows = (await db.execute(statement.offset(offset).limit(50))).all()
     await write_audit_log(
         db, tenant_id=staff.tenant_id, actor=str(staff.id), action="staff.leads_viewed"
     )
     await db.commit()
-    return [
-        {
-            "id": str(lead.id),
-            "status": lead.status.value,
-            "course": name,
-            "course_id": str(lead.current_course_id) if lead.current_course_id else None,
-        }
-        for lead, name in rows
-    ]
+    return [lead_summary(lead, name) for lead, name in rows]
+
+
+@router.post("/leads/search", dependencies=[Depends(require_browser_write)])
+async def search_leads(
+    payload: LeadSearch, staff: Staff, db: Db, response: Response
+) -> list[dict[str, Any]]:
+    response.headers["Cache-Control"] = "no-store"
+    rows = (
+        await db.execute(lead_statement(staff.tenant_id, payload).offset(payload.offset).limit(50))
+    ).all()
+    result = [lead_summary(lead, course) for lead, course in rows]
+    await write_audit_log(
+        db,
+        tenant_id=staff.tenant_id,
+        actor=str(staff.id),
+        action="staff.leads_searched",
+        details={"result_count": len(result)},
+    )
+    await db.commit()
+    return result
 
 
 @router.get("/leads/{lead_id}")
