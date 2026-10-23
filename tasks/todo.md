@@ -7,40 +7,15 @@ there is no parallel roadmap. Prior task IDs and historical results below remain
 baseline evidence, not Telegram end-to-end acceptance. Original dated records are
 preserved in the [baseline archive](../docs/planning/archive/2026-10-23-before-telegram-alignment/README.md).
 
-### Active work ownership and safe parallel work
+### Active work ownership
 
-The current primary agent owns **Task 22** (Telegram send budgets/queuing) and then
-**Task 21** (consent-aware scheduled follow-ups). Task 22 is on
-`codex/telegram-send-budgets`; implementation and local verification are recorded below.
-Do not duplicate either task while this ownership is active.
-
-**Available for another agent: Task 26 — dashboard funnel/time-series analytics.**
-Deliver a session-authenticated, tenant-scoped read-only API router, an analytics UI
-component and isolated tests. Cover all lead lifecycle counts, clearly defined
-conversion denominators and institution-local daily/weekly lead totals, including
-empty data and cross-tenant rejection. Do not imply historical stage conversions from
-current-state counts. Reuse existing models/authentication and the current UI design.
-
-Safe new files: `backend/src/staff/analytics.py`, `frontend/app/analytics.tsx`,
-`frontend/app/analytics.module.css`, `backend/tests/test_analytics.py`,
-`backend/tests/integration/test_analytics.py` and
-`frontend/tests/analytics.e2e.ts`. The primary agent will integrate router/navigation
-registration and run the integrated browser acceptance after the component is ready.
-Task 26 is available, not a claim that another agent has started or finished it.
-
-**Reserved integration files:** existing `backend/src/db/`, `backend/migrations/`,
-`backend/src/telegram/`, `backend/src/engine/`, `backend/src/tasks/`,
-`backend/src/core/settings.py`, `backend/src/staff/management.py`,
-`backend/src/staff/leads.py`, `backend/src/main.py`, `frontend/app/page.tsx`,
-`frontend/app/globals.css`, `frontend/app/management.tsx`, `frontend/app/admissions.tsx`,
-`tasks/plan.md`, this file, `EVENT_CONTEXT.md`, build manifests and graph outputs.
-
-Use a separate branch/worktree of this same repository for Git operations. If sharing
-this checkout, create only the isolated files above; do not switch branches, stage or
-commit, apply migrations, regenerate shared artifacts, restart shared services or
-change local credentials. Report changed paths, test results and integration needs.
-No analytics schema migration is needed for this slice. Retain the full remaining
-roadmap; this partition exists only to avoid overlapping edits.
+The user has assigned **all remaining tasks to the primary agent**. The previous
+proposal to reserve Task 26 for another agent is superseded; nothing is waiting for
+an external analytics handoff. Finish Task 22 publication through PR #4, then Task 21
+consent-aware follow-ups and the rest of this existing roadmap, including analytics.
+Group related implementation work, use focused tests during development, and run the
+full applicable gate once each feature group is ready. Keep the repository's review,
+privacy, tenant-isolation and release requirements intact.
 
 ### Task 43: Telegram identity and trusted bot-to-institution mapping
 
