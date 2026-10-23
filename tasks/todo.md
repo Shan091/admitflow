@@ -795,7 +795,8 @@ consent-aware follow-ups is next.
 **Acceptance criteria:**
 
 - [X] Provisioned staff accounts can log in; default Overview and unauthorized access are verified.
-- [ ] Institution-managed staff creation/invitation remains part of the administration milestone; public self-registration is not claimed.
+- [x] Administrators create staff, manage roles/active status and reset initial passwords. Private first-login password setup is mandatory; role/reset/deactivation revokes sessions. No email invitation delivery or public self-registration is claimed.
+  **Evidence:** Three PostgreSQL account tests cover setup, rotation, tenant isolation, revocation and concurrent last-admin protection; browser setup flow passes.
 - [X] Hashed opaque sessions use expiring HttpOnly cookies; passwords are salted hashes.
 - [X] Route guards enforce tenant scope and administrator writes versus staff reads.
   **Verification:** Login flow + unauthorized access blocked
@@ -975,7 +976,7 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
 
 - [X] Business hours and IANA timezone configurable with opening/closing validation.
 - [X] Re-engagement delay and optional retention period configurable by administrators.
-- [ ] Verify the configured values affect follow-up, escalation and cleanup behavior once those operations are implemented.
+- [x] Configured timezone/business hours affect follow-ups and escalation; tenant retention controls history cleanup, verified with boundary and inactivity cases.
   **Verification:** Update settings, verify they affect bot behavior
   **Dependencies:** Task 25
   **Estimated scope:** Small
@@ -994,27 +995,28 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
   **Dependencies:** Task 17
   **Estimated scope:** Small
 
-### Task 36: Delete My Data endpoint
+### Task 36: Explicit inquiry erasure
 
-**Description:** API endpoint that purges all data for a given phone number: conversation state, lead facts, messages, application, payment orders.
+**Description:** Administrator-only, CSRF-protected `DELETE /api/staff/leads/{id}` with matching `confirm_id`; the dashboard requires typing the inquiry reference before confirmation.
 **Acceptance criteria:**
 
-- [ ] All user data deleted across all tables
-- [ ] Deletion logged in audit trail
-  **Verification:** Delete a test user, verify no data remains
-  **Dependencies:** Task 4
-  **Estimated scope:** Small
+- [x] Tenant-owned inquiry identity, facts, memories, messages, inbox/outbox, applications, payment records and linked integration deliveries/receipts are deleted through the linked data graph
+- [x] Subject-linked audit details are scrubbed; a receipt retains actor/reason without the deleted inquiry reference or student content
+- [x] Active sends, payment creation and webhook delivery block erasure; lead locking serializes outbound claims against deletion
+  **Verification:** Five privacy PostgreSQL cases plus browser mock and actual synthetic inquiry deletion; nonadministrator and cross-tenant requests fail. No real inquiry was deleted. This is database erasure, not provider/backups deletion or withdrawal; enrolled seats are not released.
+  **Dependencies:** Task 4, 25
 
-### Task 37: Data retention auto-cleanup
+### Task 37: Conversation-history retention
 
-**Description:** Scheduled job that deletes conversations older than the configured retention period.
+**Description:** Scheduler expires inactive conversation history and saved dialogue facts at each institution's optional retention period. It preserves the inquiry/contact profile, submitted applications and financial records. Full inquiry erasure remains explicit Task 36.
 **Acceptance criteria:**
 
-- [ ] Conversations beyond retention period auto-deleted
-- [ ] Configurable per tenant
-  **Verification:** Test with artificially aged data
-  **Dependencies:** Task 4
-  **Estimated scope:** Small
+- [x] History, memory, dialogue facts and associated conversation delivery/integration data expire after the latest created/inbound/outbound timestamp crosses the UTC cutoff
+- [x] Configurable per tenant; blank disables cleanup. Active/queued inbound work is skipped, and an expiry marker makes repeated sweeps idempotent
+- [x] Pending reminders/consent and queued payment creation from expired dialogue are invalidated; confirmed payments and business records remain
+- [x] Retention runs independently of queue startup/dispatch failures
+  **Verification:** Artificially aged PostgreSQL data, cutoff/activity/tenant boundaries, preserved financial graph and scheduler outage tests. The local one-shot removed zero histories. No actual data removal is claimed.
+  **Dependencies:** Task 4, 34, 36
 
 ### Task 38: Docker Compose for local development
 
@@ -1042,30 +1044,19 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
 
 ## Phase 3–4 addition (see ADR-008)
 
-### Task 40: `decide()` System-1 decision-layer abstraction
+### Task 40: Typed OpenAI decision layer
 
-**Description:** Build `src/decision/` — a `decide()` interface exposing choice/score/noul primitives with calibrated probabilities. Demo backend uses Gemini Flash structured outputs; the interface is backend-agnostic so a self-hosted Laya backend can drop in later (ADR-008). Used by input guardrail, triage, readiness scoring, and escalation detection.
+**Description:** Use the existing OpenAI-only provider boundary through `src/decision/decide()` for typed interpretation and extraction. No model training or additional decision service. Eligibility, readiness state, money and authorization remain code-owned. Model output is not a calibrated probability.
 **Acceptance criteria:**
 
-- [ ] `decide()` returns typed answers (label+prob / score / yes-no prob) via Gemini Flash structured output
-- [ ] Guardrail, triage, readiness, and escalation call `decide()` (no ad-hoc LLM calls)
-- [ ] Backend is swappable behind the interface (config-selected)
-  **Verification:** Unit tests with a mocked backend; each decision site covered
+- [x] Shared typed interface validates structured OpenAI responses and rejects refusal/malformed output
+- [x] Active Telegram intent/escalation routing and eligibility extraction use `decide()`; deterministic safety and explicit staff-request shortcuts remain
+- [x] Input/output safety classifiers and compatibility triage use the same decision boundary
+- [x] Configured OpenAI roles, bounded provider calls and safe failure behavior retained
+  **Verification:** Decision, triage and safety unit checks; PostgreSQL Telegram journey checks. Exact-quote generation remains behind the existing provider factory. No AI readiness score or calibration claim.
   **Dependencies:** Task 9, 10, 11, 15
-  **Estimated scope:** Medium
 
-### Task 41: Distill decisions into self-hosted Laya (post-demo)
-
-**Description:** Stand up self-hosted Laya (Jev-compatible `/v1/systemone`) as a `decide()` backend. Use labels collected during the demo to fine-tune/calibrate the high-frequency decisions (triage, guardrail-triage, readiness, escalation). Switch per decision only after evaluating Malayalam/Hinglish accuracy and fitting calibration.
-**Acceptance criteria:**
-
-- [ ] Laya backend implements the `decide()` interface
-- [ ] Malayalam/Hinglish accuracy measured per decision vs the LLM backend
-- [ ] Calibration (temperature) fitted; over-confidence checked (ECE)
-- [ ] OTHER/ESCALATE option present on all choice decisions
-  **Verification:** Offline eval set per decision; shadow-run against live LLM decisions before cutover
-  **Dependencies:** Task 40, 17
-  **Estimated scope:** Large
+Task 41 was removed by user decision. No distillation, fine-tuning, self-hosted decision backend or training-label collection is planned.
 
 ### Task 42: Advanced RAG Strategy (ADR-011)
 
@@ -1088,7 +1079,7 @@ This epic is broken down into sub-tasks for focused implementation.
 
 ### Task 42.2: Contextual Query Rewriting
 
-**Description:** Add a query resolution step before vector search. Use Gemini Flash to rewrite the raw WhatsApp message into a standalone query (resolving slang and pronouns using conversation history).
+**Description:** Add a query resolution step before vector search. Use OpenAI to rewrite the raw Telegram message into a standalone query (resolving slang and pronouns using conversation history).
 **Acceptance criteria:**
 
 - [ ] Query rewriter LLM chain implemented
@@ -1100,19 +1091,20 @@ This epic is broken down into sub-tasks for focused implementation.
   **Files likely touched:** `backend/src/core/rag.py`
   **Estimated scope:** Medium
 
-### Task 42.3: Pluggable Reranker (Cohere API vs Local)
+### Task 42.3: Required OpenAI passage reranking
 
-**Description:** Add a config-driven reranker layer to `search_chunks`. In dev mode, use a fast/free pass-through or tiny local cross-encoder. In prod mode, use Cohere's Rerank API via LiteLLM for high precision without CPU bloat.
+**Description:** Rerank the approved, relevance-filtered candidate passages in the active Telegram FAQ and staff document-search paths using the existing OpenAI configuration. This is current release work, independent of contextual rewriting. No additional provider or local model service.
 **Acceptance criteria:**
 
-- [ ] Reranking logic implemented after hybrid search
-- [ ] `use_reranker` and `reranker_provider` (local vs cohere) added to settings
-- [ ] Latency stays well within budget (since compute is offloaded)
-  **Verification:**
-- [ ] Unit tests mock the reranker and verify correct top-N sorting
-  **Dependencies:** Task 42.2
-  **Files likely touched:** `backend/src/core/rag.py`, `backend/src/core/settings.py`
-  **Estimated scope:** Medium
+- [x] Reranking runs for two or more eligible candidates before selecting the top five
+- [x] At most 12 tenant-owned candidates; bounded question/passage text and configurable timeout
+- [x] Accept only a complete permutation of original candidate IDs; preserve original content and source references
+- [x] Retain relevance floor, approved-upload scope, injection filtering, exact-quote verification and unsupported-question abstention
+- [x] Timeout, refusal, provider failure or invalid ranking falls back to the filtered retrieval order
+- [x] Unit checks cover ordering, tenant isolation, injected passages, malformed rankings and outage fallback; PostgreSQL document/journey checks pass
+  **Verification:** `tests/test_decision_reranking.py`, document workspace and Telegram journey integration tests. Live synthetic checks pass **4/4 ranking cases** and **24/24 FAQ source/abstention cases** across the four languages; results are recorded in `docs/event/RERANKING_RESULTS.json` and `EVALUATION_RESULTS.json`. No broad fluency or production latency claim.
+  **Dependencies:** Task 13; does not wait for Task 42.2
+  **Files:** `src/decision/`, `src/knowledge/reranking.py`, `src/knowledge/api.py`, `src/engine/journey.py`
 
 ---
 

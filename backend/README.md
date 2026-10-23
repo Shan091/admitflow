@@ -398,3 +398,50 @@ Rollback: stop the new API/worker/scheduler, downgrade to `a82df107e436`, then s
 previous release. This removes endpoint configuration, integration delivery history and
 notification receipts, while preserving source audit/domain records. Event, delivery and
 read-receipt rows cascade with their inquiry; no new student text is retained here.
+
+# Staff access and privacy operations
+
+Upgrade to `c4817a02f59d` before running this source. Administrators manage institution
+staff at `/api/staff/users`; new/reset credentials permit only private password setup,
+identity lookup and logout. `POST /api/staff/password` verifies the current password,
+revokes old sessions and issues a new cookie. Role changes and deactivation revoke
+sessions; concurrent changes preserve an active administrator with a private password.
+Initial passwords are shared manually; there is no email invitation delivery service.
+
+`DELETE /api/staff/leads/{id}` requires an administrator, browser-write protection
+and JSON `confirm_id` equal to the inquiry UUID. It permanently erases the linked
+inquiry data graph. Active provider operations return conflict until they settle;
+outbound claims serialize against deletion. The audit receipt retains the staff actor
+and reason without a student reference. External providers/backups are outside this
+logical erasure; deleting an inquiry does not release enrolled seats.
+
+`uv run python -m src.scripts.scheduler --once` runs history retention independently
+of queue dispatch. Run without `--once` for the continuous scheduler. An institution's
+optional retention period uses last inbound/outbound activity or creation, skips active
+work, expires history/facts/memory, cancels reminder consent and invalidates pending
+payment-creation consent. It preserves inquiry identity, applications and financial
+records. Full deletion is a separate explicit administrator action.
+
+Rollback: stop current API/worker/scheduler, downgrade to `6dd017583606`, then run
+the previous source. The password migration disables setup-only accounts and revokes
+their sessions before removing that guard; the history marker is regenerable.
+Downgrading does not restore erased data; recovery requires an appropriate backup.
+
+# Typed OpenAI decisions and required reranking
+
+`src/decision/decide()` validates typed OpenAI interpretation/extraction and rejects
+refusal or invalid output. No fine-tuning, distillation or separate model service is
+required. Eligibility, readiness state, money and authorization remain code-owned.
+
+Both Telegram FAQ and authenticated document search rerank up to twelve approved,
+relevance-filtered tenant passages, then select five original passages. The structured
+ranking must contain exactly the supplied IDs once each. `KNOWLEDGE_RERANK_TIMEOUT_SECONDS`
+(default 8) bounds the entire added model operation; invalid output, refusal or outage
+preserves baseline order. Existing relevance floors, injection filtering, exact-source
+quotation and abstention still apply. The compatibility hybrid helper is not this path.
+
+Run `uv run python -m src.scripts.evaluate_reranking` for four bounded multilingual
+synthetic ranking cases, and `uv run python -m src.scripts.evaluate_faq` for the
+24-case source/abstention check. These make paid OpenAI calls but no Telegram sends or
+database writes. Reports are saved under `docs/event/`; they do not establish broad
+fluency or production latency. CI uses mocked models and disposable test databases.

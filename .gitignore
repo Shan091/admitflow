@@ -40,3 +40,6 @@ graphify-out/.graphify_*
 
 # Logs
 *.log
+
+# Keep accidental nested graph output local; only the root report is published.
+/backend/graphify-out/

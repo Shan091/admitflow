@@ -18,6 +18,7 @@ from src.db.audit import write_audit_log
 from src.db.models import Document, DocumentChunk, KnowledgeUpload
 from src.knowledge.extraction import SUPPORTED, ExtractionError, validate_path
 from src.knowledge.processing import dispatch_pending, embed_chunks
+from src.knowledge.reranking import rerank
 from src.knowledge.retrieval import retrieval_query
 from src.staff.auth import Db, Staff, require_admin, require_browser_write
 from src.staff.throttle import consume_limit
@@ -247,11 +248,20 @@ async def search(payload: Search, staff: Staff, db: Db, response: Response) -> d
                 DocumentChunk.embedding_model == get_settings().llm_embedding_model,
             )
             .order_by(distance)
-            .limit(10)
+            .limit(12)
         )
     ).all()
+    eligible = [
+        chunk
+        for chunk, _, score in rows
+        if 1 - float(score) >= get_settings().knowledge_min_similarity
+        and not JAILBREAK_PATTERN.search(chunk.content)
+    ]
+    ranked = await rerank(query, eligible, staff.tenant_id)
+    source_rows = {chunk.id: (upload, score) for chunk, upload, score in rows}
     matches = []
-    for chunk, upload, score in rows:
+    for chunk in ranked:
+        upload, score = source_rows[chunk.id]
         similarity = max(0.0, min(1.0, 1 - float(score)))
         if similarity < get_settings().knowledge_min_similarity or JAILBREAK_PATTERN.search(
             chunk.content

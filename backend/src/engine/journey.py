@@ -31,10 +31,12 @@ from src.db.models import (
     QualificationRule,
     TelegramBot,
 )
+from src.decision import decide
 from src.engine.contracts import Button, Event, Reply
 from src.engine.escalation import Reason, escalation_reason, office_open
 from src.engine.llm_factory import AllProvidersFailedError, generate_completion
 from src.knowledge.processing import embed_chunks
+from src.knowledge.reranking import rerank
 from src.knowledge.retrieval import retrieval_query
 from src.logic.rules import evaluate_rule
 from src.telegram.callbacks import callback_data, parse_callback
@@ -245,15 +247,14 @@ async def qualify(
             f"Active question field: {memory.get('question')}. "
             "Return facts as key/value/evidence strings. Numeric values must be plain decimals."
         )
-        response = await generate_completion(
+        parsed = await decide(
+            Extraction,
             [
                 {"role": "system", "content": prompt},
                 *history[-6:],
                 {"role": "user", "content": text},
             ],
-            response_format=Extraction,
         )
-        parsed = Extraction.model_validate_json(response.choices[0].message.content)
         if parsed.declined:
             memory["eligibility"] = {
                 "outcome": "needs_information",
@@ -373,7 +374,7 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
                 DocumentChunk.embedding_model == get_settings().llm_embedding_model,
             )
             .order_by(distance)
-            .limit(5)
+            .limit(12)
         )
     ).all()
     candidates = [
@@ -384,6 +385,9 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
     ]
     if not candidates:
         return Reply(text=copy("unknown", memory))
+    sources = {chunk.id: path for chunk, path in candidates}
+    ranked = await rerank(query, [chunk for chunk, _ in candidates], lead.tenant_id)
+    candidates = [(chunk, sources[chunk.id]) for chunk in ranked]
     passages = [{"passage": i, "text": chunk.content} for i, (chunk, _) in enumerate(candidates)]
     response = await generate_completion(
         [
@@ -590,7 +594,8 @@ async def route(
 
             return await collect_application(db, lead, bot, memory, text)
         history = await recent_history(db, lead)
-        response = await generate_completion(
+        interpretation = await decide(
+            Interpretation,
             [
                 {
                     "role": "system",
@@ -607,9 +612,8 @@ async def route(
                 *history[-8:],
                 {"role": "user", "content": text},
             ],
-            response_format=Interpretation,
         )
-        intent = Interpretation.model_validate_json(response.choices[0].message.content).intent
+        intent = interpretation.intent
     if intent == "handoff":
         return await request_staff(db, lead, memory, "staff_review")
     if intent == "question":

@@ -142,6 +142,9 @@ async def lead_detail(
         "id": str(lead.id),
         "status": lead.status.value,
         "copilot_mode": lead.copilot_mode,
+        "conversation_purged_at": lead.conversation_purged_at.isoformat()
+        if lead.conversation_purged_at
+        else None,
         "draft_stale": draft_stale,
         "memory": memory,
         "course_id": str(lead.current_course_id) if lead.current_course_id else None,

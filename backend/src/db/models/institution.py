@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import CheckConstraint, Enum, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, CheckConstraint, Enum, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -69,5 +69,8 @@ class StaffUser(IdMixin, TenantMixin, TimestampMixin, Base):
         Enum(StaffRole, native_enum=False, length=16), nullable=False
     )
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
+    must_change_password: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
     institution: Mapped[Institution] = relationship(back_populates="staff")

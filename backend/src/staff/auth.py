@@ -62,10 +62,16 @@ def require_browser_write(request: Request) -> None:
 
 
 async def require_staff(request: Request, db: Db) -> StaffUser:
-    return await session_user(db, request.cookies.get(COOKIE, ""))
+    return await session_user(
+        db,
+        request.cookies.get(COOKIE, ""),
+        allow_password_setup=request.url.path in {"/api/staff/me", "/api/staff/password"},
+    )
 
 
-async def session_user(db: AsyncSession, token: str) -> StaffUser:
+async def session_user(
+    db: AsyncSession, token: str, *, allow_password_setup: bool = False
+) -> StaffUser:
     """Shared HTTP/WebSocket authentication, rechecked for every socket snapshot."""
     if not token or len(token) > 200:
         raise HTTPException(401, "Sign in to your institution workspace.")
@@ -81,9 +87,12 @@ async def session_user(db: AsyncSession, token: str) -> StaffUser:
             StaffSession.expires_at > datetime.now(UTC),
             StaffUser.is_active.is_(True),
         )
+        .execution_options(populate_existing=True)
     )
     if staff is None:
         raise HTTPException(401, "Your session has expired. Sign in again.")
+    if staff.must_change_password and not allow_password_setup:
+        raise HTTPException(403, "Set your private password before accessing institution data.")
     return staff
 
 
@@ -114,12 +123,20 @@ async def login(payload: Login, request: Request, response: Response, db: Db) ->
             StaffUser.email == payload.email.strip().lower(),
             StaffUser.is_active.is_(True),
         )
+        .with_for_update(of=StaffUser)
     )
     # Always run the expensive KDF to avoid a cheap user-existence timing signal.
     stored = staff.hashed_password if staff else "scrypt$" + "0" * 32 + "$" + "0" * 128
     valid = await asyncio.to_thread(verify_password, payload.password, stored)
     if not valid or staff is None:
         raise HTTPException(401, "Institution, email or password is incorrect.")
+    issue_session(db, staff, response)
+    await write_audit_log(db, tenant_id=staff.tenant_id, action="staff.login", actor=str(staff.id))
+    await db.commit()
+    return {"status": "signed_in"}
+
+
+def issue_session(db: AsyncSession, staff: StaffUser, response: Response) -> None:
     token = secrets.token_urlsafe(32)
     db.add(
         StaffSession(
@@ -129,8 +146,6 @@ async def login(payload: Login, request: Request, response: Response, db: Db) ->
             expires_at=datetime.now(UTC) + timedelta(hours=get_settings().staff_session_hours),
         )
     )
-    await write_audit_log(db, tenant_id=staff.tenant_id, action="staff.login", actor=str(staff.id))
-    await db.commit()
     response.set_cookie(
         COOKIE,
         token,
@@ -141,18 +156,56 @@ async def login(payload: Login, request: Request, response: Response, db: Db) ->
         path="/",
     )
     response.headers["Cache-Control"] = "no-store"
-    return {"status": "signed_in"}
 
 
 @router.get("/me")
-async def me(staff: Staff, db: Db, response: Response) -> dict[str, str]:
+async def me(staff: Staff, db: Db, response: Response) -> dict[str, str | bool]:
     institution = await db.get(Institution, staff.tenant_id)
     response.headers["Cache-Control"] = "no-store"
     return {
         "email": staff.email,
         "role": staff.role.value,
         "institution": institution.name if institution else "Institution",
+        "institution_code": institution.slug or "" if institution else "",
+        "must_change_password": staff.must_change_password,
     }
+
+
+class PasswordChange(BaseModel):
+    model_config = {"extra": "forbid"}
+    current_password: str = Field(min_length=1, max_length=1024, repr=False)
+    new_password: str = Field(min_length=12, max_length=1024, repr=False)
+
+
+@router.post("/password", dependencies=[Depends(require_browser_write)])
+async def change_password(
+    payload: PasswordChange, staff: Staff, db: Db, response: Response
+) -> dict[str, str]:
+    from src.staff.throttle import consume_limit
+
+    await consume_limit(f"password-change:{staff.id}", 10)
+    await db.refresh(staff, with_for_update=True)
+    if not staff.is_active:
+        raise HTTPException(401, "Your account is inactive.")
+    if not await asyncio.to_thread(
+        verify_password, payload.current_password, staff.hashed_password
+    ):
+        raise HTTPException(422, "The current password is incorrect.")
+    if payload.current_password == payload.new_password:
+        raise HTTPException(422, "Choose a different private password.")
+    staff.hashed_password = await asyncio.to_thread(hash_password, payload.new_password)
+    staff.must_change_password = False
+    await db.execute(
+        delete(StaffSession).where(
+            StaffSession.tenant_id == staff.tenant_id, StaffSession.user_id == staff.id
+        )
+    )
+    issue_session(db, staff, response)
+    await write_audit_log(
+        db, tenant_id=staff.tenant_id, actor=str(staff.id), action="staff.password_changed"
+    )
+    await db.commit()
+    return {"status": "password_changed"}
 
 
 @router.post("/logout", dependencies=[Depends(require_browser_write)])

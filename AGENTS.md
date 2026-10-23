@@ -9,8 +9,10 @@ Antigravity, Gemini, …). Read this first, then follow the handbook it links to
 institutions in Kerala, India. Readiness-aware, tap-first, multilingual
 (English / Hindi / Hinglish / Malayalam). Python backend (FastAPI + TaskIQ + a hand-rolled
 conversation engine, pgvector RAG, OpenAI); Next.js admin dashboard. Applications/review
-and payment foundations have local automated evidence; live payment validation,
-co-pilot, follow-ups and remaining operations are in progress. See ADR-012 for
+payments, co-pilot, consent-aware follow-ups, institution administration, reporting
+and privacy controls have local automated evidence. Live payment validation and
+production operations remain open. Typed OpenAI decisions and passage reranking
+use the existing API configuration; no model training is planned. See ADR-012 for
 the current channel/provider decision and tasks/todo.md for verified progress.
 
 - Spec: [SPEC.md](SPEC.md) · Execution: [tasks/plan.md](tasks/plan.md) · Progress: [tasks/todo.md](tasks/todo.md)

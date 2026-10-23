@@ -85,6 +85,7 @@ class Lead(IdMixin, TenantMixin, TimestampMixin, Base):
     followup_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_inbound_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_outbound_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    conversation_purged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     institution: Mapped[Institution] = relationship(back_populates="leads")
     facts: Mapped[list[LeadFact]] = relationship(

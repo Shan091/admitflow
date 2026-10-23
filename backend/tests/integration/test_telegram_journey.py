@@ -41,6 +41,8 @@ async def completion(
     schema = response_format.__name__
     if schema == "Interpretation":
         result = {"intent": "question" if "?" in text else "qualification"}
+    elif schema == "PassageRanking":
+        result = {"ordered_ids": [row["id"] for row in json.loads(text)["passages"]]}
     elif schema == "Extraction":
         if "age" in text:
             value, key = text.split()[-1], "age"
@@ -69,6 +71,7 @@ def journey(workspace: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> dict[
     monkeypatch.setattr("src.telegram.identity.get_settings", lambda: workspace["settings"])
     workspace["settings"].phone_hash_key = "synthetic-journey-lookup"
     monkeypatch.setattr(engine, "generate_completion", completion)
+    monkeypatch.setattr("src.decision.generate_completion", completion)
     monkeypatch.setattr(engine, "embed_chunks", fake_embeddings)
 
     async def ack(self: TelegramClient, callback_id: str) -> None:
@@ -355,7 +358,7 @@ def test_missing_rules_closed_batches_and_foreign_course_are_not_approved(
                     ]
                 )
 
-            monkeypatch.setattr("src.engine.journey.generate_completion", decline)
+            monkeypatch.setattr("src.decision.generate_completion", decline)
             memory["question"] = "age"
             response = await qualify(db, lead, bot, memory, "I prefer not to answer", [])
             assert "declined" in response.text.lower()
@@ -479,6 +482,7 @@ def test_provider_outage_refusal_and_bad_schema_preserve_facts_and_allow_handoff
                 )
 
             monkeypatch.setattr("src.engine.journey.generate_completion", unavailable)
+            monkeypatch.setattr("src.decision.generate_completion", unavailable)
             reply, _ = await turn(number, "Am I eligible?")
             assert "temporarily unavailable" in reply.text
             assert "Synthetic provider" not in reply.text

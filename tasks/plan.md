@@ -217,6 +217,9 @@ CRM, exports/integrations and the remaining institutional product milestones.
 - [x] Task 27: tenant-scoped CRM, all lifecycle filters and private known-name/phone search; database and browser checks pass.
 - [x] Task 32 exports: audited CSV/Excel downloads for inquiries, applications and payments; signed transactional webhook delivery and administrator configuration also pass database/browser checks.
 - [x] Task 33: authenticated live notifications, durable per-user read receipts and all four event categories; source/database/browser checks pass.
+- [x] Institution-managed staff accounts, forced private-password setup and session revocation; PostgreSQL and browser checks pass.
+- [x] Explicit full inquiry erasure and separately scoped conversation-history retention; role, tenant, concurrency and financial-preservation checks pass.
+- [x] Typed OpenAI decisions and required bounded passage reranking; no model training. Unit/database checks and live 4/4 ranking plus 24/24 FAQ checks pass.
 - [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
 
 | Phase | Retained work and historical IDs |
@@ -226,7 +229,7 @@ CRM, exports/integrations and the remaining institutional product milestones.
 | Institution administration | 28 course/batch/rule CRUD; 30 reviewed document uploads; 34 settings/business hours |
 | Reporting and integrations | 26 analytics; 32 export/outbound webhooks; 33 notifications |
 | Reliability and operations | 22 channel-specific rate/send queue; 23 optional Langfuse; 35 optional Sentry; 36 deletion; 37 retention; 38 full Compose; 39 production topology |
-| Evidence-driven AI improvements | 40 typed decision abstraction; 41 optional distillation; 42.1 complex parsing, 42.2 query rewriting, 42.3 optional reranking |
+| Evidence-driven AI improvements | 40 typed OpenAI decisions (implemented); 42.3 required OpenAI reranking (implemented); 42.1 complex parsing and 42.2 contextual rewriting remain separately tracked |
 
 Security, auditability, tenant isolation and safe handling remain requirements of the
 first milestone that touches them. Real applicant pilots additionally require verified

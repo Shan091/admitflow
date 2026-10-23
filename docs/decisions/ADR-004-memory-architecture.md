@@ -9,7 +9,7 @@ The AI must remember the full context of a conversation so parents don't have to
 
 ## Decision
 Implement a **Dual Memory Architecture**:
-1. **Episodic Memory**: Persist every turn as rows in a queryable `messages` table (PostgreSQL). Each `handle_turn()` reloads the recent N turns (or a rolling summary once the thread grows) to maintain conversational continuity. This is the single source of truth — also read by the dashboard and used to collect System-1 (Laya) training labels. *(Originally specified as LangGraph `AsyncPostgresSaver`; revised when the engine went hand-rolled — SPEC §17.1. A checkpointer would have duplicated this state in an opaque blob.)*
+1. **Episodic Memory**: Persist every turn as rows in a queryable `messages` table (PostgreSQL). Each `handle_turn()` reloads the recent N turns (or a rolling summary once the thread grows) to maintain conversational continuity. This is the single source of truth — also read by the dashboard and used for persistent conversational context. *(Originally specified as LangGraph `AsyncPostgresSaver`; revised when the engine went hand-rolled — SPEC §17.1. A checkpointer would have duplicated this state in an opaque blob.)*
 2. **Semantic Memory**: Create a custom `lead_facts` table in PostgreSQL. After each turn, extract key facts (name, age, course interest, timeline, budget) and save them to this table. Inject these facts into the system prompt as a `{memory_block}`.
 
 ## Alternatives Considered

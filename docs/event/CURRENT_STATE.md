@@ -171,7 +171,9 @@ hardening. Decide which belong in the first usable release versus later phases;
 do not mark them removed or completed based on this proposal.
 
 Neysa, SerpAPI, self-hosted models, distillation, external rerankers, LangGraph and
-additional AI providers are unnecessary for this first proposed milestone.
+additional AI providers are unnecessary for this first proposed milestone. The current
+user decision requires OpenAI itself for typed decisions and passage reranking;
+model training is removed. See ADR-008/011/012 and Tasks 40/42.3 for current evidence.
 Langfuse/Sentry can be evaluated later; basic sanitized logs and request/error/
 latency/usage evidence are needed from the beginning. Hosting remains to be chosen
 against actual runtime, persistence and budget needs; no new service was provisioned.

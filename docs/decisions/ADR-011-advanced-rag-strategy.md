@@ -1,39 +1,38 @@
-# ADR-011: Advanced RAG Strategy (Latency vs Precision)
+# ADR-011: Required OpenAI passage reranking
 
-**Status:** Accepted
-
-## Context
-AdmitFlow utilizes a RAG (Retrieval-Augmented Generation) pipeline to answer complex knowledge questions from institution documents. The baseline pipeline (Task 13) implemented a pgvector HNSW index with hybrid search + Reciprocal Rank Fusion (RRF). 
-
-However, standard RAG has three critical blindspots for a WhatsApp admissions bot:
-1. **Latency Sensitivity:** WhatsApp users expect near-instant responses. A heavy local cross-encoder for reranking would add 500ms to 2.5s of latency per turn, risking race conditions and degraded UX.
-2. **Complex Document Formatting:** Institutions upload PDFs heavily formatted with tables, multi-column layouts, and bulleted lists. A naive sliding-window text chunker destroys this structural context.
-3. **Conversational Drift & Slang:** WhatsApp queries are often informal ("fee 4 btech?") or rely on conversational memory ("what about hostel?"), making dense vector similarity matching highly erratic without query resolution.
+Status: Accepted; revised by user decision. Reranking is current release scope.
 
 ## Decision
-We are upgrading to an "Advanced RAG" pipeline governed by strict latency budgets and structural awareness.
 
-### 1. Complex Document Ingestion (`docling` or `unstructured`)
-Instead of directly extracting raw text and applying a sliding window, we will integrate a specialized document parsing library (`docling` or `unstructured`).
-- **Action:** Documents will be converted to structured Markdown.
-- **Chunking:** We will use semantic chunking (e.g., splitting by Markdown headers) to retain parent-child context. Tables will be preserved in Markdown format.
+Use the existing OpenAI provider configuration to rerank evidence in active Telegram
+FAQ answers and authenticated staff document search. No extra API vendor, local
+cross-encoder, model training or serving infrastructure is required.
 
-### 2. Pluggable Reranking Architecture (Cohere API over Local CPU)
-To achieve state-of-the-art precision without breaking the per-turn latency budget on our self-hosted CPU infrastructure:
-- **Production:** We will integrate the Cohere Rerank API via LiteLLM. It offloads compute and only incurs a ~150-300ms network roundtrip penalty.
-- **Development/Testing:** A lightweight local model (e.g., `cross-encoder/ms-marco-MiniLM-L-2-v2`) or a no-op passthrough will be used to keep local testing fast and free.
+Retrieve at most 12 candidates from approved, ready uploads in the requesting tenant
+with the configured embedding model. Preserve the existing similarity floor and
+injection filter before ranking. Send only bounded question/reference text, never the
+applicant profile or conversation history. Zero or one candidate needs no ranking call.
 
-### 3. Contextual Query Rewriting
-Before executing the hybrid search, the user's raw WhatsApp message will be passed through the fast Gemini Flash model to rewrite it into a well-formed query, resolving pronouns and slang based on conversational history.
+The structured output must be a complete permutation of supplied candidate IDs.
+Reject duplicates, missing IDs and invented IDs. Return original database objects,
+preserving text, source paths and chunk references; select the top five.
 
-## Consequences
+An additional configurable timeout bounds the ranking operation across provider
+retries. Refusal, timeout, provider error and invalid output retain the safe baseline
+retrieval order. Logs record outcome/count only. Ranking does not establish support:
+FAQ answers still require an exact quotation from a supplied source or abstain.
 
-**Positive:**
-- Complex tables and layouts in institution PDFs survive the chunking process.
-- High precision retrieval via Cohere Reranker without massive local compute requirements.
-- WhatsApp slang and fragmented follow-ups are successfully matched against formal PDFs.
-- Latency is carefully managed.
+## Separate retrieval work
 
-**Negative:**
-- `docling` / `unstructured` adds ingestion time complexity and memory overhead to the background TaskIQ worker (though it doesn't affect user latency).
-- Cohere API introduces a vendor dependency and marginal per-query cost (vs. a purely self-hosted approach).
+Digital PDF, DOCX and text ingestion remains supported. Complex table/layout parsing,
+semantic chunking and full conversational rewriting remain separate tasks. Existing
+bounded non-ASCII query translation remains in place. The active candidate search is
+pgvector similarity; the compatibility hybrid-search helper is not this runtime path.
+
+## Verification and tradeoffs
+
+Unit checks cover ranking order, original-source preservation, tenant/injection
+filtering and invalid/outage fallback. PostgreSQL document and journey checks verify
+integration. Synthetic live multilingual ranking/FAQ reports are kept in docs/event.
+This adds model-call cost and latency. No fixed latency or broad accuracy claim is
+made; baseline fallback protects availability, not equivalent ranking quality.
