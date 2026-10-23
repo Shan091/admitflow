@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 from src.db.enums import LeadStatus
 from src.db.models.audit import AuditLog
 from src.db.models.lead import Lead
+from src.integrations.events import capture_event
 
 
 def record_stage_changes(session: Session, _flush_context: Any, _instances: Any) -> None:
@@ -51,6 +52,8 @@ def record_stage_changes(session: Session, _flush_context: Any, _instances: Any)
 
 
 event.listen(Session, "before_flush", record_stage_changes)
+
+event.listen(AuditLog, "after_insert", capture_event)
 
 
 async def write_audit_log(

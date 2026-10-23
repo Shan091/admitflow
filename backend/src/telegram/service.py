@@ -10,6 +10,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import undefer
 
 from src.core.security import decrypt_pii, encrypt_pii
+from src.db.audit import write_audit_log
 from src.db.models import (
     ConversationEvent,
     ConversationReply,
@@ -310,7 +311,7 @@ async def send_reply(reply_id: uuid.UUID) -> None:
                     next_attempt = datetime.now(UTC) + timedelta(seconds=max(error.retry_after, 1))
             except Exception:
                 status, code = "failed", "invalid_reply"
-        await db.execute(
+        delivered = await db.execute(
             update(ConversationReply)
             .where(ConversationReply.id == reply_id, ConversationReply.status == "sending")
             .values(
@@ -319,7 +320,17 @@ async def send_reply(reply_id: uuid.UUID) -> None:
                 telegram_message_id=message_id,
                 next_attempt_at=next_attempt,
             )
+            .returning(ConversationReply.id)
         )
+        if delivered.first() and status in {"failed", "uncertain"}:
+            await write_audit_log(
+                db,
+                tenant_id=event.tenant_id,
+                lead_id=event.lead_id,
+                actor="telegram-delivery",
+                action="delivery.attention",
+                details={"reply_id": str(reply_id)},
+            )
         if status == "sent":
             await db.execute(
                 update(Lead)
@@ -335,14 +346,31 @@ async def recover_pending() -> None:
     from src.tasks.telegram import process_telegram_event, send_telegram_reply
 
     async with get_sessionmaker()() as db:
-        await db.execute(
+        interrupted = await db.execute(
             update(ConversationReply)
             .where(
                 ConversationReply.status == "sending",
                 ConversationReply.updated_at < datetime.now(UTC) - timedelta(seconds=90),
             )
             .values(status="uncertain", error_code="worker_interrupted")
+            .returning(ConversationReply.event_id)
         )
+        interrupted_ids = list(interrupted.scalars())
+        if interrupted_ids:
+            affected = (
+                await db.scalars(
+                    select(ConversationEvent).where(ConversationEvent.id.in_(interrupted_ids))
+                )
+            ).all()
+            for event in affected:
+                await write_audit_log(
+                    db,
+                    tenant_id=event.tenant_id,
+                    lead_id=event.lead_id,
+                    actor="telegram-recovery",
+                    action="delivery.attention",
+                    details={"event_id": str(event.id)},
+                )
         events = list(
             (
                 await db.scalars(

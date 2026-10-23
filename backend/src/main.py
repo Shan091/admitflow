@@ -28,6 +28,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     if not broker.is_worker_process:
         await broker.startup()
     recovery = None
+    integration_recovery = None
+    if get_settings().database_url and get_settings().integration_recovery_enabled:
+        from src.integrations.delivery import recovery_loop as integration_loop
+
+        integration_recovery = asyncio.create_task(integration_loop())
     if get_settings().database_url and get_settings().knowledge_recovery_enabled:
         from src.knowledge.processing import recovery_loop
 
@@ -35,6 +40,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         yield
     finally:
+        if integration_recovery:
+            integration_recovery.cancel()
+            await asyncio.gather(integration_recovery, return_exceptions=True)
         if recovery:
             recovery.cancel()
             await asyncio.gather(recovery, return_exceptions=True)
@@ -63,8 +71,10 @@ def create_app() -> FastAPI:
     from src.staff.auth import router as staff_router
     from src.staff.copilot import router as copilot_router
     from src.staff.exports import router as exports_router
+    from src.staff.integrations import router as integrations_router
     from src.staff.leads import router as leads_router
     from src.staff.management import router as management_router
+    from src.staff.notifications import router as notifications_router
     from src.staff.operations import router as staff_operations_router
     from src.staff.payments import router as staff_payments_router
 
@@ -72,6 +82,8 @@ def create_app() -> FastAPI:
     application.include_router(staff_router)
     application.include_router(analytics_router)
     application.include_router(exports_router)
+    application.include_router(integrations_router)
+    application.include_router(notifications_router)
     application.include_router(leads_router)
     application.include_router(management_router)
     application.include_router(applications_router)

@@ -1115,6 +1115,146 @@ td:first-child {
 .export-form .notice {
   margin-top: 18px;
 }
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.notification-center {
+  position: relative;
+}
+.notification-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: var(--paper);
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+}
+.notification-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--green);
+}
+.notification-panel {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  top: calc(100% + 12px);
+  width: min(380px, calc(100vw - 44px));
+  max-height: 70vh;
+  overflow: auto;
+  padding: 22px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgb(25 48 41 / 12%);
+}
+.notification-panel li strong {
+  font-size: 14px;
+}
+.notification-panel button {
+  font-size: 13px;
+}
+.integration-form {
+  margin-top: 24px;
+}
+.integration-form input[type="checkbox"] {
+  accent-color: var(--green);
+}
+.integration-form > button {
+  margin-top: 10px;
+}
+.notification-panel h2 {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+.notification-panel ul,
+.integration-deliveries ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.notification-panel li,
+.integration-deliveries li {
+  display: grid;
+  gap: 8px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+.notification-panel li.unread {
+  background: var(--soft);
+  padding-inline: 10px;
+}
+.notification-panel time,
+.integration-deliveries time {
+  color: var(--muted);
+  font-size: 12px;
+}
+.notification-panel li button {
+  justify-self: start;
+}
+.integration-form,
+.integration-secret {
+  max-width: 680px;
+  margin-bottom: 40px;
+}
+.integration-form p,
+.integration-secret p {
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 65ch;
+}
+.integration-form label:not(.check),
+.integration-secret label {
+  display: grid;
+  gap: 8px;
+  margin-block: 20px;
+}
+.integration-form input:not([type="checkbox"]),
+.integration-secret input {
+  font: inherit;
+  width: 100%;
+  min-width: 0;
+  color: var(--ink);
+  background: var(--paper);
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.integration-form .check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-block: 16px;
+}
+.integration-form h2 {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  .topbar {
+    height: auto;
+    min-height: 74px;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding-block: 16px;
+  }
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .notification-panel {
+    max-height: min(60dvh, 420px);
+  }
+}
 .export-form {
   max-width: 650px;
 }

@@ -95,6 +95,9 @@ def test_every_tenant_scoped_table_has_tenant_id_fk_to_institutions() -> None:
             "human_requests": {TENANT_ROOT, "leads"},
             "outbound_messages": {TENANT_ROOT, "leads"},
             "payment_events": {TENANT_ROOT, "payment_orders"},
+            "integration_events": {TENANT_ROOT, "leads"},
+            "webhook_deliveries": {TENANT_ROOT, "webhook_endpoints", "integration_events"},
+            "notification_receipts": {TENANT_ROOT, "staff_users", "integration_events"},
         }.get(name, {TENANT_ROOT})
         assert targets == expected_targets, f"{name}.tenant_id must enforce tenant ownership"
 

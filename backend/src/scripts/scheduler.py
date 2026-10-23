@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import logging
 
+from src.integrations.delivery import dispatch_pending as dispatch_integrations
 from src.outreach.followups import dispatch_due
 from src.tasks.broker import broker
 from src.telegram.outbound import recover_outbound
@@ -18,6 +19,7 @@ async def run(*, once: bool = False, interval: int = 60) -> None:
             try:
                 count = await dispatch_due()
                 await recover_outbound()
+                await dispatch_integrations()
                 if once:
                     print(f"Due follow-up jobs queued: {count}", flush=True)
             except asyncio.CancelledError:

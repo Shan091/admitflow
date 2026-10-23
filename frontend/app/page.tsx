@@ -9,6 +9,8 @@ import Payments from "./payments";
 import DeliveryBudget from "./delivery-budget";
 import Analytics from "./analytics";
 import Exports from "./exports";
+import Integrations from "./integrations";
+import Notifications from "./notifications";
 
 type Staff = { email: string; role: string; institution: string };
 type Doc = {
@@ -111,6 +113,7 @@ export default function Knowledge() {
     | "applications"
     | "payments"
     | "exports"
+    | "integrations"
   >("overview");
   const [staff, setStaff] = useState<Staff | null>(null);
   const [inquiryFocus, setInquiryFocus] = useState<string | null>(null);
@@ -410,7 +413,10 @@ export default function Knowledge() {
               ["applications", "Applications"],
               ["payments", "Payments"],
               ...(staff.role === "admin"
-                ? ([["exports", "Data exports"]] as const)
+                ? ([
+                    ["exports", "Data exports"],
+                    ["integrations", "Outbound webhooks"],
+                  ] as const)
                 : []),
             ] as const
           ).map(([key, label]) => (
@@ -461,11 +467,23 @@ export default function Knowledge() {
                         ? "Payments"
                         : view === "exports"
                           ? "Data exports"
-                          : "Staff requests"}
+                          : view === "integrations"
+                            ? "Outbound webhooks"
+                            : "Staff requests"}
           </span>
-          <span className="role">
-            {staff.role === "admin" ? "Administrator" : "Staff member"}
-          </span>
+          <div className="topbar-actions">
+            <span className="role">
+              {staff.role === "admin" ? "Administrator" : "Staff member"}
+            </span>
+            <Notifications
+              request={api}
+              onError={sessionFailure}
+              onOpenInquiry={(id) => {
+                setInquiryFocus(id);
+                setView("leads");
+              }}
+            />
+          </div>
         </header>
         <div className="content">
           <DeliveryBudget request={api} onError={sessionFailure} />
@@ -499,6 +517,8 @@ export default function Knowledge() {
             />
           ) : view === "exports" ? (
             <Exports onError={sessionFailure} />
+          ) : view === "integrations" ? (
+            <Integrations request={api} onError={sessionFailure} />
           ) : view !== "knowledge" ? (
             <Admissions
               key={view}

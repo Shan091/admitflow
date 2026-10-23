@@ -356,3 +356,45 @@ lookup tokens, ciphertext, webhook payloads or payment URLs are exported.
 Rollback: stop processes using the new model, downgrade to `e31b0847c629`, then run
 the previous release. The downgrade drops only the regenerable name index; known
 encrypted names/application forms remain intact.
+# Outbound integrations and live notifications
+
+Upgrade to `6dd017583606`. Include `src.tasks.integrations` in the TaskIQ worker's
+module list alongside Telegram, knowledge and follow-ups. The API dispatches committed
+webhook work every three seconds when `INTEGRATION_RECOVERY_ENABLED=true`; the scheduler
+also recovers it. Configuration is optional: no endpoint means no external deliveries.
+The dashboard's administrator-only Outbound webhooks page configures a public HTTPS
+destination and shows delivery status. URL/signing secrets are encrypted. A newly created
+or rotated signing secret is returned once; later reads expose only the hostname.
+
+Signatures cover `timestamp + "." + exact_body_bytes` with HMAC-SHA256, using the
+shown signing secret as UTF-8 bytes. Headers are `X-AdmitFlow-Timestamp`,
+`X-AdmitFlow-Signature: v1=<hex digest>` and `X-AdmitFlow-Delivery`. Receivers must
+verify the signature in constant time, reject stale request timestamps, and durably
+deduplicate the delivery ID before side effects. Retries preserve the delivery/event
+IDs and body, but sign a fresh attempt timestamp. Events can be duplicated or arrive
+out of order; they contain type, institution/inquiry references, state and event time,
+never names, phone numbers, conversation text or arbitrary audit details.
+
+Six delivery attempts are allowed, with bounded exponential backoff. A crashed lease
+is recoverable and may replay a received request. Redirects and permanent 4xx responses
+(except 408/429) become dead deliveries; transient failures retry. Destinations resolve
+again for each attempt, reject any nonpublic address, and pin the selected IP while
+preserving TLS hostname/certificate checks. Proxies and redirects are disabled, response
+bodies are not consumed, and an overall deadline bounds the attempt. HTTP traces for
+the delivery's async context are suppressed so URL paths/query credentials cannot leak.
+Saving configuration cancels older queued/leased work; an in-flight request may arrive.
+Older events are not replayed into a newly configured destination.
+
+Notifications use a same-origin authenticated WebSocket at
+`/api/staff/notifications/ws` through the Next.js proxy. Origin, session expiry and
+active-account checks are enforced; snapshots refresh every two seconds without holding
+an idle database transaction. Qualified inquiries, failed/uncertain Telegram deliveries,
+reviewable co-pilot drafts and confirmed payments produce notifications in the source
+transaction. Read receipts belong to each staff account, and unread events are shown
+first so backlogs larger than 50 remain accessible. Read/access audit events never
+generate another notification or webhook. The HTTP snapshot/read routes support recovery.
+
+Rollback: stop the new API/worker/scheduler, downgrade to `a82df107e436`, then start the
+previous release. This removes endpoint configuration, integration delivery history and
+notification receipts, while preserving source audit/domain records. Event, delivery and
+read-receipt rows cascade with their inquiry; no new student text is retained here.

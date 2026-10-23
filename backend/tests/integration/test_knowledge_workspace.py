@@ -58,6 +58,7 @@ def workspace() -> Iterator[dict[str, Any]]:
                 redis_url=None,
                 pii_encryption_key=Fernet.generate_key().decode(),
                 knowledge_recovery_enabled=False,
+                integration_recovery_enabled=False,
             )
             for module in (
                 "src.core.settings",

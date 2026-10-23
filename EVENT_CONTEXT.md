@@ -2,7 +2,23 @@
 
 ## Current direction
 
-**Current CRM/export slice:** The primary agent owns all remaining tasks; the user
+**Current integration/notification slice:** The primary agent completed Tasks 32/33.
+Minimal events/outbox rows commit with source actions; encrypted per-tenant webhook
+configuration, rotating signatures, public-IP-pinned HTTPS, stable deduplication IDs,
+recoverable leases, six-attempt backoff and dead/cancelled monitoring are implemented.
+The socket uses real staff sessions, origin checks, repeated expiry/account validation,
+per-user receipts and unread-first paging. Both Telegram senders/recovery emit attention
+events; read audit actions cannot cause an event loop. The group gate passes 220 default
+tests/105 source files, 75 PostgreSQL plus two Redis cases across full/focused runs,
+frontend lint/build and all nine browser scenarios. The actual same-origin socket received
+a synthetic committed eligibility event; that temporary inquiry was removed. Desktop/mobile
+QA completed in two rounds. Migration `6dd017583606` is applied; API, worker (including
+`src.tasks.integrations`), scheduler and frontend run current source. No real external
+webhook is configured and no Telegram message was sent for this group. The full roadmap
+remains open: continue staff administration, deletion/retention and operational milestones.
+
+**Published CRM/export slice:** PR #7 passed both CI checks and was squash-merged as `009933e`.
+ The primary agent owns all remaining tasks; the user
 requested faster grouped execution without delegation. Task 27 now provides all twelve
 status filters, private Unicode known-name prefix/exact international phone lookup,
 transactional blind indexes and legacy-name backfill. Task 32 CSV/Excel downloads

@@ -22,14 +22,14 @@ privacy, tenant-isolation and release requirements intact.
 **Status:** Published in the fresh repository through merged PR #1; verification below records the original task evidence.
 **Dependencies:** Existing schema, encryption and audit foundation.
 
-- [x] Add institution-owned Telegram bots and encrypted student routing fields.
-- [x] Permit institution/lead creation without fabricated WhatsApp contacts.
-- [x] Enforce same-tenant bot/lead identity links and scoped unique user/chat lookups.
-- [x] Add domain-separated keyed lookup hashes with private-chat identifier validation.
-- [x] Add a migration preserving existing rows and refusing destructive identity downgrade.
-- [x] Prove migration up/down, legacy preservation and cross-tenant/duplicate rejection in real PostgreSQL.
-- [x] Pass the full backend gate and complete an adversarial review of the scoped changes.
-- [x] Commit, PR, CI and merge under the repository workflow (fresh repository PR #1).
+- [X] Add institution-owned Telegram bots and encrypted student routing fields.
+- [X] Permit institution/lead creation without fabricated WhatsApp contacts.
+- [X] Enforce same-tenant bot/lead identity links and scoped unique user/chat lookups.
+- [X] Add domain-separated keyed lookup hashes with private-chat identifier validation.
+- [X] Add a migration preserving existing rows and refusing destructive identity downgrade.
+- [X] Prove migration up/down, legacy preservation and cross-tenant/duplicate rejection in real PostgreSQL.
+- [X] Pass the full backend gate and complete an adversarial review of the scoped changes.
+- [X] Commit, PR, CI and merge under the repository workflow (fresh repository PR #1).
 
 **Verification:** Test-first regression failed because TelegramBot/TelegramIdentity
 were absent. Focused identity/schema checks passed 16 tests. A first real-database
@@ -50,23 +50,23 @@ These checks do not establish a live Telegram journey. Next implementation task:
 **Status:** Implemented and locally verified; live-provider/bot and selected live journey checks passed. Agent language review is recorded. Publication is now authorized;
 PR/CI/merge remain separate release gates. No new roadmap replaces this file.
 
-- [x] Manually provision institution administrators; verify salted passwords and expiring sessions.
-- [x] Enforce administrator writes, staff reads and session-derived institution scope.
-- [x] Upload multiple files or a nested folder with preserved relative source paths.
-- [x] Extract digital PDF, DOCX and UTF-8 TXT/Markdown/CSV; report OCR-required PDFs explicitly.
-- [x] Bound file/batch/page/archive/text sizes; reject unsafe paths and unsupported files.
-- [x] Encrypt original bytes, deduplicate per institution and retain durable queued jobs.
-- [x] Index through TaskIQ with atomic claims/publication, retry and expired-lease recovery.
-- [x] Show queued/indexing/ready/failed states and source passages in the staff UI.
-- [x] Search ready material in pgvector with a similarity floor and suspicious-chunk exclusion.
-- [x] Delete original uploads and their indexed chunks; prevent publication after deletion.
-- [x] Verify extraction/passwords, request limits, account-rotation throttling and invalid vectors.
-- [x] Verify real PostgreSQL upload/index/search, duplicate deliveries, provider failure/retry,
+- [X] Manually provision institution administrators; verify salted passwords and expiring sessions.
+- [X] Enforce administrator writes, staff reads and session-derived institution scope.
+- [X] Upload multiple files or a nested folder with preserved relative source paths.
+- [X] Extract digital PDF, DOCX and UTF-8 TXT/Markdown/CSV; report OCR-required PDFs explicitly.
+- [X] Bound file/batch/page/archive/text sizes; reject unsafe paths and unsupported files.
+- [X] Encrypt original bytes, deduplicate per institution and retain durable queued jobs.
+- [X] Index through TaskIQ with atomic claims/publication, retry and expired-lease recovery.
+- [X] Show queued/indexing/ready/failed states and source passages in the staff UI.
+- [X] Search ready material in pgvector with a similarity floor and suspicious-chunk exclusion.
+- [X] Delete original uploads and their indexed chunks; prevent publication after deletion.
+- [X] Verify extraction/passwords, request limits, account-rotation throttling and invalid vectors.
+- [X] Verify real PostgreSQL upload/index/search, duplicate deliveries, provider failure/retry,
   tenant isolation, agent permissions, session expiry and safe migration up/down.
-- [x] Pass the final backend gate and frontend typecheck/build; complete adversarial review.
-- [x] Confirm mobile/desktop behavior after the responsive fix.
-- [x] Validate live OpenAI requests and the Telegram answer path separately; see current evidence below.
-- [x] Publish through the authorized PR/CI workflow (fresh repository PR #1).
+- [X] Pass the final backend gate and frontend typecheck/build; complete adversarial review.
+- [X] Confirm mobile/desktop behavior after the responsive fix.
+- [X] Validate live OpenAI requests and the Telegram answer path separately; see current evidence below.
+- [X] Publish through the authorized PR/CI workflow (fresh repository PR #1).
 
 **Verification:** Test-first extraction/password imports initially failed; 16 focused tests
 now pass. Regression tests first exposed account-rotation bypass and a missing API-key
@@ -100,40 +100,40 @@ roles, encryption/storage behavior and operational recovery are in backend/READM
 The entries below track implemented acceptance separately from shipping. Git publication
 is authorized; the verified platform was published through fresh repository PR #1.
 
-- [x] Task 44 implementation: Typed channel-neutral events and validated replies, with
+- [X] Task 44 implementation: Typed channel-neutral events and validated replies, with
   transport length limits and one validation boundary for every reply branch.
-- [x] Task 45 implementation: Private-chat normalization, token-safe HTTP, long polling,
+- [X] Task 45 implementation: Private-chat normalization, token-safe HTTP, long polling,
   sender, prompt callback acknowledgment and signed conversation-bound choices.
-- [x] Task 46 implementation: Encrypted durable inbox, same-transaction offset commit,
+- [X] Task 46 implementation: Encrypted durable inbox, same-transaction offset commit,
   scoped update dedup, lead-row serialization, per-bot receiver lock and reply outbox.
   Restart recovery republishes pending work; interrupted/ambiguous sends stay uncertain.
-- [x] Task 47 implementation: OpenAI-only model roles, explicit masked API-key loading,
+- [X] Task 47 implementation: OpenAI-only model roles, explicit masked API-key loading,
   typed contracts, deadlines, bounded retries/output and sanitized usage/latency logs.
-- [x] Task 48 implementation/live checkpoint: Idempotent synthetic institution, courses,
+- [X] Task 48 implementation/live checkpoint: Idempotent synthetic institution, courses,
   batches, rules and staff seed; actual Redis/TaskIQ processing and handset-confirmed replies.
-- [x] Task 49 implementation: Encrypted conversation memory, explicit fact corrections,
+- [X] Task 49 implementation: Encrypted conversation memory, explicit fact corrections,
   newest-first loading with chronological presentation, stored inbound/outbound outcomes.
-- [x] Task 50 implementation: Tenant/actor-bound course and batch choices, active/capacity
+- [X] Task 50 implementation: Tenant/actor-bound course and batch choices, active/capacity
   checks, explicit multi-batch selection and invalidation/re-evaluation on course changes.
-- [x] Task 51 implementation: Typed evidence-backed extraction, active-question numeric
+- [X] Task 51 implementation: Typed evidence-backed extraction, active-question numeric
   routing, code-owned rules, missing/eligible/ineligible/review outcomes and no-rule abstention.
-- [x] Task 52 implementation: Ready-upload search, relevance floor, suspicious-chunk
+- [X] Task 52 implementation: Ready-upload search, relevance floor, suspicious-chunk
   exclusion, exact source quotations and unsupported-question abstention.
-- [x] Task 53 implementation: Validated plain-text sends, safe failure replies, per-chat/
+- [X] Task 53 implementation: Validated plain-text sends, safe failure replies, per-chat/
   institution model limits, language preference/templates and bounded query translation.
-- [x] Task 54 implementation: Manual staff provisioning, salted scrypt, hashed expiring
+- [X] Task 54 implementation: Manual staff provisioning, salted scrypt, hashed expiring
   sessions, CSRF/origin controls, shared production throttles and tenant authorization.
-- [x] Task 55 implementation: Audited tenant-scoped inquiry/detail, ordered conversation,
+- [X] Task 55 implementation: Audited tenant-scoped inquiry/detail, ordered conversation,
   selected course/batch, eligibility evidence and human-request APIs.
-- [x] Task 56 implementation: Staff login, inquiry/status/course filters, detail, facts,
+- [X] Task 56 implementation: Staff login, inquiry/status/course filters, detail, facts,
   evidence, source documents, conversation/history pagination and human-request queue.
-- [x] Task 57 implementation: Recorded student request, paused qualification, staff
+- [X] Task 57 implementation: Recorded student request, paused qualification, staff
   acknowledge/resolve and separate explicit resume. Subsequent messages remain visible.
-- [x] Task 58 core acceptance: Real database journey, duplicate/concurrent processing,
+- [X] Task 58 core acceptance: Real database journey, duplicate/concurrent processing,
   cross-tenant negatives, correction/grounding/abstention/request controls and live API smoke checks.
-- [x] Task 59 local-runtime choice: Existing PostgreSQL/Redis plus API, TaskIQ worker,
+- [X] Task 59 local-runtime choice: Existing PostgreSQL/Redis plus API, TaskIQ worker,
   one polling receiver and Next.js. Added data-store readiness and production debug rejection.
-- [x] Task 60 draft assets: Root setup/status docs, demonstration script, six-slide
+- [X] Task 60 draft assets: Root setup/status docs, demonstration script, six-slide
   editable deck and 178-word AI Impact Statement.
 
 **Live evidence:** `python -m src.scripts.validate_services --openai --telegram`
@@ -245,14 +245,14 @@ and nonzero failure exit. No runtime conversation behavior was changed by this s
 
 **Remaining acceptance and release work:**
 
-- [x] Complete the final repository gate, full integration run, frontend lint/build and container smoke after edits.
-- [x] Record the local staff walkthrough and fingerprint the tested source/configuration.
-- [x] Confirm live age corrections, sourced FAQ and unsupported-question abstention in persisted replies and staff visibility.
-- [x] Confirm live `/human` intake and staff acknowledgment, resolution and explicit resume, including pause preservation and audit records.
-- [x] Prepare and execute the 24-case FAQ evaluation, add provider-failure database coverage and create the fluent-review packet.
-- [x] Replace the invalid OpenAI key and pass the expanded live FAQ evaluation: **24/24**.
-- [x] Complete agent review of the language templates as requested; record scope and limits in LANGUAGE_REVIEW.md.
-- [x] Record the longer actual staff view of the saved student journey and prepare prior-work disclosure.
+- [X] Complete the final repository gate, full integration run, frontend lint/build and container smoke after edits.
+- [X] Record the local staff walkthrough and fingerprint the tested source/configuration.
+- [X] Confirm live age corrections, sourced FAQ and unsupported-question abstention in persisted replies and staff visibility.
+- [X] Confirm live `/human` intake and staff acknowledgment, resolution and explicit resume, including pause preservation and audit records.
+- [X] Prepare and execute the 24-case FAQ evaluation, add provider-failure database coverage and create the fluent-review packet.
+- [X] Replace the invalid OpenAI key and pass the expanded live FAQ evaluation: **24/24**.
+- [X] Complete agent review of the language templates as requested; record scope and limits in LANGUAGE_REVIEW.md.
+- [X] Record the longer actual staff view of the saved student journey and prepare prior-work disclosure.
 - [ ] Final demo recording, owner/team/license details, judge-accessible links and portal/prior-work confirmation.
 - [ ] Git publication, PR/CI/adversarial merge gate and any selected-host deployment.
 
@@ -293,8 +293,8 @@ for fee confirmation, duplicate jobs, uncertain outcomes and signed payment even
 real Razorpay test-card journey, reconciliation and later operations remain unfinished.
 Publication must not tick the remaining roadmap or the PR/CI/merge release gates.
 
-- [x] Push preserved main history (`96b5c75`) and checkpoint (`a4212cb`) to Shan091/admitflow.
-- [x] Open [draft PR #1](https://github.com/Shan091/admitflow/pull/1) from `codex/telegram-admissions-checkpoint`.
+- [X] Push preserved main history (`96b5c75`) and checkpoint (`a4212cb`) to Shan091/admitflow.
+- [X] Open [draft PR #1](https://github.com/Shan091/admitflow/pull/1) from `codex/telegram-admissions-checkpoint`.
 - [ ] Complete CI and adversarial review before merging; full roadmap completion remains open.
 
 **Replacement repository publication:** The user subsequently deleted/recreated the
@@ -382,42 +382,50 @@ See [EVENT_CONTEXT.md](../EVENT_CONTEXT.md) and the
 ## Phase 1: Foundation
 
 ### Task 1: Initialize Python project, FastAPI, settings, and Docker
+
 **Description:** Create the `backend/` directory, `requirements.txt`, FastAPI app entry, settings singleton, and Dockerfile.
 **Acceptance criteria:**
-- [x] FastAPI boots on localhost:8000
-- [x] `/docs` shows Swagger UI
-- [x] Settings loaded from `.env`
-**Verification:** `uvicorn src.main:app --reload` starts successfully
-**Dependencies:** None
-**Estimated scope:** Small
+
+- [X] FastAPI boots on localhost:8000
+- [X] `/docs` shows Swagger UI
+- [X] Settings loaded from `.env`
+  **Verification:** `uvicorn src.main:app --reload` starts successfully
+  **Dependencies:** None
+  **Estimated scope:** Small
 
 ### Task 2: PostgreSQL schema (SQLAlchemy + Alembic)
+
 **Description:** Define all core SQLAlchemy models: Institution, StaffUser, Course, Batch, QualificationRule, DiscountCode, Lead, LeadFact, Message, Application, PaymentOrder, AuditLog. Every table has `tenant_id`.
 **Acceptance criteria:**
-- [x] All models defined with proper relationships
-- [x] Alembic migration runs cleanly
-- [x] `tenant_id` on every tenant-scoped table
-**Verification:** `alembic upgrade head` succeeds
-**Dependencies:** Task 1
-**Estimated scope:** Large
+
+- [X] All models defined with proper relationships
+- [X] Alembic migration runs cleanly
+- [X] `tenant_id` on every tenant-scoped table
+  **Verification:** `alembic upgrade head` succeeds
+  **Dependencies:** Task 1
+  **Estimated scope:** Large
 
 ### Task 3: TaskIQ + Redis broker setup
+
 **Description:** Configure TaskIQ with Redis as the message broker for background processing.
 **Acceptance criteria:**
-- [x] TaskIQ broker boots successfully
-- [x] A dummy task can be enqueued and processed
-**Verification:** Trigger a test task from a `/debug` endpoint
-**Dependencies:** Task 1
-**Estimated scope:** Small
+
+- [X] TaskIQ broker boots successfully
+- [X] A dummy task can be enqueued and processed
+  **Verification:** Trigger a test task from a `/debug` endpoint
+  **Dependencies:** Task 1
+  **Estimated scope:** Small
 
 ### Task 4: PII encryption utilities and audit log infrastructure
+
 **Description:** Build `security.py` (encrypt/decrypt PII fields) and the audit log write utility.
 **Acceptance criteria:**
-- [x] Phone numbers and names can be encrypted/decrypted transparently
-- [x] `write_audit_log()` function writes to the `audit_log` table
-**Verification:** Unit tests for encryption roundtrip and audit log writes
-**Dependencies:** Task 2
-**Estimated scope:** Small
+
+- [X] Phone numbers and names can be encrypted/decrypted transparently
+- [X] `write_audit_log()` function writes to the `audit_log` table
+  **Verification:** Unit tests for encryption roundtrip and audit log writes
+  **Dependencies:** Task 2
+  **Estimated scope:** Small
 
 ---
 
@@ -447,170 +455,200 @@ See [EVENT_CONTEXT.md](../EVENT_CONTEXT.md) and the
 > (code + migration agree) — cosmetic, no change needed.
 
 ### Task 5: Meta WhatsApp webhook (HMAC + dedup + enqueue)
+
 **Description:** Build `GET` (challenge verification) and `POST` (HMAC verify body, Redis SETNX dedup on `message.id`, extract payload, enqueue to TaskIQ).
 **Acceptance criteria:**
-- [x] `GET /api/webhook` passes Meta challenge
-- [x] `POST /api/webhook` returns 200 OK immediately
-- [x] Duplicate `message.id` silently dropped
-- [x] Valid messages enqueued to TaskIQ
-**Verification:** Test with ngrok + Meta test tool
-**Dependencies:** Task 3
-**Estimated scope:** Medium
+
+- [X] `GET /api/webhook` passes Meta challenge
+- [X] `POST /api/webhook` returns 200 OK immediately
+- [X] Duplicate `message.id` silently dropped
+- [X] Valid messages enqueued to TaskIQ
+  **Verification:** Test with ngrok + Meta test tool
+  **Dependencies:** Task 3
+  **Estimated scope:** Medium
 
 ### Task 6: WhatsApp message sending service
+
 **Description:** Build `whatsapp.py` service with functions to send: text, interactive buttons, interactive lists, and template messages via Meta Cloud API.
 **Acceptance criteria:**
-- [x] `send_text()`, `send_buttons()`, `send_list()`, `send_template()` all work
-**Verification:** Send a test message to a verified number
-**Dependencies:** Task 1
-**Estimated scope:** Medium
+
+- [X] `send_text()`, `send_buttons()`, `send_list()`, `send_template()` all work
+  **Verification:** Send a test message to a verified number
+  **Dependencies:** Task 1
+  **Estimated scope:** Medium
 
 ### Task 7: Redis distributed mutex
+
 **Description:** Implement `redis_mutex(key)` async context manager using Redis Lua CAS for owner-safe release, with keepalive TTL extension.
 **Acceptance criteria:**
-- [x] Only one worker processes a message per phone number at a time
-- [x] Lock auto-releases after TTL if worker crashes
-**Verification:** Unit test with simulated concurrent access
-**Dependencies:** Task 3
-**Estimated scope:** Small
+
+- [X] Only one worker processes a message per phone number at a time
+- [X] Lock auto-releases after TTL if worker crashes
+  **Verification:** Unit test with simulated concurrent access
+  **Dependencies:** Task 3
+  **Estimated scope:** Small
 
 ---
 
 ## Phase 3: AI Core (Engine + RAG)
 
 ### Task 8: Engine state definition and lifecycle
+
 **Description:** Define the conversation state schema (a plain dataclass/Pydantic model loaded per turn, not a graph state) including: `lead_status`, `conversation_history`, `current_course`, `extracted_facts`, `pending_order`, `applied_discount`, `co_pilot_mode`, `consult_stage`. Build `engine/state.py` (lifecycle states + allowed transitions) and the `engine/dispatcher.py` skeleton (`handle_turn()`).
 **Acceptance criteria:**
-- [x] State schema defined with all required fields
-- [x] Lead lifecycle transitions enforced in code
-**Verification:** Unit test state transitions
-**Dependencies:** Task 2
-**Estimated scope:** Medium
+
+- [X] State schema defined with all required fields
+- [X] Lead lifecycle transitions enforced in code
+  **Verification:** Unit test state transitions
+  **Dependencies:** Task 2
+  **Estimated scope:** Medium
 
 ### Task 9: Multi-provider LLM factory with fallback
+
 **Description:** Build `llm_factory.py` that tries Gemini → OpenAI → Anthropic with automatic fallback on API errors (chain per ADR-007; model IDs config-driven).
 **Acceptance criteria:**
-- [x] Primary provider used when healthy
-- [x] Automatic fallback to next provider on error
-- [x] All providers return the same interface
-**Verification:** Mock primary provider failure, verify fallback triggers
-**Dependencies:** Task 1
-**Estimated scope:** Medium
+
+- [X] Primary provider used when healthy
+- [X] Automatic fallback to next provider on error
+- [X] All providers return the same interface
+  **Verification:** Mock primary provider failure, verify fallback triggers
+  **Dependencies:** Task 1
+  **Estimated scope:** Medium
 
 ### Task 10: Input guardrail node
+
 **Description:** First node in the graph. Detects prompt injection, profanity, and abuse patterns. Issues canned refusal and halts processing.
 **Acceptance criteria:**
-- [x] Injection attempts detected and blocked
-- [x] Profanity detected and blocked
-- [x] Clean messages pass through unchanged
-**Verification:** Unit tests with adversarial inputs
-**Dependencies:** Task 8
-**Estimated scope:** Medium
+
+- [X] Injection attempts detected and blocked
+- [X] Profanity detected and blocked
+- [X] Clean messages pass through unchanged
+  **Verification:** Unit tests with adversarial inputs
+  **Dependencies:** Task 8
+  **Estimated scope:** Medium
 
 ### Task 11: Triage node (intent detection)
+
 **Description:** Routes incoming messages to the appropriate downstream node: Discovery, RAG, Qualification, Handoff.
 **Acceptance criteria:**
-- [x] Correct routing for course exploration, knowledge questions, qualification answers, and human requests
-**Verification:** Unit tests with representative message types
-**Dependencies:** Task 8, 9
-**Estimated scope:** Medium
+
+- [X] Correct routing for course exploration, knowledge questions, qualification answers, and human requests
+  **Verification:** Unit tests with representative message types
+  **Dependencies:** Task 8, 9
+  **Estimated scope:** Medium
 
 ### Task 12: Discovery node
+
 **Description:** Presents available courses as WhatsApp interactive lists/buttons. Handles course selection and batch routing.
 **Acceptance criteria:**
-- [x] Courses fetched from DB filtered by `tenant_id`
-- [x] Only batches with `seats_remaining > 0` shown
-- [x] Tap-based selection updates lead state to `discovering`
-**Verification:** Integration test with seeded course data
-**Dependencies:** Task 8, 6
-**Estimated scope:** Medium
+
+- [X] Courses fetched from DB filtered by `tenant_id`
+- [X] Only batches with `seats_remaining > 0` shown
+- [X] Tap-based selection updates lead state to `discovering`
+  **Verification:** Integration test with seeded course data
+  **Dependencies:** Task 8, 6
+  **Estimated scope:** Medium
 
 ### Task 13: RAG pipeline
+
 **Description:** Build document ingestion (chunk, embed, store in pgvector), hybrid search (dense + lexical with RRF), and RAG chunk sanitizer.
 **Acceptance criteria:**
-- [x] Documents chunked and embedded per tenant
-- [x] Search returns relevant chunks above confidence threshold
-- [x] Chunks sanitized before injection
-**Verification:** Golden question retrieval test (≥80% hit rate)
-**Dependencies:** Task 2
-**Estimated scope:** Large
+
+- [X] Documents chunked and embedded per tenant
+- [X] Search returns relevant chunks above confidence threshold
+- [X] Chunks sanitized before injection
+  **Verification:** Golden question retrieval test (≥80% hit rate)
+  **Dependencies:** Task 2
+  **Estimated scope:** Large
 
 ### Task 14: RAG node
+
 **Description:** Graph node that retrieves from the knowledge base and generates an answer. Fail-closed below confidence threshold.
 **Acceptance criteria:**
-- [x] Answers knowledge questions from institution documents
-- [x] Says "I don't have that information" below threshold (no hallucination)
-**Verification:** Test with institution FAQ documents
-**Dependencies:** Task 13, 9
-**Estimated scope:** Medium
+
+- [X] Answers knowledge questions from institution documents
+- [X] Says "I don't have that information" below threshold (no hallucination)
+  **Verification:** Test with institution FAQ documents
+  **Dependencies:** Task 13, 9
+  **Estimated scope:** Medium
 
 ### Task 15: Qualification node
+
 **Description:** Asks the user questions to extract field values, then verifies against structured course rules in code. Extraction uses native structured outputs (JSON-schema / function calling), not free-text parsing — extracted fields feed deterministic rule eval (ADR-007 LLM efficiency).
 **Acceptance criteria:**
-- [x] AI asks the right questions to fill rule fields
-- [x] Field values extracted via structured output into a typed schema (no regex/free-text parsing)
-- [x] Code evaluates field/operator/value rules deterministically
-- [x] Lead marked `admission_ready` only when ALL rules pass
-**Verification:** Unit tests for rule engine + integration test with mocked LLM
-**Dependencies:** Task 8, 9, 12
-**Estimated scope:** Large
+
+- [X] AI asks the right questions to fill rule fields
+- [X] Field values extracted via structured output into a typed schema (no regex/free-text parsing)
+- [X] Code evaluates field/operator/value rules deterministically
+- [X] Lead marked `admission_ready` only when ALL rules pass
+  **Verification:** Unit tests for rule engine + integration test with mocked LLM
+  **Dependencies:** Task 8, 9, 12
+  **Estimated scope:** Large
 
 ### Task 16: Output guardrail
+
 **Description:** Validates AI response before sending to WhatsApp. Blocks hallucinated fees, made-up course names, PII leakage, and ensures WhatsApp-safe formatting.
 **Acceptance criteria:**
-- [x] Monetary figures not from DB are blocked
-- [x] Course names not in the DB are flagged
-- [x] WhatsApp formatting applied correctly
-**Verification:** Unit tests with adversarial AI outputs
-**Dependencies:** Task 8
-**Estimated scope:** Medium
+
+- [X] Monetary figures not from DB are blocked
+- [X] Course names not in the DB are flagged
+- [X] WhatsApp formatting applied correctly
+  **Verification:** Unit tests with adversarial AI outputs
+  **Dependencies:** Task 8
+  **Estimated scope:** Medium
 
 ### Task 17: Wire webhook → TaskIQ → engine dispatcher → WhatsApp
+
 **Description:** Connect all the pieces: TaskIQ worker picks up the message, runs it through the full `handle_turn()` dispatcher (decide → dispatch → generate → guard), and sends the response.
 **Acceptance criteria:**
+
 - [ ] Full loop works end-to-end
 - [ ] Episodic memory (`messages` table) persists conversation between turns; recent turns reloaded each message
 - [ ] Semantic memory (`lead_facts`) updated after each turn
-**Verification:** End-to-end test on a real WhatsApp device
-**Dependencies:** Task 5, 6, 7, 8–16
-**Estimated scope:** Medium
+  **Verification:** End-to-end test on a real WhatsApp device
+  **Dependencies:** Task 5, 6, 7, 8–16
+  **Estimated scope:** Medium
 
 ---
 
 ## Phase 4: Advanced Bot Features
 
 ### Task 18: Application form collection node
+
 **Description:** Collect structured application data through explicit Telegram prompts.
 **Acceptance criteria:**
-- [x] Full name, DOB, parent/guardian, address and previous school collected after an explicit start; cancel and review/submit are supported.
-- [x] Form saved encrypted in the application table; new DOB/school values are not written to legacy plaintext columns.
-- [x] Lead moves through form_collecting to payment_pending (or under_review for a zero-fee course).
-**Evidence:** Database form journey proves invalid-DOB rejection, stale-submit nonce rejection,
-explicit submission, replay protection, encryption, no seat reservation and application-state
-preservation through later qualification/course requests and human resume. Live transport
-for the earlier inquiry is separate; no new handset application submission is claimed.
-**Verification:** Integration test collecting a full application
-**Dependencies:** Task 15, 17
-**Estimated scope:** Medium
+
+- [X] Full name, DOB, parent/guardian, address and previous school collected after an explicit start; cancel and review/submit are supported.
+- [X] Form saved encrypted in the application table; new DOB/school values are not written to legacy plaintext columns.
+- [X] Lead moves through form_collecting to payment_pending (or under_review for a zero-fee course).
+  **Evidence:** Database form journey proves invalid-DOB rejection, stale-submit nonce rejection,
+  explicit submission, replay protection, encryption, no seat reservation and application-state
+  preservation through later qualification/course requests and human resume. Live transport
+  for the earlier inquiry is separate; no new handset application submission is claimed.
+  **Verification:** Integration test collecting a full application
+  **Dependencies:** Task 15, 17
+  **Estimated scope:** Medium
 
 ### Task 19: Razorpay integration
+
 **Description:** Build discount code validation, payment link creation (raw httpx), HMAC webhook verification, and in-chat confirmation.
 **Acceptance criteria:**
-- [x] Invoice and provider request use DB-sourced integer paise, with validated discounts.
-- [x] Fee preview and an expiring, nonce-bound explicit tap precede link creation.
-- [x] Immutable invoice, atomic job claims and outbound dedup prevent duplicate creation/sends; uncertain attempts are not blindly repeated.
-- [x] Raw-body HMAC, full captured amount/reference checks and replay-safe events update payment status.
-- [x] Verified settlement queues one encrypted Telegram confirmation; a full discount is WAIVED, not a fabricated PAID payment.
-- [x] Staff monitoring and administrator reconciliation recover only an existing exact-reference link; lookup alone cannot confirm payment.
-- [x] Known pre-creation configuration/rate failures can retry the same bounded invoice; missing or ambiguous links cannot authorize retry.
+
+- [X] Invoice and provider request use DB-sourced integer paise, with validated discounts.
+- [X] Fee preview and an expiring, nonce-bound explicit tap precede link creation.
+- [X] Immutable invoice, atomic job claims and outbound dedup prevent duplicate creation/sends; uncertain attempts are not blindly repeated.
+- [X] Raw-body HMAC, full captured amount/reference checks and replay-safe events update payment status.
+- [X] Verified settlement queues one encrypted Telegram confirmation; a full discount is WAIVED, not a fabricated PAID payment.
+- [X] Staff monitoring and administrator reconciliation recover only an existing exact-reference link; lookup alone cannot confirm payment.
+- [X] Known pre-creation configuration/rate failures can retry the same bounded invoice; missing or ambiguous links cannot authorize retry.
 - [ ] Complete the actual Razorpay test-mode link/card/webhook/Telegram journey.
-**Verification:** Provider contracts, fee-change reconfirmation, concurrent creation,
-waiver, signed event tampering/replay, tenant/role boundaries and reconciliation are
-automated. Browser fixture checks cover explicit staff confirmation, unresolved state,
-inquiry navigation and mobile/desktop rendering. The user needs to create a Razorpay
-test account; no real provider payment is claimed. Live payments remain disabled.
-**Dependencies:** Task 17, 6
-**Estimated scope:** Large
+  **Verification:** Provider contracts, fee-change reconfirmation, concurrent creation,
+  waiver, signed event tampering/replay, tenant/role boundaries and reconciliation are
+  automated. Browser fixture checks cover explicit staff confirmation, unresolved state,
+  inquiry navigation and mobile/desktop rendering. The user needs to create a Razorpay
+  test account; no real provider payment is claimed. Live payments remain disabled.
+  **Dependencies:** Task 17, 6
+  **Estimated scope:** Large
 
 ### Staff takeover and reviewed co-pilot evidence (Tasks 20 and 29)
 
@@ -641,30 +679,34 @@ The published ancestry contains only newly created commits; prior repository his
 remains local. The remaining handset/payment checks stay open.
 
 ### Task 20: Human handoff + co-pilot mode
+
 **Description:** Handoff node for escalation. Co-pilot mode: AI generates suggested replies visible in dashboard.
 **Acceptance criteria:**
-- [x] Escalate clear frustration, explicit human requests and urgent safety signals; ordinary questions/refusals remain in the normal journey.
-- [x] Co-pilot generates encrypted drafts without sending; approval requires explicit review, fresh context and an active takeover.
-- [x] "Resume AI" restores the bot with confirmed staff replies and saved student facts; pending staff sends must finish first.
-- [x] Institution-local office hours affect escalation wording without promising immediate support.
-**Verification:** Integration test with escalation triggers
-**Dependencies:** Task 17
-**Estimated scope:** Large
+
+- [X] Escalate clear frustration, explicit human requests and urgent safety signals; ordinary questions/refusals remain in the normal journey.
+- [X] Co-pilot generates encrypted drafts without sending; approval requires explicit review, fresh context and an active takeover.
+- [X] "Resume AI" restores the bot with confirmed staff replies and saved student facts; pending staff sends must finish first.
+- [X] Institution-local office hours affect escalation wording without promising immediate support.
+  **Verification:** Integration test with escalation triggers
+  **Dependencies:** Task 17
+  **Estimated scope:** Large
 
 ### Task 21: Cold lead re-engagement worker
+
 **Description:** Scheduled TaskIQ task that finds stale leads and sends AI-generated, context-aware follow-up hooks.
 **Acceptance criteria:**
-- [x] Identify opted-in stale inquiries using the configured delay; new messages, opt-out and staff takeover invalidate pending outreach.
-- [x] Generate a context-aware multilingual reminder with a continue button; no invented urgency, deadlines, prices or admission promises.
-- [x] At most two reminder delivery opportunities; a confirmed second reminder marks a still-inactive early-stage inquiry `cold`.
-**Verification:** The feature-group gate passes lint/format, strict typing over **92
-source files** and **186 default tests** (two pre-existing RAG AsyncMock warnings).
-The full PostgreSQL suite passes **60 cases** and two real Redis cases pass separately:
-**62 integration cases** total. Sixteen follow-up database scenarios cover explicit signed
-consent, opt-out during takeover, fresh-state checks, queued inbound messages, office
-hours/unknown hours, inactive courses, global disable, provider ambiguity, expired leases,
-concurrent jobs and the two-reminder cap. Five unit cases cover eligibility and generated
-copy refusal/provider-failure fallbacks.
+
+- [X] Identify opted-in stale inquiries using the configured delay; new messages, opt-out and staff takeover invalidate pending outreach.
+- [X] Generate a context-aware multilingual reminder with a continue button; no invented urgency, deadlines, prices or admission promises.
+- [X] At most two reminder delivery opportunities; a confirmed second reminder marks a still-inactive early-stage inquiry `cold`.
+  **Verification:** The feature-group gate passes lint/format, strict typing over **92
+  source files** and **186 default tests** (two pre-existing RAG AsyncMock warnings).
+  The full PostgreSQL suite passes **60 cases** and two real Redis cases pass separately:
+  **62 integration cases** total. Sixteen follow-up database scenarios cover explicit signed
+  consent, opt-out during takeover, fresh-state checks, queued inbound messages, office
+  hours/unknown hours, inactive courses, global disable, provider ambiguity, expired leases,
+  concurrent jobs and the two-reminder cap. Five unit cases cover eligibility and generated
+  copy refusal/provider-failure fallbacks.
 
 Live OpenAI generation plus independent typed safety checks pass in English, Hindi,
 Hinglish and Malayalam (**8 successful structured calls**, no neutral fallbacks).
@@ -685,22 +727,24 @@ certification are not claimed. Task 26 analytics and the remaining roadmap stay 
 **Estimated scope:** Medium
 
 ### Task 22: Telegram delivery limits and queuing
+
 **Description:** Track institution send volume, honor Telegram retry delays and queue messages when a configured send budget is reached. ADR-012 supersedes the old Meta tier requirements.
 **Acceptance criteria:**
-- [x] Conversation replies and standalone deliveries serialize claims per lead and preserve order in both directions; uncertain delivery is not automatically repeated.
-- [x] Shared Redis reservations count send attempts per institution-local day; confirmed-delivery totals come from durable database records.
-- [x] Workspace warning at 80% usage; authenticated counts, queued totals, reset time and administrator budget control.
-- [x] Both bot and standalone replies stay queued at the cap; zero pauses new claims, raising the cap wakes deferred work, and production budget outages defer safely.
-**Verification:** The backend gate passes **181 tests**, lint/format and strict typing
-across **87 source files**. The full PostgreSQL suite passes **44 cases**; two Redis-only
-cases pass separately (**46 integration cases** total). Six budget unit cases cover local
-midnight/DST, replay, pause and unavailable budget storage. Four budget database cases
-cover both delivery queues, concurrent claims, scoped settings, exact provider retry delay,
-migration up/down and preservation. Rate-limited replies remain queued beyond three
-attempts and wait the full delay measured from rejection. Final review reproduced a lost-statistics-write
-regression; the four budget database cases pass after making confirmed counts DB-owned.
-The real Redis test admits exactly seven of 100 competing reservations, replays without
-spending again and proves tenant isolation. Failed/uncertain attempts consume budget.
+
+- [X] Conversation replies and standalone deliveries serialize claims per lead and preserve order in both directions; uncertain delivery is not automatically repeated.
+- [X] Shared Redis reservations count send attempts per institution-local day; confirmed-delivery totals come from durable database records.
+- [X] Workspace warning at 80% usage; authenticated counts, queued totals, reset time and administrator budget control.
+- [X] Both bot and standalone replies stay queued at the cap; zero pauses new claims, raising the cap wakes deferred work, and production budget outages defer safely.
+  **Verification:** The backend gate passes **181 tests**, lint/format and strict typing
+  across **87 source files**. The full PostgreSQL suite passes **44 cases**; two Redis-only
+  cases pass separately (**46 integration cases** total). Six budget unit cases cover local
+  midnight/DST, replay, pause and unavailable budget storage. Four budget database cases
+  cover both delivery queues, concurrent claims, scoped settings, exact provider retry delay,
+  migration up/down and preservation. Rate-limited replies remain queued beyond three
+  attempts and wait the full delay measured from rejection. Final review reproduced a lost-statistics-write
+  regression; the four budget database cases pass after making confirmed counts DB-owned.
+  The real Redis test admits exactly seven of 100 competing reservations, replays without
+  spending again and proves tenant isolation. Failed/uncertain attempts consume budget.
 
 Frontend lint/build and **all five browser scenarios** pass, including budget pause/change,
 unavailable statistics, existing staff/payment flows and live OpenAI knowledge search.
@@ -720,39 +764,46 @@ consent-aware follow-ups is next.
 **Estimated scope:** Small
 
 ### Task 23: Langfuse tracing integration
+
 **Description:** Add `@observe()` decorators to all LLM-calling functions. Configure Langfuse client in `tracing.py`.
 **Acceptance criteria:**
+
 - [ ] Every LLM call visible in Langfuse with input/output/latency/cost
 - [ ] Graph execution path traceable per conversation
-**Verification:** Run a conversation and verify traces appear in Langfuse dashboard
-**Dependencies:** Task 17
-**Estimated scope:** Small
+  **Verification:** Run a conversation and verify traces appear in Langfuse dashboard
+  **Dependencies:** Task 17
+  **Estimated scope:** Small
 
 ---
 
 ## Phase 5: Dashboard Frontend (Next.js)
 
 ### Task 24: Initialize the Next.js staff workspace
+
 **Description:** The current SPEC uses the existing responsive staff design and plain CSS; the archived dark/glass/Tailwind baseline is superseded.
 **Acceptance criteria:**
-- [x] Next.js app runs on localhost:3000; lint/build and browser navigation pass.
-- [x] Current staff-design tokens, responsive layouts and visible focus styles are in place; no dark/glass redesign is claimed.
-**Verification:** Visual inspection of a test page
-**Dependencies:** None
-**Estimated scope:** Small
+
+- [X] Next.js app runs on localhost:3000; lint/build and browser navigation pass.
+- [X] Current staff-design tokens, responsive layouts and visible focus styles are in place; no dark/glass redesign is claimed.
+  **Verification:** Visual inspection of a test page
+  **Dependencies:** None
+  **Estimated scope:** Small
 
 ### Task 25: Authentication (email + password)
+
 **Description:** Login with expiring opaque database sessions and administrator/staff roles under the current SPEC; JWT storage from the archived baseline is superseded.
 **Acceptance criteria:**
-- [x] Provisioned staff accounts can log in; default Overview and unauthorized access are verified.
+
+- [X] Provisioned staff accounts can log in; default Overview and unauthorized access are verified.
 - [ ] Institution-managed staff creation/invitation remains part of the administration milestone; public self-registration is not claimed.
-- [x] Hashed opaque sessions use expiring HttpOnly cookies; passwords are salted hashes.
-- [x] Route guards enforce tenant scope and administrator writes versus staff reads.
-**Verification:** Login flow + unauthorized access blocked
-**Dependencies:** Task 24, Task 2 (backend auth endpoints)
-**Estimated scope:** Medium
+- [X] Hashed opaque sessions use expiring HttpOnly cookies; passwords are salted hashes.
+- [X] Route guards enforce tenant scope and administrator writes versus staff reads.
+  **Verification:** Login flow + unauthorized access blocked
+  **Dependencies:** Task 24, Task 2 (backend auth endpoints)
+  **Estimated scope:** Medium
 
 ### Task 26: Dashboard home (funnel analytics)
+
 **Current execution:** Implemented on `codex/institution-reporting`, based on fresh
 `origin/main` after PR #5 (`91f4370`). Real ORM transitions append same-transaction
 `lead.stage_changed` audit records; current counts and known stage reach remain separate.
@@ -762,16 +813,17 @@ records supply verified conversions; paid and waived remain distinct. The Overvi
 home preserves access to knowledge, inquiries, staff requests, management and payments.
 **Description:** Main dashboard page with funnel visualization and time-series lead charts.
 **Acceptance criteria:**
-- [x] Lifecycle funnel separates current states from observed reach, with explicit inquiry-cohort denominators; application, fee-satisfaction and enrollment conversions have real numerators/denominators.
-- [x] Institution-local daily/weekly inquiry series, zero-filled gaps, accessible exact counts and bounded date filters.
-**Verification:** The group gate passes lint/format, strict typing over **93 source
-files** and **193 default tests**, with two existing RAG AsyncMock warnings. The full
-PostgreSQL suite passes **65 cases**, and two real Redis cases pass separately:
-**67 integration cases** total. Seven analytics unit cases cover local/DST boundaries,
-Monday buckets, zero/invalid denominators, date limits and calendar extremes. Five
-real-database cases cover scoped counts, corrections/history, empty/weekly data,
-tenant/session controls, transactional/no-op/rollback auditing and consistent metrics
-under a concurrent arrival.
+
+- [X] Lifecycle funnel separates current states from observed reach, with explicit inquiry-cohort denominators; application, fee-satisfaction and enrollment conversions have real numerators/denominators.
+- [X] Institution-local daily/weekly inquiry series, zero-filled gaps, accessible exact counts and bounded date filters.
+  **Verification:** The group gate passes lint/format, strict typing over **93 source
+  files** and **193 default tests**, with two existing RAG AsyncMock warnings. The full
+  PostgreSQL suite passes **65 cases**, and two real Redis cases pass separately:
+  **67 integration cases** total. Seven analytics unit cases cover local/DST boundaries,
+  Monday buckets, zero/invalid denominators, date limits and calendar extremes. Five
+  real-database cases cover scoped counts, corrections/history, empty/weekly data,
+  tenant/session controls, transactional/no-op/rollback auditing and consistent metrics
+  under a concurrent arrival.
 
 Frontend lint/build and **all six browser scenarios** pass. The new overview case
 covers filter changes, chart/denominator content and error/empty recovery. Real login
@@ -793,223 +845,274 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
 **Estimated scope:** Medium
 
 ### Task 27: Leads CRM page
+
 **Description:** Table/grid of all leads with status filters, search, and click-to-view detail.
 **Acceptance criteria:**
-- [x] Leads fetched from FastAPI, filtered by tenant
-- [x] Status indicators (color-coded by lifecycle state), all twelve states available as filters
-- [x] Known-name word-prefix search and exact international phone lookup; private POST body, audited access
-**Evidence:** Four real PostgreSQL cases cover tenant boundaries, role access, Unicode
-prefixes, encrypted-name rename/removal, idempotent legacy backfill, bounded 50-row
-pagination and exports. The browser scenario verifies the private query body, all status
-options, name display and 390/1440px layouts. No phone is inferred from Telegram.
-Migration `a82df107e436` applies/reverses; local backfill processed both saved inquiries.
-**Verification:** Load with seeded leads
-**Dependencies:** Task 25
-**Estimated scope:** Medium
+
+- [X] Leads fetched from FastAPI, filtered by tenant
+- [X] Status indicators (color-coded by lifecycle state), all twelve states available as filters
+- [X] Known-name word-prefix search and exact international phone lookup; private POST body, audited access
+  **Evidence:** Four real PostgreSQL cases cover tenant boundaries, role access, Unicode
+  prefixes, encrypted-name rename/removal, idempotent legacy backfill, bounded 50-row
+  pagination and exports. The browser scenario verifies the private query body, all status
+  options, name display and 390/1440px layouts. No phone is inferred from Telegram.
+  Migration `a82df107e436` applies/reverses; local backfill processed both saved inquiries.
+  **Verification:** Load with seeded leads
+  **Dependencies:** Task 25
+  **Estimated scope:** Medium
 
 ### Task 28: Course & batch management
+
 **Description:** CRUD pages for courses, batches, discount codes, and qualification rules builder.
 **Acceptance criteria:**
-- [x] Create/edit/archive courses and batches; archiving preserves existing inquiry references.
-- [x] Qualification rules builder with typed field/operator/value validation.
-- [x] Batch capacity and available seats visible; invalid capacity rejected.
-- [x] Administrator discount-code create/edit/deactivate, percentage/fixed values, usage limits and immutable usage counts.
-**Evidence:** Real database management tests cover roles, tenant boundaries, invalid values
-and duplicate-code conflicts. Actual Chrome creation/archive, rules, fees and seat values
-pass at desktop/mobile widths. The permanent catalog/discount browser test passes,
-including INR-to-paise conversion and deactivation. Settings and application screens
-inherit the existing staff design; detector checks report no findings.
-**Verification:** Create a course with rules, verify in DB
-**Dependencies:** Task 25
-**Estimated scope:** Large
+
+- [X] Create/edit/archive courses and batches; archiving preserves existing inquiry references.
+- [X] Qualification rules builder with typed field/operator/value validation.
+- [X] Batch capacity and available seats visible; invalid capacity rejected.
+- [X] Administrator discount-code create/edit/deactivate, percentage/fixed values, usage limits and immutable usage counts.
+  **Evidence:** Real database management tests cover roles, tenant boundaries, invalid values
+  and duplicate-code conflicts. Actual Chrome creation/archive, rules, fees and seat values
+  pass at desktop/mobile widths. The permanent catalog/discount browser test passes,
+  including INR-to-paise conversion and deactivation. Settings and application screens
+  inherit the existing staff design; detector checks report no findings.
+  **Verification:** Create a course with rules, verify in DB
+  **Dependencies:** Task 25
+  **Estimated scope:** Large
 
 ### Task 29: Chat takeover + co-pilot UI
+
 **Description:** Messaging interface showing chat history, AI suggested replies, and manual send.
 **Acceptance criteria:**
-- [x] Unified student/bot/standalone-delivery history with payment labels, timestamps and delivery states; stable tenant-scoped cursor pagination includes equal-time messages.
-- [x] AI-suggested replies support review, edit, approve and ignore; stale/expired drafts cannot be approved.
-- [x] Manual text input queues a tenant-scoped Telegram reply with an exact-text confirmation and replay-safe send reference.
-- [x] "Take Over" and "Resume AI" buttons, confirmations and bot-pause status.
-**Verification:** PostgreSQL/API and browser scenarios cover takeover, manual-send retry, reviewed drafts and resume. A handset-confirmed staff-authored delivery is still a separate live check.
+
+- [X] Unified student/bot/standalone-delivery history with payment labels, timestamps and delivery states; stable tenant-scoped cursor pagination includes equal-time messages.
+- [X] AI-suggested replies support review, edit, approve and ignore; stale/expired drafts cannot be approved.
+- [X] Manual text input queues a tenant-scoped Telegram reply with an exact-text confirmation and replay-safe send reference.
+- [X] "Take Over" and "Resume AI" buttons, confirmations and bot-pause status.
+  **Verification:** PostgreSQL/API and browser scenarios cover takeover, manual-send retry, reviewed drafts and resume. A handset-confirmed staff-authored delivery is still a separate live check.
 - [ ] Confirm one explicitly authorized staff reply on the Telegram handset.
-**Dependencies:** Task 25, 20
-**Estimated scope:** Large
+  **Dependencies:** Task 25, 20
+  **Estimated scope:** Large
 
 ### Task 30: Document management (RAG)
+
 **Description:** Upload/delete institution documents for the RAG knowledge base.
 **Acceptance criteria:**
-- [x] File upload triggers durable backend ingestion (verified with an isolated worker invocation).
-- [x] Document list shows indexed files and failure/retry states.
-- [x] Delete removes chunks from pgvector; an active worker cannot republish a deleted upload.
+
+- [X] File upload triggers durable backend ingestion (verified with an isolated worker invocation).
+- [X] Document list shows indexed files and failure/retry states.
+- [X] Delete removes chunks from pgvector; an active worker cannot republish a deleted upload.
 - [ ] Upload a PDF and verify a grounded answer through the live Telegram bot.
-**Verification:** See current execution evidence above. API/database and fixture-backed UI
-checks are complete locally; live bot acceptance remains pending.
-**Dependencies:** Task 13; provisioning/authentication slice of Task 54.
-**Estimated scope:** Medium
+  **Verification:** See current execution evidence above. API/database and fixture-backed UI
+  checks are complete locally; live bot acceptance remains pending.
+  **Dependencies:** Task 13; provisioning/authentication slice of Task 54.
+  **Estimated scope:** Medium
 
 ### Task 31: Application submissions view
+
 **Description:** Table of submitted application forms with detail view and manual review actions (Approve, Waitlist, Reject).
 **Acceptance criteria:**
-- [x] Submitted encrypted form fields displayed through audited tenant-scoped staff APIs.
-- [x] Application links to the saved inquiry and conversation.
-- [x] Explicit administrator approve/waitlist/reject controls; unpaid approval is blocked,
+
+- [X] Submitted encrypted form fields displayed through audited tenant-scoped staff APIs.
+- [X] Application links to the saved inquiry and conversation.
+- [X] Explicit administrator approve/waitlist/reject controls; unpaid approval is blocked,
   final decisions cannot be overwritten, and approval allocates one available seat atomically.
-**Evidence:** Two simultaneous approvals compete for one seat: one succeeds and one receives
-409; repeating the winner does not allocate another seat. Actual staff-browser validation
-uses a labelled synthetic seeded form, blocks unpaid approval, saves waitlist, checks
-desktop/mobile and opens its inquiry. No Telegram updates were fabricated for that fixture.
-**Verification:** Submit an application via bot, verify it appears in dashboard
-**Dependencies:** Task 25, 18
-**Estimated scope:** Small
+  **Evidence:** Two simultaneous approvals compete for one seat: one succeeds and one receives
+  409; repeating the winner does not allocate another seat. Actual staff-browser validation
+  uses a labelled synthetic seeded form, blocks unpaid approval, saves waitlist, checks
+  desktop/mobile and opens its inquiry. No Telegram updates were fabricated for that fixture.
+  **Verification:** Submit an application via bot, verify it appears in dashboard
+  **Dependencies:** Task 25, 18
+  **Estimated scope:** Small
 
 ### Task 32: Data export + webhook config
+
 **Description:** CSV/Excel export for leads, applications, payments. Outbound webhook URL configuration.
 **Acceptance criteria:**
-- [x] Administrator download buttons generate CSV/Excel for inquiries, applications and payments
-- [ ] Webhook URL configurable per institution
-- [ ] Events pushed to webhook URL in real-time
-**Verification:** Export data + configure a test webhook URL
-**Export evidence:** Tenant-scoped, CSRF-protected, audited downloads pass real database
-checks for all three datasets in both formats. CSV formula-like text is neutralized;
-Excel stores text cells explicitly. Amounts retain database minor units, phone strings
-retain country codes, ciphertext/search indexes are excluded, and exceeding the configured
-row/cell limit fails explicitly. Actual local authenticated CSV downloads returned two
-inquiries, one application and zero payments; browser download and mobile layout pass.
-Outbound webhook configuration/delivery remains the next part of this task.
-**Dependencies:** Task 25
-**Estimated scope:** Medium
+
+- [X] Administrator download buttons generate CSV/Excel for inquiries, applications and payments
+- [X] Administrator webhook destination and signing-secret rotation configurable per institution
+- [X] Transactional minimal events dispatched promptly through a signed, leased, bounded-retry outbox
+  **Verification:** Export data + configure a test webhook URL
+  **Export evidence:** Tenant-scoped, CSRF-protected, audited downloads pass real database
+  checks for all three datasets in both formats. CSV formula-like text is neutralized;
+  Excel stores text cells explicitly. Amounts retain database minor units, phone strings
+  retain country codes, ciphertext/search indexes are excluded, and exceeding the configured
+  row/cell limit fails explicitly. Actual local authenticated CSV downloads returned two
+  inquiries, one application and zero payments; browser download and mobile layout pass.
+  **Webhook evidence:** Six PostgreSQL cases cover source rollback, endpoint roles and
+  encrypted secrets, tenant scope, concurrent claims, retry/recovery/caps, configuration
+  cancellation and per-user socket receipts. Twenty security cases cover public-address
+  checks, mixed DNS answers, IP pinning with TLS hostname verification, signatures,
+  non-followed redirects and secret-safe logs. The browser verifies destination settings,
+  secret handling and delivery status at 390/1440px. Delivery uses a simulated receiver;
+  no real external webhook is configured or contacted locally.
+  **Dependencies:** Task 25
+  **Estimated scope:** Medium
 
 ### Task 33: Real-time WebSocket notifications
+
 **Description:** Notification bell with live badge count for new events.
 **Acceptance criteria:**
-- [ ] WebSocket connection established on dashboard load
-- [ ] Badge increments on: new qualified lead, dead-letter message, co-pilot suggestion, payment received
-**Verification:** Trigger an event from the bot, verify badge updates
-**Dependencies:** Task 25
-**Estimated scope:** Medium
+
+- [X] Authenticated same-origin WebSocket established on dashboard load, with reconnect and HTTP recovery
+- [X] Badge reflects committed eligible-inquiry, failed/uncertain Telegram delivery, co-pilot draft and confirmed-payment events
+  **Verification:** A real authenticated browser connection through Next.js received a
+  committed synthetic eligibility event and persisted its read receipt. Source Telegram
+  delivery tests verify one attention event for an ambiguous send. Mocked browser events
+  verify all four notification categories; database tests prove cross-tenant exclusion,
+  separate staff receipts, session revocation and unread backlogs beyond 50. The temporary
+  local inquiry was removed afterward; no Telegram message or real webhook was sent.
+  All nine browser scenarios pass, alongside 220 default tests/105 strictly typed source
+  files and 75 PostgreSQL plus two Redis cases across full/focused runs. Desktop/mobile
+  visual QA completed in two bounded rounds; no further cosmetic pass is needed.
+  **Dependencies:** Task 25
+  **Estimated scope:** Medium
 
 ### Task 34: Institution settings
+
 **Description:** Settings page for business hours, re-engagement timing, and general config.
 **Acceptance criteria:**
-- [x] Business hours and IANA timezone configurable with opening/closing validation.
-- [x] Re-engagement delay and optional retention period configurable by administrators.
+
+- [X] Business hours and IANA timezone configurable with opening/closing validation.
+- [X] Re-engagement delay and optional retention period configurable by administrators.
 - [ ] Verify the configured values affect follow-up, escalation and cleanup behavior once those operations are implemented.
-**Verification:** Update settings, verify they affect bot behavior
-**Dependencies:** Task 25
-**Estimated scope:** Small
+  **Verification:** Update settings, verify they affect bot behavior
+  **Dependencies:** Task 25
+  **Estimated scope:** Small
 
 ---
 
 ## Phase 6: Production Hardening
 
 ### Task 35: Sentry error monitoring
+
 **Description:** Integrate Sentry SDK in both FastAPI and TaskIQ worker.
 **Acceptance criteria:**
+
 - [ ] Unhandled exceptions reported to Sentry with full context
-**Verification:** Trigger a test error, verify it appears in Sentry
-**Dependencies:** Task 17
-**Estimated scope:** Small
+  **Verification:** Trigger a test error, verify it appears in Sentry
+  **Dependencies:** Task 17
+  **Estimated scope:** Small
 
 ### Task 36: Delete My Data endpoint
+
 **Description:** API endpoint that purges all data for a given phone number: conversation state, lead facts, messages, application, payment orders.
 **Acceptance criteria:**
+
 - [ ] All user data deleted across all tables
 - [ ] Deletion logged in audit trail
-**Verification:** Delete a test user, verify no data remains
-**Dependencies:** Task 4
-**Estimated scope:** Small
+  **Verification:** Delete a test user, verify no data remains
+  **Dependencies:** Task 4
+  **Estimated scope:** Small
 
 ### Task 37: Data retention auto-cleanup
+
 **Description:** Scheduled job that deletes conversations older than the configured retention period.
 **Acceptance criteria:**
+
 - [ ] Conversations beyond retention period auto-deleted
 - [ ] Configurable per tenant
-**Verification:** Test with artificially aged data
-**Dependencies:** Task 4
-**Estimated scope:** Small
+  **Verification:** Test with artificially aged data
+  **Dependencies:** Task 4
+  **Estimated scope:** Small
 
 ### Task 38: Docker Compose for local development
+
 **Description:** `docker-compose.yml` with all services: FastAPI, TaskIQ worker, PostgreSQL+pgvector, Redis, Langfuse.
 **Acceptance criteria:**
+
 - [ ] `docker compose up --build` starts everything
-**Verification:** Full stack boots from clean state
-**Dependencies:** All previous tasks
-**Estimated scope:** Medium
+  **Verification:** Full stack boots from clean state
+  **Dependencies:** All previous tasks
+  **Estimated scope:** Medium
 
 ### Task 39: Production deployment
+
 **Description:** Deploy Next.js to Vercel; backend API + TaskIQ worker + scheduler to Fly.io (always-on machines); Neon (managed Postgres + pgvector); Redis on Fly; Langfuse Cloud. Per ADR-007.
 **Acceptance criteria:**
+
 - [ ] Frontend accessible on production URL
 - [ ] Backend API accessible on production URL
 - [ ] Webhooks configured with production URLs
-**Verification:** End-to-end test on production
-**Dependencies:** All previous tasks
-**Estimated scope:** Medium
+  **Verification:** End-to-end test on production
+  **Dependencies:** All previous tasks
+  **Estimated scope:** Medium
 
 ---
 
 ## Phase 3–4 addition (see ADR-008)
 
 ### Task 40: `decide()` System-1 decision-layer abstraction
+
 **Description:** Build `src/decision/` — a `decide()` interface exposing choice/score/noul primitives with calibrated probabilities. Demo backend uses Gemini Flash structured outputs; the interface is backend-agnostic so a self-hosted Laya backend can drop in later (ADR-008). Used by input guardrail, triage, readiness scoring, and escalation detection.
 **Acceptance criteria:**
+
 - [ ] `decide()` returns typed answers (label+prob / score / yes-no prob) via Gemini Flash structured output
 - [ ] Guardrail, triage, readiness, and escalation call `decide()` (no ad-hoc LLM calls)
 - [ ] Backend is swappable behind the interface (config-selected)
-**Verification:** Unit tests with a mocked backend; each decision site covered
-**Dependencies:** Task 9, 10, 11, 15
-**Estimated scope:** Medium
+  **Verification:** Unit tests with a mocked backend; each decision site covered
+  **Dependencies:** Task 9, 10, 11, 15
+  **Estimated scope:** Medium
 
 ### Task 41: Distill decisions into self-hosted Laya (post-demo)
+
 **Description:** Stand up self-hosted Laya (Jev-compatible `/v1/systemone`) as a `decide()` backend. Use labels collected during the demo to fine-tune/calibrate the high-frequency decisions (triage, guardrail-triage, readiness, escalation). Switch per decision only after evaluating Malayalam/Hinglish accuracy and fitting calibration.
 **Acceptance criteria:**
+
 - [ ] Laya backend implements the `decide()` interface
 - [ ] Malayalam/Hinglish accuracy measured per decision vs the LLM backend
 - [ ] Calibration (temperature) fitted; over-confidence checked (ECE)
 - [ ] OTHER/ESCALATE option present on all choice decisions
-**Verification:** Offline eval set per decision; shadow-run against live LLM decisions before cutover
-**Dependencies:** Task 40, 17
-**Estimated scope:** Large
+  **Verification:** Offline eval set per decision; shadow-run against live LLM decisions before cutover
+  **Dependencies:** Task 40, 17
+  **Estimated scope:** Large
 
 ### Task 42: Advanced RAG Strategy (ADR-011)
+
 **Description:** Implement the advanced RAG pipeline to handle complex document parsing, latency-optimized reranking, and contextual query rewriting.
 This epic is broken down into sub-tasks for focused implementation.
 
 ### Task 42.1: Complex Document Parsing & Semantic Chunking
+
 **Description:** Integrate `docling` (or `unstructured`) to parse uploaded PDFs into Markdown, preserving tables and structure. Replace the naive sliding window chunker in `rag.py` with a semantic, Markdown-header-aware chunker.
 **Acceptance criteria:**
+
 - [ ] Document ingestion pipeline uses `docling`/`unstructured` for PDFs
 - [ ] Tables and multi-column layouts are preserved in Markdown
 - [ ] Semantic chunking implemented (retains parent-child headers)
-**Verification:**
+  **Verification:**
 - [ ] Unit tests uploading a complex PDF and verifying structural chunks
-**Dependencies:** Task 13
-**Files likely touched:** `backend/pyproject.toml`, `backend/src/core/rag.py`
-**Estimated scope:** Medium
+  **Dependencies:** Task 13
+  **Files likely touched:** `backend/pyproject.toml`, `backend/src/core/rag.py`
+  **Estimated scope:** Medium
 
 ### Task 42.2: Contextual Query Rewriting
+
 **Description:** Add a query resolution step before vector search. Use Gemini Flash to rewrite the raw WhatsApp message into a standalone query (resolving slang and pronouns using conversation history).
 **Acceptance criteria:**
+
 - [ ] Query rewriter LLM chain implemented
 - [ ] Uses previous conversation turns to resolve ambiguous intent
 - [ ] Pre-filters search space using metadata tags if a specific course is identified
-**Verification:**
+  **Verification:**
 - [ ] Unit tests for query resolution given ambiguous user inputs
-**Dependencies:** Task 13
-**Files likely touched:** `backend/src/core/rag.py`
-**Estimated scope:** Medium
+  **Dependencies:** Task 13
+  **Files likely touched:** `backend/src/core/rag.py`
+  **Estimated scope:** Medium
 
 ### Task 42.3: Pluggable Reranker (Cohere API vs Local)
+
 **Description:** Add a config-driven reranker layer to `search_chunks`. In dev mode, use a fast/free pass-through or tiny local cross-encoder. In prod mode, use Cohere's Rerank API via LiteLLM for high precision without CPU bloat.
 **Acceptance criteria:**
+
 - [ ] Reranking logic implemented after hybrid search
 - [ ] `use_reranker` and `reranker_provider` (local vs cohere) added to settings
 - [ ] Latency stays well within budget (since compute is offloaded)
-**Verification:**
+  **Verification:**
 - [ ] Unit tests mock the reranker and verify correct top-N sorting
-**Dependencies:** Task 42.2
-**Files likely touched:** `backend/src/core/rag.py`, `backend/src/core/settings.py`
-**Estimated scope:** Medium
+  **Dependencies:** Task 42.2
+  **Files likely touched:** `backend/src/core/rag.py`, `backend/src/core/settings.py`
+  **Estimated scope:** Medium
 
 ---
 
@@ -1018,6 +1121,7 @@ This epic is broken down into sub-tasks for focused implementation.
 **Scope:** Preserve context in this repository; no new repository, product changes, or deployment.
 **Dependencies:** Public event/handbook snapshots and repository inspection.
 **Acceptance criteria:**
+
 - [ ] Root EVENT_CONTEXT.md records the latest user direction, event rules, baseline facts, unknowns, and restart prompt.
 - [ ] docs/event/ holds the preparation plan, source snapshots, and discrepancies.
 - [ ] AGENTS.md links the handoff and local links/content have been checked.
@@ -1030,6 +1134,7 @@ Start at [../EVENT_CONTEXT.md](../EVENT_CONTEXT.md). Next implementation step pr
 **Scope:** One-hour evidence check in the renamed admitflow repository; preserve the dirty baseline. Local configuration authorized by the user. No broad implementation.
 **Evidence:** [../docs/event/READINESS_CHECK.md](../docs/event/READINESS_CHECK.md).
 **Acceptance criteria:**
+
 - [ ] Real demo-phone ingress -> Redis queue -> registered worker -> delivered WhatsApp reply evidenced with latency.
 - [ ] Seeded course selection, next-turn memory, and tenant-scoped persisted lead inspected.
 - [ ] Pass/fail/blocker and smallest repair scope recorded at the timebox boundary.
@@ -1051,7 +1156,3 @@ Fresh default baseline gate: 106 passed, 4 integration tests deselected, 2 warni
 **Scope:** Correct the existing app callback and missing account subscription; observe signed delivery statuses without PII. Preserve other app subscriptions and existing webhook fields.
 **Evidence:** READINESS_CHECK.md records successful subscription repair and a real failure webhook (131031). Meta health API reports the test account banned (141014), sending BLOCKED. Appeal in Meta Business Support Home is the next required user action; local configuration cannot lift the restriction.
 **Verification:** Missing-status regression reproduced; focused tests cover signed status logs, invalid-signature rejection, PII exclusion, and tunnel route restrictions. Full gate result recorded in the readiness report when completed. No phone-delivery or complete learner-journey claim.
-
-### Final Postman diagnostic (executed; delivery blocked)
-
-User authorized executing the Postman setup and one final send. Imported collection ran via isolated temporary Newman, using ignored local credentials in memory. Health BLOCKED; send accepted HTTP 200; signed failure event 131031 confirmed (`f3fc27bca826` hashed reference). Safe local runner added; syntax checked. Corrected sandbox variable declarations, then read-only execution produced 2 assertions with 1 expected restriction failure. No subsequent send. Details: [../docs/event/POSTMAN_CHECK.md](../docs/event/POSTMAN_CHECK.md). Further delivery depends on Meta account access, not another client or API retry.

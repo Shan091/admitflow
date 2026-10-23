@@ -16,6 +16,12 @@ from src.db.models.conversation import (
 )
 from src.db.models.delivery import OutboundMessage, PaymentEvent
 from src.db.models.institution import Institution, StaffUser
+from src.db.models.integrations import (
+    IntegrationEvent,
+    NotificationReceipt,
+    WebhookDelivery,
+    WebhookEndpoint,
+)
 from src.db.models.knowledge import Document, DocumentChunk
 from src.db.models.lead import Lead, LeadFact, Message
 from src.db.models.telegram import TelegramBot, TelegramIdentity
@@ -35,6 +41,10 @@ __all__ = [
     "Document",
     "DocumentChunk",
     "Institution",
+    "IntegrationEvent",
+    "WebhookEndpoint",
+    "WebhookDelivery",
+    "NotificationReceipt",
     "KnowledgeUpload",
     "Lead",
     "LeadFact",
