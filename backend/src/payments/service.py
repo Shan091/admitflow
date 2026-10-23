@@ -181,10 +181,29 @@ async def request_payment(
 async def process_payment(order_id: uuid.UUID) -> uuid.UUID | None:
     sessions = get_sessionmaker()
     async with sessions() as db:
+        owner = (
+            await db.execute(
+                select(PaymentOrder.tenant_id, PaymentOrder.lead_id).where(
+                    PaymentOrder.id == order_id
+                )
+            )
+        ).first()
+        if owner is None:
+            return None
+        if (
+            await db.scalar(
+                select(Lead.id)
+                .where(Lead.tenant_id == owner.tenant_id, Lead.id == owner.lead_id)
+                .with_for_update()
+            )
+            is None
+        ):
+            return None
         order = await db.scalar(
             update(PaymentOrder)
             .where(
                 PaymentOrder.id == order_id,
+                PaymentOrder.tenant_id == owner.tenant_id,
                 PaymentOrder.creation_state == "queued",
                 PaymentOrder.creation_attempts < 3,
                 (PaymentOrder.next_attempt_at.is_(None))

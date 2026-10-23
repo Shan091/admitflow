@@ -66,6 +66,7 @@ def create_app() -> FastAPI:
     from src.knowledge.api import router as knowledge_router
     from src.knowledge.limits import UploadBodyLimit
     from src.payments.webhook import router as payments_router
+    from src.staff.accounts import router as accounts_router
     from src.staff.analytics import router as analytics_router
     from src.staff.applications import router as applications_router
     from src.staff.auth import router as staff_router
@@ -77,9 +78,11 @@ def create_app() -> FastAPI:
     from src.staff.notifications import router as notifications_router
     from src.staff.operations import router as staff_operations_router
     from src.staff.payments import router as staff_payments_router
+    from src.staff.privacy import router as privacy_router
 
     application.add_middleware(UploadBodyLimit)
     application.include_router(staff_router)
+    application.include_router(accounts_router)
     application.include_router(analytics_router)
     application.include_router(exports_router)
     application.include_router(integrations_router)
@@ -89,6 +92,7 @@ def create_app() -> FastAPI:
     application.include_router(applications_router)
     application.include_router(payments_router)
     application.include_router(staff_payments_router)
+    application.include_router(privacy_router)
     application.include_router(staff_operations_router)
     application.include_router(copilot_router)
     application.include_router(knowledge_router)

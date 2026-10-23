@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Discounts from "./discounts";
+import StaffAccounts from "./staff-accounts";
 
 type Batch = {
   id?: string;
@@ -66,14 +67,16 @@ export default function Management({
   request,
   onError,
   admin,
+  institutionCode = "",
 }: {
   request: (path: string, init?: RequestInit) => Promise<unknown>;
   onError: (error: unknown) => string;
   admin: boolean;
+  institutionCode?: string;
 }) {
-  const [tab, setTab] = useState<"catalog" | "settings" | "discounts">(
-    "catalog",
-  );
+  const [tab, setTab] = useState<
+    "catalog" | "settings" | "discounts" | "staff"
+  >("catalog");
   const [courses, setCourses] = useState<Course[]>([]);
   const [course, setCourse] = useState<Course | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -185,7 +188,14 @@ export default function Management({
         </div>
       </header>
       <div className="management-tabs" aria-label="Management sections">
-        {(["catalog", "discounts", "settings"] as const).map((item) => (
+        {(
+          [
+            "catalog",
+            "discounts",
+            "settings",
+            ...(admin ? ["staff" as const] : []),
+          ] as const
+        ).map((item) => (
           <button
             key={item}
             className={tab === item ? "primary" : "secondary"}
@@ -200,7 +210,9 @@ export default function Management({
               ? "Course catalog"
               : item === "discounts"
                 ? "Discount codes"
-                : "Institution settings"}
+                : item === "staff"
+                  ? "Staff accounts"
+                  : "Institution settings"}
           </button>
         ))}
       </div>
@@ -221,6 +233,12 @@ export default function Management({
       )}
       {loading ? (
         <p className="empty">Loading institution information…</p>
+      ) : tab === "staff" ? (
+        <StaffAccounts
+          request={request}
+          onError={onError}
+          institutionCode={institutionCode}
+        />
       ) : tab === "discounts" ? (
         <Discounts request={request} onError={onError} admin={admin} />
       ) : tab === "catalog" ? (
@@ -681,7 +699,7 @@ export default function Management({
                 />
               </label>
               <label>
-                Retention period (days, blank disables cleanup)
+                Inactive conversation history (days, blank keeps history)
                 <input
                   type="number"
                   min="1"
@@ -698,8 +716,11 @@ export default function Management({
                 />
               </label>
               <p className="quiet">
-                Scheduling and cleanup activation are verified separately.
-                Saving a value does not send follow-ups or delete data.
+                Scheduled checks apply these values. Follow-ups require student
+                consent. Conversation retention clears stored dialogue and saved
+                facts after inactivity. Applications and payment records remain;
+                complete inquiry erasure requires an administrator’s explicit
+                confirmation.
               </p>
               {admin && (
                 <button className="primary" disabled={saving}>

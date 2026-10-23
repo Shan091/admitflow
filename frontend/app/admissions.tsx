@@ -1,5 +1,6 @@
 "use client";
 import StaffControls from "./staff-controls";
+import PrivacyControls from "./privacy-controls";
 import type { StaffDraft } from "./staff-controls";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -55,6 +56,7 @@ type Detail = {
   id: string;
   status: string;
   copilot_mode: boolean;
+  conversation_purged_at?: string | null;
   draft_stale: boolean;
   course_id: string | null;
   batch_id: string | null;
@@ -82,11 +84,15 @@ export default function Admissions({
   request,
   onError,
   initialLead = null,
+  admin = false,
+  onDeleted,
 }: {
   view: "leads" | "requests";
   request: Request;
   onError: (error: unknown) => string;
   initialLead?: string | null;
+  admin?: boolean;
+  onDeleted?: () => void;
 }) {
   const [rows, setRows] = useState<Inquiry[]>([]);
   const [requests, setRequests] = useState<Human[]>([]);
@@ -105,6 +111,13 @@ export default function Admissions({
   const [notice, setNotice] = useState("");
   const [confirmResume, setConfirmResume] = useState<string | null>(null);
   const [olderLoaded, setOlderLoaded] = useState(false);
+  useEffect(() => {
+    if (initialLead) {
+      setSelected(initialLead);
+      setOlderLoaded(false);
+      setDetail(null);
+    }
+  }, [initialLead]);
 
   const refresh = useCallback(async () => {
     const version = ++refreshVersion.current;
@@ -504,6 +517,12 @@ export default function Admissions({
                 </details>
               )}
               <h3 className="conversation-heading">Conversation</h3>
+              {detail.conversation_purged_at && (
+                <p className="notice">
+                  Earlier conversation history was removed under this
+                  institution’s retention policy.
+                </p>
+              )}
               <StaffControls
                 key={detail.id}
                 leadId={detail.id}
@@ -564,6 +583,23 @@ export default function Admissions({
                 Eligibility is not admission or a reserved seat. “Uncertain”
                 delivery requires review; it is not automatically resent.
               </p>
+              {admin && (
+                <PrivacyControls
+                  key={`privacy-${detail.id}`}
+                  leadId={detail.id}
+                  request={request}
+                  onError={onError}
+                  onDeleted={() => {
+                    setSelected(null);
+                    setDetail(null);
+                    setOffset(0);
+                    setNotice(
+                      "Inquiry data deleted. A deletion receipt was recorded.",
+                    );
+                    onDeleted?.();
+                  }}
+                />
+              )}
             </>
           )}
         </section>

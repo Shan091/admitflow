@@ -93,6 +93,84 @@ def test_migration_applies_up_and_down(pg_url: str) -> None:
     assert "leads" not in remaining
 
 
+def test_password_setup_downgrade_revokes_restricted_access(pg_url: str) -> None:
+    import uuid
+    from datetime import UTC, datetime, timedelta
+
+    from src.db.enums import StaffRole
+    from src.db.models import Institution, StaffSession, StaffUser
+
+    cfg = _alembic_config()
+    command.upgrade(cfg, "head")
+    tenant_id = uuid.uuid4()
+    pending, normal = uuid.uuid4(), uuid.uuid4()
+
+    async def seed():
+        engine = create_async_engine(pg_url)
+        async with engine.begin() as db:
+            await db.execute(
+                sa.insert(Institution).values(id=tenant_id, name="Synthetic rollback institution")
+            )
+            for user_id, restricted in ((pending, True), (normal, False)):
+                await db.execute(
+                    sa.insert(StaffUser).values(
+                        id=user_id,
+                        tenant_id=tenant_id,
+                        email=f"{user_id}@example.test",
+                        hashed_password="synthetic-unusable-hash",
+                        role=StaffRole.AGENT,
+                        is_active=True,
+                        must_change_password=restricted,
+                    )
+                )
+                await db.execute(
+                    sa.insert(StaffSession).values(
+                        tenant_id=tenant_id,
+                        user_id=user_id,
+                        token_hash=uuid.uuid4().hex * 2,
+                        expires_at=datetime.now(UTC) + timedelta(hours=1),
+                    )
+                )
+        await engine.dispose()
+
+    asyncio.run(seed())
+    command.downgrade(cfg, "6dd017583606")
+
+    async def inspect():
+        engine = create_async_engine(pg_url)
+        async with engine.begin() as db:
+            rows = dict(
+                (
+                    await db.execute(
+                        sa.select(StaffUser.id, StaffUser.is_active).where(
+                            StaffUser.tenant_id == tenant_id
+                        )
+                    )
+                ).all()
+            )
+            assert rows == {pending: False, normal: True}
+            remaining = list(
+                (
+                    await db.execute(
+                        sa.select(StaffSession.user_id).where(StaffSession.tenant_id == tenant_id)
+                    )
+                ).scalars()
+            )
+            assert remaining == [normal]
+        await engine.dispose()
+
+    asyncio.run(inspect())
+    command.upgrade(cfg, "head")
+
+    async def clean():
+        engine = create_async_engine(pg_url)
+        async with engine.begin() as db:
+            await db.execute(sa.delete(Institution).where(Institution.id == tenant_id))
+        await engine.dispose()
+
+    asyncio.run(clean())
+
+
 def test_tenant_fk_and_unique_constraints_hold(pg_url: str) -> None:
     """Round-trip an Institution -> Lead; the tenant FK + phone uniqueness bind."""
     from src.db.enums import LeadStatus

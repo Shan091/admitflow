@@ -3,9 +3,11 @@
 import argparse
 import asyncio
 import logging
+from collections.abc import Awaitable, Callable
 
 from src.integrations.delivery import dispatch_pending as dispatch_integrations
 from src.outreach.followups import dispatch_due
+from src.staff.privacy import purge_retained
 from src.tasks.broker import broker
 from src.telegram.outbound import recover_outbound
 
@@ -13,26 +15,49 @@ logger = logging.getLogger(__name__)
 
 
 async def run(*, once: bool = False, interval: int = 60) -> None:
-    await broker.startup()
+    broker_ready = False
+    operations: tuple[tuple[str, Callable[[], Awaitable[int | None]]], ...] = (
+        ("retention", purge_retained),
+        ("followups", dispatch_due),
+        ("outbound", recover_outbound),
+        ("integrations", dispatch_integrations),
+    )
     try:
         while True:
+            failed = []
             try:
-                count = await dispatch_due()
-                await recover_outbound()
-                await dispatch_integrations()
-                if once:
-                    print(f"Due follow-up jobs queued: {count}", flush=True)
+                if not broker_ready:
+                    await broker.startup()
+                    broker_ready = True
             except asyncio.CancelledError:
                 raise
             except Exception:
-                if once:
+                failed.append("queue")
+                logger.warning("scheduler_queue_startup_unavailable")
+            results = {}
+            for component, operation in operations:
+                try:
+                    results[component] = await operation()
+                except asyncio.CancelledError:
                     raise
-                logger.warning("scheduler_sweep_unavailable; durable work retained")
+                except Exception:
+                    failed.append(component)
+                    logger.warning(
+                        "scheduler_sweep_unavailable component=%s; durable work retained", component
+                    )
             if once:
+                print(f"Due follow-up jobs queued: {results.get('followups', 0)}", flush=True)
+                print(
+                    f"Expired conversation histories removed: {results.get('retention', 0)}",
+                    flush=True,
+                )
+                if failed:
+                    raise RuntimeError("One or more scheduler components are unavailable")
                 return
             await asyncio.sleep(interval)
     finally:
-        await broker.shutdown()
+        if broker_ready:
+            await broker.shutdown()
 
 
 def main() -> None:

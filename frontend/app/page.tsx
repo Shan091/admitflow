@@ -11,8 +11,15 @@ import Analytics from "./analytics";
 import Exports from "./exports";
 import Integrations from "./integrations";
 import Notifications from "./notifications";
+import PasswordForm from "./password-form";
 
-type Staff = { email: string; role: string; institution: string };
+type Staff = {
+  email: string;
+  role: string;
+  institution: string;
+  must_change_password?: boolean;
+  institution_code?: string;
+};
 type Doc = {
   id: string;
   filename: string;
@@ -114,6 +121,7 @@ export default function Knowledge() {
     | "payments"
     | "exports"
     | "integrations"
+    | "account"
   >("overview");
   const [staff, setStaff] = useState<Staff | null>(null);
   const [inquiryFocus, setInquiryFocus] = useState<string | null>(null);
@@ -168,7 +176,7 @@ export default function Knowledge() {
       .finally(() => setChecking(false));
   }, []);
   useEffect(() => {
-    if (!staff) return;
+    if (!staff || staff.must_change_password) return;
     void refresh();
     const timer = setInterval(() => {
       if (document.visibilityState === "visible") void refresh();
@@ -382,6 +390,34 @@ export default function Knowledge() {
       </main>
     );
 
+  if (staff.must_change_password)
+    return (
+      <main className="password-setup">
+        <a className="brand" href="/">
+          AdmitFlow
+        </a>
+        <h1>Set your private password</h1>
+        <p>
+          Your initial password provides setup access only. Choose a private
+          password before viewing institution data.
+        </p>
+        <PasswordForm
+          request={api}
+          onError={sessionFailure}
+          onDone={async () => setStaff((await api("/staff/me")) as Staff)}
+        />
+        <button
+          className="text-button"
+          onClick={async () => {
+            await api("/staff/logout", { method: "POST" });
+            setStaff(null);
+          }}
+        >
+          Sign out
+        </button>
+      </main>
+    );
+
   const visible = docs.filter((d) =>
     d.relative_path.toLowerCase().includes(filter.toLowerCase()),
   );
@@ -412,6 +448,7 @@ export default function Knowledge() {
               ["management", "Institution management"],
               ["applications", "Applications"],
               ["payments", "Payments"],
+              ["account", "Your account"],
               ...(staff.role === "admin"
                 ? ([
                     ["exports", "Data exports"],
@@ -467,9 +504,11 @@ export default function Knowledge() {
                         ? "Payments"
                         : view === "exports"
                           ? "Data exports"
-                          : view === "integrations"
-                            ? "Outbound webhooks"
-                            : "Staff requests"}
+                          : view === "account"
+                            ? "Your account"
+                            : view === "integrations"
+                              ? "Outbound webhooks"
+                              : "Staff requests"}
           </span>
           <div className="topbar-actions">
             <span className="role">
@@ -494,6 +533,7 @@ export default function Knowledge() {
               request={api}
               onError={sessionFailure}
               admin={staff.role === "admin"}
+              institutionCode={staff.institution_code || ""}
             />
           ) : view === "applications" ? (
             <Applications
@@ -519,6 +559,20 @@ export default function Knowledge() {
             <Exports onError={sessionFailure} />
           ) : view === "integrations" ? (
             <Integrations request={api} onError={sessionFailure} />
+          ) : view === "account" ? (
+            <>
+              <header className="page-heading">
+                <div>
+                  <h1>Your account</h1>
+                  <p>{staff.email}</p>
+                </div>
+              </header>
+              <PasswordForm
+                request={api}
+                onError={sessionFailure}
+                onDone={async () => setStaff((await api("/staff/me")) as Staff)}
+              />
+            </>
           ) : view !== "knowledge" ? (
             <Admissions
               key={view}
@@ -526,6 +580,8 @@ export default function Knowledge() {
               request={api}
               onError={sessionFailure}
               initialLead={inquiryFocus}
+              admin={staff.role === "admin"}
+              onDeleted={() => setInquiryFocus(null)}
             />
           ) : (
             <>

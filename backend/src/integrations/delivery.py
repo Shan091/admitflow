@@ -9,7 +9,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import or_, select, update
 
 from src.core.security import decrypt_pii
-from src.db.models import IntegrationEvent, WebhookDelivery, WebhookEndpoint
+from src.db.models import IntegrationEvent, Lead, WebhookDelivery, WebhookEndpoint
 from src.db.session import get_sessionmaker
 from src.integrations.transport import post_event
 
@@ -23,6 +23,29 @@ async def deliver(tenant_id: uuid.UUID, delivery_id: uuid.UUID) -> None:
     lease = uuid.uuid4()
     sessions = get_sessionmaker()
     async with sessions() as db:
+        subject = (
+            await db.execute(
+                select(IntegrationEvent.lead_id)
+                .join(
+                    WebhookDelivery,
+                    (WebhookDelivery.event_id == IntegrationEvent.id)
+                    & (WebhookDelivery.tenant_id == IntegrationEvent.tenant_id),
+                )
+                .where(WebhookDelivery.id == delivery_id, WebhookDelivery.tenant_id == tenant_id)
+            )
+        ).first()
+        if subject is None:
+            return
+        if (
+            subject.lead_id is not None
+            and await db.scalar(
+                select(Lead.id)
+                .where(Lead.tenant_id == tenant_id, Lead.id == subject.lead_id)
+                .with_for_update()
+            )
+            is None
+        ):
+            return
         row = await db.scalar(
             select(WebhookDelivery)
             .where(WebhookDelivery.id == delivery_id, WebhookDelivery.tenant_id == tenant_id)
