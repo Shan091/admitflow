@@ -7,7 +7,13 @@ import pytest
 from sqlalchemy import select, update
 
 from src.core.security import encrypt_pii
-from src.db.models import ConversationEvent, ConversationReply, OutboundMessage, TelegramBot
+from src.db.models import (
+    ConversationEvent,
+    ConversationReply,
+    IntegrationEvent,
+    OutboundMessage,
+    TelegramBot,
+)
 from src.engine.contracts import Reply
 from src.telegram import outbound, service
 from src.telegram.adapter import TelegramAPIError, TelegramClient
@@ -107,6 +113,16 @@ def test_outbound_dedup_claims_order_and_uncertainty(
         async with journey["sessions"]() as db:
             stored = await db.get(OutboundMessage, second)
             assert stored.status == "uncertain" and stored.attempts == 1
+            notifications = (
+                await db.scalars(
+                    select(IntegrationEvent).where(
+                        IntegrationEvent.tenant_id == tenant,
+                        IntegrationEvent.lead_id == lead_id,
+                        IntegrationEvent.notification == "delivery",
+                    )
+                )
+            ).all()
+            assert len(notifications) == 1
             third = await outbound.enqueue_outbound(
                 db,
                 tenant_id=tenant,

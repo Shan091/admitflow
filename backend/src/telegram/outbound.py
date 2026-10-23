@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
 
 from src.core.security import decrypt_pii, encrypt_pii
+from src.db.audit import write_audit_log
 from src.db.enums import PaymentStatus
 from src.db.models import (
     ConversationEvent,
@@ -153,6 +154,14 @@ async def send_outbound(message_id: uuid.UUID) -> None:
         ).first()
         if routing is None:
             message.status, message.error_code = "failed", "routing_unavailable"
+            await write_audit_log(
+                db,
+                tenant_id=lead.tenant_id,
+                lead_id=lead.id,
+                actor="telegram-delivery",
+                action="delivery.attention",
+                details={"outbound_id": str(message.id)},
+            )
             await db.commit()
             return
         identity, bot = routing
@@ -189,7 +198,7 @@ async def send_outbound(message_id: uuid.UUID) -> None:
     except Exception:
         state, error = "uncertain", "delivery_unknown"
     async with sessions() as db:
-        await db.execute(
+        delivered = await db.execute(
             update(OutboundMessage)
             .where(
                 OutboundMessage.id == message_id,
@@ -202,7 +211,17 @@ async def send_outbound(message_id: uuid.UUID) -> None:
                 telegram_message_id=message_reference,
                 next_attempt_at=next_attempt,
             )
+            .returning(OutboundMessage.id)
         )
+        if delivered.first() and state in {"failed", "uncertain"}:
+            await write_audit_log(
+                db,
+                tenant_id=tenant_id,
+                lead_id=lead_id,
+                actor="telegram-delivery",
+                action="delivery.attention",
+                details={"outbound_id": str(message_id)},
+            )
         if state == "sent":
             await db.execute(
                 update(Lead)
@@ -237,14 +256,24 @@ async def recover_outbound() -> None:
     from src.tasks.outbound import send_outbound_message
 
     async with get_sessionmaker()() as db:
-        await db.execute(
+        interrupted = await db.execute(
             update(OutboundMessage)
             .where(
                 OutboundMessage.status == "sending",
                 OutboundMessage.updated_at < datetime.now(UTC) - timedelta(seconds=90),
             )
             .values(status="uncertain", error_code="worker_interrupted")
+            .returning(OutboundMessage.tenant_id, OutboundMessage.lead_id, OutboundMessage.id)
         )
+        for tenant_id, lead_id, message_id in interrupted:
+            await write_audit_log(
+                db,
+                tenant_id=tenant_id,
+                lead_id=lead_id,
+                actor="telegram-recovery",
+                action="delivery.attention",
+                details={"outbound_id": str(message_id)},
+            )
         ids = list(
             (
                 await db.scalars(

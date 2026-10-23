@@ -62,7 +62,11 @@ def require_browser_write(request: Request) -> None:
 
 
 async def require_staff(request: Request, db: Db) -> StaffUser:
-    token = request.cookies.get(COOKIE, "")
+    return await session_user(db, request.cookies.get(COOKIE, ""))
+
+
+async def session_user(db: AsyncSession, token: str) -> StaffUser:
+    """Shared HTTP/WebSocket authentication, rechecked for every socket snapshot."""
     if not token or len(token) > 200:
         raise HTTPException(401, "Sign in to your institution workspace.")
     staff = await db.scalar(
@@ -88,7 +92,7 @@ Staff = Annotated[StaffUser, Depends(require_staff)]
 
 def require_admin(staff: StaffUser) -> None:
     if staff.role != StaffRole.ADMIN:
-        raise HTTPException(403, "Only institution administrators can change documents.")
+        raise HTTPException(403, "This action requires an institution administrator.")
 
 
 class Login(BaseModel):
