@@ -19,6 +19,15 @@ async def seed() -> None:
     code = get_settings().telegram_institution_code
     async with get_sessionmaker()() as db:
         institution = await db.scalar(select(Institution).where(Institution.slug == code))
+        if institution and await db.scalar(
+            select(Course.id)
+            .where(Course.tenant_id == institution.id, Course.is_reference.is_(True))
+            .limit(1)
+        ):
+            await db.rollback()
+            await get_engine().dispose()
+            print("Published reference catalogue exists; synthetic seeding was skipped.")
+            return
         if institution is None:
             institution = Institution(name="AdmitFlow Demo Institute", slug=code)
             db.add(institution)

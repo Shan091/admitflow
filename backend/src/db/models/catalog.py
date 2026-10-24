@@ -38,6 +38,10 @@ class Course(IdMixin, TenantMixin, TimestampMixin, Base):
     # and the amount comes from the DB, never the LLM (ADR-006).
     application_fee: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_reference: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    reference_url: Mapped[str | None] = mapped_column(String(1024))
 
     institution: Mapped[Institution] = relationship(back_populates="courses")
     batches: Mapped[list[Batch]] = relationship(

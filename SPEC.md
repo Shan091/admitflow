@@ -294,6 +294,16 @@ deadline updates. These are tracked tasks, not reasons to add unnecessary servic
 
 ## Adaptive course guidance (Task 61)
 
+### Published programme references (Task 65 / ADR-016)
+
+Publicly listed programmes support guidance without fabricated intake records.
+Mark them as references with official source URLs. Keep live eligibility, fees,
+capacity and application authorization unverified. Do not select an admissions
+intake, collect applications or create payments for references. The dashboard and
+fee replies show unknown fees as unverified. Existing configured admissions offerings
+retain their behavior. The JAIN Kochi snapshot and transactional local reset follow
+ADR-016; preserve access/bot configuration and prevent synthetic reseeding.
+
 ### Supportive interaction (Task 63)
 
 Task 64 refinement: routine discovery, catalogue browsing, uncertainty and successful

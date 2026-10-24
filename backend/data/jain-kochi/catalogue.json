@@ -1,0 +1,660 @@
+{
+  "institution": "JAIN (Deemed-to-be University), Kochi",
+  "mode": "published-reference-only",
+  "discovery_provider": "SerpAPI",
+  "retrieved_on": "2026-10-24",
+  "homepage": "https://www.jainuniversity.ac.in/kochi/",
+  "contact": {
+    "address": "Knowledge Park, Nirmal Infopark, Kakkanad, Kochi - 682042, Kerala",
+    "phone": "0484 435 5555",
+    "email": "enquiry.kochi@jainuniversity.ac.in"
+  },
+  "limitations": [
+    "Published programme options are not confirmation of current intake or available seats.",
+    "Eligibility summaries do not replace the full university admissions rules or constitute an approval.",
+    "Current fees and application processing are unverified; no fee or seat records are invented.",
+    "This is an independent public-information demonstration, not an official university admissions channel."
+  ],
+  "programmes": [
+    {
+      "name": "BCom — Certified Program in General Management",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) (Regular)",
+      "overview": "This Bachelor of Commerce program with a Certified Programme in General Management covers management, marketing, finance, HR, and entrepreneurship. The fourth year offers an honours specialization focusing on research, analytical skills, technology, and global commerce understanding.",
+      "published_eligibility": "Applicants must have passed 10+2 in Science or Commerce from recognized boards or equivalent as per university norms. Honours with Research requires a minimum GPA.",
+      "published_duration": "3 years for degree; 4 years for Honours/Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bcom-colleges-in-general-management-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — Certified Program in Entreprenuership & Business Management",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) (Regular)",
+      "overview": "The Bachelor of Commerce with Certified Programme in Entrepreneurship & Business Management prepares students for small business ventures, integrating theory and practice. The fourth year honours specialization enhances business management skills with emphasis on research, analytics, and technology.",
+      "published_eligibility": "Minimum qualification is passing 10+2 in Science or Commerce from recognized boards or equivalent as per university norms. Honours with Research requires minimum GPA.",
+      "published_duration": "3 years for degree; 4 years for Honours/Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bachelor-of-commerce-colleges-in-entrepreneurship-and-business-management-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — Certified Program in Capital Markets",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) (Regular)",
+      "overview": "This Bachelor of Commerce with Certified Programme in Capital Markets educates students on stocks, securities, and financial markets. The fourth year honours specialization deepens knowledge with focus on research, analytics, technology, and global commerce domains.",
+      "published_eligibility": "Applicants must have passed 10+2 in Science or Commerce from recognized boards or equivalent as per university norms. Honours with Research requires minimum GPA.",
+      "published_duration": "3 years for degree; 4 years for Honours/Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bcom-in-capital-market-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — Business Analytics Integrated with Institute of Analytics (IoA - UK)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) with Global Qualification",
+      "overview": "The Bachelor of Commerce with Business Analytics integrated with Institute of Analytics (IoA-UK) teaches data analysis, programming (Python, R), and strategic decision-making. The fourth year honours specialization enhances business management competence with research and technology focus.",
+      "published_eligibility": "Pass in 10+2 in Science or Commerce from recognized boards or equivalent as per university norms. Honours with Research requires minimum GPA. Exit options available after first and second years per NEP.",
+      "published_duration": "3 years for degree; 4 years for Honours/Honours with Research; course starts Aug 2026.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bcom-in-business-and-analytics-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — Logistics and Supply Chain Management in association with Chartered Institute of Procurement and Supply (CIPS - UK)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) with Global Qualification",
+      "overview": "This Bachelor of Commerce program in Logistics and Supply Chain Management at JAIN University Kochi, in partnership with CIPS UK, covers product delivery processes, management, international trade, and supply chain management, combining theory and practical applications for global business practices.",
+      "published_eligibility": "Applicants must have passed 10+2 in Science or Commerce from recognized boards or equivalent as per university norms. Honours with Research requires a minimum GPA.",
+      "published_duration": "3 years for Degree; 4 years for Honours / Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bcom-logistics-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — International Finance and Accounting Integrated with Association of Chartered Certified Accountants (ACCA - UK)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) with Global Qualification",
+      "overview": "The Bachelor of Commerce in International Finance and Accounting at JAIN University Kochi integrates ACCA UK standards, covering fundamentals to professional levels in finance and accounting, with emphasis on SMEs, emerging economies, and sustainable practices.",
+      "published_eligibility": "Minimum qualification is passing 10+2 in Science or Commerce from recognized boards or equivalent. Honours with Research requires a minimum GPA.",
+      "published_duration": "3 years for Degree; 4 years for Honours / Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bcom-international-accounting-and-finance-with-acca-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — Risk Management Integrated with Chartered Institute of Management Accountant (CIMA-UK)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) with Global Qualification",
+      "overview": "JAIN University's Bachelor of Commerce in Risk Management at Kochi integrates CIMA UK qualification, covering business subjects and advanced risk management topics, with options for research and preparation for CIMA exams and global networking.",
+      "published_eligibility": "Pass in 10+2 in Science or Commerce from recognized boards or equivalent as per university norms. Honours with Research requires a minimum GPA.",
+      "published_duration": "3 years for Degree; 4 years for Honours / Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bachelor-of-commerce-colleges-in-risk-management-integrated-with-cima-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — Corporate Accounting Integrated with Certified Management Accountants (US CMA)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) with Global Qualification",
+      "overview": "The Bachelor of Commerce in Corporate Accounting at JAIN University Kochi integrates US CMA certification, focusing on accounting, auditing, taxation, and corporate finance, with practical learning through case studies and projects, and an advanced Honours year.",
+      "published_eligibility": "Pass in 10+2 in Science or Commerce from recognized boards or equivalent as per university norms. Honours with Research requires a minimum GPA.",
+      "published_duration": "3 years for Degree; 4 years for Honours / Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bcom-with-cma-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BCom — Financial Technologies",
+      "level": "undergraduate",
+      "degree": "Bachelor of Commerce (Honours / Honours with Research) with Global Qualification",
+      "overview": "JAIN University Kochi offers a Bachelor of Commerce with Honours or Honours with Research in Financial Technologies, integrating finance and technology knowledge. The program includes collaboration with AICPA, Zerodha, and Paytm, covering fintech curriculum and certifications, with a specialized fourth year focusing on research and global commerce.",
+      "published_eligibility": "Completion of 10+2 in Science or Commerce from recognized boards like PUC, ISC, CBSE, or equivalent. Honours with Research requires minimum GPA as per university norms.",
+      "published_duration": "3 years for Degree; 4 years for Honours / Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-bcom-financial-accounting-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "MCom — Business Studies",
+      "level": "postgraduate",
+      "degree": "Master of Commerce (Regular)",
+      "overview": "The Master of Commerce (Regular) in Business Studies is a two-year postgraduate course focusing on accounting, finance, marketing, and business analytics. It includes project-centric learning and prepares students for careers in commerce sectors or academic research, with opportunities for specialization and industry exposure.",
+      "published_eligibility": "Bachelor's degree in Commerce, Accounting, or Management with at least 50% marks from a recognized university.",
+      "published_duration": "2 years.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-mcom-business-studies-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "MCom — Accounting and Taxation",
+      "level": "postgraduate",
+      "degree": "Master of Commerce (Regular)",
+      "overview": "Master of Commerce (Regular) in Accounting and Taxation is a two-year postgraduate program emphasizing accounting principles, taxation laws, and practical skills like corporate restructuring and tax planning. It includes project-based learning to develop research and analytical skills for diverse career opportunities.",
+      "published_eligibility": "Bachelor's degree in Commerce, Accounting, or Management with minimum 50% marks from a recognized university.",
+      "published_duration": "2 years.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-mcom-accounting-and-taxation-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "MCom — Finance and Technology",
+      "level": "postgraduate",
+      "degree": "Master of Commerce (Regular)",
+      "overview": "The Master of Commerce (Regular) in Finance and Technology is a two-year postgraduate program covering finance, technology, business analytics, and related fields. It offers specialization in Finance & Technology, with project-centric learning to enhance research and analytical skills, preparing students for dynamic commerce careers.",
+      "published_eligibility": "Bachelor's degree in Commerce, Accounting, or Management with at least 50% marks from a recognized university.",
+      "published_duration": "2 years.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-mcom-finance-and-technology-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "MCom — Entrepreneurship",
+      "level": "postgraduate",
+      "degree": "Master of Commerce (Regular)",
+      "overview": "The Master of Commerce (M.Com) in Entrepreneurship is a two-year postgraduate course focusing on commerce sectors like accounting, banking, and financial services. It emphasizes project-centric learning and prepares students for business management, research, and teaching careers.",
+      "published_eligibility": "Bachelor's degree in Commerce, Accounting, or Management with at least 50% marks from a recognized university.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-mcom-entrepreneurship-development-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "MCom — International Finance and Accounting Accredited and Integrated with ACCA - UK",
+      "level": "postgraduate",
+      "degree": "Master of Commerce with Global Qualification",
+      "overview": "This two-year M.Com program integrates international finance and accounting with the ACCA UK qualification. It covers fundamentals to professional levels, focusing on SMEs, emerging economies, and sustainable business practices, enhancing skills in finance, accounting, and research.",
+      "published_eligibility": "Pass in 10+2 examination in Science or Commerce from recognized boards or equivalent as per university norms.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/commerce/best-commerce-college-in-international-finance-and-accounting-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/commerce-programs.php"
+    },
+    {
+      "name": "BBA — BBA ( Finance / Marketing / HR )",
+      "level": "undergraduate",
+      "degree": "Bachelor of Business Administration (Honours / Honours with Research) (Regular)",
+      "overview": "The Bachelor of Business Administration (BBA) offers foundational business and management education with specializations in Finance, Marketing, or HR. It combines theory, practical experience, and soft skills development, preparing students for ethical and global business challenges.",
+      "published_eligibility": "Pass in 10+2 examination in Science, Commerce, or Arts from recognized boards.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-bba-finance-marketing-hr-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "BBA — Business Analytics",
+      "level": "undergraduate",
+      "degree": "Bachelor of Business Administration (Honours / Honours with Research) (Regular)",
+      "overview": "The BBA in Business Analytics is a four-year program combining business fundamentals, mathematics, and analytics training. It includes real-world projects and internships to prepare students for data-driven decision-making and operational efficiency in business.",
+      "published_eligibility": "Pass in 10+2 examination in Science, Commerce, or Arts from recognized boards.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-business-analytics-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "BBA — Travel and Tourism",
+      "level": "undergraduate",
+      "degree": "Bachelor of Business Administration (Honours / Honours with Research) (Regular)",
+      "overview": "This four-year Bachelor of Business Administration in Travel and Tourism at JAIN University Kochi combines business management fundamentals with specialized tourism knowledge, including a minor in aviation management. The curriculum emphasizes global perspectives and experiential learning through internships in travel-related sectors.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science, Commerce, or Arts from recognized boards such as HSE, ICSE, or CBSE.",
+      "published_duration": "4 years for Honours/Honours with Research; 3 years for Degree programme.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-bba-travel-tourism-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "BBA — Branding & Advertising",
+      "level": "undergraduate",
+      "degree": "Bachelor of Business Administration (Honours / Honours with Research) (Regular)",
+      "overview": "The four-year Bachelor of Business Administration in Branding and Advertising at JAIN University Kochi integrates core business principles with specialized branding and advertising knowledge. The program emphasizes experiential learning through projects and internships with advertising agencies, focusing on consumer psychology and market trends.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science, Commerce, or Arts from recognized boards such as PUC, ISC, or CBSE.",
+      "published_duration": "4 years for Honours/Honours with Research; 3 years for Degree programme.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-bba-brading-advertising-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "BBA — Sports Management",
+      "level": "undergraduate",
+      "degree": "Bachelor of Business Administration (Honours / Honours with Research) (Regular)",
+      "overview": "The Bachelor of Business Administration in Sports Management at JAIN University Kochi prepares students for management roles in sports and recreation industries. The program includes experiential learning, industry mentoring, event management projects, and practical training through simulations and interactions with sports professionals.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science, Commerce, or Arts from recognized boards such as PUC, ISC, or CBSE.",
+      "published_duration": "4 years for Honours/Honours with Research; 3 years for Degree programme.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-bba-in-sports-management-colleges-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "BBA — Digital Business",
+      "level": "undergraduate",
+      "degree": "Bachelor of Business Administration (Honours / Honours with Research) (Regular)",
+      "overview": "The Bachelor of Business Administration in Digital Business at JAIN University Kochi addresses the growing importance of digital technologies in business. The program offers a comprehensive curriculum to equip students with skills to navigate the digital economy and support organizational digital transformation.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science, Commerce, or Arts from recognized boards such as PUC, ISC, or CBSE.",
+      "published_duration": "Unverified.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/digital-business-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "BBA — Finance & Accounting With ACCA - UK",
+      "level": "undergraduate",
+      "degree": "Bachelor of Business Administration (Honours / Honours with Research) with Global Qualification",
+      "overview": "The Bachelor of Business Administration in Finance and Accounting with ACCA at JAIN University Kochi is a four-year program designed to develop skills in managing corporate finance, including investing, insurance, financial planning, and taxation, preparing students for entry-level finance roles.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science, Commerce, or Arts from recognized boards such as PUC, ISC, or CBSE.",
+      "published_duration": "4 years for Honours/Honours with Research; 3 years for regular degree",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-bba-in-finance-and-accounting-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "MBA — Marketing and Finance",
+      "level": "postgraduate",
+      "degree": "Master of Business Administration (Dual Specialization)",
+      "overview": "The MBA with dual specialization in Marketing and Finance at JAIN University Kochi offers a curriculum combining core business principles with specialized courses in marketing and finance, emphasizing practical learning through case studies and industry interaction.",
+      "published_eligibility": "Candidates must hold a bachelor's degree with at least 50% aggregate and have cleared competitive exams like CAT, MAT, CMAT, XAT, NMAT, or GMAT.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-marketing-and-finance-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "MBA — Finance and Human Resource Management",
+      "level": "postgraduate",
+      "degree": "Master of Business Administration (Dual Specialization)",
+      "overview": "The MBA dual specialization in Finance and Human Resource Management at JAIN University Kochi is structured to meet industry needs, providing foundational business knowledge alongside specialized courses in HR and finance, with experiential learning components.",
+      "published_eligibility": "Applicants require a bachelor's degree with a minimum 50% aggregate and successful completion of exams such as CAT, MAT, CMAT, XAT, NMAT, or GMAT.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-finance-and-human-resource-management-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "MBA — Marketing and Human Resources Management",
+      "level": "postgraduate",
+      "degree": "Master of Business Administration (Dual Specialization)",
+      "overview": "The MBA dual specialization in Marketing and Human Resource Management at JAIN University Kochi integrates marketing strategies with HR practices, aiming to develop versatile leaders through a curriculum that includes core business and specialized courses with practical learning.",
+      "published_eligibility": "Candidates must have a bachelor's degree with at least 50% aggregate and have passed competitive exams like CAT, MAT, CMAT, XAT, NMAT, or GMAT.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/marketing-and-human-resource",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "MBA — International Finance & Accounting with ACCA - UK",
+      "level": "postgraduate",
+      "degree": "Master of Business Administration (Specialization)",
+      "overview": "This MBA program at JAIN University Kochi focuses on International Finance & Accounting, aligned with ACCA UK standards, offering exemptions for nine ACCA courses and integrating practical experience requirements.",
+      "published_eligibility": "Applicants need a bachelor's degree with at least 50% aggregate or equivalent, including final-year students. Entrance involves a written test, group discussion, and interview; valid CAT/MAT/XAT/ATMA/CMAT/GMAT scores waive the written test.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-mba-in-international-finance-accounting-accredited-by-acca-uk-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "MBA — Business Analytics - IoA - UK",
+      "level": "postgraduate",
+      "degree": "Master of Business Administration (Specialization)",
+      "overview": "The two-year MBA in Business Analytics at JAIN University Kochi, accredited by IoA UK, covers data mining, analysis, visualization, and foundational business topics, emphasizing practical training and leadership development in analytics.",
+      "published_eligibility": "Applicants require a bachelor's degree with a minimum 50% aggregate or equivalent, including final-year students. Admission includes a written test, group discussion, and interview; valid CAT/MAT/XAT/ATMA/CMAT/GMAT scores exempt the written test.",
+      "published_duration": "Two years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/management/best-business-analytics-with-ioa-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/management-programs.php"
+    },
+    {
+      "name": "BA — Psychology, Communicative English, and Human Resource & Employee Relations",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts (Honours / Honours with Research)",
+      "overview": "The BA (Honours/Honours with Research) at JAIN University Kochi integrates Psychology, Communicative English, and Human Resource Management with Employee Relations, combining classroom learning, internships, and fieldwork aligned with NEP guidelines.",
+      "published_eligibility": "Candidates must have completed 10+2 in Arts, Commerce, or Science from a recognized board or equivalent.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ba-psychology-colleges-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "BA — Economics",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts (Honours / Honours with Research)",
+      "overview": "JAIN University Kochi offers a BA (Honours/Honours with Research) in Economics, covering core and elective courses with specializations and practical exposure, preparing students for competitive exams and collaborations with industry and research bodies.",
+      "published_eligibility": "Applicants must have completed 10+2 in Arts, Commerce, or Science from a recognized board or equivalent.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ba-economics-colleges-in-Kochi-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "BA — Economics and Public Policy",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts (Honours / Honours with Research)",
+      "overview": "The BA in Economics and Public Policy at Jain University Kochi integrates economics fundamentals with public policy, covering liberal arts and quantitative methods. It emphasizes leadership, analytical skills, and policy design, including private sector roles in development and policy analysis.",
+      "published_eligibility": "Applicants must have passed the 10+2 exam in Science, Commerce, or Arts from recognized boards such as PUC, ISC, or CBSE.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ba-economics-and-pubic-policy-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "BA — English",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts (Honours / Honours with Research)",
+      "overview": "The BA in English at Jain University Kochi focuses on literary study, critical analysis, and theoretical approaches across periods. It includes skill enhancement, electives, and project-based learning, with opportunities for internships and international exposure.",
+      "published_eligibility": "Applicants must have passed the 10+2 exam in Arts, Commerce, or Science from recognized boards such as HSC, PUC, ISC, or CBSE.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ba-english-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "BA — Journalism and Mass communication",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts (Professional)",
+      "overview": "The BA (Professional) in Journalism and Mass Communication at Jain University Kochi covers media topics like digital media, news reporting, advertising, and film studies. It includes practical skills and internships, preparing students for careers in journalism, broadcasting, and public relations.",
+      "published_eligibility": "Applicants must have passed the 10+2 exam in Science, Commerce, or Arts from recognized boards such as PUC, ISC, or CBSE.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ba-journalism-and-mass-communication-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "MA — English",
+      "level": "postgraduate",
+      "degree": "Master of Arts",
+      "overview": "The MA in English at Jain University Kochi is a two-year postgraduate program focusing on creative and critical reasoning, literary theory, and research. It aims to develop analytical skills, research aptitude, and literary composition abilities.",
+      "published_eligibility": "Applicants must hold an undergraduate degree with at least 50% aggregate marks from any recognized university in India or abroad.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ma-english-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "MA — Economics",
+      "level": "postgraduate",
+      "degree": "Master of Arts",
+      "overview": "The MA Economics program at JAIN University Kochi focuses on economic theories, applications, and research using statistical and econometric tools. It aims to develop analytical, creative, and problem-solving skills with an emphasis on practical implications and preparation for competitive exams like UPSC.",
+      "published_eligibility": "Applicants must have an undergraduate degree with at least 50% aggregate marks from a recognized university in India or abroad.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ma-economics-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "MA — Journalism and Mass communication",
+      "level": "postgraduate",
+      "degree": "Master of Arts",
+      "overview": "The MA in Journalism and Mass Communication at JAIN University Kochi covers media theories, advertising, public relations, photojournalism, and various media production techniques. The program combines theoretical knowledge with practical training, including internships, to prepare students for diverse media careers.",
+      "published_eligibility": "Candidates need a bachelor's degree with a minimum of 50% marks from a recognized university; final year students may also apply.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences/best-ma-mass-media-and-communication-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/humanities-and-social-sciences.php"
+    },
+    {
+      "name": "BSc — Psychology",
+      "level": "undergraduate",
+      "degree": "Bachelor of Science (Honours / Honours with Research)",
+      "overview": "The B.Sc. Psychology program at JAIN University Kochi offers a multidisciplinary study of human behavior, covering cognitive, social, clinical, and other psychology fields. It emphasizes practical experience through internships and research projects, fostering critical thinking and autonomous learning.",
+      "published_eligibility": "Pass in 10+2 examination in Science or Commerce from recognized boards; for Honours with Research, a minimum CGPA of 7.5 is required.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-bsc-psychology-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BSc — Marine Science",
+      "level": "undergraduate",
+      "degree": "Bachelor of Science (Honours / Honours with Research)",
+      "overview": "The B.Sc. Marine Science program at JAIN University Kochi explores ocean sciences including biology, chemistry, physics, and ecology. It integrates theoretical and practical learning with opportunities for research and skill development aligned with national and international marine initiatives.",
+      "published_eligibility": "Pass in 10+2 Science with Physics, Chemistry, and Biology from recognized boards; Honours with Research requires minimum CGPA of 7.5.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-marine-science-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BSc — Applied Forensic Science",
+      "level": "undergraduate",
+      "degree": "Bachelor of Science (for Professional Course)",
+      "overview": "This Bachelor of Science in Applied Forensic Science at JAIN University Kochi integrates theoretical and practical training across various forensic disciplines, including crime scene investigation and cyber forensics, with laboratory work and internships.",
+      "published_eligibility": "Applicants must have passed the 10+2 Science examination from PUC/ISC/CBSE or an equivalent board recognized by the University.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-bsc-forensic-science-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BSc — Interior Design",
+      "level": "undergraduate",
+      "degree": "Bachelor of Science (for Professional Course)",
+      "overview": "The B.Sc in Interior Design at JAIN University Kochi is a three-year program combining design theory and practical skills, allowing specialization in residential, commercial, or blended design, with project-based learning and internships.",
+      "published_eligibility": "Completion of 10+2 in Science, Commerce, or Humanities from PUC/ISC/CBSE or an equivalent board recognized by the University is required.",
+      "published_duration": "3 years for Degree; 4 years for Honours/Honours with Research.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-bsc-interior-design-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BSc — Data Science & Analytics",
+      "level": "undergraduate",
+      "degree": "Bachelor of Science (Honours / Honours with Research) with Global Certification",
+      "overview": "This Bachelor of Science (Honours/Honours with Research) in Data Science and Analytics at JAIN University Kochi includes global certification and membership with the Institute of Analytics (IoA-UK), focusing on data interpretation, research, and scientific problem-solving.",
+      "published_eligibility": "Applicants must have passed 10+2 in Science or Commerce with Mathematics or Statistics, and clear an entrance exam and personal interview as per University requirements.",
+      "published_duration": "Unverified.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-bsc-data-science-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "MSc — Psychology (Psychological Counselling/Clinical Psychology/Industrial Psychology)",
+      "level": "postgraduate",
+      "degree": "Master of Science",
+      "overview": "The Master of Science in Psychology at JAIN University Kochi covers clinical, counselling, industrial, and child/adolescent psychology, focusing on human behavior theories, psychological research methods, and counselling strategies.",
+      "published_eligibility": "Minimum 50% marks in the relevant bachelor's degree from a recognized university; final year bachelor's students may also apply.",
+      "published_duration": "2 years.",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/psychology-psychological-counsellingclinical-psychologyindustrial-psychology",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "MSc — Data Science & Analytics",
+      "level": "postgraduate",
+      "degree": "Master of Science",
+      "overview": "The M.Sc. in Data Science and Analytics at JAIN University Kochi covers traditional and emerging data science areas, including data engineering, analysis, social data, and big data, preparing students for roles like data engineer, scientist, or analyst.",
+      "published_eligibility": "Applicants need at least 50% in graduation in specified fields and must pass an entrance exam and interview; programming knowledge is required.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-msc-data-science-and-analytics-courses-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "MSc — Forensic Science",
+      "level": "postgraduate",
+      "degree": "Master of Science",
+      "overview": "The M.Sc. in Forensic Science at JAIN University Kochi focuses on applying scientific methods to crime investigation and human anatomy, teaching students to collect and analyze forensic evidence for judicial use.",
+      "published_eligibility": "Minimum 50% in bachelor's degree or any Life Science UG course; final year students may apply.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/forensic-science-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BCA — BCA - Electives",
+      "level": "undergraduate",
+      "degree": "Bachelor of Computer Application (BCA-Electives)",
+      "overview": "The BCA (Electives) at JAIN University Kochi is a 3 or 4-year undergraduate program emphasizing computer applications, software security, and practical skills, including CompTIA Server+ certification, preparing students for software industry roles.",
+      "published_eligibility": "Pass in 10+2 Science or Commerce with Maths/Statistics/Computer Science/Information Practice from recognized boards.",
+      "published_duration": "3 or 4 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-bachelor-of-computer-science-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BCA — Artificial Intelligence",
+      "level": "undergraduate",
+      "degree": "Bachelor of Computer Application (BCA - Specialization)",
+      "overview": "The BCA (Specialization) in Artificial Intelligence at JAIN University Kochi provides foundational computer science knowledge and AI-specific skills, including programming in Python and R, and hands-on experience with AI frameworks and projects.",
+      "published_eligibility": "Completion of 10+2 in Science or Commerce with Maths, Statistics, Computer Science, or Information Practice from recognized boards.",
+      "published_duration": "4 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-bca-artificial-intellegence-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BCA — Cybersecurity",
+      "level": "undergraduate",
+      "degree": "Bachelor of Computer Application (BCA - Specialization)",
+      "overview": "The Bachelor of Computer Application (BCA) with Cybersecurity specialization at JAIN University Kochi focuses on skills to protect networks and systems from cyber threats, teaching programming languages like Python and C++, and tools for penetration testing and ethical hacking.",
+      "published_eligibility": "Completion of 10+2 in Science or Commerce with Mathematics, Statistics, Computer Science, or Information Practice from recognized boards or equivalent.",
+      "published_duration": "3 or 4 years (Honours) as specified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/bca-cyber-security-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BCA — Data Analytics",
+      "level": "undergraduate",
+      "degree": "Bachelor of Computer Application (BCA - Specialization)",
+      "overview": "The BCA with Data Analytics specialization at JAIN University Kochi covers data representation, mining, visualization, and management, preparing students with technical skills for data-driven decision-making in modern environments.",
+      "published_eligibility": "Pass in 10+2 Science or Commerce with Maths, Statistics, Computer Science, or Information Practice from recognized boards or equivalent.",
+      "published_duration": "3 or 4 years (Honours) as specified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-bca-data-analytics-courses-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "MCA — MCA with Electives",
+      "level": "postgraduate",
+      "degree": "Master of Computer Applications (MCA - Electives)",
+      "overview": "The Master of Computer Applications (MCA) with Electives at JAIN University Kochi is a postgraduate program designed to provide advanced knowledge and skills in core and emerging IT areas for career readiness in the evolving IT industry.",
+      "published_eligibility": "Bachelor's degree in BCA, Computer Science Engineering, or equivalent; or B.Sc./B.Com./B.A. with Mathematics at 10+2 or graduation level; minimum 50% marks (45% for reserved categories); entrance exam and interview required.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-mca-electives-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "MCA — Artificial Intelligence (AI) and Machine Learning (ML)",
+      "level": "postgraduate",
+      "degree": "Master of Computer Application (MCA - Specialization)",
+      "overview": "The MCA with specialization in Artificial Intelligence and Machine Learning at JAIN University Kochi prepares students for careers in AI-driven data analytics, emphasizing real-time analytics, explainability, and ethical AI use across industries.",
+      "published_eligibility": "Bachelor's degree in BCA, Computer Science Engineering, or equivalent; or B.Sc./B.Com./B.A. with Mathematics at 10+2 or graduation level; minimum 50% marks (45% for reserved categories); entrance exam and interview required.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-mca-artificial-intelligence-and-machine-learning-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "MCA — Cyber Security",
+      "level": "postgraduate",
+      "degree": "Master of Computer Application (MCA - Specialization)",
+      "overview": "The MCA with Cyber Security specialization at JAIN University Kochi is a postgraduate program focusing on practical skills to identify vulnerabilities and implement security measures against cyber threats, combining theoretical and applied knowledge.",
+      "published_eligibility": "Unverified eligibility details; not explicitly stated in the source text.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/science/best-mca-cyber-security-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/sciences-programs.php"
+    },
+    {
+      "name": "BTech — Computer Science & Engineering",
+      "level": "undergraduate",
+      "degree": "Bachelor of Technology (B.Tech)",
+      "overview": "The B.Tech in Computer Science & Engineering at JAIN University Kochi covers a broad curriculum including AI, machine learning, data science, networking, and security, aiming to develop technical and collaborative skills.",
+      "published_eligibility": "Pass PUC/10+2 with Physics and Mathematics compulsory, plus Chemistry/Computer Science/Electronics; minimum 60% marks (55% for SC/ST) in these subjects combined.",
+      "published_duration": "4 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/engineering-technology/best-private-engineering-colleges-in-kerala-for-computer-science",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-engineering-and-technology-college-in-kerala.php"
+    },
+    {
+      "name": "BTech — Computer Science & Engineering - Artificial Intelligence (AI) and Machine Learning (ML)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Technology (B.Tech)",
+      "overview": "The B.Tech in Computer Science & Engineering with AI and Machine Learning at JAIN University Kochi prepares students for Industry 5.0 technologies using project-based learning and includes machine learning certifications.",
+      "published_eligibility": "Pass PUC/10+2 with Physics and Mathematics compulsory, plus Chemistry/Computer Science/Electronics; minimum 60% marks (55% for SC/ST) in these subjects combined.",
+      "published_duration": "4 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/engineering-technology/best-engineering-colleges-in-kerala-for-computer-science",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-engineering-and-technology-college-in-kerala.php"
+    },
+    {
+      "name": "BTech — Computer Science & Engineering - Data Science",
+      "level": "undergraduate",
+      "degree": "Bachelor of Technology (B.Tech)",
+      "overview": "The B.Tech in Computer Science & Engineering with Data Science at JAIN University Kochi emphasizes fundamental concepts and practical experience in data analysis and interpretation to prepare students for data-driven roles.",
+      "published_eligibility": "Pass PUC/10+2 with Physics and Mathematics compulsory, plus Chemistry/Computer Science/Electronics; minimum 60% marks (55% for SC/ST) in these subjects combined.",
+      "published_duration": "4 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/engineering-technology/best-computer-science-engineering-data-science-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-engineering-and-technology-college-in-kerala.php"
+    },
+    {
+      "name": "BDes — Communication Design",
+      "level": "undergraduate",
+      "degree": "Bachelor of Design",
+      "overview": "The Bachelor of Design in Communication Design at JAIN University Kochi is a four-year program focusing on developing creative and design skills for visual communication careers.",
+      "published_eligibility": "Applicants must have completed 10+2 or equivalent with at least 50% in Arts, Science, or Commerce including English, or a 3-year Diploma, plus a UCEED rank or passing JET exam.",
+      "published_duration": "4 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-communication-design-college-in-kochi",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "BA — Communication Design (Animation and VFX)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts",
+      "overview": "The Bachelor of Arts in Communication Design (Animation and VFX) at JAIN University Kochi is an interdisciplinary program combining artistic creativity with technology, covering animation principles, VFX techniques, and practical projects.",
+      "published_eligibility": "Applicants need to have passed 10+2 in Science or Commerce or equivalent; Honours requires a minimum GPA as per university norms.",
+      "published_duration": "3 years for Degree, 4 years for Honours",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-communication-design-in-animation-and-VFX-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "BA — Communication Design (Graphic Design)",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts",
+      "overview": "The Bachelor of Arts in Communication Design (Graphic Design) at JAIN University Kochi is a four-year program emphasizing creative thinking and visual storytelling with options in print, digital, or hybrid design tracks.",
+      "published_eligibility": "Applicants must have passed 10+2 in Science or Commerce or equivalent; Honours requires a minimum GPA as per university norms.",
+      "published_duration": "4 years for Degree, 4 years for Honours",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-communication-design-in-graphic-design-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "BA — Communication Design (UI/UX) with a Certificate in Graphic Design",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts",
+      "overview": "The Bachelor of Arts in Communication Design (UI/UX) with a Certificate in Graphic Design at JAIN University Kochi integrates communication theory, UI/UX design, and graphic design with practical projects and ethical design considerations.",
+      "published_eligibility": "Applicants must have passed 10+2 in Science or Commerce or equivalent; Honours requires a minimum GPA as per university norms.",
+      "published_duration": "4 years for Degree, 4 years for Honours",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-ba-communication-design-in-UI-UX-with-graphic-design-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "BA — Interactive Game Art, Design and Development",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts",
+      "overview": "This undergraduate programme covers game art, design, and development, including digital illustration, 3D modelling, game mechanics, programming with tools like Unreal Engine, and emerging technologies such as AR and VR. It includes collaborative projects and specialisations to develop industry-relevant skills.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science or Commerce from recognized boards or equivalent as per university norms. Honours programmes require a minimum GPA.",
+      "published_duration": "4 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-game-art-and-design-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "BA — Fashion Design",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts",
+      "overview": "The Bachelor of Arts in Fashion Design combines theoretical and practical learning in design principles, textiles, fashion illustration, and trend forecasting. The first year focuses on foundational knowledge, progressing to advanced skills including computer-aided design and eco-conscious practices.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science or Commerce from recognized boards or equivalent as per university norms. Honours programmes require a minimum GPA.",
+      "published_duration": "3 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-ba-fashion-design-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "BA — Film and Media",
+      "level": "undergraduate",
+      "degree": "Bachelor of Arts",
+      "overview": "This programme offers study in film and media theory, history, and practical production skills such as screenwriting, cinematography, and editing. It includes media evaluation, film appreciation, and industry-related courses, culminating in a capstone media production project.",
+      "published_eligibility": "Applicants must have passed the 10+2 examination in Science or Commerce from recognized boards or equivalent as per university norms. Honours programmes require a minimum GPA.",
+      "published_duration": "3 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-ba-in-film-and-media-colleges-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "MA — Communication Design (Graphic Design)",
+      "level": "postgraduate",
+      "degree": "Master of Arts",
+      "overview": "The Master of Arts in Communication Design (Graphic Design) is a two-year programme focusing on visual communication theory and practice, including typography, layout, branding, UX design, and ethical considerations. It includes electives, internships, and a thesis project.",
+      "published_eligibility": "Applicants must hold a bachelor's degree with at least 50% marks from a recognized university as per university norms.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-masters-in-communication-design-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "MA — Communication Design (Animation and VFX)",
+      "level": "postgraduate",
+      "degree": "Master of Arts",
+      "overview": "This two-year Master's programme focuses on communication design with specialization in animation and visual effects, combining artistic and technical skills for roles in animation studios and film production. The curriculum covers 2D/3D animation, character design, motion graphics, CGI, and VFX compositing, including practical projects and internships.",
+      "published_eligibility": "Applicants must have at least 50% marks in a relevant bachelor's degree from a recognized university.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-master-communication-design-in-animation-and-vfx-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "MA — Fashion Design",
+      "level": "postgraduate",
+      "degree": "Master of Arts",
+      "overview": "A two-year postgraduate programme in fashion design emphasizing advanced design techniques, sustainable practices, and innovation. It prepares students for leadership and entrepreneurial roles in the fashion industry, integrating technology and emerging trends like the Metaverse.",
+      "published_eligibility": "Applicants require a minimum of 50% marks in the relevant bachelor's degree from a recognized university.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-masters-in-fashion-designing-course-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "MA — Film and Media",
+      "level": "postgraduate",
+      "degree": "Master of Arts",
+      "overview": "This Master's programme in Film and Media offers creative, technical, and entrepreneurial training for careers in film and digital media. The curriculum includes filmmaking fundamentals such as screenwriting, cinematography, editing, sound design, media management, and entrepreneurship, with practical internships and projects.",
+      "published_eligibility": "Applicants must have at least 50% marks in a relevant bachelor's degree from a recognized university.",
+      "published_duration": "Unverified",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-ma-film-and-media-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    },
+    {
+      "name": "MDes — User Experience Design",
+      "level": "postgraduate",
+      "degree": "Master of Design",
+      "overview": "A two-year Master of Design in User Experience Design focusing on practical projects, user research, prototype development, and user-centric design. The programme includes electives for specialization and requires portfolio review and interviews as part of the selection process.",
+      "published_eligibility": "Candidates must hold a 4-year degree with minimum 50% marks in Fine Arts, Applied Arts, or related fields, have studied English, and secure a valid CEED rank or pass the university's JET exam including portfolio review and interview.",
+      "published_duration": "2 years",
+      "source_url": "https://www.jainuniversity.ac.in/kochi/design/best-masters-of-design-user-experience-design-college-in-kerala",
+      "listing_url": "https://www.jainuniversity.ac.in/kochi/best-design-courses-in-kerala.php"
+    }
+  ]
+}

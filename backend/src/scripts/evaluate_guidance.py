@@ -145,6 +145,10 @@ async def evaluate() -> dict[str, object]:
         ]
         try:
             interpreted = await interpret_turn(scenario["text"], state, facts, rules, [])
+            # These scenarios have no selected course/intake. Production guide()
+            # falls through to guidance for a qualification intent in that state.
+            if interpreted.intent == "qualification":
+                interpreted.intent = "guidance"
             merge_evidence(
                 state, interpreted, scenario["text"], facts=facts, expected={"age": 18, "marks": 50}
             )
@@ -289,6 +293,8 @@ async def evaluate_dialogues() -> dict[str, object]:
                     for c in courses
                 ]
                 interpreted = await interpret_turn(message, state, facts, rules, history)
+                if interpreted.intent == "qualification":
+                    interpreted.intent = "guidance"
                 merge_evidence(
                     state, interpreted, message, facts=facts, expected={"age": 18, "marks": 50}
                 )

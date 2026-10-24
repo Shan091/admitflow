@@ -1,0 +1,120 @@
+{
+  "scope": "Authorized local dummy-data replacement with official JAIN Kochi reference information",
+  "source_fingerprint": "58d861acd2d23ef9606ae436b8ec5e3d19fb6c66305bd34532f693668533b067",
+  "discovery": {
+    "provider": "SerpAPI",
+    "credential_saved_only_in_ignored_env": true,
+    "department_listings": 6,
+    "detail_pages_fetched": 64,
+    "programme_options": 64,
+    "third_party_snippets_used_as_facts": false
+  },
+  "reset": {
+    "reset_committed": true,
+    "removed_rows": {
+      "payment_events": 0,
+      "conversation_replies": 35,
+      "webhook_deliveries": 0,
+      "payment_orders": 0,
+      "notification_receipts": 0,
+      "conversation_events": 35,
+      "telegram_identities": 2,
+      "outbound_messages": 1,
+      "messages": 0,
+      "lead_facts": 0,
+      "integration_events": 16,
+      "human_requests": 4,
+      "conversation_memories": 2,
+      "audit_logs": 498,
+      "applications": 1,
+      "leads": 3,
+      "qualification_rules": 17,
+      "knowledge_uploads": 2,
+      "document_chunks": 2,
+      "batches": 17,
+      "webhook_endpoints": 0,
+      "documents": 2,
+      "discount_codes": 10,
+      "courses": 15
+    },
+    "reference_programmes": 64,
+    "knowledge_documents": 65,
+    "admin_and_bot_configuration_preserved": true
+  },
+  "verified_database": {
+    "institution": "JAIN (Deemed-to-be University), Kochi — public-information demo",
+    "counts": {
+      "institutions": 1,
+      "reference_programmes": 64,
+      "batches": 0,
+      "leads": 0,
+      "applications": 0,
+      "staff_requests": 0,
+      "ready_documents": 65,
+      "chunks": 65,
+      "payment_orders": 0,
+      "staff_accounts": 1,
+      "bot_connections": 1
+    },
+    "old_synthetic_text_hits": 0,
+    "all_programmes_are_references": true,
+    "all_uploads_ready": true,
+    "budget_attempts": 0,
+    "budget_confirmed_sent": 0,
+    "razorpay_api_values_present": false,
+    "live_payments_enabled": false
+  },
+  "verification": {
+    "default_tests_passed": 313,
+    "strict_source_files": 127,
+    "postgresql_cases_passed": 121,
+    "redis_specific_cases_skipped": 2,
+    "final_focused_postgresql_cases_passed": 6,
+    "frontend_lint_and_build": true,
+    "reference_ui_test_passed": 1,
+    "viewport_widths": [
+      1440,
+      390
+    ],
+    "mechanical_ui_findings": 0,
+    "live_reference_guidance_and_rag_checks_passed": 3,
+    "live_test_messages_sent": 0,
+    "broader_live_guidance": {
+      "distinct_cases_passed": 13,
+      "total": 13,
+      "initial_sweep_passed": 11,
+      "targeted_follow_up_passed": 2,
+      "multi_turn_dialogues_passed": 3,
+      "single_all_pass_sweep": false,
+      "initial_failures_preserved": "GUIDANCE_EVALUATION_RESULTS.json"
+    }
+  },
+  "adversarial_review": {
+    "critical_or_important_findings_open": 0,
+    "checked": [
+      "local database and dummy-tenant reset guards",
+      "rollback and incomplete-embedding rejection",
+      "access and polling-state preservation",
+      "reference cannot approve eligibility or create applications/payments",
+      "unknown fee not displayed as free",
+      "tenant/course source scope",
+      "synthetic seeding cannot restore fake courses"
+    ]
+  },
+  "deferred": [
+    "Authorized public test ingress and actual provider test-card/webhook validation"
+  ],
+  "public_deployment_performed": false,
+  "publication_evidence": "The reviewed pull request and exact-head CI are recorded by GitHub; this file records local verification.",
+  "verified_database_note": "Database snapshot immediately after reset, before the owner supplied payment API values.",
+  "payment_configuration": {
+    "test_credentials_verified_read_only": true,
+    "encrypted_institution_configuration_present": true,
+    "saved_values_match_local_env": true,
+    "test_mode": true,
+    "live_payments_enabled": false,
+    "payment_orders": 0,
+    "payment_link_created": false,
+    "actual_card_and_webhook_validation": false
+  }
+}

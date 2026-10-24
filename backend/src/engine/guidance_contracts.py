@@ -53,8 +53,20 @@ class GuidanceInterpretation(StrictModel):
 
 class CourseMatch(StrictModel):
     course_id: uuid.UUID
-    student_evidence: str = Field(min_length=3, max_length=300)
-    course_evidence: str = Field(min_length=3, max_length=300)
+    student_evidence: str = Field(
+        min_length=3,
+        max_length=300,
+        description="One short exact interest/goal/strength quotation "
+        "from matchable_student_quotes. "
+        "Never combine it with schooling or another note; no paraphrase or added punctuation.",
+    )
+    course_evidence: str = Field(
+        min_length=3,
+        max_length=300,
+        description="A short exact phrase (prefer 3-12 words) "
+        "from the course name or description. "
+        "Do not join sentences, paraphrase, add ellipses or copy a long paragraph.",
+    )
     reason: str = Field(
         min_length=1,
         max_length=240,

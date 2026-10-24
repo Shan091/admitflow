@@ -155,7 +155,7 @@ async def courses(db: AsyncSession, lead: Lead, bot: TelegramBot, memory: dict[s
             .where(
                 Course.tenant_id == lead.tenant_id,
                 Course.is_active.is_(True),
-                Course.id.in_(available),
+                (Course.id.in_(available) | Course.is_reference.is_(True)),
             )
             .order_by(Course.name)
             .limit(10)
@@ -204,6 +204,7 @@ async def qualify(
             Batch.course_id == lead.current_course_id,
             Batch.tenant_id == lead.tenant_id,
             Course.tenant_id == lead.tenant_id,
+            Course.is_reference.is_(False),
             Batch.is_active.is_(True),
             Batch.seats_remaining > 0,
             Course.is_active.is_(True),
@@ -357,7 +358,11 @@ async def fee_information(
         return Reply(text=copy("clarify_reference", memory))
     return Reply(
         text="\n".join(
-            f"{course.name}: application/registration fee INR {course.application_fee / 100:.2f}. "
+            f"{course.name}: application fees are unverified in this public-information demo. "
+            "Check current charges directly with the university."
+            if course.is_reference
+            else f"{course.name}: application/registration fee "
+            f"INR {course.application_fee / 100:.2f}. "
             "This is the configured application fee, not tuition or a seat reservation."
             for course in courses
         )
@@ -507,6 +512,20 @@ async def select_course(
             Course.is_active.is_(True),
         )
     )
+    if course is not None and course.is_reference:
+        state.active = True
+        state.recommended_ids = [course.id]
+        save_guidance(memory, state)
+        return Reply(
+            text=f"{course.name}\n{(course.description or '')[:1200]}\n\n"
+            "Published programme information. Current intakes, fees and admission decisions "
+            "must be confirmed directly with the university. I can help you compare programmes; "
+            "applications and payments for this reference catalogue are not available here.",
+            buttons=[
+                button("Compare programmes", "guide", "resume", lead, bot),
+                button("Browse programmes", "courses", "all", lead, bot),
+            ],
+        )
     batches = list(
         (
             await db.scalars(
@@ -572,6 +591,7 @@ async def select_batch(
             Batch.seats_remaining > 0,
             Course.tenant_id == lead.tenant_id,
             Course.is_active.is_(True),
+            Course.is_reference.is_(False),
         )
     )
     if batch is None:

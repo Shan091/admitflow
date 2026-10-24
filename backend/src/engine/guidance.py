@@ -94,9 +94,18 @@ that have an open intake and no failed known eligibility rule. Interest does not
 If academic information is needed, ask the most useful missing field, using question_field exactly
 as provided. Extract academic facts only from explicit current-message evidence; a bare number
 belongs only to last_field. Never infer an unstated mark, age, qualification or other prerequisite.
+For published_reference_only=true, the programme can be explored without a verified intake.
+Match it to the student's study level and interests, but never imply confirmed seats, fees,
+eligibility approval, institutional representation or an application being processed here.
+Its needs_review status describes unverified admissions information, not a reason to send an
+ordinary explorer to staff. Unknown live intake does not mean the published programme is absent.
 If no suitable course is verified, acknowledge the gap and suggest at most two general fields
 to research elsewhere. No invented institution, accreditation, tuition, duration, salary, jobs,
 prerequisite, seat reservation or admission claim. Do not push a loosely related local substitute.
+An explicit rejection rules an option out even if broad words overlap. Negative course wording
+such as 'not clinical nursing' is an exclusion, never evidence of clinical training. If someone
+only wants clinical nursing and the catalogue has administrative healthcare, explain the gap;
+do not recommend the office course as a route into that qualification.
 
 Respect decided students: answer their question and offer their chosen verified course without a
 compulsory test. Invite relevant less-familiar courses only when connected to their interests or
@@ -223,7 +232,7 @@ async def text_selection(
 def catalog_status(
     course: Course, rules: list[QualificationRule], facts: dict[str, Any], open_batch: bool
 ) -> tuple[Status, list[str]]:
-    if not course.is_active or not open_batch:
+    if not course.is_active or (not open_batch and not course.is_reference):
         return "unavailable", []
     if not rules:
         return "needs_review", []
@@ -236,6 +245,8 @@ def catalog_status(
                 return "not_eligible", []
     except (TypeError, ValueError):
         return "needs_review", []
+    if course.is_reference:
+        return "needs_review", missing
     return ("needs_information", missing) if missing else ("eligible", [])
 
 
@@ -425,8 +436,13 @@ async def interpret_turn(
                 "browse for an explicit request to list the catalog. Extract literal phrases from "
                 "the CURRENT message as separate atomic profile notes: education/work background, "
                 "interests, concrete self-reported strengths, values, constraints, goals, dislikes "
-                "or a course preference. Copy wording exactly. Never infer ability, personality, "
-                "diagnoses or protected characteristics. replaces contains only FULL prior notes "
+                "or a course preference. Copy wording exactly. "
+                "Do not omit an explicit study goal when education is also provided. "
+                "For 'I completed BCA. I want to study robotics', copy 'completed BCA' as "
+                "background and 'want to study robotics' as goal. Use short literal fragments; "
+                "do not expand abbreviations or combine education with a preference. "
+                "Never infer ability, personality, diagnoses or protected characteristics. "
+                "replaces contains only FULL prior notes "
                 "explicitly corrected; preserve unrelated information. Age/marks belong in facts, "
                 "not replacement background notes. Extract only explicit academic facts "
                 "for listed rule fields with exact evidence; numbers are plain decimals. "
@@ -512,6 +528,7 @@ async def request_decision(
                 "name": c.name,
                 "description": (c.description or "")[:1000],
                 "status": status,
+                "published_reference_only": bool(c.is_reference),
                 "missing": missing,
                 "requirements": [
                     {"field": r.field, "operator": r.operator.value, "value": r.value}
@@ -559,7 +576,8 @@ def checked_text(value: str) -> str:
 def selection_question(ids: list[uuid.UUID], entries: Catalog) -> str | None:
     if len(ids) == 1:
         course = next(c for c, _, _ in entries if c.id == ids[0])
-        return f"Would you like to choose {course.name}? Reply yes or select the course below."
+        verb = "explore" if course.is_reference else "choose"
+        return f"Would you like to {verb} {course.name}? Reply yes or select the course below."
     return "Which course would you like to explore?" if ids else None
 
 
@@ -607,7 +625,10 @@ def render_decision(
             course_quote = literal_quote(match.course_evidence, f"{c.name}\n{description}")
             reason = f'You mentioned "{student_quote}". This course covers "{course_quote}".'
         eligibility = (
-            "Your shared details meet the entry requirements."
+            "Published programme; entry requirements, fees and intake availability "
+            "need confirmation."
+            if c.is_reference
+            else "Your shared details meet the entry requirements."
             if status == "eligible"
             else "Entry details still need checking"
             + (f": {', '.join(f.replace('_', ' ') for f in missing)}." if missing else " by staff.")

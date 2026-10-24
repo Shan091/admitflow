@@ -106,6 +106,19 @@ async def application_action(
 ) -> Reply:
     from src.engine.journey import qualify
 
+    if target != "cancel" and lead.current_course_id:
+        reference = await db.scalar(
+            select(Course.id).where(
+                Course.id == lead.current_course_id,
+                Course.tenant_id == lead.tenant_id,
+                Course.is_reference.is_(True),
+            )
+        )
+        if reference:
+            return Reply(
+                text="This published programme is for exploration. "
+                "University applications are not processed by this demonstration."
+            )
     if target == "cancel":
         if not memory.get("application_draft"):
             return Reply(text="This application step has already ended.")

@@ -10,6 +10,7 @@ def main() -> None:
     paths: set[Path] = set()
     for folder in (
         "backend/src",
+        "backend/data",
         "backend/tests",
         "backend/scripts",
         "backend/migrations",
