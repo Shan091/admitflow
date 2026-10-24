@@ -192,8 +192,8 @@ def test_recommendation_requires_student_and_course_evidence():
     )
     text, choices = render_decision(result, state, [(c, "eligible", [])], complete=True)
     assert c.name in text and choices == [c.id]
-    assert "does not grant admission" in text
-    assert "Explore spreadsheets and data patterns" in text
+    assert "Your shared details meet the entry requirements" in text
+    assert "data work you enjoy" in text
     wrong = result.model_copy(deep=True)
     wrong.matches[0].course_id = uuid.uuid4()
     text, choices = render_decision(wrong, state, [(c, "eligible", [])], complete=True)
@@ -219,7 +219,7 @@ def test_bad_generated_reason_falls_back_to_verified_quotes_not_a_false_claim():
         result, state, [(c, "needs_information", ["age"])], complete=True
     )
     assert choices == [c.id]
-    assert "You meet" not in text and "Eligibility still needs verification: age" in text
+    assert "You meet" not in text and "Entry details still need checking: age" in text
     assert "I enjoy data" in text and "spreadsheets" in text
 
 
@@ -243,7 +243,7 @@ def test_course_card_replaces_unverified_model_eligibility_reflection():
         result, state, [(c, "needs_information", ["marks"])], complete=True
     )
     assert choices == [c.id] and "meet the criteria" not in text
-    assert "Eligibility still needs verification: marks" in text
+    assert "Entry details still need checking: marks" in text
 
 
 @pytest.mark.parametrize("status", ["not_eligible", "unavailable"])
@@ -293,8 +293,11 @@ def test_missing_course_is_honest_without_pushing_a_local_substitute():
     ],
 )
 def test_unsupported_output_never_reaches_the_student(response):
-    with pytest.raises(ValueError):
-        render_decision(decision(response=response), GuidanceMemory(), [], complete=True)
+    text, choices = render_decision(
+        decision(response=response), GuidanceMemory(), [], complete=True
+    )
+    assert response not in text and not choices
+    assert text == decision().question
 
 
 async def test_decision_has_bounded_context_and_preserves_refusal_and_unknowns(monkeypatch):

@@ -1270,3 +1270,37 @@ reloaded; the receiver and serial knowledge worker listen and the scheduler runs
 This is exploratory guidance, not psychometric validation or real-student outcome
 evidence. No new adaptive-guidance handset receipt or upgraded running Compose image
 is claimed. Public deployment remains deferred by the owner.
+
+### Task 62: Natural collection, reset and response latency
+
+The pasted messages were separate examples, not a report of conflicting replies.
+The requested work is personalised conversation, less repetitive copy, automatic reuse
+of explicit details, a fresh testing context, typing feedback and lower response latency.
+
+- [x] Collect only missing application details, reuse verified explicit information,
+  support interruptions/pauses/corrections, and require review before submission.
+- [x] Reduce unnecessary menus and repeated technical notices.
+- [x] Confirm `/reset`, exclude earlier history, invalidate old course/application controls and preserve
+  submitted business records, consent and staff ownership.
+- [x] Bound best-effort typing and keep failures outside the durable reply path.
+- [x] Reduce model/SQL overhead; record measured latency and call counts.
+- [x] Pass regression, real database, live provider and full quality gates; complete
+  adversarial review with no open critical/important findings.
+- [ ] Publish through protected-main CI.
+
+**Evidence:** 293 default tests and strict typing over 124 source files; 107 distinct
+PostgreSQL cases verified across the full run and focused assertion/regression rechecks,
+plus two dedicated Redis checks. The full run's remaining failure was an old English
+copy assertion; its refreshed case and all nine final focused regressions pass.
+Live OpenAI: 13 independent guidance cases, three multi-turn dialogues and five
+collection cases pass. The three collection model turns took 1,078–2,663 ms (median
+1,297 ms) locally; greetings/simple form answers and active numeric eligibility answers
+need no model. This is a small local sample, not a production latency percentile.
+
+Adversarial checks cover repeated numeric questions after punctuation, omitted literal
+marks, direct named-course confirmation, unavailable courses, inferred DOB, literal
+detail extraction, reset replay/history boundaries, retained institutional contact data,
+staff ownership/consent, one/two-query context loading and typing cancellation/failure.
+See ADR-014, `CONVERSATION_EVALUATION_RESULTS.json` and
+`CONVERSATION_RELEASE_RESULTS.json`. No new handset observation or public deployment
+is claimed; submitted applications keep their existing review controls.

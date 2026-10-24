@@ -30,6 +30,25 @@ to browse the verified catalog, `/assessment` for optional deeper exploration, a
 choices support signed buttons or their unique full names. An immediate “yes” can
 confirm a single proposed course. Exploration is optional for a decided applicant.
 
+After a confirmed course/intake meets its entry rules, the assistant prepares a draft
+and asks for missing details. It reuses information the student explicitly supplied,
+supports multiple details/corrections in one message and answers questions without
+turning them into form values. A student must review and confirm before submission.
+Use `/pause` to keep a draft for later and `/apply` to resume it.
+
+Use `/reset` and confirm **Start fresh** to clear chat context, course exploration and
+an unfinished draft. Earlier messages stay in the institution's audit history but are
+excluded from future model context. Submitted applications/payments, reminder choices
+and active staff requests are preserved; reset does not bypass their review controls.
+This is a fresh testing conversation before submission, not deletion of an application.
+
+Telegram typing feedback runs while the reply is generated. Greetings, ordinary short
+form answers and numbers answering an active eligibility question avoid model calls.
+Free-form interpretation still uses OpenAI, so network/provider latency varies. Model
+history uses a bounded bulk query, plus one catalog-name lookup when buttons are present.
+See [conversation decisions](docs/decisions/ADR-014-conversation-continuity.md) and
+[collection timing evidence](docs/event/CONVERSATION_EVALUATION_RESULTS.json).
+
 The assistant records explicit student evidence and a provisional support stage:
 exploring, comparing or decided. It can introduce less familiar relevant courses, but
 only from the institution's current catalog, descriptions, entry rules and open intakes.

@@ -4,6 +4,7 @@ import asyncio
 import itertools
 import json
 import uuid
+from contextlib import asynccontextmanager
 from types import SimpleNamespace
 from typing import Any
 
@@ -43,6 +44,19 @@ async def completion(
     schema = response_format.__name__
     if schema == "Interpretation":
         result = {"intent": "question" if "?" in text else "qualification"}
+    elif schema == "GuidanceInterpretation":
+        data = json.loads(text)
+        message = data["message"]
+        if "?" in message:
+            result = {"intent": "faq"}
+        else:
+            field = "age" if "age" in message.lower() else data["last_field"]
+            result = {
+                "intent": "qualification",
+                "facts": [{"key": field, "value": message.split()[-1], "evidence": message}],
+            }
+    elif schema == "ApplicationTurn":
+        result = {"intent": "faq", "details": []}
     elif schema == "ResolvedQuestion":
         result = {"query": json.loads(text)["question"], "needs_clarification": False}
     elif schema == "PassageRanking":
@@ -82,6 +96,12 @@ def journey(workspace: dict[str, Any], monkeypatch: pytest.MonkeyPatch) -> dict[
         return None
 
     monkeypatch.setattr(TelegramClient, "acknowledge", ack)
+
+    @asynccontextmanager
+    async def no_typing(self, chat_id):
+        yield
+
+    monkeypatch.setattr(TelegramClient, "typing", no_typing)
     return workspace
 
 
@@ -181,11 +201,11 @@ def test_complete_journey_corrections_faq_human_and_staff(journey: dict[str, Any
     reply, _ = asyncio.run(turn("20"))
     assert "marks" in reply.text
     reply, _ = asyncio.run(turn("70"))
-    assert "meet the configured eligibility" in reply.text
+    assert "full name" in reply.text and not reply.buttons
     reply, _ = asyncio.run(turn("Actually my age is 17"))
     assert "do not meet" in reply.text
     reply, _ = asyncio.run(turn("Actually my age is 21"))
-    assert "meet the configured eligibility" in reply.text
+    assert "full name" in reply.text
 
     signin(client)
     uploaded = send(
@@ -203,7 +223,7 @@ def test_complete_journey_corrections_faq_human_and_staff(journey: dict[str, Any
     reply, _ = asyncio.run(turn("Can I visit the moon?"))
     assert "could not find" in reply.text
     reply, _ = asyncio.run(turn("/human"))
-    assert "request is recorded" in reply.text
+    assert "request is with the admissions team" in reply.text
     reply, _ = asyncio.run(turn("Actually my age is 10"))
     assert "paused" in reply.text
 
@@ -330,7 +350,7 @@ def test_missing_rules_closed_batches_and_foreign_course_are_not_approved(
             memory: dict[str, Any] = {"facts": {}}
             reply = await qualify(db, lead, bot, memory, "", [])
             assert memory["eligibility"]["outcome"] == "needs_staff_review"
-            assert "not configured" in reply.text
+            assert "needs to confirm the entry requirements" in reply.text
             signed = callback_data("course", foreign.id.hex, lead.id, bot.id)
             response = await route(
                 db,
@@ -341,11 +361,11 @@ def test_missing_rules_closed_batches_and_foreign_course_are_not_approved(
                 ),
                 memory,
             )
-            assert "no longer valid" in response.text and lead.current_course_id == course.id
+            assert "expired" in response.text and lead.current_course_id == course.id
             batch.seats_remaining = 0
             await db.flush()
             response = await qualify(db, lead, bot, memory, "", [])
-            assert "no longer valid" in response.text
+            assert "expired" in response.text
             assert lead.status != LeadStatus.ADMISSION_READY
             batch.seats_remaining = 10
             db.add(
@@ -494,7 +514,7 @@ def test_provider_outage_refusal_and_bad_schema_preserve_facts_and_allow_handoff
             monkeypatch.setattr("src.engine.journey.generate_completion", unavailable)
             monkeypatch.setattr("src.decision.generate_completion", unavailable)
             reply, _ = await turn(number, "Am I eligible?")
-            assert "temporarily unavailable" in reply.text
+            assert "couldn't complete" in reply.text
             assert "Synthetic provider" not in reply.text
             async with journey["sessions"]() as db:
                 memory = await db.scalar(

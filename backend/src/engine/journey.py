@@ -131,19 +131,14 @@ async def request_staff(
     return await held_reply(db, lead, memory)
 
 
-async def recent_history(db: AsyncSession, lead: Lead) -> list[dict[str, str]]:
-    from src.engine.timeline import timeline
+async def recent_history(
+    db: AsyncSession, lead: Lead, memory: dict[str, Any] | None = None
+) -> list[dict[str, str]]:
+    from src.engine.model_history import model_history
 
-    messages, _ = await timeline(db, lead.tenant_id, lead.id, None)
-    return [
-        {
-            "role": "user" if message["direction"] == "inbound" else "assistant",
-            "content": message["text"],
-        }
-        for message in messages
-        if (message["direction"] == "inbound" and message["status"] == "done")
-        or (message["direction"] == "outbound" and message["status"] == "sent")
-    ][-20:]
+    if memory is None:
+        _, memory = await load_memory(db, lead)
+    return await model_history(db, lead, memory)
 
 
 def button(label: str, kind: str, target: str, lead: Lead, bot: TelegramBot) -> Button:
@@ -249,14 +244,20 @@ async def qualify(
             f"Active question field: {memory.get('question')}. "
             "Return facts as key/value/evidence strings. Numeric values must be plain decimals."
         )
-        parsed = await decide(
-            Extraction,
-            [
-                {"role": "system", "content": prompt},
-                *history[-6:],
-                {"role": "user", "content": text},
-            ],
-        )
+        field = memory.get("question")
+        if re.fullmatch(r"-?\d+(?:\.\d+)?", text.strip()) and field in expected:
+            parsed = Extraction(
+                facts=[ExtractedFact(key=field, value=text.strip(), evidence=text)], declined=False
+            )
+        else:
+            parsed = await decide(
+                Extraction,
+                [
+                    {"role": "system", "content": prompt},
+                    *history[-6:],
+                    {"role": "user", "content": text},
+                ],
+            )
         if parsed.declined:
             memory["eligibility"] = {
                 "outcome": "needs_information",
@@ -389,7 +390,7 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
     )
     if ready is None:
         return Reply(text=copy("unknown", memory))
-    history = await recent_history(db, lead)
+    history = await recent_history(db, lead, memory)
     query = await contextual_query(text, history, course.name if course else None)
     if query is None:
         return Reply(text=copy("clarify_reference", memory))
@@ -579,13 +580,38 @@ async def select_batch(
         return Reply(text=copy("stale", memory))
     lead.current_batch_id = batch.id
     lead.status = LeadStatus.QUALIFYING
-    return await qualify(db, lead, bot, memory, "", [])
+    return await advance_application(
+        db, lead, bot, memory, await qualify(db, lead, bot, memory, "", [])
+    )
+
+
+async def advance_application(
+    db: AsyncSession, lead: Lead, bot: TelegramBot, memory: dict[str, Any], reply: Reply
+) -> Reply:
+    """A confirmed choice may start a draft; submission remains explicitly confirmed."""
+    if memory.get("eligibility", {}).get("outcome") == "eligible":
+        from src.engine.applications import application_action
+
+        return await application_action(db, lead, bot, memory, "start")
+    if memory.get("question"):
+        from src.engine.guidance import load_guidance, save_guidance
+
+        state = load_guidance(memory)
+        state.last_field, state.last_question = memory["question"], reply.text
+        save_guidance(memory, state)
+    return reply
 
 
 async def route(
     db: AsyncSession, lead: Lead, bot: TelegramBot, event: Event, memory: dict[str, Any]
 ) -> Reply:
     memory["language"] = "en"
+    from src.engine.session_controls import reset_reply
+
+    if reset := await reset_reply(db, lead, bot, event, memory):
+        return reset
+    if event.kind == "callback" and event.message_id <= memory.get("callback_after_message_id", 0):
+        return Reply(text=copy("stale", memory))
     held = await db.scalar(
         select(HumanRequest).where(
             HumanRequest.tenant_id == lead.tenant_id,
@@ -662,6 +688,10 @@ async def route(
     if text.split(" ")[0].split("@")[0] == "/start":
         if submitted:
             return submitted_reply()
+        if memory.get("application_draft") and not memory["application_draft"].get("paused"):
+            from src.engine.applications import collect_application
+
+            return await collect_application(db, lead, bot, memory, "hi")
         from src.engine.guidance import load_guidance, save_guidance
 
         state = load_guidance(memory)
@@ -676,12 +706,7 @@ async def route(
         )
         return Reply(
             text=f"Welcome to {institution.name if institution else 'AdmitFlow'}.{demo} "
-            "I can help you explore courses that fit your interests and background, or look "
-            "at a course you already have in mind. "
-            "You can skip any personal question. Don't send personal documents. "
-            "Use /courses to browse, /assessment for optional deeper exploration, or /human "
-            "for staff help. Optional reminders stay off unless you opt in with /followups. "
-            "Use /stop to turn them off.\n\n" + state.last_question
+            "Let's find courses that fit your interests and background.\n\n" + state.last_question
         )
     reason = escalation_reason(text)
     if reason:
@@ -691,6 +716,8 @@ async def route(
     if text == "/courses":
         if submitted:
             return submitted_reply()
+        if memory.get("application_draft"):
+            memory["application_draft"]["paused"] = True
         from src.engine.guidance import load_guidance, save_guidance
 
         state = load_guidance(memory)
@@ -700,6 +727,8 @@ async def route(
     if text in {"/guide", "/assessment"}:
         if submitted:
             return submitted_reply()
+        if memory.get("application_draft"):
+            memory["application_draft"]["paused"] = True
         from src.engine.guidance import OFFICIAL_INTEREST_TOOL, guide, load_guidance, save_guidance
 
         if text == "/guide":
@@ -734,12 +763,22 @@ async def route(
             from src.engine.applications import application_action
 
             return await application_action(db, lead, bot, memory, "start")
-        if memory.get("application_draft"):
+        if memory.get("application_draft") and not memory["application_draft"].get("paused"):
             from src.engine.applications import collect_application
 
             return await collect_application(db, lead, bot, memory, text)
         if not submitted:
             from src.engine.guidance import guide, load_guidance, save_guidance, text_selection
+
+            if (
+                lead.current_course_id
+                and lead.current_batch_id
+                and memory.get("question")
+                and re.fullmatch(r"-?\d+(?:\.\d+)?", text)
+            ):
+                return await advance_application(
+                    db, lead, bot, memory, await qualify(db, lead, bot, memory, text, [])
+                )
 
             choice = await text_selection(db, lead, memory, text)
             if choice:
@@ -751,8 +790,27 @@ async def route(
             state.pending_course = None
             if "guidance" in memory:
                 save_guidance(memory, state)
-                if state.active:
-                    return await guide(db, lead, bot, memory, text)
+            from src.engine.application_profile import GREETING
+
+            if GREETING.fullmatch(text):
+                if lead.current_course_id:
+                    course = await db.scalar(
+                        select(Course).where(
+                            Course.id == lead.current_course_id, Course.tenant_id == lead.tenant_id
+                        )
+                    )
+                    return Reply(
+                        text="Hi! We were discussing "
+                        f"{course.name if course else 'your course options'}. "
+                        "What would you like to know or do next?"
+                    )
+                state.active = True
+                save_guidance(memory, state)
+                return Reply(
+                    text="Hi! Do you have a course in mind, "
+                    "or would you like help exploring your interests?"
+                )
+            return await guide(db, lead, bot, memory, text)
         history = await recent_history(db, lead)
         interpretation = await decide(
             Interpretation,

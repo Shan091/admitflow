@@ -1,0 +1,57 @@
+{
+  "scope": "Synthetic English application collection; no database writes or sends",
+  "cases": [
+    {
+      "id": "greeting",
+      "passed": true,
+      "elapsed_ms": 2,
+      "model_calls": 0,
+      "saved_fields": [],
+      "response": "Hi! We were preparing your application.\n\nWhat is your full name?"
+    },
+    {
+      "id": "short-answer",
+      "passed": true,
+      "elapsed_ms": 1,
+      "model_calls": 0,
+      "saved_fields": [
+        "full_name"
+      ],
+      "response": "What is your date of birth (YYYY-MM-DD)?"
+    },
+    {
+      "id": "multiple-details",
+      "passed": true,
+      "elapsed_ms": 2663,
+      "model_calls": 1,
+      "saved_fields": [
+        "full_name",
+        "dob"
+      ],
+      "response": "What is your parent or guardian name?"
+    },
+    {
+      "id": "explicit-correction",
+      "passed": true,
+      "elapsed_ms": 1297,
+      "model_calls": 1,
+      "saved_fields": [
+        "full_name",
+        "dob"
+      ],
+      "response": "What is your parent or guardian name?"
+    },
+    {
+      "id": "no-inferred-birthday",
+      "passed": true,
+      "elapsed_ms": 1078,
+      "model_calls": 1,
+      "saved_fields": [],
+      "response": "Your draft is saved. Use /apply whenever you're ready to continue."
+    }
+  ],
+  "passed": 5,
+  "total": 5,
+  "live_model_turn_median_ms": 1297,
+  "latency_limits": "Small local sample, not a production percentile or speedup claim"
+}

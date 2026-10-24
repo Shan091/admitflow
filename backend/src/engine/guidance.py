@@ -19,6 +19,7 @@ from src.engine.guidance_contracts import (
     GuidanceInterpretation,
     GuidanceMemory,
     Note,
+    StudyFact,
 )
 from src.engine.llm_factory import AllProvidersFailedError
 from src.knowledge.retrieval import numeric_values
@@ -304,27 +305,27 @@ def academic_number_supported(key: str, value: float, text: str, last_field: str
     """An interest score, phone number or unrelated number is not an academic fact."""
     if last_field == key and re.fullmatch(r"-?\d+(?:\.\d+)?", text.strip()):
         return True
-    number = rf"(?<![\d.]){re.escape(str(value).removesuffix('.0'))}(?![\d.])"
+    # Parse the literal numeric token. A sentence-ending period is punctuation,
+    # whereas 65.50 and 65.5 are equivalent values, and 650 must never match 65.
+    number = r"(-?\d+(?:\.\d+)?)"
     if key == "age" or key.endswith("_age"):
-        return bool(
-            re.search(
-                rf"(?:\bage\s*(?:is|:|=)?|\baged|\bi am|\bi['’]m)\s*{number}|"
-                rf"{number}\s*(?:years?\s*old|y/o)",
-                text,
-                re.I,
-            )
+        pattern = (
+            rf"(?:\bage\s*(?:is|:|=)?|\baged|\bi am|\bi['’]m)\s*{number}|"
+            rf"{number}\s*(?:years?\s*old|y/o)"
         )
-    if any(term in key for term in ("mark", "percent")):
-        return bool(
-            re.search(
-                rf"\b(?:marks?(?: percentage)?|percentage)\s*(?:is|are|of|:|=)?\s*{number}|"
-                rf"{number}\s*(?:marks?\b|%\s*(?:in|for)\s*(?:class|grade|school|my exam))",
-                text,
-                re.I,
-            )
+    elif any(term in key for term in ("mark", "percent")):
+        pattern = (
+            rf"\b(?:marks?(?: percentage)?|percentage)\s*(?:is|are|of|:|=)?\s*{number}|"
+            rf"{number}\s*(?:marks?\b|%\s*(?:in|for)\s*(?:class|grade|school|my exam))"
         )
-    # Custom numerical fields must be asked explicitly or named by the student.
-    return key.replace("_", " ").casefold() in text.casefold()
+    else:
+        return key.replace("_", " ").casefold() in text.casefold()
+    return any(
+        float(token) == value
+        for match in re.finditer(pattern, text, re.I)
+        for token in match.groups()
+        if token is not None
+    )
 
 
 def question_field(question: str | None, field: str | None, expected: dict[str, Any]) -> str | None:
@@ -355,7 +356,7 @@ async def interpret_turn(
     expected = {
         r.field: r.value[0] if isinstance(r.value, list) and r.value else r.value for r in rules
     }
-    return await decide(
+    parsed = await decide(
         GuidanceInterpretation,
         [
             {
@@ -380,6 +381,12 @@ async def interpret_turn(
                 "A bare number belongs only to last_field, never an interest score. "
                 "Current corrections override old values: 'I am 21, not 17' means age=21. "
                 "A refusal changes no academic fact; record only its literal constraint if useful. "
+                "Never extract requirements, hypothetical cases or another person's details "
+                "as the student's academic facts. "
+                "details contains explicit full_name, dob, parent_name, address, previous_school "
+                "for application reuse. Values/evidence must be literal message substrings. "
+                "Never infer a name from greetings or birthday from age. DOB must be YYYY-MM-DD. "
+                "Do not solicit these personal details during interest exploration. "
                 "Do not answer, recommend, evaluate eligibility or ask a question.",
             },
             {
@@ -404,6 +411,23 @@ async def interpret_turn(
         ],
         max_tokens=1400,
     )
+    # A structured `age 19, marks 65` statement must not become a repeated question
+    # merely because an otherwise valid interpretation omitted one literal field.
+    if not re.search(
+        r"\b(?:if|suppose|imagine|assuming|friend|brother|sister|someone|minimum|required|need)\b",
+        text,
+        re.I,
+    ):
+        for key in ("age", "marks"):
+            if key not in expected or any(f.key == key for f in parsed.facts):
+                continue
+            matches = list(
+                re.finditer(rf"\b{key}\s*(?:is|are|:|=)?\s*(\d+(?:\.\d+)?)\b", text, re.I)
+            )
+            if len(matches) == 1 and len(parsed.facts) < 12:
+                match = matches[0]
+                parsed.facts.append(StudyFact(key=key, value=match[1], evidence=match[0]))
+    return parsed
 
 
 async def request_decision(
@@ -442,7 +466,7 @@ async def request_decision(
         ],
         "history": [
             {"role": turn["role"], "content": turn["content"][:1000]}
-            for turn in history[-10:]
+            for turn in history[-6:]
             if turn.get("role") in {"user", "assistant"}
         ],
     }
@@ -496,9 +520,8 @@ def render_decision(
         try:
             parts.append(checked_text(decision.response))
         except ValueError:
-            if decision.action not in {"recommend", "select"}:
-                raise
-            # The verified course card below supplies the authoritative outcome.
+            # Reflections are optional. Verified cards and a safe question carry the reply.
+            pass
     choices: list[uuid.UUID] = []
     notes = "\n".join([*(n.evidence for n in state.notes), student_text])
     by_id = {c.id: (c, status, missing) for c, status, missing in entries}
@@ -527,21 +550,38 @@ def render_decision(
             course_quote = literal_quote(match.course_evidence, f"{c.name}\n{description}")
             reason = f'You mentioned "{student_quote}". This course covers "{course_quote}".'
         eligibility = (
-            "Known eligibility rules are met; this does not grant admission."
+            "Your shared details meet the entry requirements."
             if status == "eligible"
-            else "Eligibility still needs verification"
+            else "Entry details still need checking"
             + (f": {', '.join(f.replace('_', ' ') for f in missing)}." if missing else " by staff.")
         )
-        parts.append(f"{c.name}\n{reason}\n{description[:450]}\n{eligibility}")
+        parts.append(f"{c.name}\n{reason}\n{eligibility}")
         choices.append(c.id)
+    if decision.action == "select" and not choices and decision.selected_course_id in by_id:
+        c, status, _ = by_id[decision.selected_course_id]
+        if status not in {"not_eligible", "unavailable"} and literal_quote(c.name, student_text):
+            # A literal named request needs no invented interest-fit explanation. The
+            # catalog ID is verified here; actual selection still needs confirmation.
+            parts.append(c.name)
+            choices.append(c.id)
     if (decision.action in {"recommend", "select"} or decision.outside_interests) and not choices:
-        parts.append(
-            "I could not verify a suitable course in the current catalogue. "
-            "You do not need to choose an unrelated course here."
-            if complete
-            else "The available catalogue context is incomplete, so I cannot rule out a suitable "
-            "course here. Staff can check the full offering."
-        )
+        if (
+            entries
+            and all(status in {"not_eligible", "unavailable"} for _, status, _ in entries)
+            and any(status == "not_eligible" for _, status, _ in entries)
+        ):
+            parts.append(
+                "Your current details do not meet the entry requirements for the "
+                "available courses. Staff can review your circumstances with /human."
+            )
+        else:
+            parts.append(
+                "I could not verify a suitable course in the current catalogue. "
+                "You do not need to choose an unrelated course here."
+                if complete
+                else "The catalogue context is incomplete, so I cannot rule out a suitable course. "
+                "Staff can check the full offering."
+            )
     if decision.outside_interests:
         fields = [
             f
@@ -615,7 +655,7 @@ async def guide(
     accepted_facts: dict[str, Any] | None = None
     original_notes = list(state.notes)
     entries, rules, complete = await catalog(db, lead, facts)
-    history = await recent_history(db, lead)
+    history = await recent_history(db, lead, memory)
     try:
         interpreted = await interpret_turn(
             text, state, facts, rules, history, eligibility_field=memory.get("question")
@@ -624,6 +664,11 @@ async def guide(
             r.field: r.value[0] if isinstance(r.value, list) and r.value else r.value for r in rules
         }
         merge_evidence(state, interpreted, text, facts=facts, expected=expected)
+        from src.engine.application_profile import validated_details
+
+        memory.setdefault("application_details", {}).update(
+            validated_details(interpreted.details, text)
+        )
         accepted_state, accepted_facts = state.model_copy(deep=True), dict(facts)
         entries, rules, complete = await catalog(db, lead, facts)
         if interpreted.intent == "handoff":
@@ -633,7 +678,12 @@ async def guide(
             and lead.current_course_id
             and lead.current_batch_id
         ):
-            return await qualify(db, lead, bot, memory, text, history)
+            from src.engine.journey import advance_application
+
+            await commit_guidance(db, lead, bot, memory, state, facts, original_facts)
+            return await advance_application(
+                db, lead, bot, memory, await qualify(db, lead, bot, memory, "", [])
+            )
         if interpreted.intent == "faq":
             reply = await answer_question(db, lead, memory, text)
             await commit_guidance(db, lead, bot, memory, state, facts, original_facts)

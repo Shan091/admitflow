@@ -212,10 +212,7 @@ def test_recommend_confirm_text_then_batch_and_eligibility(setup_guidance, monke
             assert lead.current_course_id == course_id and lead.current_batch_id is None
             assert "Evening" in [b.text for b in reply.buttons]
             reply = await turn("Evening")
-            assert (
-                lead.current_batch_id == batch_id
-                and "meet the configured eligibility" in reply.text
-            )
+            assert lead.current_batch_id == batch_id and "full name" in reply.text
 
     asyncio.run(exercise())
 

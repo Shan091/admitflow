@@ -1,0 +1,41 @@
+{
+  "scope": "Task 62 English conversation continuity, reset and Telegram responsiveness",
+  "source_fingerprint": "147e5252c8c2d11e69ecd1e8223a26709faa5ab1d3e574f2c25f58ffc1f7335c",
+  "backend": {
+    "default_tests_passed": 293,
+    "strict_source_files": 124,
+    "lint_and_format_passed": true,
+    "postgresql_distinct_cases_passed": 107,
+    "postgresql_evidence": "Full suite passed 106 cases; the remaining stale-copy assertion was refreshed and its case passed. Nine final focused regressions passed, including reset ownership and callback history.",
+    "redis_tests_passed": 2
+  },
+  "openai": {
+    "guidance_scenarios_passed": 13,
+    "guidance_dialogues_passed": 3,
+    "collection_scenarios_passed": 5,
+    "no_database_writes_or_telegram_sends_by_evaluations": true
+  },
+  "latency": {
+    "collection_model_turns": 3,
+    "collection_model_turn_median_ms": 1297,
+    "collection_model_turn_range_ms": [1078, 2663],
+    "greeting_and_short_answer_model_calls": 0,
+    "active_numeric_eligibility_answer_model_calls": 0,
+    "model_history_queries": "One bounded bulk query; one extra tenant-scoped name lookup when callbacks are present",
+    "limits": "Local synthetic sample, excludes inbox/outbox network delay; no production percentile or quantified speedup claim"
+  },
+  "typing": {
+    "initial_delay_ms": 350,
+    "renew_seconds": 4,
+    "attempt_timeout_ms": 1500,
+    "lifecycle_and_failure_tests_passed": true,
+    "new_handset_observation_claimed": false
+  },
+  "review": {
+    "open_critical_or_important_findings": 0,
+    "scope": ["literal details and no inferred DOB", "numeric punctuation and field binding", "reset replay and retained institutional contacts", "submitted records, consent and staff ownership", "tenant-scoped bounded history and callback labels", "typing cancellation and durable outbox isolation", "explicit review before submission"]
+  },
+  "frontend": "No dashboard changes in this task; GitHub frontend CI remains required",
+  "deployment": "Deferred until explicitly authorized by the owner",
+  "publication": "Pending protected-main PR and exact-head CI"
+}

@@ -18,37 +18,37 @@
     "ഇപ്പോൾ കോഴ്സ്/ബാച്ച് ലഭ്യമല്ല. സ്റ്റാഫിന്റെ സഹായം ആവശ്യപ്പെടാം."
   ],
   "held": [
-    "Your request is recorded for staff. Automated qualification is paused. Your messages remain visible to your institution.",
+    "Your request is with the admissions team. Automated replies are paused.",
     "आपका अनुरोध स्टाफ के लिए दर्ज है। स्वचालित पात्रता प्रक्रिया रुकी है। आपके संदेश संस्था को दिखाई देंगे।",
     "Aapki request staff ke liye record ho gayi. Automated qualification paused hai. Aapke messages institution ko dikhte rahenge.",
     "നിങ്ങളുടെ അഭ്യർത്ഥന സ്റ്റാഫിനായി രേഖപ്പെടുത്തി. സ്വയമേവയുള്ള യോഗ്യതാ പരിശോധന നിർത്തിയിരിക്കുന്നു. നിങ്ങളുടെ സന്ദേശങ്ങൾ സ്ഥാപനത്തിന് കാണാം."
   ],
   "eligible": [
-    "You meet the configured eligibility criteria. This is not admission or a seat reservation. You can correct an answer or request staff review.",
+    "Your details meet the entry requirements.",
     "आप निर्धारित पात्रता मानदंड पूरे करते हैं। यह प्रवेश या सीट आरक्षण नहीं है। उत्तर सुधार सकते हैं या स्टाफ समीक्षा मांग सकते हैं।",
     "Aap configured eligibility criteria meet karte hain. Yeh admission ya seat reservation nahi hai. Answer correct kar sakte hain ya staff review maang sakte hain.",
     "നിശ്ചയിച്ച യോഗ്യതാ മാനദണ്ഡങ്ങൾ നിങ്ങൾ പാലിക്കുന്നു. ഇത് പ്രവേശനമോ സീറ്റ് റിസർവേഷനോ അല്ല. ഉത്തരം തിരുത്തുകയോ സ്റ്റാഫ് പരിശോധന ആവശ്യപ്പെടുകയോ ചെയ്യാം."
   ],
   "ineligible": [
-    "Your current answers do not meet the configured criteria. You can correct an answer, explore another course or request staff review.",
+    "Your current details do not meet this course's entry requirements. We can explore alternatives or ask staff to review.",
     "आपके वर्तमान उत्तर निर्धारित मानदंड पूरे नहीं करते। उत्तर सुधारें, दूसरा कोर्स चुनें या स्टाफ समीक्षा मांगें।",
     "Current answers criteria meet nahi karte. Answer correct karein, doosra course dekhein ya staff review maangein.",
     "നിലവിലെ ഉത്തരങ്ങൾ നിശ്ചയിച്ച മാനദണ്ഡങ്ങൾ പാലിക്കുന്നില്ല. ഉത്തരം തിരുത്താം, മറ്റൊരു കോഴ്സ് നോക്കാം, അല്ലെങ്കിൽ സ്റ്റാഫ് പരിശോധന ആവശ്യപ്പെടാം."
   ],
   "review": [
-    "Eligibility needs staff review because the institution has not configured valid rules. No eligibility approval has been made.",
+    "The admissions team needs to confirm the entry requirements for this course.",
     "वैध नियम निर्धारित नहीं हैं, इसलिए स्टाफ समीक्षा जरूरी है। पात्रता स्वीकृत नहीं हुई है।",
     "Valid rules configured nahi hain, isliye staff review chahiye. Eligibility approve nahi hui hai.",
     "സാധുവായ നിയമങ്ങൾ ക്രമീകരിച്ചിട്ടില്ലാത്തതിനാൽ സ്റ്റാഫ് പരിശോധന ആവശ്യമാണ്. യോഗ്യത അംഗീകരിച്ചിട്ടില്ല."
   ],
   "missing": [
-    "Please provide your {field}. You may decline or ask for staff help.",
+    "What is your {field}?",
     "कृपया अपना {field} बताएं। मना कर सकते हैं या स्टाफ से सहायता मांग सकते हैं।",
     "Apna {field} batayein. Aap mana kar sakte hain ya staff help maang sakte hain.",
     "ദയവായി നിങ്ങളുടെ {field} നൽകുക. നിരസിക്കുകയോ സ്റ്റാഫിന്റെ സഹായം ആവശ്യപ്പെടുകയോ ചെയ്യാം."
   ],
   "unknown": [
-    "I could not find a supporting passage in the institution's knowledge. Please ask a more specific question or request staff help.",
+    "I could not find verified information about that. Use /human to ask the admissions team.",
     "संस्था की जानकारी में सहायक अंश नहीं मिला। अधिक स्पष्ट प्रश्न पूछें या स्टाफ से सहायता मांगें।",
     "Institution ke documents mein supporting passage nahi mila. Specific question poochhein ya staff help maangein.",
     "സ്ഥാപനത്തിന്റെ വിവരങ്ങളിൽ പിന്തുണയ്ക്കുന്ന ഭാഗം കണ്ടെത്താനായില്ല. കൂടുതൽ വ്യക്തമായ ചോദ്യം ചോദിക്കുക അല്ലെങ്കിൽ സ്റ്റാഫിന്റെ സഹായം ആവശ്യപ്പെടുക."
@@ -60,7 +60,7 @@
     "AI സേവനം ഇപ്പോൾ ലഭ്യമല്ല. സന്ദേശം സംരക്ഷിച്ചു; വീണ്ടും ശ്രമിക്കുക. കോഴ്സ് ബട്ടണുകളോ സ്റ്റാഫിന്റെ സഹായമോ ഉപയോഗിക്കാം."
   ],
   "stale": [
-    "This choice is no longer valid. Please use the current course buttons.",
+    "That button has expired. Please use the latest message.",
     "यह विकल्प अब मान्य नहीं है। वर्तमान कोर्स बटन इस्तेमाल करें।",
     "Yeh choice valid nahi hai. Current course buttons use karein.",
     "ഈ തിരഞ്ഞെടുപ്പ് ഇപ്പോൾ സാധുവല്ല. നിലവിലെ കോഴ്സ് ബട്ടണുകൾ ഉപയോഗിക്കുക."

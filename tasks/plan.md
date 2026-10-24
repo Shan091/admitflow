@@ -287,3 +287,16 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
 - [x] Verify unit/adversarial, real database and bounded live OpenAI student scenarios;
   adversarial review and final local checks pass; update this checklist.
 - [x] Publish through the protected-main PR/CI gate ([PR #15](https://github.com/Shan091/admitflow/pull/15)).
+
+## Task 62: Natural admissions conversation and responsive Telegram delivery
+
+- [x] Reuse explicitly provided application details; collect missing details naturally
+  after a confirmed course/intake, with explicit review before submission.
+- [x] Shorten repeated copy; handle greetings, questions, pauses and corrections during collection.
+- [x] Add a confirmed `/reset` that clears conversational context/drafts without deleting
+  submitted applications, payments, consent preferences or staff ownership.
+- [x] Show best-effort typing during processing; eliminate redundant model calls and
+  transcript queries, and measure response latency without sending test messages.
+- [x] Verify regressions, database boundaries, provider scenarios and quality gate;
+  document limits in ADR-014 and the conversation release evidence.
+- [ ] Publish through the reviewed protected-main PR/CI gate.
