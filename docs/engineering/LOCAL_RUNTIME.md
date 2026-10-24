@@ -37,6 +37,7 @@ From `backend/`:
 
 ```bash
 uv sync --frozen
+uv run python -m src.scripts.prepare_document_models
 uv run alembic upgrade head
 uv run python -m src.scripts.seed_demo
 ```
@@ -54,7 +55,8 @@ Use separate terminals. The following backend commands run from `backend/`:
 
 ```bash
 uv run uvicorn src.main:app --host 127.0.0.1 --port 8000
-uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge src.tasks.followups src.tasks.integrations --workers 1
+uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.followups src.tasks.integrations --workers 1
+uv run taskiq worker src.tasks.knowledge:broker src.tasks.knowledge --workers 1 --max-async-tasks 1
 uv run python -m src.telegram.receiver --institution-code demo
 uv run python -m src.scripts.scheduler
 ```

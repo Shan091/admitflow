@@ -77,7 +77,8 @@ uv run alembic upgrade head
 uv run python -m src.scripts.provision_staff --institution-code your-code --institution-name "Your institution" --email admin@example.edu
 uv run uvicorn src.main:app --reload
 # Separate terminal, from backend/:
-uv run taskiq worker src.tasks.broker:broker src.tasks.knowledge
+uv run python -m src.scripts.prepare_document_models
+uv run taskiq worker src.tasks.knowledge:broker src.tasks.knowledge --workers 1 --max-async-tasks 1
 ```
 
 The provisioning command prompts twice for a password (12–1024 characters), never
@@ -146,7 +147,7 @@ commands. It also explains safe token rotation, readiness, paused human requests
 uncertain delivery. Keep one polling receiver per bot and run both task modules:
 
 ```bash
-uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge --workers 1
+uv run taskiq worker src.tasks.broker:broker src.tasks.telegram --workers 1
 uv run python -m src.telegram.receiver --institution-code demo
 ```
 
@@ -280,7 +281,7 @@ An already in-flight Telegram request cannot be recalled by a later opt-out.
 Run the worker with the reminder task module and a scheduler producer:
 
 ```bash
-uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.knowledge src.tasks.followups --workers 1
+uv run taskiq worker src.tasks.broker:broker src.tasks.telegram src.tasks.followups --workers 1
 uv run python -m src.scripts.scheduler
 # One read/dispatch/recovery sweep, using the same consent rules:
 uv run python -m src.scripts.scheduler --once
@@ -359,7 +360,8 @@ encrypted names/application forms remain intact.
 # Outbound integrations and live notifications
 
 Upgrade to `6dd017583606`. Include `src.tasks.integrations` in the TaskIQ worker's
-module list alongside Telegram, knowledge and follow-ups. The API dispatches committed
+module list alongside Telegram and follow-ups. Run document jobs on the separate
+serial knowledge worker described in [DOCUMENT_INGESTION.md](../docs/engineering/DOCUMENT_INGESTION.md). The API dispatches committed
 webhook work every three seconds when `INTEGRATION_RECOVERY_ENABLED=true`; the scheduler
 also recovers it. Configuration is optional: no endpoint means no external deliveries.
 The dashboard's administrator-only Outbound webhooks page configures a public HTTPS

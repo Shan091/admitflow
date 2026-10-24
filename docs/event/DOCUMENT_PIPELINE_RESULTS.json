@@ -1,0 +1,9 @@
+{
+  "scope": "synthetic live PDF/OpenAI; no Telegram sends",
+  "checks": {
+    "actual_queue_docling_openai_publication": true,
+    "nursing_table_evidence": true,
+    "commerce_table_evidence": true,
+    "own_upload_removed": true
+  }
+}

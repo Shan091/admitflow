@@ -13,14 +13,17 @@ includes applications, payments, co-pilot, follow-ups and institution administra
 
 The current implementation also includes encrypted application submission/review,
 catalog/settings/discount management, payment monitoring and safe reconciliation.
-Staff transcripts include standalone deliveries and stable pagination. Real Razorpay
-test-card validation, co-pilot/follow-ups and later operations remain in progress;
+Staff takeover/co-pilot, consent-aware follow-ups, analytics/exports, signed webhooks,
+live notifications, staff accounts, erasure and retention are implemented. Staff transcripts
+include standalone deliveries and stable pagination. Real Razorpay test-card validation,
+final handset checks and public deployment remain unverified;
 see [tasks/todo.md](tasks/todo.md) for verified acceptance and remaining work.
 
 ## Stack
 
 Python/FastAPI/Pydantic, PostgreSQL/SQLAlchemy/Alembic/pgvector, Redis/TaskIQ,
-OpenAI, and a Next.js/TypeScript staff knowledge workspace. Only necessary
+OpenAI and Next.js/TypeScript. Digital PDF structure uses offline CPU Docling
+layout/table models, isolated in a bounded child process and dedicated serial worker. Only necessary
 services are required; additional AI providers and sponsor infrastructure are optional.
 Business rules, prices and authorization remain code-owned.
 
@@ -37,7 +40,8 @@ After replacing an invalid key, live credential probes pass again and the expand
 24-case multilingual FAQ evaluation passes. Results use synthetic reference material;
 they are not a fluency or production-readiness claim.
 Live corrections, sourced/unsupported answers and the user-requested staff workflow
-have passed selected checks. Fluent-speaker review and production release work remain.
+have passed selected checks. Language wording has agent review, as requested;
+human/native fluency and real-applicant outcomes remain unvalidated.
 Synthetic data is used for development/demonstrations.
 
 Follow the existing [plan](tasks/plan.md) and [task list](tasks/todo.md) for progress,
@@ -60,7 +64,9 @@ environment assumptions are in the backend README. These commands start the
 backend. Full receiver/worker/demo setup is in the backend README below.
 
 For document ingestion, follow the [knowledge workspace setup](backend/README.md#institution-knowledge-workspace).
-Run the API and TaskIQ worker, provision an administrator, then start the frontend:
+Prepare the offline PDF assets and run the API, interactive worker and separate
+serial knowledge worker following the [document runbook](docs/engineering/DOCUMENT_INGESTION.md).
+Provision an administrator, then start the frontend:
 
 ```bash
 cd frontend
@@ -73,7 +79,8 @@ Supported formats: digital PDF, DOCX, TXT, Markdown and CSV. Scanned PDFs need a
 searchable replacement. Live indexing/search requires an OpenAI API key; automated
 tests substitute synthetic embeddings. Original files are encrypted; extracted reference
 text is stored in the institution-scoped database. Upload institution reference material,
-not applicant personal files. All current work remains local until Git publication is authorized.
+not applicant personal files. OpenAI remains the decision, embedding and reranking provider;
+no fine-tuning or extra hosted inference service is required.
 
 ## Demonstration and submission
 
@@ -90,10 +97,13 @@ shows corrections, sourced answers and the staff request in the actual dashboard
 the final handset/event video and public demo link remain pending. Artifact requirements and outstanding
 organizer inputs are in [submission requirements](docs/event/SUBMISSION_PLAN.md).
 Prior work and verification evidence are preserved in repository records. A license
-must be selected before publication; none is implied by this README.
+remains to be selected by the owner; none is implied by this README.
 
 The [prior-work disclosure](docs/event/PRIOR_WORK_DISCLOSURE.md),
 [language review packet](docs/event/LANGUAGE_REVIEW.md) and
 [expanded evaluation results](docs/event/EVALUATION_RESULTS.json) record remaining
-review and credential requirements. The latest backend gate passes 156 tests and
-the separate PostgreSQL integration suite passes 16 tests.
+review and verification limits. The structured-document build passes 251 default tests,
+87 PostgreSQL tests and two separate Redis checks, plus strict typing and frontend
+lint/build. The [live PDF report](docs/event/DOCUMENT_PIPELINE_RESULTS.json) verifies
+upload, dedicated worker, Docling, OpenAI embeddings and programme-specific search.
+Its temporary synthetic upload was removed; no Telegram message was sent.

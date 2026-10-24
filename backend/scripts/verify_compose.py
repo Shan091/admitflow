@@ -104,6 +104,33 @@ asyncio.run(main())
         compose,
         "exec",
         "-T",
+        "api",
+        ".venv/bin/python",
+        "-c",
+        """
+import asyncio
+import uuid
+from src.tasks.broker import broker, knowledge_broker
+from src.tasks.knowledge import ingest_upload
+async def main():
+    assert knowledge_broker.queue_name != broker.queue_name
+    await knowledge_broker.startup()
+    try:
+        # Random absent tenant/upload IDs exercise the real worker without changing data.
+        task = await ingest_upload.kiq(str(uuid.uuid4()), str(uuid.uuid4()))
+        result = await task.wait_result(timeout=20)
+        assert not result.is_err and result.return_value is None
+        print('knowledge-queue-confirmed')
+    finally:
+        await knowledge_broker.shutdown()
+asyncio.run(main())
+""",
+    )
+    checks["separate_knowledge_worker_roundtrip"] = "knowledge-queue-confirmed" in result
+    result = await asyncio.to_thread(
+        compose,
+        "exec",
+        "-T",
         "scheduler",
         ".venv/bin/python",
         "-m",

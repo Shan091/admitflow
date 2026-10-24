@@ -36,30 +36,15 @@ def extract_file(name: str, data: bytes) -> str:
         raise ExtractionError("no_text")
     try:
         if suffix == ".pdf":
-            from pypdf import PdfReader
+            import asyncio
 
-            reader = PdfReader(io.BytesIO(data))
-            if reader.is_encrypted:
-                raise ExtractionError("password_protected")
-            if len(reader.pages) > 100:
-                raise ExtractionError("page_limit")
-            pieces = []
-            size = 0
-            for page in reader.pages:
-                content = page.get_contents()
-                if content is not None and len(content.get_data()) > 8_000_000:
-                    raise ExtractionError("page_limit")
-                piece = page.extract_text() or ""
-                if not piece.strip():
-                    # Do not silently index only the readable half of a mixed scan.
-                    raise ExtractionError("ocr_required")
-                size += len(piece)
-                if size > MAX_TEXT:
-                    raise ExtractionError("text_limit")
-                pieces.append(piece)
-            text = "\n\n".join(pieces)
+            from src.knowledge.pdf_parser import parse_pdf
+
+            text = asyncio.run(parse_pdf(data))
         elif suffix == ".docx":
             from docx import Document
+            from docx.table import Table
+            from docx.text.paragraph import Paragraph
 
             with zipfile.ZipFile(io.BytesIO(data)) as archive:
                 entries = archive.infolist()
@@ -72,18 +57,30 @@ def extract_file(name: str, data: bytes) -> str:
                 if "word/document.xml" not in archive.namelist():
                     raise ExtractionError("invalid_document")
             document = Document(io.BytesIO(data))
-            pieces = [p.text for p in document.paragraphs]
-            pieces.extend(
-                " | ".join(c.text for c in row.cells)
-                for table in document.tables
-                for row in table.rows
-            )
-            text = "\n".join(pieces)
+            pieces = []
+            for block in document.iter_inner_content():
+                if isinstance(block, Paragraph):
+                    style = block.style.style_id if block.style else ""
+                    heading = re.fullmatch(r"Heading([1-6])", style or "", re.I)
+                    pieces.append(("#" * int(heading[1]) + " " if heading else "") + block.text)
+                elif isinstance(block, Table):
+                    rows = [
+                        "| "
+                        + " | ".join(
+                            c.text.replace("|", r"\|").replace("\n", "<br>") for c in row.cells
+                        )
+                        + " |"
+                        for row in block.rows
+                    ]
+                    if rows:
+                        rows.insert(1, "| " + " | ".join("---" for _ in block.rows[0].cells) + " |")
+                        pieces.append("\n".join(rows))
+            text = "\n\n".join(pieces)
         else:
             text = data.decode("utf-8-sig")
             if "\x00" in text:
                 raise ExtractionError("invalid_text")
-        text = re.sub(r"[ \t]+", " ", text).strip()
+        text = "\n".join(line.rstrip() for line in text.replace("\r\n", "\n").splitlines()).strip()
         if not text:
             raise ExtractionError("no_text")
         if len(text) > MAX_TEXT:

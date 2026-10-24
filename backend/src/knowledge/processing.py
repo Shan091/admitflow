@@ -5,6 +5,7 @@ import logging
 import math
 import uuid
 from datetime import UTC, datetime, timedelta
+from pathlib import PurePosixPath
 from typing import Any
 
 from litellm import aembedding
@@ -17,6 +18,7 @@ from src.db.audit import write_audit_log
 from src.db.models import Document, DocumentChunk, KnowledgeUpload
 from src.db.session import get_sessionmaker
 from src.knowledge.extraction import ExtractionError, extract_file
+from src.knowledge.pdf_parser import parse_pdf
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +85,10 @@ async def process_upload(tenant_id: uuid.UUID, upload_id: uuid.UUID) -> None:
     try:
         async with asyncio.timeout(get_settings().ingestion_timeout_seconds):
             raw = decrypt_bytes(row.source_enc)
-            text = await asyncio.to_thread(extract_file, row.filename, raw)
+            if PurePosixPath(row.filename).suffix.lower() == ".pdf":
+                text = await parse_pdf(raw)
+            else:
+                text = await asyncio.to_thread(extract_file, row.filename, raw)
             chunks = chunk_text(text)
             if len(chunks) > 500:
                 raise ExtractionError("text_limit")
