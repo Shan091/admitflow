@@ -8,7 +8,7 @@ private configuration out of the recording. No real applicant documents are requ
 2. Provide synthetic age 20 and marks 70. Show the code-evaluated eligible result and
    the explanation that eligibility does not mean admission or a reserved seat.
 3. Correct age to 17, then 21. Show the changed result and persisted correction history.
-4. Ask where the demo campus is. Show a quotation and its document source.
+4. Ask where the demo campus is. Show the grounded answer without a source footer. Source references stay internal.
 5. Ask an unsupported question. Show abstention rather than an invented answer.
 6. Open Admissions inquiries in the staff workspace. Select the same inquiry and show
    the selected course/batch, facts, eligibility evidence and ordered conversation.
@@ -18,7 +18,14 @@ private configuration out of the recording. No real applicant documents are requ
    that original files are encrypted and only ready material appears in search.
 
 For a short final demo, focus on selection, one correction and the staff conversation.
-Keep the full source/abstention and human-request sequence ready for desk review.
+Keep the full grounded-answer/abstention and human-request sequence ready for desk review.
+Upload [the synthetic counselling PDF](artifacts/synthetic-counselling-reference.pdf),
+wait for Ready, then ask “What is the demo admissions counselling room called?”
+The expected answer contains Lotus Hall. Show source evidence in staff search only.
+For desk review, demonstrate applications/review, catalog controls, reviewed co-pilot
+and opted-in follow-ups separately. Do not claim a real payment until the Razorpay
+provider journey is validated. A new external staff test message needs authorization;
+the previously authorized send already has user-confirmed receipt.
 
 The [local staff walkthrough](artifacts/staff-walkthrough.webm) is a silent, 33-second
 recording of the actual production frontend against the local API. It shows reference
@@ -33,6 +40,9 @@ It is a silent record of persisted behavior, with no simulated handset or new st
 state changes. Run `npm run record:demo -- --journey` from frontend/ to record it to
 a new output after preserving any existing recording.
 
+The actual handset roundtrip, one authorized staff reply and the uploaded-PDF answer
+have user confirmation. See [sanitized evidence](LIVE_HANDSET_RESULTS.json). Historical
+recordings may show source footers; current student messages omit them.
 The actual handset roundtrip has user confirmation. The user also sent both age
 corrections and FAQ checks; all four replies have confirmed sends and match saved
 facts/results and the staff transcript. The resent `/human` produced a confirmed

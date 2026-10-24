@@ -147,9 +147,14 @@ def test_course_scope_authority_search_and_faq(workspace: dict[str, Any], monkey
     async def exercise():
         async with workspace["sessions"]() as db:
             lead = Lead(tenant_id=tenant, current_course_id=nursing)
-            assert "scope/nursing.txt" in (await answer_question(db, lead, {}, "Hostel?")).text
+            nursing_reply = await answer_question(db, lead, {}, "Hostel?")
+            assert nursing_reply.source is not None
+            assert nursing_reply.source.relative_path == "scope/nursing.txt"
+            assert nursing_reply.text == "NursingXYZ hostel is beside the library."
             reply = await answer_question(db, lead, {}, "CommerceXYZ hostel?")
-            assert "scope/commerce.txt" in reply.text
+            assert reply.source is not None
+            assert reply.source.relative_path == "scope/commerce.txt"
+            assert reply.text == "CommerceXYZ hostel is near the bus stop."
             assert lead.current_course_id == nursing
             fees = await answer_question(db, lead, {}, "CommerceXYZ application fee?")
             assert fees.text.startswith("CommerceXYZ:")

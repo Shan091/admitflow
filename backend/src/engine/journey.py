@@ -33,7 +33,7 @@ from src.db.models import (
     TelegramBot,
 )
 from src.decision import decide
-from src.engine.contracts import Button, Event, Reply
+from src.engine.contracts import Button, Event, GroundingSource, Reply
 from src.engine.escalation import Reason, escalation_reason, office_open
 from src.engine.llm_factory import AllProvidersFailedError, generate_completion
 from src.knowledge.processing import embed_chunks
@@ -471,7 +471,15 @@ async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], 
         or len(selected.quote) > 1200
     ):
         return Reply(text=copy("unknown", memory))
-    return Reply(text=f"{selected.quote}\n\nSource: {path}, passage {chunk.chunk_index + 1}.")
+    return Reply(
+        text=selected.quote,
+        source=GroundingSource(
+            document_id=chunk.document_id,
+            chunk_id=chunk.id,
+            relative_path=path,
+            passage=chunk.chunk_index + 1,
+        ),
+    )
 
 
 async def build_reply(db: AsyncSession, lead: Lead, bot: TelegramBot, event: Event) -> Reply:

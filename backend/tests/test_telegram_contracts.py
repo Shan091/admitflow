@@ -108,3 +108,37 @@ async def test_uncertain_send_is_never_retried(monkeypatch: pytest.MonkeyPatch) 
     with pytest.raises(TelegramAPIError):
         await TelegramClient("synthetic-token").call("sendMessage", {"text": "hello"})
     assert calls == 1
+
+
+async def test_grounding_is_saved_but_never_sent_to_telegram(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = {
+        "document_id": str(uuid.uuid4()),
+        "chunk_id": str(uuid.uuid4()),
+        "relative_path": "private-institution/reference.pdf",
+        "passage": 2,
+    }
+    reply = Reply.model_validate({"text": "The room is Lotus Hall.", "source": source})
+    restored = Reply.model_validate_json(reply.model_dump_json())
+    assert restored.source is not None
+    assert restored.source.model_dump(mode="json") == source
+    calls = []
+
+    async def capture(self: TelegramClient, method: str, payload: dict) -> dict:
+        calls.append((method, payload))
+        return {"message_id": 99}
+
+    monkeypatch.setattr(TelegramClient, "call", capture)
+    assert await TelegramClient("synthetic-token").send(42, restored) == 99
+    assert calls == [
+        (
+            "sendMessage",
+            {
+                "chat_id": 42,
+                "text": "The room is Lotus Hall.",
+                "protect_content": True,
+            },
+        )
+    ]
+    assert Reply.model_validate({"text": "Earlier reply", "buttons": []}).source is None

@@ -1,49 +1,46 @@
-# AdmitFlow pitch deck copy
+# AdmitFlow pitch deck
 
-Six slides, including the opening slide. Editable live deck:
-`artifact_BuTM0-38X76wS7ACrxqoGQrexLu7Mc10` in this Codex conversation.
-This draft uses verified software behavior and labels commercial assumptions.
-Team names, publication links and the final recording require owner completion.
+Owner: **shan**. The editable [six-slide PowerPoint](artifacts/admitflow-pitch-final.pptx)
+contains actual synthetic-data product screens and speaker notes. This replaces the
+older conversation-only draft. Commercial assumptions are explicitly labelled.
 
 ## Slide 1: AdmitFlow
 
-Admissions conversations with a record your team can review.
+Admissions conversations with context for your team.
+Telegram for students. A workspace for institutions. Owner: shan.
 
-Telegram for students. An authenticated workspace for institutions.
+## Slide 2: The admissions handoff
 
-## Slide 2: The admissions inquiry
+Students ask in chat. Staff need the course, the answers already given and the reason
+behind the next step. Less repeated information collection is the product hypothesis;
+customer demand and time savings remain unmeasured.
 
-Students ask about programmes and eligibility in chat. Staff need the selected course,
-the answers already given and the reason for an eligibility result.
+## Slide 3: A working institution workspace
 
-These are product hypotheses for institution interviews, not measured market findings.
+Telegram collects course choices and explicit answers. Staff control the catalog,
+batches and application fees. The actual catalog screenshot uses synthetic data.
+Applications/review, takeover/co-pilot and consent-aware follow-ups are implemented;
+the actual Razorpay test-card journey remains unverified.
 
-## Slide 3: A working student journey
+## Slide 4: Answers from approved documents
 
-A private Telegram conversation offers course and batch choices. The assistant
-collects explicit answers and accepts corrections. Code evaluates institution rules.
+PDF tables and headings stay together. OpenAI searches and reranks approved evidence.
+Answers stay grounded or abstain. Student messages omit source footers; the saved
+internal evidence and staff search keep document references. Digital PDF, DOCX and
+text are supported; OCR is outside this version. Screenshot: actual upload controls.
 
-Staff can inspect the same saved inquiry and handle a request for human review.
+## Slide 5: AI with institution control
 
-## Slide 4: Institution knowledge and control
+OpenAI handles interpretation, typed extraction, embeddings and evidence reranking.
+Code controls eligibility, fees, tenant access and application changes.
+Live OpenAI and handset checks pass. The current backend gate has 252 default tests;
+the prior full PostgreSQL run has 87 cases. See tasks/todo.md for the changed-slice run.
+Stack: FastAPI, PostgreSQL/pgvector, Redis/TaskIQ and Next.js.
 
-Administrators upload PDF, DOCX and text files or folders. Search returns original
-passages with their sources. Unsupported questions abstain.
+## Slide 6: An institution pilot
 
-Human requests pause qualification until staff resolve the request and explicitly resume automation.
-
-## Slide 5: Technology and verification
-
-FastAPI, PostgreSQL with pgvector, Redis and TaskIQ. OpenAI for interpretation,
-extraction, query translation and embeddings. Next.js for staff access.
-
-Live OpenAI checks and a user-confirmed Telegram roundtrip passed. Synthetic tests
-check tenant boundaries, corrections and recovery. See tasks/todo.md for current evidence.
-
-## Slide 6: Pilot and next steps
-
-Start with a synthetic institutional demonstration, then seek an approved pilot.
-Proposed buyer: an institution admissions team. Pricing and willingness to pay remain unvalidated.
-
-Next: fluent-speaker review, pilot privacy controls and measured staff usefulness.
-Payments and applications remain later work.
+Proposed buyer: admissions teams in Kerala institutions. A paid institution workspace
+is the business model to test; pricing and willingness to pay are unvalidated.
+Pilot measures: repeated questions, staff review time and application completion.
+Next: payment validation and an approved institution pilot. Public deployment awaits
+the owner's explicit instruction.

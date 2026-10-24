@@ -1,23 +1,25 @@
 # AI Impact Statement
 
-AdmitFlow uses OpenAI to interpret admissions messages, extract explicitly supplied
-facts, resolve conversational references, embed approved documents, rerank evidence
-and select supporting quotations. Digital PDFs use offline pretrained Docling layout
-and table models; DOCX/text extraction preserves source structure. No decision-model
-fine-tuning or OCR is used. Credentials and model configuration remain server-side.
+AdmitFlow uses the configured OpenAI gpt-4.1-mini model for interpreting admissions
+messages, extracting explicit facts, resolving references, reranking evidence and
+selecting exact quotations. text-embedding-3-small supplies document embeddings.
+Digital PDFs use offline pretrained Docling layout/TableFormer models; DOCX/text
+extraction preserves structure. No fine-tuning or OCR is used.
 
-Code owns eligibility rules, prices, course/batch choices, authorization and consequential
-changes. Eligibility grants neither admission nor a seat. Unsupported questions receive
-abstention; staff requests pause automation until an explicit resume.
+Code controls eligibility, fees, authorization and consequential changes. Eligibility
+confers neither admission nor a reserved seat. Tenant-scoped retrieval, relevance
+checks and exact-quote validation prevent unsupported answers; missing evidence
+produces abstention. Source references remain internal, while staff search displays
+them. Staff requests pause automation until explicit resume.
 
-The demonstration uses synthetic institution material and student answers. Identifiers,
-conversation content and eligibility memory are encrypted in application storage.
-Tenant-scoped access, expiring staff sessions, bounded workers, deletion/retention controls
-and adversarial checks protect institutional boundaries. Live OpenAI, document-search
-and user-confirmed Telegram checks have passed. Language fluency and real-applicant
-outcomes remain unvalidated.
+The demonstration uses authored synthetic institution material and student answers,
+without a public training dataset or real applicant records. Owner shan licenses
+project source under MIT. Third-party code/models retain upstream terms; Docling
+model cards identify Apache-2.0 and CDLA-Permissive-2.0. OpenAI is accessed as a
+hosted API. See DATA_PROVENANCE.md for sources and limits.
 
-The intended impact is less repeated information collection and clearer staff review.
-Conversion gains, revenue and time savings have not been measured. Institutions must
-authorize reference material and its use. A real pilot requires operational and privacy
-review; final source-code licensing remains an owner decision.
+Encrypted identifiers/conversations, scoped staff sessions, bounded workers and
+deletion/retention controls protect institutional data. Live OpenAI, uploaded-PDF
+and handset checks pass. General language fluency and real-applicant outcomes
+remain unvalidated. Reduced repetition and clearer staff review are intended
+benefits; revenue, conversion gains and time savings have not been measured.

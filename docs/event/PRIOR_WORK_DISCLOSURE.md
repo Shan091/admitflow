@@ -1,29 +1,32 @@
-# Prior-work disclosure draft
+# Prior-work disclosure
 
-AdmitFlow continues an existing repository. It was not created entirely during this
-event. Confirm this disclosure with the organizers and their current eligibility rules
-before submitting it.
+AdmitFlow continues an existing repository. It was not created entirely during the
+event. Organizer acceptance of this disclosure and the current eligibility rules
+must be confirmed before submission.
 
-The starting foundation included FastAPI, PostgreSQL models and migrations,
-Redis/TaskIQ, encryption and audit helpers, rule evaluation, retrieval and guardrail
-modules, and a WhatsApp dispatcher/transport. Actual WhatsApp delivery was blocked
-by a provider account restriction. Existing modules and historical tests did not
-establish a complete student journey or staff dashboard.
+The starting foundation included FastAPI, PostgreSQL models/migrations, Redis/TaskIQ,
+encryption and audit helpers, rule evaluation, retrieval/guardrail modules and a
+WhatsApp dispatcher/transport. Actual WhatsApp delivery was blocked by a provider
+account restriction. Existing modules did not establish a complete student journey
+or staff dashboard.
 
-The current work introduces Telegram institution/lead identities, private-chat
-transport, durable encrypted inbox/outbox, conversation memory and corrections,
-course/batch callbacks, integrated eligibility, source-quoted FAQs and abstention.
-It also introduces authenticated institution file/folder ingestion and the Next.js
-knowledge, inquiry, conversation and human-request screens. OpenAI is the active
-inference and embedding provider. Applications, payments, co-pilot and follow-ups
-remain later milestones.
+Current implementation adds Telegram identities and private-chat delivery, encrypted
+durable inbox/outbox, memory/corrections, course/batch choices and code-owned
+eligibility. It includes authenticated file/folder ingestion, offline PDF layout/table
+parsing, contextual course-scoped retrieval, required OpenAI reranking and abstention.
+The Next.js workspace includes inquiries, knowledge, human requests, takeover/co-pilot,
+applications/review, catalog/settings/discount management, payment monitoring,
+consent-aware follow-ups, analytics, exports, signed webhooks, notifications, staff
+accounts and deletion/retention. These are implementation claims; actual Razorpay
+test-card/link/webhook/Telegram acceptance remains open.
 
-The saved baseline is in docs/planning/archive/. Current implementation and actual
-validation results are in tasks/todo.md, including failures and delivery uncertainty.
-Development demonstrations use synthetic institution references and student answers;
-no customer, revenue or measured efficiency claim is made.
+The baseline is preserved in docs/planning/archive/. Current task records and Git PRs
+identify implementation/verification work without claiming it all occurred during
+the event. Synthetic institution references and student answers are used; no customer,
+revenue or measured efficiency claim is made.
 
-The user reports that no surprise requirement or revised deadline has been announced.
-This is not organizer approval or proof that a required surprise element is complete.
-Repository publication, owner/team attribution and the source-code license require
-completion before submission. Third-party dependencies keep their own licenses.
+Owner: shan. Project source uses MIT; third-party material retains upstream terms.
+See [provenance](DATA_PROVENANCE.md). The user reports no announced surprise requirement
+or revised deadline. This is not organizer permission or proof that a future surprise
+element is complete. Portal details, final recording/public judge access and submission
+remain open. Public deployment is expressly deferred until the owner authorizes it.

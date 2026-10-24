@@ -24,7 +24,13 @@ This checklist supports execution; it is not an additional product roadmap.
 - [x] Use synthetic institution/student data and label it clearly.
 - [x] Save and visually inspect the actual local staff walkthrough recording.
 - [ ] Rehearse the student-to-staff journey and record the final working build.
-- [ ] Finish the README/demo link, deck and AI Impact Statement.
+- [x] Finish README copy, editable six-slide deck, owner/license and AI Impact Statement.
+- [x] Confirm an authorized staff reply and uploaded-PDF answer on the handset.
+- [ ] Publish a final demo recording link and verify judge access.
+
+The user finished their walkthrough successfully. Public deployment remains deferred
+until explicitly authorized. Existing videos predate the source-footer change; keep
+that limitation visible when choosing a final recording.
 - [ ] Check judge access to every link and upload with a buffer.
 
 Event schedules remain in [original sources](SOURCES.md). This active checklist uses

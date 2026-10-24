@@ -1,5 +1,6 @@
 """Channel-neutral input and validated plain-text reply boundary."""
 
+import uuid
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
@@ -29,10 +30,21 @@ class Button(BaseModel):
         return value
 
 
+class GroundingSource(BaseModel):
+    """Internal evidence persisted in encrypted replies, excluded from channel payloads."""
+
+    model_config = ConfigDict(extra="forbid")
+    document_id: uuid.UUID
+    chunk_id: uuid.UUID
+    relative_path: str = Field(min_length=1, max_length=1024)
+    passage: int = Field(ge=1)
+
+
 class Reply(BaseModel):
     model_config = ConfigDict(extra="forbid")
     text: str = Field(min_length=1, max_length=3500)
     buttons: list[Button] = Field(default_factory=list, max_length=12)
+    source: GroundingSource | None = None
 
     @field_validator("text")
     @classmethod

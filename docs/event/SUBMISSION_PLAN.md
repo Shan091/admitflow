@@ -11,11 +11,11 @@ Confirm portal fields and current organizer instructions before uploading.
 
 | Artifact | Required content | Status |
 | --- | --- | --- |
-| GitHub URL | Judge-accessible source, license/attribution, setup and prior-work disclosure | Source published at Shan091/admitflow; judge access, owner licensing and organizer acceptance pending |
-| Root README | Problem/users, actual features, stack, setup, demo link, team and limitations | Updated locally; owner/team/license and public links pending |
+| GitHub URL | Judge-accessible source, license/attribution, setup and prior-work disclosure | Source published at Shan091/admitflow; MIT LICENSE and owner shan recorded; judge access and organizer acceptance pending |
+| Root README | Problem/users, actual features, stack, setup, demo link, team and limitations | Owner shan and MIT recorded; setup/status and provenance updated; public links pending |
 | Product demo link | Recording or hosted product showing the final working build | Local 33-second staff and 58-second saved-journey recordings ready; final owner approval/public link pending |
-| Pitch deck | At most six slides: problem, insight, solution, technology, value/GTM, next steps | Six-slide editable draft and repository copy prepared |
-| AI Impact Statement | At most 200 words: actual AI/models, data/licenses, guardrails and expected impact | Updated draft under 200 words; includes OpenAI reranking and offline document models |
+| Pitch deck | At most six slides: problem, insight, solution, technology, value/GTM, next steps | Six-slide editable PowerPoint, actual product screens and speaker notes ready locally |
+| AI Impact Statement | At most 200 words: actual AI/models, data/licenses, guardrails and expected impact | Under 200 words; configured OpenAI model IDs, offline model terms and provenance recorded |
 
 A separate hosted demo is optional but favored. Prepare a recording even if hosted.
 
@@ -28,7 +28,14 @@ adds the actual stored student choices, corrections, source/abstention and staff
 Both are staff views, not handset recordings. Current OpenAI structured output,
 embeddings and the real PDF ingestion/search check pass; the saved recordings document
 their original verified staff behavior.
-The deck is editable in this Codex conversation. The local runtime and recovery
+The editable [PowerPoint](artifacts/admitflow-pitch-final.pptx) is saved in this repository.
+Owner: shan. The handbook FAQ permits MIT or Apache-2.0; the root MIT license records
+the delegated selection. See [data/model provenance](DATA_PROVENANCE.md). The user
+completed their walkthrough and reported everything tested worked. Staff-reply and
+uploaded-PDF handset checks are confirmed in [live evidence](LIVE_HANDSET_RESULTS.json).
+Public deployment is deferred until the user explicitly authorizes it; a recording
+can satisfy the demo-link requirement. Existing recordings predate the source-footer
+change and do not constitute a final handset recording. The local runtime and recovery
 instructions are in [LOCAL_RUNTIME.md](../engineering/LOCAL_RUNTIME.md).
 Technical evidence belongs to the current tasks/todo.md; draft artifacts do not
 constitute organizer acceptance, judge access or a completed submission.
