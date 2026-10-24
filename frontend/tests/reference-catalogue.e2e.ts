@@ -15,7 +15,10 @@ test("published programmes do not display an invented zero fee", async ({ page, 
   expect(reference.batches).toHaveLength(0);
   await page.goto("/");
   await page.getByRole("button", { name: "Institution management", exact: true }).click();
-  await page.getByRole("button", { name: reference.name, exact: false }).click();
+  const referenceRow = page.getByRole("button", { name: reference.name, exact: false });
+  await expect(referenceRow).toContainText("Application fee: Unverified");
+  await expect(referenceRow).not.toContainText("INR 0.00");
+  await referenceRow.click();
   await expect(page.getByText("Published programme for exploration.", { exact: false })).toBeVisible();
   const fee = page.getByLabel("Application fee (INR)", { exact: true });
   await expect(fee).toBeDisabled();

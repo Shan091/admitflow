@@ -288,7 +288,7 @@ export default function Analytics({
                     </text>
                     <polyline
                       fill="none"
-                      stroke="var(--green)"
+                      stroke="var(--accent)"
                       strokeWidth="2.5"
                       points={points
                         .map((point) => `${point.x},${point.y}`)
@@ -301,7 +301,7 @@ export default function Analytics({
                           cx={point.x}
                           cy={point.y}
                           r="3.5"
-                          fill="var(--green)"
+                          fill="var(--accent)"
                         />
                       ))}
                     <text x="30" y="174">
