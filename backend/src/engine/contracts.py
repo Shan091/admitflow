@@ -15,6 +15,7 @@ class Event(BaseModel):
     kind: Literal["text", "callback", "unsupported"]
     text: str = Field(default="", max_length=4096)
     callback_id: str | None = Field(default=None, max_length=256)
+    selected_answer: str | None = Field(default=None, min_length=1, max_length=55)
 
 
 class Button(BaseModel):

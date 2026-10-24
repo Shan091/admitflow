@@ -650,7 +650,9 @@ async def route(
             kind, target = parse_callback(text, lead.id, bot.id)
         except ValueError:
             return Reply(text=copy("stale", memory))
-        if submitted and kind in {"course", "batch", "courses", "guide"}:
+        if kind != "answer":
+            memory.pop("guidance_answers", None)
+        if submitted and kind in {"course", "batch", "courses", "guide", "answer"}:
             return submitted_reply()
         if kind == "language" and target in LANGUAGES:
             if submitted:
@@ -660,6 +662,15 @@ async def route(
             return await guide(db, lead, bot, memory, "")
         if kind == "human" and target == "request":
             text = "/human"
+        elif kind == "answer":
+            from src.engine.guidance import guide
+            from src.engine.guidance_interaction import consume_answer
+
+            answer = consume_answer(memory, target)
+            if answer is None:
+                return Reply(text=copy("stale", memory))
+            event.selected_answer = answer
+            return await guide(db, lead, bot, memory, answer)
         elif kind == "apply":
             from src.engine.applications import application_action
 
@@ -685,6 +696,7 @@ async def route(
             return await select_batch(db, lead, bot, memory, uuid.UUID(target))
         else:
             return Reply(text=copy("stale", memory))
+    memory.pop("guidance_answers", None)
     if text.split(" ")[0].split("@")[0] == "/start":
         if submitted:
             return submitted_reply()

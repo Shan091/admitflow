@@ -1,0 +1,157 @@
+{
+  "scope": "Synthetic OpenAI dialogue through production response composition; no database writes, Telegram sends, psychometric validity or outcome claim",
+  "cases": [
+    {
+      "id": "interest-first-novice",
+      "passed": true,
+      "contextual_choices_seen": true,
+      "turns": [
+        {
+          "student": "i like to study the tech industry",
+          "response": "Which of these activities sounds most interesting to you?\n\nYou can also type your own answer.",
+          "options": [
+            "Building websites or apps",
+            "Learning how computers work",
+            "Exploring new gadgets and tech news",
+            "Not sure yet"
+          ],
+          "facts": {},
+          "passed": true,
+          "elapsed_ms": 3975
+        },
+        {
+          "student": "like web development",
+          "response": "What is your age?",
+          "options": [],
+          "facts": {},
+          "passed": true,
+          "elapsed_ms": 2787
+        },
+        {
+          "student": "some",
+          "response": "We can return to entry details when you're ready.\n\nWould you like to keep exploring, or check entry requirements now?",
+          "options": [
+            "Keep exploring",
+            "Check entry requirements",
+            "Not sure yet"
+          ],
+          "facts": {},
+          "passed": true,
+          "elapsed_ms": 2736
+        },
+        {
+          "student": "I finished Class 12 science. My age is 20 and marks 70.",
+          "response": "You have a suitable background and interest for a beginner web development course.\n\nBeginner Web Development\nYou like web development and want to learn from the beginning, which fits this course that teaches creating web pages and simple interactive websites from scratch.\nYour shared details meet the entry requirements.",
+          "options": [
+            "Beginner Web Development",
+            "Explore my interests further"
+          ],
+          "facts": {
+            "age": 20,
+            "marks": 70
+          },
+          "passed": true,
+          "elapsed_ms": 4323
+        },
+        {
+          "student": "I want to learn to create websites. Please show the suitable course now.",
+          "response": "You want to learn to create websites, and the Beginner Web Development course matches your interest and background well.\n\nBeginner Web Development\nYou want to learn to create websites, and this course teaches creating web pages and simple interactive websites from the beginning, matching your interest directly.\nYour shared details meet the entry requirements.\n\nWould you like to choose Beginner Web Development? Reply yes or select the course below.",
+          "options": [
+            "Beginner Web Development",
+            "Explore my interests further"
+          ],
+          "facts": {
+            "age": 20,
+            "marks": 70
+          },
+          "passed": true,
+          "elapsed_ms": 3255
+        }
+      ]
+    },
+    {
+      "id": "background-first-uncertain",
+      "passed": true,
+      "contextual_choices_seen": true,
+      "turns": [
+        {
+          "student": "I finished Class 12 commerce. My age is 19 and marks 65. I am unsure what to study.",
+          "response": "You have completed Class 12 commerce with marks 65 and are unsure what to study next.\n\nWhich of these activities sounds most interesting to you?\n\nYou can also type your own answer.",
+          "options": [
+            "Creating videos or graphics",
+            "Writing stories or articles",
+            "Helping others with advice or support",
+            "Not sure yet"
+          ],
+          "facts": {
+            "age": 19,
+            "marks": 65
+          },
+          "passed": true,
+          "elapsed_ms": 3158
+        },
+        {
+          "student": "Creating videos or graphics",
+          "response": "Creating videos or graphics fits well with a course in digital content production.\n\nDigital Content Production\nYou are interested in creating videos or graphics, and this course explores visual storytelling and creating graphics, which matches your interest well.\nYour shared details meet the entry requirements.",
+          "options": [
+            "Digital Content Production",
+            "Explore my interests further"
+          ],
+          "facts": {
+            "age": 19,
+            "marks": 65
+          },
+          "passed": true,
+          "elapsed_ms": 3569
+        },
+        {
+          "student": "I like drawing and creating pictures, but haven't tried design software.",
+          "response": "Your interest in drawing and creating pictures aligns well with a course that explores visual storytelling and creating graphics.\n\nDigital Content Production\nYou like drawing and creating pictures, and this course explores visual storytelling and creating graphics, which fits your interest well.\nYour shared details meet the entry requirements.",
+          "options": [
+            "Digital Content Production",
+            "Explore my interests further"
+          ],
+          "facts": {
+            "age": 19,
+            "marks": 65
+          },
+          "passed": true,
+          "elapsed_ms": 3365
+        },
+        {
+          "student": "I want a course where I can explore visual storytelling. Show the options now.",
+          "response": "You have a good match with the Digital Content Production course that explores visual storytelling and creating graphics.\n\nDigital Content Production\nYou want to explore visual storytelling and like drawing and creating pictures, which fits well with a course that explores visual storytelling and creating graphics.\nYour shared details meet the entry requirements.",
+          "options": [
+            "Digital Content Production",
+            "Explore my interests further"
+          ],
+          "facts": {
+            "age": 19,
+            "marks": 65
+          },
+          "passed": true,
+          "elapsed_ms": 3148
+        }
+      ]
+    },
+    {
+      "id": "specific-field-absent",
+      "passed": true,
+      "contextual_choices_seen": false,
+      "turns": [
+        {
+          "student": "I want to study web development, not general office skills. I finished Class 12 science, age 20, marks 70. If you do not have a verified web course, please tell me honestly.",
+          "response": "You have a clear goal to study web development, but the available course is a general digital skills foundation, not specifically web development.\n\nI could not verify a suitable course in the current catalogue. You do not need to choose an unrelated course here.\n\nFields to research elsewhere (not verified as courses at this institution): web development. Check actual entry requirements and recognition with the provider before deciding.",
+          "options": [],
+          "facts": {
+            "age": 20
+          },
+          "passed": true,
+          "elapsed_ms": 2971
+        }
+      ]
+    }
+  ],
+  "passed": 3,
+  "total": 3
+}

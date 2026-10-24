@@ -6,9 +6,9 @@
       "passed": true,
       "action": "ask",
       "stage": "exploring",
-      "question": "Have you had any experience or interest in creating educational content, like videos, presentations, or written guides?",
+      "question": "Which of these activities sounds most interesting to you?",
       "matched_courses": [],
-      "response": "Thanks for sharing your background and interests. Explaining things to classmates suggests you might enjoy roles involving communication or teaching.\n\nHave you had any experience or interest in creating educational content, like videos, presentations, or written guides?",
+      "response": "Which of these activities sounds most interesting to you?",
       "profile": {
         "version": 1,
         "active": true,
@@ -33,7 +33,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 18,
@@ -49,7 +50,7 @@
       "matched_courses": [
         "Data and Reporting"
       ],
-      "response": "You have chosen Data and Reporting, which fits well with your enjoyment of spreadsheets and making dashboards.\n\nData and Reporting\nYou have decided on Data and Reporting because you enjoy spreadsheets and making dashboards, which matches the course focus on exploring spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.\n\nWould you like to choose Data and Reporting? Reply yes or select the course below.",
+      "response": "You have chosen Data and Reporting, which fits well with your interest in spreadsheets and dashboards.\n\nData and Reporting\nYou have decided on Data and Reporting because you enjoy spreadsheets and making dashboards, and this course explores spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.\n\nWould you like to choose Data and Reporting? Reply yes or select the course below.",
       "profile": {
         "version": 1,
         "active": true,
@@ -78,7 +79,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 21,
@@ -90,11 +92,11 @@
       "passed": true,
       "action": "recommend",
       "stage": "exploring",
-      "question": "What kind of work or projects have you enjoyed most when organizing or managing resources?",
+      "question": null,
       "matched_courses": [
         "Supply Chain Operations"
       ],
-      "response": "You have experience planning stock and coordinating deliveries, which aligns well with a course focused on those skills.\n\nSupply Chain Operations\nYou have experience planning stock and coordinating deliveries, so you would find the Supply Chain Operations course relevant and engaging.\nYour shared details meet the entry requirements.\n\nWhat kind of work or projects have you enjoyed most when organizing or managing resources?",
+      "response": "You have experience enjoying planning stock and coordinating deliveries, which fits well with a course on Supply Chain Operations.\n\nSupply Chain Operations\nYou have experience enjoying planning stock and coordinating deliveries, which fits well with a course on Supply Chain Operations.\nYour shared details meet the entry requirements.",
       "profile": {
         "version": 1,
         "active": true,
@@ -116,7 +118,7 @@
         ],
         "themes": [
           {
-            "theme": "practical",
+            "theme": "organizing",
             "evidence": "I enjoyed planning stock and coordinating deliveries for our school fair"
           }
         ],
@@ -124,7 +126,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 19,
@@ -138,7 +141,7 @@
       "stage": "exploring",
       "question": null,
       "matched_courses": [],
-      "response": "You want marine biology and field research, but we do not offer courses in that area.\n\nI could not verify a suitable course in the current catalogue. You do not need to choose an unrelated course here.\n\nFields to research elsewhere (not verified as courses at this institution): marine biology; field research. Check actual entry requirements and recognition with the provider before deciding.",
+      "response": "You want marine biology and field research, but we don't offer courses in that area here.\n\nI could not verify a suitable course in the current catalogue. You do not need to choose an unrelated course here.\n\nFields to research elsewhere (not verified as courses at this institution): marine biology; field research. Check actual entry requirements and recognition with the provider before deciding.",
       "profile": {
         "version": 1,
         "active": true,
@@ -147,10 +150,14 @@
         "notes": [
           {
             "topic": "background",
-            "evidence": "I am 20 with 80 marks and finished Class 12 biology"
+            "evidence": "finished Class 12 biology"
           },
           {
             "topic": "interest",
+            "evidence": "I only want marine biology and field research"
+          },
+          {
+            "topic": "goal",
             "evidence": "I only want marine biology and field research"
           },
           {
@@ -163,7 +170,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 20,
@@ -175,9 +183,9 @@
       "passed": true,
       "action": "recommend",
       "stage": "exploring",
-      "question": "What kind of projects or tasks have you done with spreadsheets so far?",
+      "question": null,
       "matched_courses": [],
-      "response": "You have a clear interest in spreadsheets and data, which aligns well with the Data and Reporting course.\n\nYour current details do not meet the entry requirements for the available courses. Staff can review your circumstances with /human.\n\nWhat kind of projects or tasks have you done with spreadsheets so far?",
+      "response": "You like working with spreadsheets and want to learn about data and reporting, which fits well with a course that explores spreadsheets, data cleaning, and practical dashboards.\n\nYour current details do not meet the entry requirements for the available courses. Staff can review your circumstances with /human.",
       "profile": {
         "version": 1,
         "active": true,
@@ -201,17 +209,13 @@
             "evidence": "Do not pretend that I meet the requirements"
           }
         ],
-        "themes": [
-          {
-            "theme": "practical",
-            "evidence": "I enjoy spreadsheets"
-          }
-        ],
+        "themes": [],
         "last_question": null,
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 17,
@@ -227,7 +231,7 @@
       "matched_courses": [
         "Data and Reporting"
       ],
-      "response": "You have a clear interest in making dashboards and working with spreadsheets, which fits well with the Data and Reporting course.\n\nData and Reporting\nYou want to focus on making dashboards and working with spreadsheets, and this course explores spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.",
+      "response": "You seem interested in making dashboards and working with spreadsheets, which fits well with a course focused on data and reporting.\n\nData and Reporting\nYou prefer making dashboards and working with spreadsheets now, which matches the course exploring spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.",
       "profile": {
         "version": 1,
         "active": true,
@@ -237,10 +241,6 @@
           {
             "topic": "interest",
             "evidence": "I prefer making dashboards and working with spreadsheets now"
-          },
-          {
-            "topic": "background",
-            "evidence": "I am 21 with 70 marks and finished Class 12"
           }
         ],
         "themes": [
@@ -253,7 +253,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 21,
@@ -269,7 +270,7 @@
       "matched_courses": [
         "Digital Content Production"
       ],
-      "response": "You have a good foundation with your Class 12 completion and interest in visual storytelling. There is a course that matches your interests well.\n\nDigital Content Production\nYou enjoy visual storytelling, and this course focuses on exploring visual storytelling and editing digital media, which aligns well with your interest.\nYour shared details meet the entry requirements.",
+      "response": "You seem well suited for a course in Digital Content Production that focuses on visual storytelling and digital media editing.\n\nDigital Content Production\nYou enjoy visual storytelling, and this course specifically explores visual storytelling and editing digital media, matching your interest well.\nYour shared details meet the entry requirements.",
       "profile": {
         "version": 1,
         "active": true,
@@ -287,19 +288,19 @@
           {
             "topic": "strength",
             "evidence": "70 marks"
-          }
-        ],
-        "themes": [
+          },
           {
-            "theme": "creative",
-            "evidence": "enjoy visual storytelling"
+            "topic": "goal",
+            "evidence": "I am 20"
           }
         ],
+        "themes": [],
         "last_question": "What budget would work for you?",
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 20,
@@ -325,7 +326,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {}
     },
@@ -334,11 +336,11 @@
       "passed": true,
       "action": "recommend",
       "stage": "exploring",
-      "question": "What specific tasks or projects would you like to accomplish using data and spreadsheets?",
+      "question": null,
       "matched_courses": [
         "Data and Reporting"
       ],
-      "response": "You have a solid foundation with your spreadsheet experience and dashboard creation, and the Data and Reporting course focuses on practical skills like spreadsheets and data cleaning, which aligns well with your interests and comfort level.\n\nData and Reporting\nYou have a solid foundation with your spreadsheet experience and dashboard creation, and the Data and Reporting course focuses on practical skills like spreadsheets and data cleaning, which aligns well with your interests and comfort level.\nYour shared details meet the entry requirements.\n\nWhat specific tasks or projects would you like to accomplish using data and spreadsheets?",
+      "response": "You have a good foundation with your spreadsheet experience and dashboard creation, and the Data and Reporting course fits well with your interests and strengths without requiring advanced math confidence.\n\nData and Reporting\nYou enjoy spreadsheets and have made a small dashboard, which matches the course focus on spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.",
       "profile": {
         "version": 1,
         "active": true,
@@ -366,17 +368,13 @@
             "evidence": "Can we explore the data course without assuming I am incapable?"
           }
         ],
-        "themes": [
-          {
-            "theme": "practical",
-            "evidence": "I enjoy spreadsheets and have made a small dashboard"
-          }
-        ],
+        "themes": [],
         "last_question": null,
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 21,
@@ -390,7 +388,7 @@
       "stage": "decided",
       "question": null,
       "matched_courses": [],
-      "response": "You want to become a registered nurse and work clinically with patients, so healthcare office administration is not suitable for your goal.\n\nI could not verify a suitable course in the current catalogue. You do not need to choose an unrelated course here.\n\nFields to research elsewhere (not verified as courses at this institution): nursing; clinical patient care. Check actual entry requirements and recognition with the provider before deciding.",
+      "response": "You want to become a registered nurse and work clinically with patients, which is clear from your goal and interest in clinical work.\n\nI could not verify a suitable course in the current catalogue. You do not need to choose an unrelated course here.\n\nFields to research elsewhere (not verified as courses at this institution): nursing; clinical healthcare. Check actual entry requirements and recognition with the provider before deciding.",
       "profile": {
         "version": 1,
         "active": true,
@@ -399,7 +397,7 @@
         "notes": [
           {
             "topic": "background",
-            "evidence": "I am 20 with 75 marks and finished Class 12 biology"
+            "evidence": "finished Class 12 biology"
           },
           {
             "topic": "goal",
@@ -408,6 +406,18 @@
           {
             "topic": "avoid",
             "evidence": "Healthcare office administration would not meet that goal"
+          },
+          {
+            "topic": "strength",
+            "evidence": "75 marks"
+          },
+          {
+            "topic": "value",
+            "evidence": "work clinically with patients"
+          },
+          {
+            "topic": "constraint",
+            "evidence": "I am 20"
           }
         ],
         "themes": [],
@@ -415,7 +425,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 20,
@@ -427,9 +438,9 @@
       "passed": true,
       "action": "ask",
       "stage": "exploring",
-      "question": "Have you ever worked with any digital media tools like video or photo editing software, or would you like to start learning about those?",
+      "question": "What is your current level of education or study background?",
       "matched_courses": [],
-      "response": "It's great that you enjoy drawing stories and want to explore design software. Trying out digital storytelling tools could be a good next step.\n\nHave you ever worked with any digital media tools like video or photo editing software, or would you like to start learning about those?",
+      "response": "Drawing stories sounds like a great start for exploring digital content creation. Let's find out more about your current study background to guide you better.\n\nWhat is your current level of education or study background?",
       "profile": {
         "version": 1,
         "active": true,
@@ -450,7 +461,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {}
     },
@@ -473,7 +485,8 @@
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {}
     },
@@ -482,11 +495,11 @@
       "passed": true,
       "action": "recommend",
       "stage": "exploring",
-      "question": "Would you like to learn more about the Supply Chain Operations course?",
+      "question": null,
       "matched_courses": [
         "Supply Chain Operations"
       ],
-      "response": "You have experience enjoying planning stock and coordinating deliveries, which aligns well with supply chain operations.\n\nSupply Chain Operations\nYou have experience enjoying planning stock and coordinating deliveries, which aligns well with supply chain operations.\nYour shared details meet the entry requirements.\n\nWould you like to learn more about the Supply Chain Operations course?",
+      "response": "You have experience planning stock and coordinating deliveries, which fits well with a course on supply chain operations.\n\nSupply Chain Operations\nYou have experience planning stock and coordinating deliveries, which fits well with a course on supply chain operations.\nYour shared details meet the entry requirements.",
       "profile": {
         "version": 1,
         "active": true,
@@ -510,17 +523,13 @@
             "evidence": "I would like to explore options"
           }
         ],
-        "themes": [
-          {
-            "theme": "practical",
-            "evidence": "I enjoyed planning stock and coordinating deliveries at a school event"
-          }
-        ],
+        "themes": [],
         "last_question": null,
         "last_field": null,
         "pending_course": null,
         "recommended_ids": [],
-        "turns": 0
+        "turns": 0,
+        "questions_since_direction": 0
       },
       "facts": {
         "age": 21,
@@ -540,18 +549,18 @@
           {
             "student": "I am 20 with 70 marks and finished Class 12. I enjoy spreadsheets and visual storytelling. I am comparing Data and Reporting with Digital Content Production.",
             "action": "recommend",
-            "response": "You have a clear interest in spreadsheets and visual storytelling, which aligns well with both Data and Reporting and Digital Content Production courses.\n\nData and Reporting\nYou enjoy spreadsheets, which fits well with the Data and Reporting course that focuses on spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.\n\nDigital Content Production\nYou enjoy visual storytelling, which aligns well with the Digital Content Production course that explores visual storytelling and editing digital media.\nYour shared details meet the entry requirements.\n\nWhich aspect do you find more engaging: working with data and creating dashboards, or crafting visual stories and editing media?",
+            "response": "You have a clear interest in both spreadsheets and visual storytelling, which matches well with two courses available here.\n\nData and Reporting\nYou enjoy spreadsheets, and this course focuses on spreadsheets, data cleaning and practical dashboards, which fits your interest well.\nYour shared details meet the entry requirements.\n\nDigital Content Production\nYou enjoy visual storytelling, and this course explores visual storytelling and editing digital media, matching your interest closely.\nYour shared details meet the entry requirements.",
             "facts": {
               "age": 20,
               "marks": 70
             },
-            "stage": "exploring",
+            "stage": "comparing",
             "passed": true
           },
           {
             "student": "Actually I prefer visual storytelling; data is just a hobby. I would rather pursue Digital Content Production. No more alternatives please.",
             "action": "select",
-            "response": "You have chosen to pursue Digital Content Production, focusing on visual storytelling and digital media editing.\n\nDigital Content Production\nYou prefer visual storytelling and want to focus on Digital Content Production, which explores visual storytelling and editing digital media.\nYour shared details meet the entry requirements.\n\nWould you like to choose Digital Content Production? Reply yes or select the course below.",
+            "response": "You have chosen to pursue Digital Content Production, focusing on visual storytelling and digital media editing.\n\nDigital Content Production\nYou prefer visual storytelling and want to focus on Digital Content Production, which explores visual storytelling and editing digital media, matching your interest closely.\nYour shared details meet the entry requirements.\n\nWould you like to choose Digital Content Production? Reply yes or select the course below.",
             "facts": {
               "age": 20,
               "marks": 70
@@ -573,7 +582,7 @@
           {
             "student": "Let's return to Digital Content Production. I would like to proceed with it.",
             "action": "select",
-            "response": "You have decided to proceed with Digital Content Production, focusing on visual storytelling and editing digital media.\n\nDigital Content Production\nYou prefer visual storytelling and want to focus on Digital Content Production, which explores visual storytelling and editing digital media.\nYour shared details meet the entry requirements.\n\nWould you like to choose Digital Content Production? Reply yes or select the course below.",
+            "response": "You have decided to proceed with Digital Content Production, which explores visual storytelling and editing digital media.\n\nDigital Content Production\nYou prefer visual storytelling and want to focus on Digital Content Production, which explores visual storytelling and editing digital media, matching your interest closely.\nYour shared details meet the entry requirements.\n\nWould you like to choose Digital Content Production? Reply yes or select the course below.",
             "facts": {
               "age": 20,
               "marks": 70
@@ -589,35 +598,35 @@
         "turns": [
           {
             "student": "I am 21 with 70 marks and finished Class 12. I enjoy spreadsheets and making dashboards. Please show me the Data and Reporting option.",
-            "action": "select",
-            "response": "You have a good background and interest match for the Data and Reporting course.\n\nData and Reporting\nYou enjoy spreadsheets and making dashboards, which fits well with the Data and Reporting course that explores spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.\n\nWould you like to choose Data and Reporting? Reply yes or select the course below.",
+            "action": "recommend",
+            "response": "You have a good fit for the Data and Reporting course based on your interest in spreadsheets and dashboards.\n\nData and Reporting\nYou enjoy spreadsheets and making dashboards, which matches the course focus on exploring spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.",
             "facts": {
               "age": 21,
               "marks": 70
             },
-            "stage": "decided",
+            "stage": "exploring",
             "passed": true
           },
           {
             "student": "Actually my age is 17, not 21. I still enjoy making dashboards.",
             "action": "recommend",
-            "response": "I see you are 17 and still enjoy making dashboards, which aligns well with the Data and Reporting course.\n\nYour current details do not meet the entry requirements for the available courses. Staff can review your circumstances with /human.",
+            "response": "Since you are 17, the Data and Reporting course here requires you to be 18 or older. Let's consider other options or directions that fit your interests and age.\n\nYour current details do not meet the entry requirements for the available courses. Staff can review your circumstances with /human.\n\nWhat kind of activities do you enjoy besides making dashboards?",
             "facts": {
               "age": 17,
               "marks": 70
             },
-            "stage": "decided",
+            "stage": "exploring",
             "passed": true
           },
           {
             "student": "I meant I'm 21, not 17. Please continue with the data option.",
-            "action": "select",
-            "response": "Data and Reporting\nYou enjoy spreadsheets and making dashboards, which fits well with the Data and Reporting course that explores spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.\n\nWould you like to choose Data and Reporting? Reply yes or select the course below.",
+            "action": "recommend",
+            "response": "Data and Reporting\nYou enjoy spreadsheets and making dashboards, which matches the course focus on exploring spreadsheets, data cleaning and practical dashboards.\nYour shared details meet the entry requirements.",
             "facts": {
               "age": 21,
               "marks": 70
             },
-            "stage": "decided",
+            "stage": "exploring",
             "passed": true
           }
         ]
@@ -628,8 +637,8 @@
         "turns": [
           {
             "student": "I am 20 with 70 marks and finished Class 12. I enjoy drawing stories, but have never tried design software. I want to explore my interests more deeply.",
-            "action": "ask",
-            "response": "It's great that you enjoy drawing stories and want to explore your interests more deeply.\n\nWhat kind of stories do you like to draw, and what do you enjoy most about creating them?",
+            "action": "recommend",
+            "response": "You might enjoy the Digital Content Production course, which focuses on visual storytelling and editing digital media, matching your interest in drawing stories and exploring design software.\n\nDigital Content Production\nYou enjoy drawing stories and want to explore your interests more deeply, so a course about visual storytelling and digital media editing fits well with what you want to learn.\nYour shared details meet the entry requirements.",
             "facts": {
               "age": 20,
               "marks": 70
@@ -640,7 +649,7 @@
           {
             "student": "I enjoyed arranging photos and telling a story for our community newsletter. I prefer creative work to keeping administrative records.",
             "action": "recommend",
-            "response": "You seem to enjoy creative storytelling and visual arrangement, which fits well with digital media work.\n\nDigital Content Production\nYou enjoy arranging photos and telling stories, which aligns well with exploring visual storytelling and editing digital media in this course.\nYour shared details meet the entry requirements.\n\nHave you tried any digital tools or software for creating or editing visual stories before?",
+            "response": "Digital Content Production fits your interest in creative storytelling and working with digital media.\n\nDigital Content Production\nYou enjoy arranging photos and telling stories creatively, so a course about visual storytelling and digital media editing suits your interests well.\nYour shared details meet the entry requirements.",
             "facts": {
               "age": 20,
               "marks": 70
@@ -651,7 +660,7 @@
           {
             "student": "That is enough exploration. Please show one or two suitable available courses now instead of asking more assessment questions.",
             "action": "recommend",
-            "response": "Based on your interest in creative storytelling and arranging photos, Digital Content Production is a suitable course for you.\n\nDigital Content Production\nYou enjoy arranging photos and telling stories, which aligns well with exploring visual storytelling and editing digital media in this course.\nYour shared details meet the entry requirements.",
+            "response": "Based on your interest in creative storytelling and arranging photos, the Digital Content Production course suits you well.\n\nDigital Content Production\nYou enjoy arranging photos and telling stories creatively, so a course about visual storytelling and digital media editing suits your interests well.\nYour shared details meet the entry requirements.",
             "facts": {
               "age": 20,
               "marks": 70

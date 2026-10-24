@@ -1,7 +1,7 @@
 """Bounded exploratory guidance; evidence notes are not psychometric measurements."""
 
 import uuid
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -75,6 +75,7 @@ class GuidanceMemory(StrictModel):
     pending_course: uuid.UUID | None = None
     recommended_ids: list[uuid.UUID] = Field(default_factory=list, max_length=3)
     turns: int = Field(default=0, ge=0)
+    questions_since_direction: int = Field(default=0, ge=0)
 
 
 class GuidanceDecision(StrictModel):
@@ -87,6 +88,13 @@ class GuidanceDecision(StrictModel):
     )
     question: str | None = Field(default=None, min_length=1, max_length=250)
     question_field: str | None = Field(default=None, max_length=64)
+    answer_options: list[Annotated[str, Field(min_length=1, max_length=55)]] = Field(
+        default_factory=list,
+        max_length=4,
+        description="Optional short, ordinary-language answers to the one question. "
+        "Use when concrete alternatives reduce effort; free text always works. "
+        "Not course selections, academic scores, commands or required questionnaire steps.",
+    )
     stage: Stage = "exploring"
     updates: list[ProfileUpdate] = Field(default_factory=list, max_length=6)
     facts: list[StudyFact] = Field(default_factory=list, max_length=12)

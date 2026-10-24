@@ -301,3 +301,16 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
   document limits in ADR-014 and the conversation release evidence.
 - [x] Publish through the reviewed protected-main PR/CI gate
   ([PR #16](https://github.com/Shan091/admitflow/pull/16)).
+
+## Task 63: Supportive guidance with contextual response choices
+
+- [x] Research and document CIP/CASVE, RIASEC and OARS principles, their evidence limits,
+  and adaptive question selection without a mandatory student-information sequence.
+- [x] Replace interview-style probing with beginner-friendly guidance and timely directions.
+- [x] Support optional contextual answer buttons alongside free text; include uncertainty,
+  preserve literal evidence and expire stale signed answers without selecting a course.
+- [x] Bound repeated exploration questions and offer a useful next step without an extra model call.
+- [x] Verify the reported short-answer journey with relevant and absent course offerings;
+  run quality/database/provider checks and document evidence.
+- [x] Publish through the reviewed protected-main PR/CI gate
+  ([PR #17](https://github.com/Shan091/admitflow/pull/17)).

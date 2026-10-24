@@ -23,6 +23,9 @@ now, rather than a permanent student type.
 | [Lent, Brown and Hackett: social cognitive career theory](https://doi.org/10.1006/jvbe.1994.1027) ([DOI](https://doi.org/10.1006/jvbe.1994.1027)) | The authors' framework relates interests and choices to self-efficacy, outcome expectations, goals and contextual/learning experiences. | Ask what the student has tried, what they hope to do and what practical supports/barriers matter. Low confidence or limited exposure is not proof of inability. This theory does not validate our particular assistant. |
 | [OECD career conversations](https://www.oecd.org/en/publications/career-conversations_15b83760-en.html) and [career guidance overview](https://www.oecd.org/en/topics/sub-issues/career-guidance.html) | The research examines how exploring, experiencing and thinking about future work relate to later outcomes. Conversations and exposure to work broaden exploration. | Introduce relevant unfamiliar course options and suggest a small project, syllabus review or conversation with someone in the field. Do not claim the institution offers those opportunities unless verified. Association in external studies is not measured impact for AdmitFlow. |
 | [International Personality Item Pool](https://www.ipip.ori.org/) and [norm/data cautions](https://www.ipip.ori.org/newNorms.htm) | IPIP provides public-domain personality items/scales; its own guidance warns about inappropriate labels, scoring and data sets. | Personality inventories were considered but are unnecessary for this release. Do not infer Big Five/MBTI/mental-health labels from chat or use personality as a course gate. Public-domain availability alone does not establish local validity or suitable use. |
+| [Florida State University: Cognitive Information Processing (CIP)](https://career.fsu.edu/tech-center/topics/career-theory-research-and-practice/cognitive-information-processing-cip-theory-based-approach) and [CASVE decision-making guide](https://career.fsu.edu/students/career/planning/decision-making/guide-to-good-decision-making) | Career decisions connect self-knowledge with knowledge of options. CASVE distinguishes recognizing a decision, understanding it, widening/narrowing possibilities, weighing them and acting; decisions can be revisited. | Choose the next conversational purpose from the student's present need. Do not turn the framework into a fixed onboarding sequence. Expand relevant unfamiliar possibilities before narrowing; explain tradeoffs and let the student revise the choice. |
+| [AHRQ: motivational interviewing in practice](https://www.ahrq.gov/sites/default/files/wysiwyg/evidencenow/tools-and-materials/interviewing.pdf) and [SAMHSA core-skills training hosted by Vermont Health](https://www.healthvermont.gov/sites/default/files/documents/pdf/ADAP_SAMHSA-Motivational_Interviewing.pdf) | OARS combines open questions, affirmations, reflections and summaries. The training emphasizes autonomy and avoiding a repetitive question/answer trap or premature focus. | Adapt these communication principles: acknowledge briefly, reflect a meaningful preference, summarize when changing direction and ask one consequential question. Do not challenge a novice to defend a project. These are clinical communication sources; adapting their techniques does not establish clinical efficacy or student outcomes for this assistant. |
+| [CareerOneStop: finding career ideas](https://cloudfront.careeronestop.org/HowTo/Findcareerideas/find-career-ideas.aspx) and [work values](https://cloudfront.careeronestop.org/ExploreCareers/Assessments/work-values.aspx) | Career exploration draws on interests, skills and values, then information about options and comparison. Work values concern what the person wants from work. | Keep these dimensions distinct. A desired outcome or preferred activity is neither a demonstrated skill nor an admissions prerequisite. Ask about relevant constraints rather than demanding a complete personal inventory. US occupation data do not establish Kerala course availability, earnings or accreditation. |
 
 Sources were consulted directly. The SCCT publisher abstract was available through
 search; full-text access was restricted. No inaccessible full-text findings, numerical
@@ -31,6 +34,61 @@ as an Indian guidance-resource lead, but the requested FAQ redirected to its hom
 no assessment-access or counselor-availability claim depends on that redirect.
 
 ## Asking useful questions
+
+### Adaptive method, not a required sequence
+
+The user's examples identify information that can matter, not a prescribed order.
+Our implementation applies the frameworks above as a **conversation design**, not
+as a copied instrument or a claim that one framework proves our generated dialogue.
+
+At each turn, use the accepted profile, recent answers, readiness and verified
+catalogue to choose the most consequential unresolved issue:
+
+- **Understand the person:** study stage/subjects when relevant, interests,
+  self-reported strengths, goals, values and practical constraints. Reuse volunteered
+  information. Do not require every dimension before being useful.
+- **Understand the decision:** a confident applicant may need entry requirements;
+  an uncertain student may need everyday activity examples; a comparing student may
+  need one tradeoff explained. These are revisable support states, not personality types.
+- **Check feasible options:** ask actual missing prerequisite facts for relevant
+  courses. Unknown eligibility remains unknown. A preliminary possibility is not an
+  eligibility approval. If the desired field is absent, acknowledge that without
+  collecting irrelevant prerequisites for an unrelated course.
+- **Broaden, compare and act:** introduce a relevant less-familiar field with a brief
+  explanation, show a supported shortlist when enough is known, or suggest an honest
+  research direction elsewhere. Course selection and application submission require
+  existing explicit actions.
+
+Use original activity-based prompts, not imported RIASEC items. Lack of exposure is
+not dislike; low confidence is not inability. Optional deeper exploration remains
+unscored. Interest themes are tentative evidence-backed notes, not a six-letter
+classification shown as a diagnosis. No inference from caste, gender, disability or
+other sensitive traits is permitted.
+
+### Text, buttons and respectful pacing
+
+Concrete contextual buttons reduce effort when the student faces a broad choice;
+include uncertainty and always accept a typed answer. Use free text for precise
+academic facts, personal context and questions. Do not suggest ages or marks to make
+eligibility easier to pass. This choice of controls is a product design decision,
+not an outcome established by the research cited above.
+
+Short answers are sufficient. Reflect or simplify rather than asking successive
+project/technology questions. New accepted background or prerequisite information
+keeps useful discovery open. Repeated questions without new accepted information
+trigger a gentle choice of next steps; this recovery limit is an engineering
+safeguard, not a scientifically prescribed number of questions. Normal/deeper modes
+use two/three consecutive no-progress questions respectively. Actual prerequisite
+questions are exempt. No extra provider call is needed for recovery or buttons.
+An unanswered prerequisite is handled with a choice to keep exploring or return to
+entry checks, rather than repeating the same question. Recommendation evidence must
+quote a stated preference, goal or self-reported strength; schooling alone is not
+evidence that a student enjoys the subject. This guard validates evidence categories
+and literal quotations, not the semantic truth of every generated fit explanation.
+
+Contextual options are signed, single-use, expiring answer references. Only the
+clicked label becomes literal student evidence; offering a label does not make it
+a fact. Matching a course name in an option must not silently choose that course.
 
 A bounded interpretation step extracts explicit current-message evidence first.
 Academic corrections are validated, catalog eligibility is refreshed, and then the
@@ -42,7 +100,7 @@ Examples below illustrate intent, not a fixed script or copied test items:
 | What is uncertain? | Useful exploration | Avoid |
 | --- | --- | --- |
 | A familiar course name is the only option known | What activity or outcome attracts the student to it? Connect relevant less familiar catalog choices to that evidence. | Assuming the traditional course is wrong or repeatedly upselling. |
-| Student says “I like computers” | Ask about something they tried: making a page, organizing information, repairing a device, creating media or another example. | Treating every computer interest as programming aptitude. |
+| Student says “I like computers” | Offer accessible activities such as creating visuals, solving problems or organizing information; invite a typed alternative. Ask education or goals instead when those would change the decision more. | Treating every computer interest as programming aptitude or requiring project evidence. |
 | Family preference conflicts with the student's interests | Clarify the student's own priorities and the source of the disagreement. | Labelling the student indecisive or treating family wishes as their consent. |
 | No experience with a field | Ask what seems interesting and suggest a small way to explore it. | Recording lack of exposure as dislike or inability. |
 | Time, travel or budget matters | Invite an optional practical constraint and explain why it affects options. | Requesting household income, caste, diagnosis or unnecessary identifiers. |
