@@ -98,14 +98,14 @@ not Git publication or production approval.
   Updated image matches all 68 source files and passes the non-root production smoke check.
 - [x] Task 59 runtime choice: Use the existing local data services and documented API,
   worker, receiver and frontend commands. No cloud provisioning is necessary for this build.
-- [x] Task 60 drafts: Six-slide editable deck, 178-word AI statement and demonstration script.
+- [x] Task 60 drafts: Six-slide editable deck, 177-word AI statement and demonstration script.
 - [x] Record and inspect the actual 33-second local staff walkthrough; preserve the
   tested code/configuration fingerprint in docs/event/BUILD_MANIFEST.json.
 - [x] Record and inspect a 58-second staff view of the saved live student journey,
   including selection, corrections, sourced/unsupported answers and the resumed staff request.
 - [ ] Final handset recording, owner/team/license details, organizer/portal verification and submission.
 - [x] Publish the existing main baseline and feature checkpoint; open [draft PR #1](https://github.com/Shan091/admitflow/pull/1).
-- [ ] Verify CI, resolve review findings and complete the PR merge gate.
+- [x] Verify code publication through PR #12 with adversarial review, both exact-head CI checks green and squash merge (`f532f1c`).
 
 The user has explicitly authorized pushing to Shan091/admitflow. Publish the existing
 main baseline and a feature-branch checkpoint, preserving source history. Keep credentials

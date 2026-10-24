@@ -13,7 +13,8 @@ The user has assigned **all remaining tasks to the primary agent**. The previous
 proposal to reserve Task 26 for another agent is superseded; nothing is waiting for
 an external analytics handoff. Tasks 21/22/26/27/32/33 and staff/privacy/OpenAI work
 were published through merged PRs #4-9. Task 38 now has verified local full-stack
-packaging. Tasks 42.1/42.2 now have document-structure and contextual-retrieval evidence. Continue remaining release checks.
+packaging. Tasks 42.1/42.2 are merged with document-structure and contextual-retrieval evidence.
+The user is personally testing the local app; submission details remain deferred.
 Group related implementation work, use focused tests during development, and run the
 full applicable gate once each feature group is ready. Keep the repository's review,
 privacy, tenant-isolation and release requirements intact.
@@ -1148,10 +1149,16 @@ limits are documented in [DOCUMENT_INGESTION.md](../docs/engineering/DOCUMENT_IN
 **Dependencies:** Public event/handbook snapshots and repository inspection.
 **Acceptance criteria:**
 
-- [ ] Root EVENT_CONTEXT.md records the latest user direction, event rules, baseline facts, unknowns, and restart prompt.
-- [ ] docs/event/ holds the preparation plan, source snapshots, and discrepancies.
-- [ ] AGENTS.md links the handoff and local links/content have been checked.
-- [ ] Follow the existing completion/commit workflow before marking this milestone complete.
+- [x] Root EVENT_CONTEXT.md records the latest user direction, event rules, baseline facts, unknowns, and restart prompt.
+- [x] docs/event/ holds the preparation plan, source snapshots, and discrepancies.
+- [x] AGENTS.md links the handoff and local links/content have been checked.
+- [x] Follow the existing completion/commit workflow before marking this milestone complete.
+
+**Verification:** Existing source snapshots/preparation/discrepancy files are present;
+local Markdown links in the nine active entry/runbook documents resolve. PR #12
+records reviewed, green-CI source publication. The refreshed resume prompt honors
+the user's hands-on review before submission work. This does not complete event
+submission or the historical WhatsApp criteria.
 
 Start at [../EVENT_CONTEXT.md](../EVENT_CONTEXT.md). The proposed WhatsApp check below was superseded by the Telegram decision.
 
