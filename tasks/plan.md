@@ -344,3 +344,16 @@ The original two provider/typed-decision failure outcomes remain recorded in
 Task 65 payment follow-up: the read-only Razorpay test API probe passed; encrypted
 institution configuration matches the private environment. Zero payment orders or
 links were created. Actual card/webhook receipt is unverified; live mode is disabled.
+
+## Task 66: Submission-facing repository README
+
+- [x] Explain the student problem, product idea, features and institution workflow.
+- [x] Document architecture and knowledge flow with Mermaid diagrams.
+- [x] Add stack/tools, reproducible setup, configuration, commands and repository structure.
+- [x] Link evidence, security boundaries, ownership and licensing without a demo placeholder.
+- [x] Verify documentation links, review factual claims and pass the repository quality gate.
+
+Task 66 verification: 34 relative links/anchors resolve, both Mermaid blocks and Markdown
+fences are checked, setup commands match the runtime/configuration sources, and the
+backend gate passes (313 tests, strict typing across 127 files, lint/format). No application
+code changed. Protected-main publication and its final-head CI are recorded on the PR.
