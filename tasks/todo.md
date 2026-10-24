@@ -1286,7 +1286,7 @@ of explicit details, a fresh testing context, typing feedback and lower response
 - [x] Reduce model/SQL overhead; record measured latency and call counts.
 - [x] Pass regression, real database, live provider and full quality gates; complete
   adversarial review with no open critical/important findings.
-- [ ] Publish through protected-main CI.
+- [x] Publish through protected-main CI ([PR #16](https://github.com/Shan091/admitflow/pull/16)).
 
 **Evidence:** 293 default tests and strict typing over 124 source files; 107 distinct
 PostgreSQL cases verified across the full run and focused assertion/regression rechecks,

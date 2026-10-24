@@ -299,4 +299,5 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
   transcript queries, and measure response latency without sending test messages.
 - [x] Verify regressions, database boundaries, provider scenarios and quality gate;
   document limits in ADR-014 and the conversation release evidence.
-- [ ] Publish through the reviewed protected-main PR/CI gate.
+- [x] Publish through the reviewed protected-main PR/CI gate
+  ([PR #16](https://github.com/Shan091/admitflow/pull/16)).

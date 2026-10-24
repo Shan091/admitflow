@@ -37,5 +37,16 @@
   },
   "frontend": "No dashboard changes in this task; GitHub frontend CI remains required",
   "deployment": "Deferred until explicitly authorized by the owner",
-  "publication": "Pending protected-main PR and exact-head CI"
+  "native_runtime": {
+    "api_readiness": "passed",
+    "dashboard_http_status": 200,
+    "default_worker": "Reloaded on tested source; listening",
+    "public_deployment_performed": false
+  },
+  "publication": {
+    "pull_request": "https://github.com/Shan091/admitflow/pull/16",
+    "reviewed_implementation_head": "61d4f5898a240643b06a02d5f4cc2a078be66813",
+    "implementation_ci": {"backend quality gate": "success", "frontend checks": "success"},
+    "closeout": "Documentation-only closeout retains the tested source fingerprint; final-head checks and merge are recorded on the pull request"
+  }
 }
