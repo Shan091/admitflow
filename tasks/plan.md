@@ -314,3 +314,9 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
   run quality/database/provider checks and document evidence.
 - [x] Publish through the reviewed protected-main PR/CI gate
   ([PR #17](https://github.com/Shan091/admitflow/pull/17)).
+
+## Task 64: Keep routine inquiries with the assistant
+
+- [x] Remove routine guidance/catalogue staff buttons; retain necessary review and explicit help.
+- [x] Show unavailable online payments honestly without creating a payable quote or staff handoff.
+- [x] Verify uncertainty, eligibility, explicit handoff and payment regressions; document results.

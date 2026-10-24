@@ -102,6 +102,20 @@ def test_old_guidance_memory_remains_loadable():
     assert state.questions_since_direction == 0
 
 
+def test_generated_answer_options_cannot_offer_routine_staff_handoff():
+    plan = GuidanceDecision(
+        action="ask",
+        question="What would help?",
+        answer_options=[
+            "Ask admissions staff",
+            "Talk to a counsellor",
+            "Human resources",
+            "Not sure yet",
+        ],
+    )
+    assert answer_labels(plan) == ["Human resources", "Not sure yet"]
+
+
 @pytest.mark.parametrize(
     "label", ["/apply", "Visit https://fake.test", "You are guaranteed admission"]
 )

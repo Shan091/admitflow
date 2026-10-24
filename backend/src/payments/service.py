@@ -144,7 +144,7 @@ async def request_payment(
     institution = await db.get(Institution, lead.tenant_id)
     if amount and (institution is None or not institution.razorpay_credentials_enc):
         raise PaymentRequestError(
-            "Payments are not configured for this institution. Request staff help."
+            "Online payments are not available yet. Your application is saved."
         )
     order = PaymentOrder(
         id=uuid.uuid4(),

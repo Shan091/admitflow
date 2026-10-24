@@ -46,6 +46,13 @@ question sequence.
 
 ## Consequences and limits
 
+Task 64 refines the recovery controls: no routine staff button in stalled exploration,
+catalogue browsing, declined optional information or a successful entry check. Filter
+staff-contact suggestions from generated contextual options as well. Keep explicit
+help, safety and necessary institutional review paths. A previous handoff remains
+paused until a staff user explicitly resumes automation; removing a button cannot
+silently override case ownership.
+
 The bot adapts its next purpose rather than forcing background, interest, eligibility
 and recommendation into a universal order. Unknown prerequisites remain unknown;
 preliminary interest fit does not imply admission. No verified offering means an

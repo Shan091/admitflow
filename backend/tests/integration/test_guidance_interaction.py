@@ -154,9 +154,73 @@ def test_interview_probe_is_replaced_without_an_extra_model_request(setup_guidan
             assert [b.text for b in reply.buttons] == [
                 "Browse available courses",
                 "Explore interests further",
-                "Ask admissions staff",
             ]
             assert lead.current_course_id is None
+
+    asyncio.run(exercise())
+
+
+def test_uncertainty_and_catalogue_do_not_offer_handoff_but_explicit_help_still_works(
+    setup_guidance, monkeypatch
+):
+    from src.db.models import HumanRequest
+
+    async def plan(*args, **kwargs):
+        return GuidanceDecision(
+            action="ask",
+            question="Which activities appeal to you?",
+            answer_options=["Solving problems", "Not sure yet"],
+        )
+
+    monkeypatch.setattr("src.engine.guidance.request_decision", plan)
+
+    async def exercise():
+        async with setup_guidance["sessions"]() as db:
+            lid, bid, *_ = setup_guidance["guidance_ids"]
+            lead, bot = await db.get(Lead, lid), await db.get(TelegramBot, bid)
+            memory = {"facts": {}, "guidance": {"questions_since_direction": 2}}
+            for i, text in enumerate(["Not sure yet", "/courses"]):
+                reply = await route(
+                    db,
+                    lead,
+                    bot,
+                    Event(
+                        update_id=i + 1,
+                        user_id=8,
+                        chat_id=8,
+                        message_id=i + 1,
+                        kind="text",
+                        text=text,
+                    ),
+                    memory,
+                )
+                assert not any(b.data.startswith("human:") for b in reply.buttons)
+                assert await db.scalar(select(func.count()).select_from(HumanRequest)) == 0
+            await route(
+                db,
+                lead,
+                bot,
+                Event(update_id=3, user_id=8, chat_id=8, message_id=3, kind="text", text="/human"),
+                memory,
+            )
+            assert await db.scalar(select(func.count()).select_from(HumanRequest)) == 1
+
+    asyncio.run(exercise())
+
+
+@pytest.mark.parametrize("age,needs_review", [(20, False), (17, True)])
+def test_successful_entry_check_has_no_staff_shortcut_but_failed_rules_allow_review(
+    setup_guidance, age, needs_review
+):
+    from src.engine.journey import qualify
+
+    async def exercise():
+        async with setup_guidance["sessions"]() as db:
+            lid, bid, cid, batch, *_ = setup_guidance["guidance_ids"]
+            lead, bot = await db.get(Lead, lid), await db.get(TelegramBot, bid)
+            lead.current_course_id, lead.current_batch_id = cid, batch
+            reply = await qualify(db, lead, bot, {"facts": {"age": age}}, "", [])
+            assert any(b.data.startswith("human:") for b in reply.buttons) == needs_review
 
     asyncio.run(exercise())
 

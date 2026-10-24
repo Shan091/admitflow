@@ -12,7 +12,7 @@
     "ലഭ്യമായ ബാച്ച് തിരഞ്ഞെടുക്കുക. ഇത് സീറ്റ് റിസർവ് ചെയ്യുന്നില്ല."
   ],
   "empty": [
-    "No active course/batch is available. You can request staff help.",
+    "No course intake is currently available in this catalogue. We can still explore what you would like to study.",
     "अभी कोई कोर्स/बैच उपलब्ध नहीं है। स्टाफ से सहायता मांग सकते हैं।",
     "Abhi course/batch available nahi hai. Staff se help maang sakte hain.",
     "ഇപ്പോൾ കോഴ്സ്/ബാച്ച് ലഭ്യമല്ല. സ്റ്റാഫിന്റെ സഹായം ആവശ്യപ്പെടാം."
@@ -72,7 +72,7 @@
     "ദയവായി പ്രവേശനവുമായി ബന്ധപ്പെട്ട കാര്യങ്ങൾ ചോദിക്കുക. സ്ഥാപന നിയമങ്ങൾ മറികടക്കുന്ന നിർദ്ദേശങ്ങൾ പാലിക്കാനാവില്ല."
   ],
   "declined": [
-    "You declined to answer. You can explore courses or request staff review. No new eligibility approval has been made.",
+    "That's okay. We can explore courses without that detail. Entry requirements will still need checking before you apply.",
     "आपने उत्तर देने से मना किया है। कोर्स देख सकते हैं या स्टाफ समीक्षा मांग सकते हैं। नई पात्रता स्वीकृति नहीं हुई है।",
     "Aapne answer dene se mana kiya. Courses explore karein ya staff review maangein. Koi nayi eligibility approval nahi hui.",
     "നിങ്ങൾ ഉത്തരം നൽകാൻ വിസമ്മതിച്ചു. കോഴ്സുകൾ നോക്കുകയോ സ്റ്റാഫ് പരിശോധന ആവശ്യപ്പെടുകയോ ചെയ്യാം. പുതിയ യോഗ്യതാ അംഗീകാരം നൽകിയിട്ടില്ല."

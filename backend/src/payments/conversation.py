@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.security import decrypt_pii
 from src.db.enums import PaymentStatus
-from src.db.models import Lead, PaymentOrder, TelegramBot
+from src.db.models import Institution, Lead, PaymentOrder, TelegramBot
 from src.engine.contracts import Button, Reply
 from src.payments.service import PaymentRequestError, existing_payment, fee_details, request_payment
 from src.telegram.callbacks import callback_data
@@ -61,6 +61,13 @@ async def preview(
     if course.application_fee == 0:
         return Reply(
             text="No application fee is configured. Your application is available for staff review."
+        )
+    institution = await db.get(Institution, lead.tenant_id)
+    if amount and (institution is None or not institution.razorpay_credentials_enc):
+        memory.pop("payment_quote", None)
+        return Reply(
+            text=f"Application fee: INR {amount / 100:.2f}. "
+            "Online payments are not available yet. Your application is saved."
         )
     nonce = secrets.token_hex(8)
     memory["payment_quote"] = {
