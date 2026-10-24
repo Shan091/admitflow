@@ -286,4 +286,4 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
 - [x] Preserve direct course choice, FAQs, human help, consent and application/payment controls.
 - [x] Verify unit/adversarial, real database and bounded live OpenAI student scenarios;
   adversarial review and final local checks pass; update this checklist.
-- [ ] Publish through the protected-main PR/CI gate.
+- [x] Publish through the protected-main PR/CI gate ([PR #15](https://github.com/Shan091/admitflow/pull/15)).

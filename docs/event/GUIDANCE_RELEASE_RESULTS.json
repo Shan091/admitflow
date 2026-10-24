@@ -45,5 +45,14 @@
     "Running Compose containers retain their previous baseline; a new build uses this source",
     "Real Razorpay provider acceptance and event submission remain open"
   ],
-  "deployment": "Deferred until explicitly authorized by the owner"
+  "deployment": "Deferred until explicitly authorized by the owner",
+  "publication": {
+    "pull_request": "https://github.com/Shan091/admitflow/pull/15",
+    "reviewed_implementation_head": "d0c9093a15b56a501ee7f168676acb1bfb78b5ff",
+    "implementation_ci": {
+      "backend quality gate": "success",
+      "frontend checks": "success"
+    },
+    "closeout": "Documentation-only closeout retains the tested source fingerprint; final-head checks and merge are recorded on the pull request"
+  }
 }

@@ -1241,7 +1241,8 @@ further exploration; English for now; student fit takes priority over enrollment
 - [x] Authorized staff can inspect the saved guidance evidence and classification.
 - [x] Full applicable gates, realistic OpenAI scenarios and adversarial review pass;
   native runtime is refreshed.
-- [ ] Publish through a reviewed protected-main PR with green exact-head CI.
+- [x] Publish through a reviewed protected-main PR with green exact-head CI
+  ([PR #15](https://github.com/Shan091/admitflow/pull/15)).
 
 **Verification:** Backend gate: 280 default tests, lint/format and strict typing over
 120 source files. Full PostgreSQL: 99 passed; the two Redis-only cases pass separately.

@@ -8,7 +8,8 @@ on each applicant's interests, background, goals and constraints. They answered:
 student fit first even when the right field is unavailable here. English for now.**
 They asked to be notified when the work is finished and not to deploy.
 
-Implementation is on `codex/adaptive-course-guidance`. New interpretation/planning
+Implementation is tracked in [PR #15](https://github.com/Shan091/admitflow/pull/15)
+from `codex/adaptive-course-guidance`. New interpretation/planning
 steps use the existing OpenAI configuration; no new provider, framework or training.
 The research record and ADR-013 distinguish career exploration from validated tests.
 Literal profile evidence is encrypted; academic facts/eligibility stay code-owned.
@@ -24,12 +25,13 @@ A failed reply must preserve validated corrections; an adversarial test also cat
 course closing during the model call. Course confirmation uses a code-owned question,
 and failed deeper exploration clears stale pending choices. Final local gates pass:
 280 default tests/120 strict source files, 99 PostgreSQL tests,
-two Redis tests, frontend lint/build and all 14 browser scenarios. Publication remains
-in progress through the protected-main PR/CI gate.
+two Redis tests, frontend lint/build and all 14 browser scenarios. Both GitHub checks
+passed on reviewed implementation head `d0c9093`; PR #15 records the final checks
+and merge status for the documentation closeout.
 Native services were found stopped and restored. API/default worker were reloaded
 on the completed source; receiver, serial knowledge worker and scheduler are running.
 The real browser login checks pass again. No public deployment was performed.
-Use tasks/todo.md and the current PR state for final verification, not this interim note.
+Use tasks/todo.md, the release evidence and PR #15 for the verification record.
 
 ## Current direction
 
