@@ -357,3 +357,10 @@ Task 66 verification: 34 relative links/anchors resolve, both Mermaid blocks and
 fences are checked, setup commands match the runtime/configuration sources, and the
 backend gate passes (313 tests, strict typing across 127 files, lint/format). No application
 code changed. Protected-main publication and its final-head CI are recorded on the PR.
+
+## Task 67: Explicit submission README requirements
+
+- [x] Confirm the root README explains the project, problem, idea and stack/tools.
+- [x] Add a prominent product demonstration link to the existing six-slide presentation.
+- [x] Identify actual prototype screens and distinguish the earlier presentation snapshot.
+- [x] Verify the presentation file, public download and README links; retain the existing green code gate.

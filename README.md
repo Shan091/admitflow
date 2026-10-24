@@ -10,6 +10,15 @@ see the conversation, shared details and next steps in an authenticated web dash
 [Features](#features) · [Architecture](#architecture) · [AI workflow](#how-admitflow-uses-ai) ·
 [Tech stack](#tech-stack) · [Getting started](#getting-started) · [Documentation](#documentation)
 
+## Product demonstration
+
+[**Download the prototype presentation (PowerPoint)**](docs/event/artifacts/admitflow-pitch-final.pptx)
+
+The six-slide presentation showcases actual AdmitFlow catalogue and document-upload screens
+with synthetic demonstration data. It explains the student-to-institution workflow, the AI
+architecture and the proposed institution pilot. It captures an earlier prototype snapshot;
+current implementation and verification details are documented below.
+
 ## The problem
 
 Choosing a course often starts with an incomplete picture. A student may know only familiar
