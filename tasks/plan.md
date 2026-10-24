@@ -367,3 +367,14 @@ code changed. Protected-main publication and its final-head CI are recorded on t
 
 The overview and technology requirements are covered. The product demonstration link is
 intentionally deferred by the owner; the older deck is not the selected submission artifact.
+
+## Task 68: Submission AI Impact Statement
+
+- [x] Update the existing statement for adaptive guidance and the current public reference catalogue.
+- [x] Cover AI tasks, model justification, data/licenses, safeguards, evaluation and expected impact.
+- [x] Keep the statement within the handbook limit: 186 of 200 words, excluding the heading.
+- [x] Verify claims against model configuration, provenance and recorded evaluation scope.
+
+No custom training, validated psychometric assessment, measured conversion gain or completed
+submission is claimed. Only statement/provenance/artifact records and these checklists changed;
+application source and the existing green code gate are unchanged.

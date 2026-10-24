@@ -6,7 +6,8 @@ provider models, dependencies or event materials.
 
 | Material | Origin and use | Terms / evidence |
 | --- | --- | --- |
-| Demo catalog, references and synthetic student answers | Authored development examples; no real institution policy or applicant records | Project material; labelled synthetic |
+| Historical demo catalogue and synthetic student answers | Authored development examples used in bounded evaluations | Project material; labelled synthetic |
+| Current JAIN Kochi public reference catalogue | 64 programme options and campus information discovered through SerpAPI and checked against official public pages; summaries indexed for exploration | Official URLs preserved in [the snapshot](../../backend/data/jain-kochi/catalogue.json); public availability is not an open-license grant or admissions authorization; third-party rights retained |
 | Synthetic counselling PDF | Authored fixture; fictional room Lotus Hall; retained as an approved demo reference | [PDF](artifacts/synthetic-counselling-reference.pdf); owner shan |
 | Pitch screenshots | Captured from the actual isolated Compose workspace with synthetic data | Project UI; credentials and applicant data excluded |
 | OpenAI interpretation/reranking | Configured `openai/gpt-4.1-mini`; hosted requests, no downloaded weights or training | Provider service terms; configured model, not a licensing grant |
