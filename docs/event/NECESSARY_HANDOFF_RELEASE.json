@@ -1,0 +1,51 @@
+{
+  "scope": "Task 64 routine inquiry controls and unavailable payment preview",
+  "source_fingerprint": "41eb6bd81eed5bf6115956d9890447a706eea0662ff535fe4ead663b3f5d7bfe",
+  "backend": {
+    "default_tests_passed": 306,
+    "strict_source_files": 126,
+    "lint_and_format_passed": true,
+    "integration_runs": [
+      {
+        "scope": "conversation, reset and payment preview",
+        "passed": 25
+      },
+      {
+        "scope": "final guidance, payment preview/jobs/webhooks/staff review",
+        "passed": 20
+      },
+      {
+        "scope": "final English copy/journey regression",
+        "passed": 6
+      }
+    ],
+    "integration_runs_overlap": true
+  },
+  "review": {
+    "critical_or_important_findings_open": 0,
+    "boundaries": [
+      "Routine buttons omitted; explicit help and necessary review retained",
+      "Generated staff-contact options filtered without excluding Human resources interest",
+      "No invoice or payable quote without institution credentials",
+      "Existing invoices/receipts and zero-payable handling retained",
+      "Existing staff ownership preserved"
+    ]
+  },
+  "runtime": {
+    "workspace_api_ready": true,
+    "dashboard_http_status": 200,
+    "common_worker_listening": true,
+    "receiver_started": true,
+    "demo_razorpay_credentials_present": false,
+    "payments_live_enabled": false,
+    "existing_staff_requests_changed": false,
+    "test_messages_sent": 0,
+    "public_deployment_performed": false
+  },
+  "limits": [
+    "No live OpenAI or handset evaluation repeated for this control/copy change.",
+    "Razorpay setup and real test-card validation remain pending.",
+    "Previously handed-off chats need explicit staff resume before fresh reset.",
+    "Separate Compose application images were not rebuilt."
+  ]
+}

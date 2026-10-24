@@ -296,6 +296,18 @@ deadline updates. These are tracked tasks, not reasons to add unnecessary servic
 
 ### Supportive interaction (Task 63)
 
+Task 64 refinement: routine discovery, catalogue browsing, uncertainty and successful
+entry checks offer no staff-handoff shortcut. Generated guidance answer options must
+also omit staff-contact actions. Explicit student requests, safety concerns, failed
+entry-rule review and changes to submitted applications retain the relevant support
+path. Existing staff-owned conversations stay paused until explicitly resumed.
+
+When paid application fees exist but the institution has no Razorpay credentials,
+show the configured fee and honest online-payment unavailability. Offer no payment
+creation button or payable quote, clear an obsolete quote and create no invoice.
+Preserve existing receipts/invoices and zero-payable-amount handling. Razorpay test
+account setup, test-card validation and live enablement remain incomplete.
+
 Use the primary-source techniques and limits in
 [the guidance research](docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md) and ADR-015.
 CIP/CASVE provides flexible decision purposes; RIASEC informs tentative activity

@@ -391,7 +391,8 @@ def test_missing_rules_closed_batches_and_foreign_course_are_not_approved(
             monkeypatch.setattr("src.decision.generate_completion", decline)
             memory["question"] = "age"
             response = await qualify(db, lead, bot, memory, "I prefer not to answer", [])
-            assert "declined" in response.text.lower()
+            assert "without that detail" in response.text.lower()
+            assert not any(b.data.startswith("human:") for b in response.buttons)
             assert memory["eligibility"]["outcome"] == "needs_information"
             assert lead.status != LeadStatus.ADMISSION_READY
             await db.rollback()

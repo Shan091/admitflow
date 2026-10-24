@@ -1332,3 +1332,21 @@ answers and progress-sensitive discovery. See `SUPPORTIVE_GUIDANCE_RESULTS.json`
 not establish psychometric validity or real-student outcomes. Local API/common worker
 were reloaded; readiness and UI HTTP checks pass. No public deployment or Telegram
 message was sent for this change.
+
+### Task 64: Necessary staff intervention and unavailable payments
+
+- [x] Remove routine guidance/catalogue staff buttons; retain necessary review and explicit help.
+- [x] Show unavailable online payments honestly without creating a payable quote or staff handoff.
+- [x] Verify uncertainty, eligibility, explicit handoff and payment regressions; document results.
+
+Task 64 evidence: **306 default tests**, strict typing across **126 source files** and
+lint/format pass. Focused integration runs pass **25 conversation/reset cases**,
+**20 final guidance/payment cases**, and **six final copy/journey cases** (overlapping
+runs, not additive counts). Explicit `/human`, failed-rule review, payment confirmation,
+receipts and webhook controls remain verified. No live-provider or handset test was
+repeated for this control/copy change. Demo Razorpay credentials remain absent and
+live payments disabled. Local API/worker/receiver and dashboard were started after
+finding the prior processes stopped; readiness, listener and UI HTTP checks pass.
+Existing staff requests were preserved. Resolve the test request and use **Resume
+automation → Confirm resume**, then `/reset` for a fresh test. No charge or public
+deployment was performed. See `docs/event/NECESSARY_HANDOFF_RELEASE.json`.

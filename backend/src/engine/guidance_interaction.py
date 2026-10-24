@@ -18,6 +18,12 @@ INTERVIEW_PROBE = re.compile(
     r"\bprojects?\b.{0,50}\b(?:worked on|have (?:you )?built)\b",
     re.I,
 )
+STAFF_OFFER = re.compile(
+    r"\b(?:ask|contact|talk|speak|connect|request|meet)\b.{0,40}"
+    r"\b(?:staff|human|counsell?or|admissions (?:team|office))\b|"
+    r"\b(?:staff|human)\s+(?:help|review|support)\b",
+    re.I,
+)
 
 
 def needs_progress(plan: GuidanceDecision, state: GuidanceMemory) -> bool:
@@ -40,6 +46,7 @@ def answer_labels(plan: GuidanceDecision) -> list[str]:
         if (
             label.startswith("/")
             or "\n" in label
+            or STAFF_OFFER.search(label)
             or label.casefold() in {s.casefold() for s in labels}
         ):
             continue
@@ -90,7 +97,6 @@ def add_response_controls(
             buttons=[
                 button("Browse available courses", "courses", "all", lead, bot),
                 button("Explore interests further", "guide", "deeper", lead, bot),
-                button("Ask admissions staff", "human", "request", lead, bot),
             ],
         )
     if has_courses or plan.action == "recommend" or plan.outside_interests:

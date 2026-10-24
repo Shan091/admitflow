@@ -1,5 +1,15 @@
 # AdmitFlow project handoff
 
+## Current work: Task 64 assistant-led routine inquiries
+
+Routine uncertainty, browsing and successful eligibility no longer offer staff buttons.
+Explicit help, safety and necessary institutional review remain. Existing handed-off
+cases require explicit staff resume; the test chat was not silently resumed.
+Unconfigured Razorpay shows the configured fee and payment unavailability, without a
+creation button/quote/invoice. Demo credentials remain absent and live payments disabled.
+See `docs/event/NECESSARY_HANDOFF_RELEASE.json` and Task 64 for checks and limits.
+
+
 ## Current work: Task 63 supportive adaptive guidance
 
 The owner clarified that background/eligibility examples are not a mandated sequence.

@@ -165,8 +165,7 @@ async def courses(db: AsyncSession, lead: Lead, bot: TelegramBot, memory: dict[s
         lead.status = LeadStatus.DISCOVERING
     return Reply(
         text=copy("choose" if rows else "empty", memory),
-        buttons=[button(row.name, "course", row.id.hex, lead, bot) for row in rows]
-        + [button("Request staff help", "human", "request", lead, bot)],
+        buttons=[button(row.name, "course", row.id.hex, lead, bot) for row in rows],
     )
 
 
@@ -267,7 +266,6 @@ async def qualify(
                 text=copy("declined", memory),
                 buttons=[
                     button("Explore courses", "courses", "all", lead, bot),
-                    button("Request staff review", "human", "request", lead, bot),
                 ],
             )
         for fact in parsed.facts[:20]:
@@ -333,7 +331,7 @@ async def qualify(
         buttons=[
             *([button("Start application", "apply", "start", lead, bot)] if eligible else []),
             button("Explore courses", "courses", "all", lead, bot),
-            button("Request staff review", "human", "request", lead, bot),
+            *([] if eligible else [button("Request staff review", "human", "request", lead, bot)]),
         ],
     )
 
