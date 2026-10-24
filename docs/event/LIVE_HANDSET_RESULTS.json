@@ -1,0 +1,23 @@
+{
+  "scope": "Synthetic demo only; user-confirmed handset receipt plus read-only local verification",
+  "staff_reply": {
+    "delivery_status": "sent",
+    "handset_confirmed": true,
+    "automation_restored": true
+  },
+  "uploaded_pdf": {
+    "source": "demo-checks/synthetic-counselling-reference.pdf",
+    "status": "ready",
+    "fact": "Lotus Hall",
+    "original_reply_delivery_status": "sent",
+    "handset_confirmed": true
+  },
+  "plain_answer": {
+    "provider": "configured OpenAI",
+    "text": "The demo admissions counselling room is called Lotus Hall.",
+    "internal_source_retained": true,
+    "citation_footer_visible": false,
+    "sent_to_handset": false
+  },
+  "no_new_telegram_messages_sent": true
+}

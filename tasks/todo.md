@@ -255,8 +255,10 @@ and nonzero failure exit. No runtime conversation behavior was changed by this s
 - [X] Replace the invalid OpenAI key and pass the expanded live FAQ evaluation: **24/24**.
 - [X] Complete agent review of the language templates as requested; record scope and limits in LANGUAGE_REVIEW.md.
 - [X] Record the longer actual staff view of the saved student journey and prepare prior-work disclosure.
-- [ ] Final demo recording, owner/team/license details, judge-accessible links and portal/prior-work confirmation.
-- [ ] Git publication, PR/CI/adversarial merge gate and any selected-host deployment.
+- [x] Owner shan and MIT license recorded; six-slide editable deck, README, AI statement and provenance prepared and checked.
+- [ ] Final demo recording, judge-accessible links and portal/prior-work confirmation.
+- [x] Existing source published through reviewed, green-CI PRs; continue the same gate for each change.
+- [ ] Public deployment only when the user explicitly authorizes it.
 
 ### Release tracking for the existing plan
 
@@ -903,10 +905,32 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
 - [X] AI-suggested replies support review, edit, approve and ignore; stale/expired drafts cannot be approved.
 - [X] Manual text input queues a tenant-scoped Telegram reply with an exact-text confirmation and replay-safe send reference.
 - [X] "Take Over" and "Resume AI" buttons, confirmations and bot-pause status.
-  **Verification:** PostgreSQL/API and browser scenarios cover takeover, manual-send retry, reviewed drafts and resume. A handset-confirmed staff-authored delivery is still a separate live check.
-- [ ] Confirm one explicitly authorized staff reply on the Telegram handset.
+  **Verification:** PostgreSQL/API and browser scenarios cover takeover, manual-send retry, reviewed drafts and resume. The explicitly authorized staff-authored test delivery is saved as sent and the user confirmed handset receipt; automation was restored.
+- [x] Confirm one explicitly authorized staff reply on the Telegram handset.
   **Dependencies:** Task 25, 20
   **Estimated scope:** Large
+
+### Task 29.1: Student answer presentation
+
+**Description:** Show only the grounded answer in Telegram, as requested after the PDF handset check.
+**Acceptance criteria:**
+
+- [x] Student FAQ replies omit source filenames and citation footers.
+- [x] Exact-quote support, relevance, course/tenant scoping and abstention remain enforced.
+- [x] Document/chunk IDs, source path and passage survive encrypted reply persistence; transport sends only text/buttons.
+- [x] Staff document search retains its sources; legacy queued replies remain readable.
+
+**Verification:** Test-first transport regression failed on the previous reply contract,
+then passed with internal typed evidence. The full backend gate passes **252 tests**,
+lint/format and strict typing over **117 source files**. **16 PostgreSQL journey,
+contextual-retrieval and staff-operation cases** pass. The multilingual live FAQ
+rerun passes **24/24** with metadata-based source scoring and no visible footer.
+A read-only live PDF answer contains Lotus Hall with its internal source; no additional
+Telegram message was sent. Native API and Telegram worker were restarted. Existing
+saved messages retain their original text; staff search still displays sources.
+Adversarial self-review covered evidence identity/tenant scope, old queued payloads,
+transport allowlisting, abstention and synthetic-data publication; no open important
+or critical finding. This source slice does not revalidate the old Compose image.
 
 ### Task 30: Document management (RAG)
 
@@ -916,9 +940,12 @@ the feature-branch/PR/CI workflow; remaining CRM/exports/operations work stays o
 - [X] File upload triggers durable backend ingestion (verified with an isolated worker invocation).
 - [X] Document list shows indexed files and failure/retry states.
 - [X] Delete removes chunks from pgvector; an active worker cannot republish a deleted upload.
-- [ ] Upload a PDF and verify a grounded answer through the live Telegram bot.
+- [x] Upload a PDF and verify a grounded answer through the live Telegram bot.
   **Verification:** See current execution evidence above. API/database and fixture-backed UI
-  checks are complete locally; live bot acceptance remains pending.
+  checks are complete locally. A retained synthetic counselling PDF indexed through
+  the real worker; the Lotus Hall answer is saved as sent and user-confirmed.
+  See `docs/event/LIVE_HANDSET_RESULTS.json`; the later footer change was verified
+  read-only against OpenAI without another handset send.
   **Dependencies:** Task 13; provisioning/authentication slice of Task 54.
   **Estimated scope:** Medium
 

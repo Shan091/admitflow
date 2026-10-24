@@ -2,12 +2,20 @@
 
 ## Current direction
 
-**User review first:** The user wants to see and personally test the app before
-owner/team/license or submission packaging work continues. The native app is running
-at http://127.0.0.1:3000, with API on 8000 and the dedicated knowledge worker active.
-Use the existing private backend/.demo-credentials.json for login; never paste its
-password or provider keys into chat. A browser-panel open was queued for this chat.
-Keep submission details deferred while the user tests. Record and fix their findings.
+**Latest user decisions:** The user's walkthrough is finished: everything they tested
+worked. Owner name is **shan**. The user delegated licensing to the event handbook;
+FAQ 17 offers MIT/Apache-2.0, so the root MIT license and provenance are now prepared.
+An explicitly authorized staff reply and an uploaded-PDF Lotus Hall answer both have
+user-confirmed handset receipt and saved sent status. The latest UX request is to
+hide source filenames/footers from student messages while retaining internal evidence
+and staff search sources (Task 29.1). See LIVE_HANDSET_RESULTS.json.
+
+**Do not deploy** until the user explicitly says. Git publication remains authorized
+through the protected-main PR workflow. Native app: http://127.0.0.1:3000; API: 8000.
+Private login is in ignored backend/.demo-credentials.json; never publish credentials.
+Six-slide editable deck, AI statement, disclosure and demo script are prepared locally.
+Actual Razorpay acceptance, final recording/public access, organizer prior-work
+permission, portal details and submission remain open.
 
 
 **Current structured-document slice:** [PR #12](https://github.com/Shan091/admitflow/pull/12)
@@ -208,7 +216,7 @@ The roadmap is not a claim that all features are implemented or event-deliverabl
 
 ## Execution checkpoint
 
-Tasks 43–57 and the core local acceptance for Tasks 58–59 are implemented and
+Tasks 43â€“57 and the core local acceptance for Tasks 58â€“59 are implemented and
 verified; Task 60 has local draft assets and a staff recording. Telegram live selection,
 corrections, grounded/unsupported answers and staff-request controls passed. See the
 latest evidence below and tasks/todo.md rather than interpreting the starting audit
@@ -302,11 +310,11 @@ existing repository and preserve local changes, runtime data and bot checkpoints
 Do not create another plan or repository. Telegram is the active channel; OpenAI
 owns decisions, embeddings and required reranking. Fine-tuning and OCR are excluded.
 
-The user wants to personally test the app before owner/team/license or submission
-work continues. The native staff app is http://127.0.0.1:3000; API readiness is
-http://127.0.0.1:8000/ready. Private demo login details are in ignored
-backend/.demo-credentials.json. Keep the running app stable while they test and
-prioritize their findings. Do not request final submission details again now.
+The user finished testing and reported everything tested worked. Preserve runtime
+and data. Owner is shan; MIT was selected from the handbook's examples. Staff reply
+and uploaded-PDF handset checks are confirmed. Continue Task 29.1 (hide student source
+footers with internal evidence retained), then the remaining current-plan acceptance.
+Never deploy until explicitly instructed. Do not ask again for completed user checks.
 
 Product implementation through offline structured-document ingestion is merged
 in PR #12 (`f532f1c`). The verified source/configuration fingerprint is in
@@ -318,10 +326,10 @@ completed staff/co-pilot/follow-up/institution-management or Task 42 work just
 because a historical entry above calls it pending.
 
 Keep remaining acceptance open: actual Razorpay test-card/link/webhook/Telegram
-validation needs test-account credentials; staff reply and uploaded-PDF answer need
-authorized handset checks. Public hosting remains deferred by the user. Final owner/
-team/license, organizer prior-work permission, portal fields, final recording/public
-links and submission remain unverified and must wait for the user's app review.
+validation needs test-account credentials. Final recording/public judge access,
+organizer prior-work permission, portal fields and submission remain unverified.
+Owner/license and the two handset checks no longer block packaging. Public hosting
+is explicitly deferred; the handbook allows a recording instead of deployment.
 Optional sponsor credits, Langfuse and Sentry are not selected release dependencies;
 historical WhatsApp acceptance is superseded by ADR-012. Never invent credentials,
 permissions, payment/handset receipt, public deployment or submission completion.
@@ -330,4 +338,4 @@ Git publication is authorized. Use feature branches from current origin/main, th
 full applicable gate, adversarial review, PR, green exact-head CI and squash merge.
 Never push the obsolete original local main/history or secrets. Keep completed tasks
 ticked with evidence and leave the overall goal incomplete until remaining acceptance
-is actually satisfied. When the user returns, continue from their testing feedback.
+is actually satisfied. Continue the existing tasks and incorporate new user feedback.

@@ -19,7 +19,9 @@ from src.db.models import (
     ConversationMemory,
     ConversationReply,
     Course,
+    DocumentChunk,
     HumanRequest,
+    KnowledgeUpload,
     Lead,
     QualificationRule,
     TelegramBot,
@@ -191,7 +193,13 @@ def test_complete_journey_corrections_faq_human_and_staff(journey: dict[str, Any
     )
     asyncio.run(process_upload(tenant, uuid.UUID(uploaded["accepted"][0]["id"])))
     reply, _ = asyncio.run(turn("Is hostel accommodation available?"))
-    assert "Source: approved/hostel.txt" in reply.text
+    assert reply.text == "Hostel accommodation is available on campus."
+    assert reply.source is not None
+    assert reply.source.relative_path == "approved/hostel.txt"
+    assert reply.source.passage == 1
+    # turn() reloads the encrypted reply: evidence survives persistence.
+    assert reply.source.document_id is not None
+    assert reply.source.chunk_id is not None
     reply, _ = asyncio.run(turn("Can I visit the moon?"))
     assert "could not find" in reply.text
     reply, _ = asyncio.run(turn("/human"))
@@ -554,7 +562,20 @@ def test_multilingual_quote_selection_uses_translated_question(
             reply = await answer_question(
                 db, Lead(tenant_id=tenant), {"language": "hi"}, "क्या हॉस्टल की सुविधा उपलब्ध है?"
             )
-            assert reply.text.startswith("Hostel accommodation is available on campus.")
-            assert "Source:" in reply.text
+            assert reply.text == "Hostel accommodation is available on campus."
+            assert reply.source is not None
+            chunk = await db.get(DocumentChunk, reply.source.chunk_id)
+            assert chunk is not None and chunk.tenant_id == tenant
+            assert chunk.document_id == reply.source.document_id
+            assert reply.text in chunk.content
+            assert reply.source.passage == chunk.chunk_index + 1
+            path = await db.scalar(
+                select(KnowledgeUpload.relative_path).where(
+                    KnowledgeUpload.tenant_id == tenant,
+                    KnowledgeUpload.document_id == chunk.document_id,
+                    KnowledgeUpload.status == "ready",
+                )
+            )
+            assert reply.source.relative_path == path
 
     asyncio.run(exercise())

@@ -1,24 +1,36 @@
-"""Evaluation rejects irrelevant quotations and does not count provider errors as abstention."""
+"""Scoring checks internal evidence, plain answers and language-specific abstention."""
 
+import uuid
+
+from src.engine.contracts import GroundingSource, Reply
 from src.scripts.evaluate_faq import Case, score_answer
 
 
-def test_supported_answer_requires_expected_fact_and_reference() -> None:
+def source(path: str = "synthetic-campus-reference.txt") -> GroundingSource:
+    return GroundingSource(
+        document_id=uuid.uuid4(), chunk_id=uuid.uuid4(), relative_path=path, passage=1
+    )
+
+
+def test_supported_answer_requires_expected_fact_and_internal_reference() -> None:
     case = Case(id="en-campus", language="en", question="Where?", expected="campus is in Kochi")
-    assert score_answer(
-        case, "The demo campus is in Kochi.\n\nSource: synthetic-campus-reference.txt, passage 1."
-    )
-    assert not score_answer(case, "The demo campus is in Kochi.")
+    text = "The demo campus is in Kochi."
+    assert score_answer(case, Reply(text=text, source=source()))
+    assert not score_answer(case, Reply(text=text))
+    assert not score_answer(case, Reply(text="A hostel exists.", source=source()))
+    assert not score_answer(case, Reply(text=text, source=source("other.txt")))
+    assert not score_answer(case, Reply(text=text + "\n\nSource: reference", source=source()))
     assert not score_answer(
-        case, "A hostel exists.\n\nSource: synthetic-campus-reference.txt, passage 1."
+        case, Reply(text=text + " synthetic-campus-reference.txt", source=source())
     )
-    assert not score_answer(case, "The demo campus is in Kochi.\n\nSource: other.txt, passage 1.")
 
 
 def test_unsupported_answer_requires_language_specific_abstention() -> None:
     from src.engine.journey import copy
 
     case = Case(id="ml-unknown", language="ml", question="Unsupported?", expected=None)
-    assert score_answer(case, copy("unknown", {"language": "ml"}))
-    assert not score_answer(case, copy("unavailable", {"language": "ml"}))
-    assert not score_answer(case, "The campus is in Kochi.")
+    text = copy("unknown", {"language": "ml"})
+    assert score_answer(case, Reply(text=text))
+    assert not score_answer(case, Reply(text=text, source=source()))
+    assert not score_answer(case, Reply(text=copy("unavailable", {"language": "ml"})))
+    assert not score_answer(case, Reply(text="The campus is in Kochi."))

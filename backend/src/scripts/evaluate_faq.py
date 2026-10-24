@@ -12,6 +12,7 @@ from sqlalchemy import select
 from src.core.settings import get_settings
 from src.db.models import Course, Institution, Lead
 from src.db.session import get_engine, get_sessionmaker
+from src.engine.contracts import Reply
 from src.engine.journey import answer_question, copy
 
 REFERENCE = "synthetic-campus-reference.txt"
@@ -25,14 +26,15 @@ class Case(BaseModel):
     expected: str | None
 
 
-def score_answer(case: Case, answer: str) -> bool:
+def score_answer(case: Case, answer: Reply) -> bool:
     if case.expected is None:
-        return answer == copy("unknown", {"language": case.language})
-    quotation, separator, citation = answer.partition("\n\nSource: ")
+        return answer.text == copy("unknown", {"language": case.language}) and answer.source is None
     return (
-        bool(separator)
-        and case.expected.casefold() in quotation.casefold()
-        and citation.startswith(f"{REFERENCE}, passage ")
+        answer.source is not None
+        and answer.source.relative_path == REFERENCE
+        and case.expected.casefold() in answer.text.casefold()
+        and "Source:" not in answer.text
+        and REFERENCE not in answer.text
     )
 
 
@@ -122,7 +124,7 @@ async def evaluate() -> dict[str, object]:
                         "id": case.id,
                         "language": case.language,
                         "expected": "source_quote" if case.expected else "abstention",
-                        "passed": score_answer(case, reply.text),
+                        "passed": score_answer(case, reply),
                     }
                 except Exception as error:
                     result = {"id": case.id, "passed": False, "error_type": type(error).__name__}

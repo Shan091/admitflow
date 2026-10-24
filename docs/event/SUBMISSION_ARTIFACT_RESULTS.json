@@ -1,0 +1,23 @@
+{
+  "scope": "Local submission artifacts; not an event submission or deployment",
+  "owner": "shan",
+  "source_license": "MIT",
+  "ai_statement_words": 188,
+  "deck": {
+    "path": "docs/event/artifacts/admitflow-pitch-final.pptx",
+    "sha256": "c7df7c1d2c226e6214d01f8317a3a72bda4681926aea0b2d0fa0c4f9362c92e8",
+    "slides": 6,
+    "editable": true,
+    "all_slides_rendered_and_visually_inspected": true,
+    "package_and_geometry_checks_passed": true,
+    "first_party_import_passed": true,
+    "native_powerpoint_opened": false
+  },
+  "remaining": [
+    "final recording/public judge access",
+    "organizer prior-work permission and portal details",
+    "actual Razorpay provider journey",
+    "submission"
+  ],
+  "deployment": "deferred by user"
+}

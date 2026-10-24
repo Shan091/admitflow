@@ -223,7 +223,9 @@ CRM, exports/integrations and the remaining institutional product milestones.
 - [x] Typed OpenAI decisions and required bounded passage reranking; no model training. Unit/database checks and live 4/4 ranking plus 24/24 FAQ checks pass.
 - [x] Task 38: isolated full-stack Compose build/start, real proxy/WebSocket/queue/scheduler checks and credential-preserving restart pass; receiver polling is an explicit profile.
 - [x] Task 42.2: bounded contextual OpenAI query resolution, uncertainty clarification, course-scoped references and matching database fee lookup; unit/database/browser and live evaluations pass.
-- [ ] Confirm an explicitly authorized staff reply on the Telegram handset.
+- [x] Confirm an explicitly authorized staff reply on the Telegram handset; user confirmed receipt and automation resumed.
+- [x] Confirm the uploaded synthetic PDF produces a Lotus Hall answer on the Telegram handset.
+- [x] Task 29.1: show grounded student answers without source footers, retaining internal evidence and staff search sources; backend/database/live-provider checks pass.
 
 | Phase | Retained work and historical IDs |
 | --- | --- |
@@ -238,6 +240,19 @@ Security, auditability, tenant isolation and safe handling remain requirements o
 first milestone that touches them. Real applicant pilots additionally require verified
 deletion/retention, access/privacy and operational readiness. Optional vendor work does
 not block synthetic event delivery. The full roadmap is not promised within the event.
+
+## Submission materials and owner review
+
+- [x] User walkthrough completed; the user reported everything tested worked.
+- [x] Owner shan recorded and MIT selected from the handbook's permitted examples; root LICENSE and third-party provenance are present.
+- [x] Six-slide editable PowerPoint with actual synthetic-data screens, speaker notes and visual/package QA.
+- [x] Refresh README, AI statement under 200 words, prior-work disclosure and demonstration script.
+- [ ] Record the final working-build demonstration and verify public judge access.
+- [ ] Obtain current portal details and organizer prior-work acceptance, then submit.
+
+Public deployment is deferred until the user explicitly instructs it. The actual
+Razorpay provider/card/webhook/Telegram journey remains open pending test credentials.
+The existing plan remains authoritative; these items complete its submission slice.
 
 ## Delivery rules
 

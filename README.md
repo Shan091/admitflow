@@ -15,8 +15,9 @@ The current implementation also includes encrypted application submission/review
 catalog/settings/discount management, payment monitoring and safe reconciliation.
 Staff takeover/co-pilot, consent-aware follow-ups, analytics/exports, signed webhooks,
 live notifications, staff accounts, erasure and retention are implemented. Staff transcripts
-include standalone deliveries and stable pagination. Real Razorpay test-card validation,
-final handset checks and public deployment remain unverified;
+include standalone deliveries and stable pagination. Real Razorpay test-card validation
+and public deployment remain unverified; staff-reply and uploaded-PDF handset receipt
+are confirmed. Deployment is deferred until the owner explicitly authorizes it;
 see [tasks/todo.md](tasks/todo.md) for verified acceptance and remaining work.
 
 ## Stack
@@ -90,20 +91,26 @@ The configured Telegram demonstration bot is `https://t.me/mike0011_bot`; it req
 the local receiver/worker and is not an independently hosted service.
 
 Use the [demo script](docs/event/DEMO_SCRIPT.md), [six-slide deck copy](docs/event/PITCH_DECK.md)
-and [AI Impact Statement](docs/event/AI_IMPACT_STATEMENT.md). The actual local
-[staff walkthrough](docs/event/artifacts/staff-walkthrough.webm) is recorded;
+and [AI Impact Statement](docs/event/AI_IMPACT_STATEMENT.md). The editable
+[six-slide PowerPoint](docs/event/artifacts/admitflow-pitch-final.pptx) is ready locally. The actual local [staff walkthrough](docs/event/artifacts/staff-walkthrough.webm) is recorded;
 the longer [saved student journey](docs/event/artifacts/student-to-staff-walkthrough.webm)
 shows corrections, sourced answers and the staff request in the actual dashboard;
 the final handset/event video and public demo link remain pending. Artifact requirements and outstanding
 organizer inputs are in [submission requirements](docs/event/SUBMISSION_PLAN.md).
-Prior work and verification evidence are preserved in repository records. A license
-remains to be selected by the owner; none is implied by this README.
+Prior work and verification evidence are preserved in repository records.
+Owner: **shan**. Project source is licensed under [MIT](LICENSE); third-party
+code, models and event materials retain their own terms. See [data/model provenance](docs/event/DATA_PROVENANCE.md).
 
 The [prior-work disclosure](docs/event/PRIOR_WORK_DISCLOSURE.md),
 [language review packet](docs/event/LANGUAGE_REVIEW.md) and
 [expanded evaluation results](docs/event/EVALUATION_RESULTS.json) record remaining
-review and verification limits. The structured-document build passes 251 default tests,
+review and verification limits. The source-display update passes 252 default tests
+and 16 affected PostgreSQL cases; the preceding full build passes
 87 PostgreSQL tests and two separate Redis checks, plus strict typing and frontend
 lint/build. The [live PDF report](docs/event/DOCUMENT_PIPELINE_RESULTS.json) verifies
 upload, dedicated worker, Docling, OpenAI embeddings and programme-specific search.
-Its temporary synthetic upload was removed; no Telegram message was sent.
+Its temporary synthetic upload was removed; no Telegram message was sent by that check.
+A separate retained synthetic counselling PDF produced a handset-confirmed Lotus Hall
+answer. Student replies now contain the grounded answer without a citation footer;
+source metadata remains encrypted internally and staff search retains its references.
+See [handset evidence](docs/event/LIVE_HANDSET_RESULTS.json).

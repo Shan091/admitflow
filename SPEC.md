@@ -157,7 +157,11 @@ Deleting an upload removes its chunks and prevents later worker publication. Onl
 ready uploads appear in the workspace search. Source paths and passage numbers
 accompany results; a configurable similarity floor permits an empty result. This is
 document search. The Telegram journey can return a validated exact quotation with
-its source after the relevance and support checks. Complex parsing and
+internal evidence after the relevance and support checks. Student-facing Telegram
+answers contain the quotation only, without a source filename or citation footer.
+Document/chunk identifiers, source path and passage number remain in the encrypted
+saved reply for internal traceability; staff document search retains its source display.
+Complex parsing and
 multilingual retrieval evaluation remain in Task 42/52.
 
 Only administrators mutate documents; active staff may view/search their own institution.
@@ -171,7 +175,8 @@ upload only approved institution material, never applicant personal documents he
 Record source title/URL or synthetic identifier, review date and provenance/license.
 Tenant-filter retrieval. Check relevance/sufficiency on an evaluation set; returning
 top-k chunks alone is not a confidence gate. Abstain when the answer is absent or weak.
-Return source references for factual answers. Fees/course availability come from the
+Retain internal source references for factual answers without appending them to
+student messages. Fees/course availability come from the
 structured catalog; document conflicts require staff clarification, not an invented value.
 Treat document content as untrusted data, never instructions. Test multilingual retrieval.
 
