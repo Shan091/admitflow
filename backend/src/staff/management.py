@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 
+from src.core.demo_admissions import demo_fee
 from src.db.audit import write_audit_log
 from src.db.enums import DiscountType, RuleOperator
 from src.db.models import (
@@ -133,6 +134,7 @@ async def course_view(db: Db, course: Course) -> dict[str, Any]:
         "is_active": course.is_active,
         "is_reference": course.is_reference,
         "reference_url": course.reference_url,
+        "demo_application_fee": await demo_fee(db, course),
         "batches": [
             {
                 "id": str(batch.id),

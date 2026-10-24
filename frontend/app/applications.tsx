@@ -7,12 +7,14 @@ type Summary = {
   lead_id: string;
   course: string;
   status: string;
+  is_demo: boolean;
   submitted_at: string;
 };
 type Detail = {
   id: string;
   lead_id: string;
   status: string;
+  is_demo: boolean;
   form: Record<string, string | null>;
   payments: string[];
 };
@@ -148,8 +150,8 @@ export default function Applications({
             <div className="empty">
               <h2>No applications here yet</h2>
               <p>
-                A student must meet the course criteria, explicitly start a form
-                and review it before submitting.
+                Students review their details before submitting. Demo applications
+                are labelled separately and require a test payment before approval.
               </p>
             </div>
           ) : (
@@ -160,7 +162,7 @@ export default function Applications({
                 aria-pressed={detail?.id === row.id}
                 onClick={() => void select(row.id)}
               >
-                <strong>{row.course}</strong>
+                <strong>{row.course}{row.is_demo ? " · Demo" : ""}</strong>
                 <span>{row.status.replaceAll("_", " ")}</span>
                 <span>
                   Submitted {new Date(row.submitted_at).toLocaleString()}
@@ -205,6 +207,7 @@ export default function Applications({
                   {detail.status.replaceAll("_", " ")}
                 </span>
               </div>
+              {detail.is_demo && <p className="notice">Demo application · Razorpay test payment required. Approval does not grant university admission or allocate a seat.</p>}
               <dl className="inquiry-facts">
                 {Object.entries(fields).map(([key, label]) => (
                   <div key={key}>
@@ -233,7 +236,9 @@ export default function Applications({
                     <>
                       <p>
                         {confirm === "approve"
-                          ? "Approve this application and allocate one available seat? Any configured application fee must be paid."
+                          ? detail.is_demo
+                            ? "Approve this demo application? A confirmed test payment is required. No university seat will be allocated."
+                            : "Approve this application and allocate one available seat? Any configured application fee must be paid."
                           : confirm === "reject"
                             ? "Reject this application? This is a final decision."
                             : "Place this application on the waitlist? No seat will be allocated."}
@@ -274,8 +279,7 @@ export default function Applications({
                 </div>
               )}
               <p className="quiet">
-                Submission does not grant admission. Approval allocates a seat
-                only when the server confirms payment and capacity.
+                {detail.is_demo ? "Demo decisions are for testing only. Real fees, eligibility and admissions must be confirmed with the university." : "Submission does not grant admission. Approval allocates a seat only when the server confirms payment and capacity."}
               </p>
             </>
           )}

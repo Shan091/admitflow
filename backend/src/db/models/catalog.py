@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Date,
     DateTime,
     Enum,
@@ -31,6 +32,12 @@ class Course(IdMixin, TenantMixin, TimestampMixin, Base):
     """A program a lead can be qualified for and pay to apply to."""
 
     __tablename__ = "courses"
+    __table_args__ = (
+        CheckConstraint(
+            "demo_application_fee IS NULL OR (is_reference AND demo_application_fee >= 100)",
+            name="demo_reference_fee",
+        ),
+    )
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
@@ -42,6 +49,7 @@ class Course(IdMixin, TenantMixin, TimestampMixin, Base):
         Boolean, nullable=False, default=False, server_default="false"
     )
     reference_url: Mapped[str | None] = mapped_column(String(1024))
+    demo_application_fee: Mapped[int | None] = mapped_column(Integer)
 
     institution: Mapped[Institution] = relationship(back_populates="courses")
     batches: Mapped[list[Batch]] = relationship(

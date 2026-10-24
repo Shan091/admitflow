@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.demo_admissions import demo_fee
 from src.core.security import encrypt_pii
 from src.db.audit import write_audit_log
 from src.db.enums import ApplicationStatus, LeadStatus, PaymentStatus
@@ -72,7 +73,7 @@ async def resumed_status(db: AsyncSession, lead: Lead) -> LeadStatus:
     )
     return (
         LeadStatus.UNDER_REVIEW
-        if paid or (course and course.application_fee == 0)
+        if paid or (course and not application.is_demo and course.application_fee == 0)
         else LeadStatus.PAYMENT_PENDING
     )
 
@@ -92,7 +93,8 @@ def prompt(draft: dict[str, Any], lead: Lead, bot: TelegramBot) -> Reply:
         for key, label in zip(FIELDS, LABELS, strict=True)
     )
     return Reply(
-        text=f"Review your application:\n{summary}\n\nSubmit only if these details are correct. "
+        text=f"Review your {'demo ' if draft.get('is_demo') else ''}application:\n{summary}\n\n"
+        "Submit only if these details are correct. "
         "Submission is not admission or a seat reservation.",
         buttons=[
             action("Submit application", f"submit-{draft['nonce']}", lead, bot),
@@ -106,19 +108,24 @@ async def application_action(
 ) -> Reply:
     from src.engine.journey import qualify
 
-    if target != "cancel" and lead.current_course_id:
-        reference = await db.scalar(
-            select(Course.id).where(
+    course = (
+        await db.scalar(
+            select(Course).where(
                 Course.id == lead.current_course_id,
                 Course.tenant_id == lead.tenant_id,
-                Course.is_reference.is_(True),
+                Course.is_active.is_(True),
             )
         )
-        if reference:
-            return Reply(
-                text="This published programme is for exploration. "
-                "University applications are not processed by this demonstration."
-            )
+        if lead.current_course_id
+        else None
+    )
+    demo_amount = await demo_fee(db, course) if course else None
+    is_demo = demo_amount is not None
+    if target != "cancel" and course and course.is_reference and not is_demo:
+        return Reply(
+            text="This published programme is for exploration. "
+            "University applications are not processed by this demonstration."
+        )
     if target == "cancel":
         if not memory.get("application_draft"):
             return Reply(text="This application step has already ended.")
@@ -137,6 +144,13 @@ async def application_action(
             )
         )
         if existing:
+            if existing.is_demo and is_demo:
+                from src.payments.conversation import preview
+
+                try:
+                    return await preview(db, lead, bot, memory, existing.id)
+                except ValueError:
+                    return Reply(text="Your demo application is already with staff for review.")
             return Reply(
                 text="An application for this course is already submitted. "
                 "Request staff review for changes."
@@ -147,10 +161,12 @@ async def application_action(
         ) == (str(lead.current_course_id), str(lead.current_batch_id)):
             memory["application_draft"].pop("paused", None)
             return prompt(memory["application_draft"], lead, bot)
-        outcome = await qualify(db, lead, bot, memory, "", [])
-        if memory.get("eligibility", {}).get("outcome") != "eligible":
-            return outcome
+        if not is_demo:
+            outcome = await qualify(db, lead, bot, memory, "", [])
+            if memory.get("eligibility", {}).get("outcome") != "eligible":
+                return outcome
         memory["application_draft"] = {
+            "is_demo": is_demo,
             "course_id": str(lead.current_course_id),
             "batch_id": str(lead.current_batch_id),
             "nonce": uuid.uuid4().hex[:12],
@@ -166,8 +182,17 @@ async def application_action(
         lead.status = LeadStatus.FORM_COLLECTING
         reply = prompt(memory["application_draft"], lead, bot)
         reply.text = (
-            "Let's prepare your application. You can review everything before it goes "
-            "to the institution. Use /pause to come back later.\n\n" + reply.text
+            (
+                "Demo application — Razorpay test mode. Use synthetic details. "
+                "This does not apply to JAIN or reserve a university seat. "
+                "You can review everything before submission. Use /pause to come back later.\n\n"
+                + reply.text
+            )
+            if is_demo
+            else (
+                "Let's prepare your application. You can review everything before it goes "
+                "to the institution. Use /pause to come back later.\n\n" + reply.text
+            )
         )
         return reply
     draft = memory.get("application_draft")
@@ -187,9 +212,12 @@ async def application_action(
         )
     if target != f"submit-{draft['nonce']}" or any(key not in draft["values"] for key in FIELDS):
         return prompt(draft, lead, bot)
-    outcome = await qualify(db, lead, bot, memory, "", [])
-    if memory.get("eligibility", {}).get("outcome") != "eligible":
-        return outcome
+    if bool(draft.get("is_demo")) != is_demo:
+        return Reply(text="Application mode changed. Use /apply to review before continuing.")
+    if not is_demo:
+        outcome = await qualify(db, lead, bot, memory, "", [])
+        if memory.get("eligibility", {}).get("outcome") != "eligible":
+            return outcome
     course = await db.scalar(
         select(Course).where(
             Course.id == lead.current_course_id, Course.tenant_id == lead.tenant_id
@@ -201,6 +229,7 @@ async def application_action(
     lead.name_enc = encrypt_pii(values["full_name"])
     application = Application(
         tenant_id=lead.tenant_id,
+        is_demo=is_demo,
         lead_id=lead.id,
         course_id=course.id,
         batch_id=lead.current_batch_id,
@@ -211,7 +240,8 @@ async def application_action(
     await db.flush()
     memory.pop("application_draft", None)
     memory["application_id"] = str(application.id)
-    lead.status = LeadStatus.PAYMENT_PENDING if course.application_fee else LeadStatus.UNDER_REVIEW
+    fee = demo_amount if is_demo else course.application_fee
+    lead.status = LeadStatus.PAYMENT_PENDING if fee else LeadStatus.UNDER_REVIEW
     await write_audit_log(
         db,
         tenant_id=lead.tenant_id,
@@ -220,6 +250,13 @@ async def application_action(
         lead_id=lead.id,
         details={"application_id": str(application.id)},
     )
+    if is_demo:
+        from src.payments.conversation import preview
+
+        memory.pop("discount_code", None)
+        reply = await preview(db, lead, bot, memory, application.id)
+        reply.text = "Demo application saved.\n\n" + reply.text
+        return reply
     return Reply(
         text="Your application is submitted for institutional review. "
         "This does not grant admission or reserve a seat. "

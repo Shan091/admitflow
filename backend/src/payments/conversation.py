@@ -20,6 +20,24 @@ def button(label: str, target: str, lead: Lead, bot: TelegramBot) -> Button:
 
 
 def order_reply(order: PaymentOrder) -> Reply:
+    if order.is_demo:
+        if order.status == PaymentStatus.PAID:
+            return Reply(
+                text=f"Test payment of INR {order.amount / 100:.2f} confirmed. "
+                "Payment is saved for your demo application. Staff decide its outcome separately; "
+                "this is not university admission."
+            )
+        if order.creation_state == "created" and order.payment_url_enc:
+            return Reply(
+                text=f"Demo application fee: INR {order.amount / 100:.2f}. Razorpay TEST mode.\n"
+                f"Use test payment details only: {decrypt_pii(order.payment_url_enc)}\n"
+                "After confirmation, staff review your demo application."
+            )
+        return Reply(
+            text="Your demo test payment link is being prepared. It will appear here shortly."
+            if order.creation_state in {"queued", "creating"}
+            else "The demo payment link needs review. Your application is saved; use /pay to check."
+        )
     if order.status == PaymentStatus.PAID:
         return Reply(
             text=f"Payment of INR {order.amount / 100:.2f} is confirmed. "
@@ -57,8 +75,10 @@ async def preview(
     existing = await existing_payment(db, lead, application_id)
     if existing:
         return order_reply(existing)
-    _, course, amount, _ = await fee_details(db, lead, application_id, memory.get("discount_code"))
-    if course.application_fee == 0:
+    application, course, amount, _ = await fee_details(
+        db, lead, application_id, memory.get("discount_code")
+    )
+    if course.application_fee == 0 and not application.is_demo:
         return Reply(
             text="No application fee is configured. Your application is available for staff review."
         )
@@ -77,6 +97,13 @@ async def preview(
         "nonce": nonce,
         "expires_at": int(time.time()) + 600,
     }
+    if application.is_demo:
+        return Reply(
+            text=f"Demo application fee: INR {amount / 100:.2f}. Razorpay TEST mode. "
+            "This is a sample fee, not JAIN's published fee. Use test payment details only. "
+            "Once payment is confirmed, your demo application goes to staff for approval.",
+            buttons=[button("Create test payment link", f"create-{nonce}", lead, bot)],
+        )
     return Reply(
         text=f"Application fee to pay: INR {amount / 100:.2f}. "
         "This is an application fee, not tuition or a seat reservation. "

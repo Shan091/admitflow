@@ -26,6 +26,7 @@ type Course = {
   batches: Batch[];
   is_reference?: boolean;
   reference_url?: string | null;
+  demo_application_fee?: number | null;
   rules: Rule[];
 };
 type Settings = {
@@ -122,6 +123,7 @@ export default function Management({
         const { id, ...body } = course;
         delete body.is_reference;
         delete body.reference_url;
+        delete body.demo_application_fee;
         const saved = (await request(`/staff/catalog${id ? `/${id}` : ""}`, {
           method: id ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -298,7 +300,9 @@ export default function Management({
                 {course.is_reference && (
                   <p className="notice">
                     Published programme for exploration. Fees and intakes are unverified;
-                    applications and payments are unavailable here.
+                    {course.demo_application_fee
+                      ? ` Demo applications use a sample fee of INR ${(course.demo_application_fee / 100).toFixed(2)} with Razorpay test payments. This does not apply to the university.`
+                      : " University applications and payments are unavailable here."}
                     {course.reference_url && (
                       <> <a href={course.reference_url} target="_blank" rel="noreferrer">University programme page</a></>
                     )}

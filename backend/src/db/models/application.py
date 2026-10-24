@@ -33,6 +33,9 @@ class Application(IdMixin, TenantMixin, TimestampMixin, Base):
     """
 
     __tablename__ = "applications"
+    is_demo: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
     lead_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("leads.id", ondelete="CASCADE"), index=True, nullable=False
@@ -83,6 +86,9 @@ class PaymentOrder(IdMixin, TenantMixin, TimestampMixin, Base):
     )
 
     request_key: Mapped[str | None] = mapped_column(String(64))
+    is_demo: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     creation_state: Mapped[str] = mapped_column(String(16), nullable=False, default="legacy")
     creation_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     payment_url_enc: Mapped[str | None] = mapped_column(Text)

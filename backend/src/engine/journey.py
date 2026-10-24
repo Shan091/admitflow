@@ -356,17 +356,27 @@ async def fee_information(
     ).all()
     if not courses:
         return Reply(text=copy("clarify_reference", memory))
-    return Reply(
-        text="\n".join(
-            f"{course.name}: application fees are unverified in this public-information demo. "
-            "Check current charges directly with the university."
-            if course.is_reference
-            else f"{course.name}: application/registration fee "
-            f"INR {course.application_fee / 100:.2f}. "
-            "This is the configured application fee, not tuition or a seat reservation."
-            for course in courses
-        )
-    )
+    from src.core.demo_admissions import demo_fee
+
+    lines = []
+    for course in courses:
+        if course.is_reference:
+            line = f"{course.name}: university application fees are unverified. "
+            line += "Check current charges directly with the university."
+            amount = await demo_fee(db, course)
+            if amount is not None:
+                line += (
+                    f" Separate demo application fee: INR {amount / 100:.2f}, "
+                    "Razorpay TEST mode only. This is not the university's fee."
+                )
+            lines.append(line)
+        else:
+            lines.append(
+                f"{course.name}: application/registration fee "
+                f"INR {course.application_fee / 100:.2f}. "
+                "This is the configured application fee, not tuition or a seat reservation."
+            )
+    return Reply(text="\n".join(lines))
 
 
 async def answer_question(db: AsyncSession, lead: Lead, memory: dict[str, Any], text: str) -> Reply:
@@ -513,6 +523,20 @@ async def select_course(
         )
     )
     if course is not None and course.is_reference:
+        from src.core.demo_admissions import demo_fee
+        from src.engine.applications import application_action
+
+        if await demo_fee(db, course) is not None:
+            if lead.current_course_id != course.id:
+                memory.pop("application_draft", None)
+            lead.current_course_id, lead.current_batch_id = course.id, None
+            state.active, state.stage = False, "decided"
+            save_guidance(memory, state)
+            memory.pop("eligibility", None)
+            memory["question"] = None
+            reply = await application_action(db, lead, bot, memory, "start")
+            reply.text = f"{course.name}\n\n" + reply.text
+            return reply
         state.active = True
         state.recommended_ids = [course.id]
         save_guidance(memory, state)

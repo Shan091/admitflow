@@ -491,3 +491,40 @@ OpenAI calls without writes or sends and records a synthetic report under docs/e
 This does not establish general fluency or calibrated confidence. No schema migration
 is needed: scope lives in existing document metadata. Older code ignores scope, so
 keep automated replies paused if rolling back until a scope-aware runtime is restored.
+
+
+# Local reference-catalogue demo applications
+
+The JAIN public reference catalogue can exercise applications, INR 3,000 Razorpay
+**test** payment and staff approval without claiming university admission. Official
+fees remain unverified. Applications and invoices persist `is_demo`; no real batch
+or seat is created. This opt-in requires `APP_ENV=dev`, `DEMO_ADMISSIONS_ENABLED=true`,
+`PAYMENTS_LIVE_ENABLED=false`, the matching `TELEGRAM_INSTITUTION_CODE` and encrypted
+institution-owned `rzp_test_` credentials.
+
+```bash
+uv run alembic upgrade head
+uv run python -m src.scripts.provision_payments --institution-code demo
+uv run python -m src.scripts.configure_demo_applications --institution-code demo --fee-paise 300000 --expected-courses 64
+```
+
+The configuration script accepts only a loopback database, preserves archived status
+and writes a separate demo fee. Restart API/worker/scheduler/receiver after changing
+settings. Selecting an active opted-in course starts a draft using explicit saved
+student details. The student reviews and submits it, confirms the fee, and receives
+a test payment link. Use test payment details only. Captured payment makes the demo
+application ready for an administrator's decision in **Applications**; unpaid or
+waived invoices cannot be approved. Decisions queue a clearly labelled demo reply.
+
+Signed Razorpay webhooks still work. For local demos without public webhook ingress,
+the scheduler verifies the exact paid link and its captured, unrefunded payment by
+authenticated provider reads. It never trusts a student saying they paid or a browser
+return URL. At most ten due demo invoices are checked per sweep within seven days;
+**Payments → Check provider** can check a known demo link explicitly. Older ordinary
+invoices continue to require signed webhook confirmation. No public deployment is
+required for this local test flow.
+
+Disable `DEMO_ADMISSIONS_ENABLED` to stop new demo operations. Retain the schema and
+markers for historical records. See ADR-017 and `docs/event/DEMO_APPLICATIONS_VALIDATION.json`
+for verification scope and rollback limits. Actual test-card completion is not yet
+claimed; the provider link-creation smoke check was cancelled without payment.

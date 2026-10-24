@@ -7,6 +7,7 @@ from collections.abc import Awaitable, Callable
 
 from src.integrations.delivery import dispatch_pending as dispatch_integrations
 from src.outreach.followups import dispatch_due
+from src.payments.demo import check_demo_payments
 from src.staff.privacy import purge_retained
 from src.tasks.broker import broker
 from src.telegram.outbound import recover_outbound
@@ -19,6 +20,7 @@ async def run(*, once: bool = False, interval: int = 60) -> None:
     operations: tuple[tuple[str, Callable[[], Awaitable[int | None]]], ...] = (
         ("retention", purge_retained),
         ("followups", dispatch_due),
+        ("demo_payments", check_demo_payments),
         ("outbound", recover_outbound),
         ("integrations", dispatch_integrations),
     )

@@ -70,6 +70,7 @@ class Settings(BaseSettings):
     razorpay_key_secret: SecretStr | None = None
     razorpay_webhook_secret: SecretStr | None = None
     payments_live_enabled: bool = False
+    demo_admissions_enabled: bool = False
     followups_enabled: bool = True
 
     # Institution knowledge workspace and processing limits.

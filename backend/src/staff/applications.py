@@ -7,11 +7,14 @@ from typing import Any, Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 
+from src.core.demo_admissions import demo_fee
 from src.core.security import decrypt_pii
 from src.db.audit import write_audit_log
 from src.db.enums import ApplicationStatus, LeadStatus, PaymentStatus
 from src.db.models import Application, Batch, Course, Lead, PaymentOrder
+from src.engine.contracts import Reply
 from src.staff.auth import Db, Staff, require_admin, require_browser_write
+from src.telegram.outbound import enqueue_outbound
 
 router = APIRouter(prefix="/api/staff/applications", tags=["applications"])
 
@@ -61,6 +64,7 @@ async def applications(
             "lead_id": str(application.lead_id),
             "course": course_name,
             "status": application.status.value,
+            "is_demo": application.is_demo,
             "submitted_at": application.submitted_at.isoformat(),
         }
         for application, course_name in rows
@@ -106,6 +110,7 @@ async def detail(application_id: uuid.UUID, staff: Staff, db: Db) -> dict[str, A
         "course_id": str(application.course_id),
         "batch_id": str(application.batch_id) if application.batch_id else None,
         "status": application.status.value,
+        "is_demo": application.is_demo,
         "form": form,
         "payments": [status.value for status in payment_states],
     }
@@ -148,32 +153,73 @@ async def review(
         )
         if course is None:
             raise HTTPException(409, "This course is unavailable.")
-        paid = await db.scalar(
-            select(PaymentOrder.id).where(
-                PaymentOrder.tenant_id == staff.tenant_id,
-                PaymentOrder.application_id == application.id,
-                PaymentOrder.status.in_([PaymentStatus.PAID, PaymentStatus.WAIVED]),
+        if application.is_demo:
+            if await demo_fee(db, course) is None or application.batch_id is not None:
+                raise HTTPException(
+                    409, "Demo approvals require the enabled test-only configuration."
+                )
+            paid = await db.scalar(
+                select(PaymentOrder.id).where(
+                    PaymentOrder.tenant_id == staff.tenant_id,
+                    PaymentOrder.application_id == application.id,
+                    PaymentOrder.lead_id == lead.id,
+                    PaymentOrder.course_id == course.id,
+                    PaymentOrder.is_demo.is_(True),
+                    PaymentOrder.status == PaymentStatus.PAID,
+                    PaymentOrder.razorpay_payment_id.is_not(None),
+                    PaymentOrder.amount >= 100,
+                    PaymentOrder.currency == "INR",
+                )
             )
-        )
-        if course.application_fee and paid is None:
-            raise HTTPException(409, "The configured application fee is not paid.")
-        batch = await db.scalar(
-            select(Batch)
-            .where(
-                Batch.id == application.batch_id,
-                Batch.course_id == course.id,
-                Batch.tenant_id == staff.tenant_id,
-                Batch.is_active.is_(True),
+            if paid is None:
+                raise HTTPException(
+                    409, "A confirmed Razorpay test payment is required before demo approval."
+                )
+        else:
+            if course.is_reference:
+                raise HTTPException(
+                    409, "This reference programme cannot grant university admission."
+                )
+            paid = await db.scalar(
+                select(PaymentOrder.id).where(
+                    PaymentOrder.tenant_id == staff.tenant_id,
+                    PaymentOrder.application_id == application.id,
+                    PaymentOrder.status.in_([PaymentStatus.PAID, PaymentStatus.WAIVED]),
+                    PaymentOrder.is_demo.is_(False),
+                )
             )
-            .with_for_update()
-        )
-        if batch is None or batch.seats_remaining <= 0:
-            raise HTTPException(409, "No available seat in the selected batch.")
-        batch.seats_remaining -= 1
+            if course.application_fee and paid is None:
+                raise HTTPException(409, "The configured application fee is not paid.")
+            batch = await db.scalar(
+                select(Batch)
+                .where(
+                    Batch.id == application.batch_id,
+                    Batch.course_id == course.id,
+                    Batch.tenant_id == staff.tenant_id,
+                    Batch.is_active.is_(True),
+                )
+                .with_for_update()
+            )
+            if batch is None or batch.seats_remaining <= 0:
+                raise HTTPException(409, "No available seat in the selected batch.")
+            batch.seats_remaining -= 1
         lead.status = LeadStatus.ENROLLED
     else:
         lead.status = LeadStatus.WAITLISTED if decision == "waitlist" else LeadStatus.REJECTED
     application.status = destination
+    if application.is_demo:
+        await enqueue_outbound(
+            db,
+            tenant_id=staff.tenant_id,
+            lead_id=lead.id,
+            kind="demo_application_decision",
+            dedup_key=f"demo-decision:{application.id}:{destination.value}",
+            reply=Reply(
+                text=f"Staff have {destination.value.replace('_', ' ')} your demo application. "
+                "This completes a demonstration review; it is not a university admission decision "
+                "and no university seat has been allocated."
+            ),
+        )
     await write_audit_log(
         db,
         tenant_id=staff.tenant_id,

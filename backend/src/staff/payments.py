@@ -7,11 +7,12 @@ from cryptography.fernet import InvalidToken
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select, update
 
+from src.core.demo_admissions import demo_fee
 from src.core.security import EncryptionKeyNotConfiguredError, decrypt_pii, encrypt_pii
 from src.core.settings import get_settings
 from src.db.audit import write_audit_log
 from src.db.enums import PaymentStatus
-from src.db.models import Institution, Lead, OutboundMessage, PaymentOrder
+from src.db.models import Course, Institution, Lead, OutboundMessage, PaymentOrder
 from src.engine.contracts import Reply
 from src.payments.provider import Credentials, PaymentProviderError, RazorpayClient
 from src.staff.auth import Db, Staff, require_admin, require_browser_write
@@ -96,6 +97,7 @@ async def payments(
             "lead_id": str(order.lead_id),
             "application_id": str(order.application_id),
             "amount": order.amount,
+            "is_demo": order.is_demo,
             "currency": order.currency,
             "status": order.status.value,
             "creation_state": order.creation_state,
@@ -117,6 +119,34 @@ async def reconcile(order_id: uuid.UUID, staff: Staff, db: Db) -> dict[str, str]
         return {"result": "already_settled"}
     if order.creation_state in {"queued", "creating", "legacy"}:
         raise HTTPException(409, "This invoice is not available for provider reconciliation.")
+    if order.is_demo:
+        course = await db.scalar(
+            select(Course).where(
+                Course.id == order.course_id,
+                Course.tenant_id == staff.tenant_id,
+            )
+        )
+        if course is None or await demo_fee(db, course) is None:
+            raise HTTPException(409, "Demo provider checks require the enabled test configuration.")
+    if order.is_demo and order.razorpay_payment_link_id:
+        from src.payments.demo import check_demo_payment
+
+        await write_audit_log(
+            db,
+            tenant_id=staff.tenant_id,
+            actor=str(staff.id),
+            action="payment.lookup_requested",
+            lead_id=order.lead_id,
+            details={"payment_order_id": str(order.id), "is_demo": True},
+        )
+        await db.commit()
+        try:
+            confirmed = await check_demo_payment(order.id)
+        except PaymentProviderError:
+            raise HTTPException(
+                502, "Test payment lookup unavailable. The invoice is unchanged."
+            ) from None
+        return {"result": "test_payment_confirmed" if confirmed else "test_payment_pending"}
     client = await provider(db, staff)
     amount = order.amount
     await write_audit_log(
@@ -154,16 +184,25 @@ async def reconcile(order_id: uuid.UUID, staff: Staff, db: Db) -> dict[str, str]
                 kind="payment_link",
                 dedup_key=f"payment-link:{order.id}",
                 reply=Reply(
-                    text=f"Your application fee is INR {amount / 100:.2f}. "
-                    f"Open the institution's payment link: {link.short_url}\n"
-                    "Payment is an application fee, not admission or a seat reservation."
+                    text=(
+                        f"Demo application fee: INR {amount / 100:.2f}. Razorpay TEST mode. "
+                        f"Use test payment details only: {link.short_url}"
+                    )
+                    if order.is_demo
+                    else (
+                        f"Your application fee is INR {amount / 100:.2f}. "
+                        f"Open the institution's payment link: {link.short_url}\n"
+                        "Payment is an application fee, not admission or a seat reservation."
+                    )
                 ),
             )
             result = "link_recovered"
         elif link.status in {"paid", "partially_paid"}:
             order.creation_state = "created"
-            order.last_error = "awaiting_signed_confirmation"
-            result = "awaiting_signed_confirmation"
+            order.last_error = (
+                "awaiting_test_confirmation" if order.is_demo else "awaiting_signed_confirmation"
+            )
+            result = "test_payment_pending" if order.is_demo else "awaiting_signed_confirmation"
         else:
             order.creation_state, order.last_error = "failed", f"provider_{link.status}"
             result = "link_unavailable"
