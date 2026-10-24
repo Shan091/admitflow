@@ -1,5 +1,38 @@
 # AdmitFlow project handoff
 
+## Current conversation work: Task 61
+
+The user asked to replace the fixed follow-up/menu path with adaptive guidance based
+on each applicant's interests, background, goals and constraints. They answered:
+**institution applicants only; adaptive conversation plus optional deeper exploration;
+student fit first even when the right field is unavailable here. English for now.**
+They asked to be notified when the work is finished and not to deploy.
+
+Implementation is tracked in [PR #15](https://github.com/Shan091/admitflow/pull/15)
+from `codex/adaptive-course-guidance`. New interpretation/planning
+steps use the existing OpenAI configuration; no new provider, framework or training.
+The research record and ADR-013 distinguish career exploration from validated tests.
+Literal profile evidence is encrypted; academic facts/eligibility stay code-owned.
+`/start`, `/guide`, `/assessment`, `/courses` and explicit text/signed choices are supported.
+Staff can see provisional support stage and student evidence. An absent fitting course
+is acknowledged; external fields are labelled research leads rather than fake offers.
+
+Current live evidence passes **13 independent synthetic scenarios and three multi-turn
+conversations** without sending Telegram messages. The multi-turn failures exposed
+stale eligibility/planning and lost background; the implementation now interprets first,
+refreshes catalog checks, preserves unrelated notes and limits planning to guidance actions.
+A failed reply must preserve validated corrections; an adversarial test also catches a
+course closing during the model call. Course confirmation uses a code-owned question,
+and failed deeper exploration clears stale pending choices. Final local gates pass:
+280 default tests/120 strict source files, 99 PostgreSQL tests,
+two Redis tests, frontend lint/build and all 14 browser scenarios. Both GitHub checks
+passed on reviewed implementation head `d0c9093`; PR #15 records the final checks
+and merge status for the documentation closeout.
+Native services were found stopped and restored. API/default worker were reloaded
+on the completed source; receiver, serial knowledge worker and scheduler are running.
+The real browser login checks pass again. No public deployment was performed.
+Use tasks/todo.md, the release evidence and PR #15 for the verification record.
+
 ## Current direction
 
 **Latest user decisions:** The user's walkthrough is finished: everything they tested
@@ -315,8 +348,11 @@ owns decisions, embeddings and required reranking. Fine-tuning and OCR are exclu
 
 The user finished testing and reported everything tested worked. Preserve runtime
 and data. Owner is shan; MIT was selected from the handbook's examples. Staff reply
-and uploaded-PDF handset checks are confirmed. Task 29.1 (hide student source footers with internal evidence retained) is implemented
-and verified. Continue the remaining current-plan acceptance; do not rebuild it.
+and uploaded-PDF handset checks are confirmed. Tasks 29.1 and 61 are implemented and locally verified. Task 61 is English adaptive
+guidance, with optional deeper exploration and honest fit/eligibility boundaries.
+Use the attached PR and Task 61 evidence for publication status. Do not rebuild it.
+Continue from user feedback and the remaining current-plan acceptance; never deploy
+until explicitly authorized.
 Never deploy until explicitly instructed. Do not ask again for completed user checks.
 
 Product implementation through offline structured-document ingestion is merged

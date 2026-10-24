@@ -1216,3 +1216,57 @@ Fresh default baseline gate: 106 passed, 4 integration tests deselected, 2 warni
 **Scope:** Correct the existing app callback and missing account subscription; observe signed delivery statuses without PII. Preserve other app subscriptions and existing webhook fields.
 **Evidence:** READINESS_CHECK.md records successful subscription repair and a real failure webhook (131031). Meta health API reports the test account banned (141014), sending BLOCKED. Appeal in Meta Business Support Home is the next required user action; local configuration cannot lift the restriction.
 **Verification:** Missing-status regression reproduced; focused tests cover signed status logs, invalid-signature rejection, PII exclusion, and tunnel route restrictions. Full gate result recorded in the readiness report when completed. No phone-delivery or complete learner-journey claim.
+
+
+### Task 61: Adaptive, student-first conversation
+
+**User decisions:** Institution applicants only; adaptive conversation with optional
+further exploration; English for now; student fit takes priority over enrollment.
+**Acceptance criteria:**
+
+- [x] Primary sources and assessment licensing/limitations documented.
+- [x] Contextual questions follow the student's evidence rather than a fixed question order.
+- [x] Decided, comparing and exploring applicants receive different support; corrections,
+  refusal, uncertain/conflicting interests and resumed conversations are respected.
+- [x] Profile evidence and tentative interest themes persist encrypted and stay separate
+  from code-owned academic eligibility; no diagnostic/aptitude/percentage-fit claims.
+- [x] Existing/newly discovered institution courses are presented with grounded reasons,
+  checked availability and eligibility uncertainty; no unsuitable-course pressure.
+- [x] Missing desired offerings are honestly acknowledged; external fields are explicitly
+  exploratory and do not claim verified colleges, fees, recognition or job outcomes.
+- [x] Optional deeper exploration and requested official assessment resources work;
+  ordinary turns use text and no compulsory language/quiz menu.
+- [x] Text and signed selections, FAQ interruptions, human/safety requests, consent,
+  application locks, tenant isolation and provider-failure recovery are covered.
+- [x] Authorized staff can inspect the saved guidance evidence and classification.
+- [x] Full applicable gates, realistic OpenAI scenarios and adversarial review pass;
+  native runtime is refreshed.
+- [x] Publish through a reviewed protected-main PR with green exact-head CI
+  ([PR #15](https://github.com/Shan091/admitflow/pull/15)).
+
+**Verification:** Backend gate: 280 default tests, lint/format and strict typing over
+120 source files. Full PostgreSQL: 99 passed; the two Redis-only cases pass separately.
+Frontend lint/build and 14 browser scenarios pass across the mock/local runs, with
+all four real login/catalog/upload/account/WebSocket cases passing after restoring
+the stopped API. The guidance panel was inspected at 1440/390 px; no overflow or
+mechanical design findings. Live OpenAI: 13/13 independent scenarios and 3/3 multi-turn
+conversations; no Telegram message was sent by these verifiers.
+
+Test-first checks exposed language-menu onboarding, unsafe academic-number extraction,
+stale source identity after a concurrent course closure, and a validated correction
+lost when reply generation failed. The completed flow separates interpretation from
+planning, refreshes catalog entities, preserves unrelated notes and recomputes selected
+course eligibility even when the reply fails. Code-owned confirmation wording and
+cleared pending choices prevent an unrelated yes after failed deeper exploration
+from selecting a course. Self-review covered tenant/explicit-choice
+boundaries, submitted applications, pause/consent, profile privacy and unsupported
+claims, with no open important/critical finding. The native API/default worker were
+reloaded; the receiver and serial knowledge worker listen and the scheduler runs.
+
+**Evidence:** `docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md`, ADR-013,
+`docs/event/GUIDANCE_EVALUATION_RESULTS.json`, `GUIDANCE_RELEASE_RESULTS.json`,
+`tests/test_guidance.py`, `tests/integration/test_adaptive_guidance.py`,
+`tests/integration/test_guidance_transitions.py`, `frontend/tests/guidance.e2e.ts`.
+This is exploratory guidance, not psychometric validation or real-student outcome
+evidence. No new adaptive-guidance handset receipt or upgraded running Compose image
+is claimed. Public deployment remains deferred by the owner.

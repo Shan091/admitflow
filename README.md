@@ -6,9 +6,11 @@ persisted inquiries, conversation context and code-evaluated eligibility results
 
 ## Product scope
 
-The first release covers Telegram onboarding and language preference, course/batch
-selection, qualification, memory/corrections, grounded institution FAQs and a minimal
-authenticated staff dashboard with a human-request queue. The full roadmap also
+The current conversation uses English adaptive guidance over student interests,
+background, goals and practical constraints. Applicants can explore unfamiliar relevant
+courses, compare options or proceed with a course they already know. Course/batch
+selection, qualification, memory/corrections, grounded institution FAQs and an
+authenticated staff dashboard support the admissions journey. The full roadmap also
 includes applications, payments, co-pilot, follow-ups and institution administration.
 
 The current implementation also includes encrypted application submission/review,
@@ -19,6 +21,37 @@ include standalone deliveries and stable pagination. Real Razorpay test-card val
 and public deployment remain unverified; staff-reply and uploaded-PDF handset receipt
 are confirmed. Deployment is deferred until the owner explicitly authorizes it;
 see [tasks/todo.md](tasks/todo.md) for verified acceptance and remaining work.
+
+## Student-first course guidance
+
+Use `/start` for an open English conversation, `/guide` to resume guidance, `/courses`
+to browse the verified catalog, `/assessment` for optional deeper exploration, and
+`/human` for staff help. Interests/background normally use free text; course and batch
+choices support signed buttons or their unique full names. An immediate “yes” can
+confirm a single proposed course. Exploration is optional for a decided applicant.
+
+The assistant records explicit student evidence and a provisional support stage:
+exploring, comparing or decided. It can introduce less familiar relevant courses, but
+only from the institution's current catalog, descriptions, entry rules and open intakes.
+Failed known rules exclude a recommendation; missing information stays unverified.
+If no fit is verified, it says so and can suggest general fields to research elsewhere.
+It does not invent external colleges, accreditation, salaries or admission guarantees.
+Catalog quality matters: add accurate descriptions and rules through Institution
+management rather than expecting the assistant to invent a curriculum.
+
+Two bounded OpenAI steps interpret the message and then plan a contextual response
+using corrected facts and refreshed catalog checks. Code owns eligibility and actual
+selection. Validated corrections survive a later reply-generation failure and invalidate
+an outdated eligibility result. Staff see saved guidance evidence alongside the inquiry.
+
+Deeper chat uses original contextual prompts and is **not a validated psychometric or
+aptitude test**. Official O*NET® assessment information is linked only on request;
+results are not imported or used for admissions screening. The
+[research and limitations](docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md),
+[decision](docs/decisions/ADR-013-adaptive-course-guidance.md) and
+[synthetic live scenarios](docs/event/GUIDANCE_EVALUATION_RESULTS.json) document the scope.
+Historical multilingual copy remains available in source; localization is deferred
+for this guidance slice. No new AI provider or model training is required.
 
 ## Stack
 

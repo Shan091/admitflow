@@ -23,7 +23,9 @@ One institution is demonstrated first; tenant isolation remains mandatory.
 - Active course and batch exploration/selection with buttons.
 - Short, context-aware eligibility questions with typed extraction and code-owned rules.
 - Persistent conversation memory, corrections and continuity after restart.
-- Institution FAQ answers from approved knowledge, source references and honest abstention.
+- Institution FAQ answers from approved knowledge, internal source references and honest abstention.
+- Adaptive English course guidance using explicit interests/background, contextual questions,
+  optional deeper exploration and honest catalog/eligibility boundaries (Task 61).
 - Persisted lead, conversation, facts, selected course/batch and eligibility evidence.
 - Staff login, tenant-scoped lead list/detail, conversation history and human-request queue.
 - Input/retrieval/output checks, duplicate/concurrency handling, clear failure states,
@@ -264,3 +266,36 @@ bot provisioning, manual staff provisioning and server-side sessions. Remaining 
 decisions include live operating budget, language reviewers, hosting and continuation cost.
 Event unknowns: portal details, existing-work permission, surprise requirement and any
 deadline updates. These are tracked tasks, not reasons to add unnecessary services.
+
+
+## Adaptive course guidance (Task 61)
+
+English is the active conversation language for this slice; onboarding does not require
+language selection. Guide applicants toward relevant institution courses by exploring
+explicit background, interests, experience, goals, values and practical constraints.
+Ask one useful contextual question at a time, adapt to known answers, accept corrections
+and skipped topics, and let a decided applicant proceed without a compulsory quiz.
+Text is the default for reflection; signed choices are useful for real course/batch
+selection and optional deeper exploration, rather than every answer.
+
+The student's provisional exploration stage and broad interest evidence are encrypted
+with conversation memory and may be reviewed by authorized staff. These are contextual
+notes, not an aptitude score, diagnosis, fixed personality type or admissions criterion.
+The optional deeper conversation uses original prompts; an official external interest
+inventory is offered only on request. No licensed test items/scoring are copied.
+
+Every institution recommendation uses a live tenant-owned active catalog entry with an
+open batch. Exclude courses with a failed known eligibility rule; unknown requirements
+remain explicitly unverified and ask only necessary questions. Code owns academic
+eligibility, fees, availability and actual selection. Interest notes never grant or deny
+admission. Recommendations explain student evidence, course evidence, uncertainty and
+a useful next step. Offer relevant less familiar catalog courses without overriding a
+student's clear preference or repeatedly upselling. When no suitable offering can be
+verified, say so and offer clearly labelled fields to research elsewhere. Never invent
+another institution's courses, accreditation, prerequisites, job outcomes or availability.
+
+Preserve FAQ grounding/abstention, consent, safety/human handoff, applications/payments,
+tenant boundaries and encrypted persistence. Guidance may pause/resume around FAQs or
+eligibility collection. Only explicit student choices change course/batch selection;
+submitted applications retain their existing change controls. Provider failures keep
+profile/selection safe and offer a retry or explicit catalog browse, not an invented fit.

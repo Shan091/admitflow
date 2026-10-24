@@ -493,9 +493,99 @@ async def build_reply(db: AsyncSession, lead: Lead, bot: TelegramBot, event: Eve
     return reply
 
 
+async def select_course(
+    db: AsyncSession, lead: Lead, bot: TelegramBot, memory: dict[str, Any], course_id: uuid.UUID
+) -> Reply:
+    from src.engine.guidance import catalog_status, load_guidance, save_guidance
+
+    state = load_guidance(memory)
+    state.pending_course = None
+    save_guidance(memory, state)
+    course = await db.scalar(
+        select(Course).where(
+            Course.id == course_id,
+            Course.tenant_id == lead.tenant_id,
+            Course.is_active.is_(True),
+        )
+    )
+    batches = list(
+        (
+            await db.scalars(
+                select(Batch)
+                .where(
+                    Batch.course_id == course_id,
+                    Batch.tenant_id == lead.tenant_id,
+                    Batch.is_active.is_(True),
+                    Batch.seats_remaining > 0,
+                )
+                .order_by(Batch.name)
+                .limit(10)
+            )
+        ).all()
+    )
+    if course is None or not batches:
+        return Reply(text=copy("stale", memory))
+    rules = list(
+        (
+            await db.scalars(
+                select(QualificationRule).where(
+                    QualificationRule.tenant_id == lead.tenant_id,
+                    QualificationRule.course_id == course.id,
+                )
+            )
+        ).all()
+    )
+    if catalog_status(course, rules, memory.get("facts", {}), True)[0] == "not_eligible":
+        return Reply(
+            text="The details you shared do not meet this course's configured entry rules. "
+            "You can correct your details, use /guide to explore alternatives, or /human "
+            "to ask staff to review the requirements. Your course choice is unchanged."
+        )
+    from src.engine.guidance_contracts import Note
+
+    state.active, state.pending_course, state.stage = False, None, "decided"
+    state.notes = [n for n in state.notes if n.topic != "decision"][-39:] + [
+        Note(topic="decision", evidence=course.name)
+    ]
+    save_guidance(memory, state)
+    lead.current_course_id, lead.current_batch_id = course.id, None
+    lead.status = LeadStatus.DISCOVERING
+    memory.pop("eligibility", None)
+    memory.pop("application_draft", None)
+    memory["question"] = None
+    return Reply(
+        text=f"{course.name}\n{(course.description or '')[:500]}\n\n" + copy("batch", memory),
+        buttons=[button(batch.name, "batch", batch.id.hex, lead, bot) for batch in batches],
+    )
+
+
+async def select_batch(
+    db: AsyncSession, lead: Lead, bot: TelegramBot, memory: dict[str, Any], batch_id: uuid.UUID
+) -> Reply:
+    batch = await db.scalar(
+        select(Batch)
+        .join(Course)
+        .where(
+            Batch.id == batch_id,
+            Batch.tenant_id == lead.tenant_id,
+            Batch.course_id == lead.current_course_id,
+            Batch.is_active.is_(True),
+            Batch.seats_remaining > 0,
+            Course.tenant_id == lead.tenant_id,
+            Course.is_active.is_(True),
+        )
+    )
+    if batch is None:
+        return Reply(text=copy("stale", memory))
+    lead.current_batch_id = batch.id
+    lead.status = LeadStatus.QUALIFYING
+    return await qualify(db, lead, bot, memory, "", [])
+
+
 async def route(
     db: AsyncSession, lead: Lead, bot: TelegramBot, event: Event, memory: dict[str, Any]
 ) -> Reply:
+    memory["language"] = "en"
     held = await db.scalar(
         select(HumanRequest).where(
             HumanRequest.tenant_id == lead.tenant_id,
@@ -534,13 +624,14 @@ async def route(
             kind, target = parse_callback(text, lead.id, bot.id)
         except ValueError:
             return Reply(text=copy("stale", memory))
-        if submitted and kind in {"course", "batch", "courses"}:
+        if submitted and kind in {"course", "batch", "courses", "guide"}:
             return submitted_reply()
         if kind == "language" and target in LANGUAGES:
-            memory["language"] = target
             if submitted:
                 return submitted_reply()
-            return await courses(db, lead, bot, memory)
+            from src.engine.guidance import guide
+
+            return await guide(db, lead, bot, memory, "")
         if kind == "human" and target == "request":
             text = "/human"
         elif kind == "apply":
@@ -551,81 +642,46 @@ async def route(
             from src.payments.conversation import payment_action
 
             return await payment_action(db, lead, bot, memory, target)
+        elif kind == "guide" and target in {"resume", "deeper"}:
+            from src.engine.guidance import guide
+
+            return await guide(db, lead, bot, memory, "", deeper=target == "deeper")
         elif kind == "courses":
+            from src.engine.guidance import load_guidance, save_guidance
+
+            state = load_guidance(memory)
+            state.active, state.pending_course = False, None
+            save_guidance(memory, state)
             return await courses(db, lead, bot, memory)
         elif kind == "course":
-            course = await db.scalar(
-                select(Course).where(
-                    Course.id == uuid.UUID(target),
-                    Course.tenant_id == lead.tenant_id,
-                    Course.is_active.is_(True),
-                )
-            )
-            batches = list(
-                (
-                    await db.scalars(
-                        select(Batch)
-                        .where(
-                            Batch.course_id == uuid.UUID(target),
-                            Batch.tenant_id == lead.tenant_id,
-                            Batch.is_active.is_(True),
-                            Batch.seats_remaining > 0,
-                        )
-                        .order_by(Batch.name)
-                        .limit(10)
-                    )
-                ).all()
-            )
-            if course is None or not batches:
-                return Reply(text=copy("stale", memory))
-            lead.current_course_id, lead.current_batch_id = course.id, None
-            lead.status = LeadStatus.DISCOVERING
-            memory.pop("eligibility", None)
-            memory.pop("application_draft", None)
-            memory["question"] = None
-            return Reply(
-                text=f"{course.name}\n{(course.description or '')[:500]}\n\n"
-                + copy("batch", memory),
-                buttons=[button(batch.name, "batch", batch.id.hex, lead, bot) for batch in batches],
-            )
+            return await select_course(db, lead, bot, memory, uuid.UUID(target))
         elif kind == "batch":
-            batch = await db.scalar(
-                select(Batch)
-                .join(Course)
-                .where(
-                    Batch.id == uuid.UUID(target),
-                    Batch.tenant_id == lead.tenant_id,
-                    Batch.course_id == lead.current_course_id,
-                    Batch.is_active.is_(True),
-                    Batch.seats_remaining > 0,
-                    Course.tenant_id == lead.tenant_id,
-                    Course.is_active.is_(True),
-                )
-            )
-            if batch is None:
-                return Reply(text=copy("stale", memory))
-            lead.current_batch_id = batch.id
-            lead.status = LeadStatus.QUALIFYING
-            return await qualify(db, lead, bot, memory, "", [])
+            return await select_batch(db, lead, bot, memory, uuid.UUID(target))
         else:
             return Reply(text=copy("stale", memory))
     if text.split(" ")[0].split("@")[0] == "/start":
+        if submitted:
+            return submitted_reply()
+        from src.engine.guidance import load_guidance, save_guidance
+
+        state = load_guidance(memory)
+        state.active, state.pending_course = True, None
+        state.last_question = "Where are you with your course choice at the moment?"
+        save_guidance(memory, state)
         institution = await db.get(Institution, lead.tenant_id)
+        demo = (
+            " This is a synthetic admissions demonstration."
+            if institution and institution.name == "AdmitFlow Demo Institute"
+            else ""
+        )
         return Reply(
-            text=f"Welcome to {institution.name if institution else 'AdmitFlow'}. "
-            "This is a synthetic admissions demonstration. Do not send personal documents. "
-            "Choose a language preference; source quotations keep their original language. "
-            "Use /courses to explore or /human to request staff review. "
-            "Optional reminders are off by default: /followups to choose, /stop to disable them.",
-            buttons=[
-                button(label, "language", language, lead, bot)
-                for label, language in [
-                    ("English", "en"),
-                    ("हिन्दी", "hi"),
-                    ("Hinglish", "hinglish"),
-                    ("മലയാളം", "ml"),
-                ]
-            ],
+            text=f"Welcome to {institution.name if institution else 'AdmitFlow'}.{demo} "
+            "I can help you explore courses that fit your interests and background, or look "
+            "at a course you already have in mind. "
+            "You can skip any personal question. Don't send personal documents. "
+            "Use /courses to browse, /assessment for optional deeper exploration, or /human "
+            "for staff help. Optional reminders stay off unless you opt in with /followups. "
+            "Use /stop to turn them off.\n\n" + state.last_question
         )
     reason = escalation_reason(text)
     if reason:
@@ -635,7 +691,32 @@ async def route(
     if text == "/courses":
         if submitted:
             return submitted_reply()
+        from src.engine.guidance import load_guidance, save_guidance
+
+        state = load_guidance(memory)
+        state.active, state.pending_course = False, None
+        save_guidance(memory, state)
         return await courses(db, lead, bot, memory)
+    if text in {"/guide", "/assessment"}:
+        if submitted:
+            return submitted_reply()
+        from src.engine.guidance import OFFICIAL_INTEREST_TOOL, guide, load_guidance, save_guidance
+
+        if text == "/guide":
+            return await guide(db, lead, bot, memory, "")
+        state = load_guidance(memory)
+        state.pending_course = None
+        save_guidance(memory, state)
+        return Reply(
+            text="Deeper exploration is optional. We can discuss activities you enjoy, "
+            "past experiences, values and practical tradeoffs. This chat is not a validated "
+            "psychometric or aptitude test, and it does not decide admission.\n\n"
+            "For an optional standardized interest inventory, the official O*NET® Interest "
+            f"Profiler is linked here: {OFFICIAL_INTEREST_TOOL} . It is an external US career "
+            "exploration tool, not an Indian eligibility check. No results are imported "
+            "automatically. You can return here to discuss what you learned.",
+            buttons=[button("Explore further in this chat", "guide", "deeper", lead, bot)],
+        )
     if text == "/human":
         intent = "handoff"
     else:
@@ -657,6 +738,21 @@ async def route(
             from src.engine.applications import collect_application
 
             return await collect_application(db, lead, bot, memory, text)
+        if not submitted:
+            from src.engine.guidance import guide, load_guidance, save_guidance, text_selection
+
+            choice = await text_selection(db, lead, memory, text)
+            if choice:
+                kind, choice_id = choice
+                if kind == "course":
+                    return await select_course(db, lead, bot, memory, choice_id)
+                return await select_batch(db, lead, bot, memory, choice_id)
+            state = load_guidance(memory)
+            state.pending_course = None
+            if "guidance" in memory:
+                save_guidance(memory, state)
+                if state.active:
+                    return await guide(db, lead, bot, memory, text)
         history = await recent_history(db, lead)
         interpretation = await decide(
             Interpretation,
@@ -668,7 +764,8 @@ async def route(
                     "or a safety concern. "
                     "Do not escalate ordinary questions or refusal to share personal details. "
                     "question for institutional facts/FAQs, "
-                    "discovery for course exploration/greetings, "
+                    "discovery for career/course guidance, interests, education background, goals, "
+                    "uncertainty, comparisons or greetings; do not route career advice to FAQ. "
                     "qualification for answers/corrections to eligibility questions. "
                     "Use conversation "
                     f"context. Active eligibility field: {memory.get('question')}",
@@ -691,4 +788,6 @@ async def route(
         return await qualify(db, lead, bot, memory, text, history)
     if submitted:
         return submitted_reply()
-    return await courses(db, lead, bot, memory)
+    from src.engine.guidance import guide
+
+    return await guide(db, lead, bot, memory, text)

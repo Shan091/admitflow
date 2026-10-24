@@ -1,6 +1,8 @@
 "use client";
 import StaffControls from "./staff-controls";
 import PrivacyControls from "./privacy-controls";
+import StudentGuidance from "./guidance-profile";
+import type { GuidanceProfile } from "./guidance-profile";
 import type { StaffDraft } from "./staff-controls";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -63,6 +65,7 @@ type Detail = {
   batch_name: string | null;
   memory: {
     language?: string;
+    guidance?: GuidanceProfile;
     staff_draft?: StaffDraft;
     facts?: Record<string, unknown>;
     eligibility?: { outcome: string; rules?: RuleEvidence[] };
@@ -516,6 +519,7 @@ export default function Admissions({
                   </div>
                 </details>
               )}
+              <StudentGuidance profile={detail.memory.guidance} />
               <h3 className="conversation-heading">Conversation</h3>
               {detail.conversation_purged_at && (
                 <p className="notice">

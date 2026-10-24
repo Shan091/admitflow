@@ -273,3 +273,17 @@ synthetic; activation/billing/hosting changes require their own concrete setup d
 Organizer confirmation is still needed for prior-work permission, submission portal,
 surprise requirement and any deadline changes. Verify the actual deadline from original event sources and upload with a buffer.
 Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md).
+
+
+## Task 61: Adaptive, student-first course guidance
+
+- [x] Document primary-source research, psychometric limits and conversation decisions.
+- [x] Replace the menu-first discovery loop with an English adaptive conversation over
+  explicit interests/background/goals and a provisional, correctable student profile.
+- [x] Offer optional deeper exploration; use text questions and contextual choices.
+- [x] Match verified institution courses, enforce eligibility/availability in code and
+  explain fit; acknowledge unavailable interests without enrollment pressure.
+- [x] Preserve direct course choice, FAQs, human help, consent and application/payment controls.
+- [x] Verify unit/adversarial, real database and bounded live OpenAI student scenarios;
+  adversarial review and final local checks pass; update this checklist.
+- [x] Publish through the protected-main PR/CI gate ([PR #15](https://github.com/Shan091/admitflow/pull/15)).

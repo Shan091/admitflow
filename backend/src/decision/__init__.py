@@ -7,13 +7,17 @@ from pydantic import BaseModel, ValidationError
 from src.engine.llm_factory import AllProvidersFailedError, generate_completion
 
 
-async def decide[T: BaseModel](schema: type[T], messages: list[dict[str, Any]]) -> T:
+async def decide[T: BaseModel](
+    schema: type[T], messages: list[dict[str, Any]], *, max_tokens: int = 800
+) -> T:
     """Validate structured model output; refusal/malformed output is never a decision.
 
     Schemas describe bounded interpretation, not authorization or calibrated
     probabilities. Business rules and consequential actions remain code-owned.
     """
-    response = await generate_completion(messages, response_format=schema, temperature=0.0)
+    response = await generate_completion(
+        messages, response_format=schema, temperature=0.0, max_tokens=max_tokens
+    )
     try:
         message = response.choices[0].message
         if getattr(message, "refusal", None) or not message.content:

@@ -4,7 +4,10 @@ Use the synthetic institution and catalog. Confirm that the API, knowledge/Teleg
 worker, receiver and staff frontend are running. Keep credentials and terminals with
 private configuration out of the recording. No real applicant documents are required.
 
-1. Open the configured Telegram bot and send `/start`. Choose English, a course and a batch.
+1. Open the configured Telegram bot and send `/start`. The current guidance flow is
+   English and starts with free text. Share synthetic interests/background, compare a
+   relevant unfamiliar option, then explicitly choose a course and batch. A decided
+   applicant can use `/courses` or type a unique course name without a compulsory quiz.
 2. Provide synthetic age 20 and marks 70. Show the code-evaluated eligible result and
    the explanation that eligibility does not mean admission or a reserved seat.
 3. Correct age to 17, then 21. Show the changed result and persisted correction history.
@@ -17,7 +20,9 @@ private configuration out of the recording. No real applicant documents are requ
 8. Return to Knowledge library. Show approved references and indexing states. Explain
    that original files are encrypted and only ready material appears in search.
 
-For a short final demo, focus on selection, one correction and the staff conversation.
+For a short final demo, focus on one adaptive guidance question, a supported course
+choice, one correction and the saved guidance evidence in the staff conversation.
+Existing recordings predate Task 61 and demonstrate their original behavior.
 Keep the full grounded-answer/abstention and human-request sequence ready for desk review.
 Upload [the synthetic counselling PDF](artifacts/synthetic-counselling-reference.pdf),
 wait for Ready, then ask “What is the demo admissions counselling room called?”
