@@ -1,6 +1,6 @@
 # ADR-016: Public programme references and an explicit local demo reset
 
-Status: Accepted
+Status: Accepted; ADR-017 adds an explicit test-only demo application exception.
 
 ## Context
 

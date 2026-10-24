@@ -11,7 +11,9 @@ institutions in Kerala, India. Readiness-aware, tap-first, multilingual
 conversation engine, pgvector RAG, OpenAI); Next.js admin dashboard. Applications/review
 payments, co-pilot, consent-aware follow-ups, institution administration, reporting
 and privacy controls have local automated evidence. Live payment validation and
-production operations remain open. Typed OpenAI decisions and passage reranking
+production operations remain open. ADR-017 adds explicit development-only demo
+applications for reference courses, with a separate sample fee, Razorpay test payment
+and staff review; it grants no university admission or seat. Typed OpenAI decisions and passage reranking
 use the existing API configuration; no model training is planned. See ADR-012 for
 the current channel/provider decision and tasks/todo.md for verified progress.
 

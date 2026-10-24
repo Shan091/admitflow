@@ -362,3 +362,18 @@ tenant boundaries and encrypted persistence. Guidance may pause/resume around FA
 eligibility collection. Only explicit student choices change course/batch selection;
 submitted applications retain their existing change controls. Provider failures keep
 profile/selection safe and offer a retry or explicit catalog browse, not an invented fit.
+
+## Explicit local demo application mode
+
+ADR-017 permits separately configured test applications on public-reference courses. Demo
+fees are distinct from unverified university fees; no real batch, capacity or academic
+eligibility is fabricated. Confirmed course choice leads to a reviewable demo application,
+Razorpay test payment and staff review. Development-only institution/test-key guards and
+persistent demo markers prevent this exception from enabling real admissions or payments.
+
+The owner-selected sample fee is INR 3,000 (300,000 paise) per demo application,
+separate from unverified university fees. Confirmed course choice starts a draft;
+explicit review/submit and fee confirmation precede provider link creation.
+Only a verified captured test payment permits demo staff approval. The local
+scheduler may authenticate exact provider link/payment reads in place of public
+webhook ingress for demo invoices; real payments retain signed event confirmation.

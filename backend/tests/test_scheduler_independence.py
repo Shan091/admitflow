@@ -21,6 +21,7 @@ async def test_queue_failure_does_not_skip_retention(monkeypatch, startup_failur
     )
     monkeypatch.setattr(scheduler, "recover_outbound", AsyncMock())
     monkeypatch.setattr(scheduler, "dispatch_integrations", AsyncMock())
+    monkeypatch.setattr(scheduler, "check_demo_payments", AsyncMock(return_value=0))
     purge = AsyncMock(return_value=1)
     monkeypatch.setattr(scheduler, "purge_retained", purge)
     with pytest.raises(RuntimeError):

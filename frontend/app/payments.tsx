@@ -7,6 +7,7 @@ type Payment = {
   lead_id: string;
   application_id: string;
   amount: number;
+  is_demo: boolean;
   currency: string;
   status: string;
   creation_state: string;
@@ -18,6 +19,8 @@ type Payment = {
 };
 const statuses = ["created", "link_sent", "paid", "waived", "failed"];
 const outcomes: Record<string, string> = {
+  test_payment_confirmed: "Captured Razorpay test payment verified. The demo application is ready for staff review.",
+  test_payment_pending: "No captured test payment confirmed yet. The demo application remains unpaid.",
   link_recovered: "Existing link recovered. Its delivery is tracked below.",
   awaiting_signed_confirmation:
     "The provider reports activity. Payment remains unconfirmed until its verified event arrives.",
@@ -180,7 +183,7 @@ export default function Payments({
                   setNotice("");
                 }}
               >
-                <strong>{money(row)}</strong>
+                <strong>{money(row)}{row.is_demo ? " · Test" : ""}</strong>
                 <span>{label(row.status)}</span>
                 <span>
                   Invoice {row.id.slice(-8)} · {label(row.creation_state)}
@@ -225,7 +228,7 @@ export default function Payments({
               <div className="management-toolbar">
                 <div>
                   <h2>{money(detail)}</h2>
-                  <p className="quiet">Application fee</p>
+                  <p className="quiet">{detail.is_demo ? "Demo application fee · Razorpay test mode" : "Application fee"}</p>
                 </div>
                 <span className="status queued">{label(detail.status)}</span>
               </div>

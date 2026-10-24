@@ -1436,3 +1436,32 @@ pass, frontend lint/build pass, the backend gate passes 313 tests with 127 stric
 source files, and the extended reference-catalogue UI test passes. Mechanical scans report
 zero findings. Local frontend refreshed; no public deployment or Telegram send. See
 `docs/engineering/UI_THEME.md` for palette and verification scope.
+
+## Task 70: Course selection through demo payment and staff approval
+
+- [x] Confirm demo/test mode for the imported catalogue; preserve reference provenance.
+- [x] Configure all 64 reference courses at the owner-selected INR 3,000 demo fee.
+- [x] Start a labelled, reviewable demo application after confirmed course selection.
+- [x] Restrict demo invoices/provider operations to test credentials and development mode.
+- [x] Verify payment before staff approval without creating or consuming university seats.
+- [x] Validate normal/reference flows, replay/tenant safety, UI labels and local activation.
+
+Task 70 evidence: the baseline gate passes 323 tests with 131 strictly typed source
+files; PostgreSQL integration checks and migration up/down pass (129 passed initially; the two
+Redis checks also pass when rerun against a disposable Redis instance), with 13 focused demo/reference/webhook/staff-payment cases rerun.
+Four browser checks cover desktop/mobile demo review, normal payment lookup and
+reference fee labels. All 64 actual local courses were exercised through draft,
+explicit submit, fee preview and immutable test invoice; temporary rows rolled back.
+A real Razorpay test link was created, read and cancelled. All 64 courses are active;
+the owner approved restoring the archived Communication Design option. Existing
+records are preserved. Local services and data-store readiness pass. Actual card
+completion and new Telegram handset receipts remain unverified; no public deployment.
+See ADR-017 and docs/event/DEMO_APPLICATIONS_VALIDATION.json.
+
+Task 70 adversarial review checked disabled/production mode, tenant boundaries,
+provider references and captured amounts, replay, unpaid/waived approval and seat
+preservation. The staff provider-lookup path now rechecks demo mode and records
+its request; no open critical or important findings remain.
+
+Final post-review follow-up: all 11 demo/staff-payment integration checks pass;
+API/data stores and frontend are healthy after the interrupted local session resumed.

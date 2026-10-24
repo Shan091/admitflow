@@ -7,6 +7,7 @@ from cryptography.fernet import InvalidToken
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.demo_admissions import demo_fee
 from src.core.security import EncryptionKeyNotConfiguredError, decrypt_pii, encrypt_pii
 from src.core.settings import get_settings
 from src.db.audit import write_audit_log
@@ -73,9 +74,25 @@ async def fee_details(
             Course.tenant_id == lead.tenant_id,
             Course.id == application.course_id,
             Course.is_active.is_(True),
-            Course.is_reference.is_(False),
         )
     )
+    if course is None:
+        raise PaymentRequestError("The course is unavailable. Request staff review before paying.")
+    if application.is_demo:
+        amount = await demo_fee(db, course)
+        if amount is None or application.batch_id is not None:
+            raise PaymentRequestError(
+                "Demo test payments are unavailable. Your application is saved."
+            )
+        if code:
+            raise PaymentRequestError(
+                "Demo applications require the full test fee; discounts are unavailable."
+            )
+        return application, course, amount, None
+    if course.is_reference:
+        raise PaymentRequestError(
+            "University payments are not available for this reference programme."
+        )
     batch = await db.scalar(
         select(Batch.id).where(
             Batch.tenant_id == lead.tenant_id,
@@ -157,6 +174,7 @@ async def request_payment(
         amount=amount,
         currency="INR",
         request_key=application_id.hex,
+        is_demo=application.is_demo,
         creation_state="queued" if amount else "created",
         creation_attempts=0,
         status=PaymentStatus.CREATED if amount else PaymentStatus.WAIVED,
@@ -238,6 +256,16 @@ async def process_payment(order_id: uuid.UUID) -> uuid.UUID | None:
                 or application.status in {ApplicationStatus.APPROVED, ApplicationStatus.REJECTED}
             ):
                 raise ValueError("Payment routing unavailable")
+            if order.is_demo != application.is_demo:
+                raise ValueError("Invoice mode mismatch")
+            if order.is_demo:
+                course = await db.get(Course, order.course_id)
+                if (
+                    course is None
+                    or course.tenant_id != tenant_id
+                    or await demo_fee(db, course) != amount
+                ):
+                    raise ValueError("Demo payments disabled")
             credentials = Credentials.model_validate_json(
                 decrypt_pii(institution.razorpay_credentials_enc)
             )
@@ -250,9 +278,14 @@ async def process_payment(order_id: uuid.UUID) -> uuid.UUID | None:
             order.creation_state, order.last_error = "failed", "configuration_unavailable"
             await db.commit()
             return None
+        is_demo = order.is_demo
         await db.commit()
     try:
-        link = await client.create_link(order_id.hex, amount)
+        link = (
+            await client.create_link(order_id.hex, amount, demo=True)
+            if is_demo
+            else await client.create_link(order_id.hex, amount)
+        )
     except PaymentProviderError as error:
         state = "uncertain" if error.uncertain else "failed"
         next_attempt = None
@@ -294,9 +327,18 @@ async def process_payment(order_id: uuid.UUID) -> uuid.UUID | None:
             kind="payment_link",
             dedup_key=f"payment-link:{order_id}",
             reply=Reply(
-                text=f"Your application fee is INR {amount / 100:.2f}. "
-                f"Open the institution's payment link: {link.short_url}\n"
-                "Payment is an application fee, not admission or a seat reservation."
+                text=(
+                    f"Demo application fee: INR {amount / 100:.2f}. Razorpay TEST mode.\n"
+                    f"Use test payment details only: {link.short_url}\n"
+                    "Confirmed test payment sends your demo application for staff review. "
+                    "No university application or seat is created."
+                )
+                if is_demo
+                else (
+                    f"Your application fee is INR {amount / 100:.2f}. "
+                    f"Open the institution's payment link: {link.short_url}\n"
+                    "Payment is an application fee, not admission or a seat reservation."
+                )
             ),
         )
         await write_audit_log(

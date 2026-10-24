@@ -1,0 +1,89 @@
+{
+  "scope": "Task 70 local development demo; no public deployment or real university admission",
+  "activation": {
+    "mode": "development-only Razorpay test applications",
+    "configured_courses": 64,
+    "active_demo_courses": 64,
+    "demo_application_fee_paise": 300000,
+    "currency": "INR",
+    "real_fees_changed": false,
+    "university_batches_created": 0,
+    "existing_records_preserved": true,
+    "counts": {
+      "institutions": 1,
+      "courses": 64,
+      "batches": 0,
+      "leads": 1,
+      "applications": 0,
+      "payment_orders": 0,
+      "documents": 65,
+      "document_chunks": 65,
+      "telegram_identities": 1
+    },
+    "owner_authorised_course_restored": "BA - Communication Design (Animation and VFX)"
+  },
+  "local_catalogue_journey": {
+    "actual_catalogue_courses_exercised": 64,
+    "review_submit_fee_invoice_verified": true,
+    "amount_paise": 300000,
+    "temporary_rows_rolled_back": true,
+    "external_messages_sent": 0,
+    "provider_calls": 0
+  },
+  "razorpay_test_provider": {
+    "razorpay_test_link_created": true,
+    "amount_paise": 300000,
+    "exact_reference_read_verified": true,
+    "unpaid_link_cannot_confirm": true,
+    "test_link_cancelled": true,
+    "actual_card_completed": false,
+    "external_messages_sent": 0
+  },
+  "baseline": {
+    "passed": 323,
+    "strict_source_files": 131,
+    "existing_mock_warnings": 2
+  },
+  "postgresql_integration": {
+    "passed": 129,
+    "skipped": 2,
+    "focused_followup_passed": 13,
+    "migration_up_down": true,
+    "skipped_reason": "Two Redis checks require an explicit dedicated test URL; both passed separately.",
+    "post_review_followup_passed": 11
+  },
+  "frontend": {
+    "lint": true,
+    "production_build": true,
+    "browser_checks_passed": 4,
+    "widths": [
+      1440,
+      390
+    ],
+    "synthetic_ui_fixtures": true
+  },
+  "runtime": {
+    "api_ready": true,
+    "frontend_http": 200,
+    "local_services_refreshed": true,
+    "resumed_readiness_verified": true
+  },
+  "limits": [
+    "Actual test-card completion unverified",
+    "Signed provider webhook transport to localhost unverified",
+    "New flow handset receipt unverified",
+    "Private smoke-check link cancelled without payment",
+    "No external test messages sent"
+  ],
+  "redis_integration": {
+    "passed": 2,
+    "disposable_instance": true,
+    "production_redis_touched": false
+  },
+  "review": {
+    "adversarial_pass": "complete",
+    "critical_findings_open": 0,
+    "important_findings_open": 0,
+    "staff_lookup_demo_guard_regression": true
+  }
+}
