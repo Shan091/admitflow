@@ -361,6 +361,9 @@ code changed. Protected-main publication and its final-head CI are recorded on t
 ## Task 67: Explicit submission README requirements
 
 - [x] Confirm the root README explains the project, problem, idea and stack/tools.
-- [x] Add a prominent product demonstration link to the existing six-slide presentation.
-- [x] Identify actual prototype screens and distinguish the earlier presentation snapshot.
-- [x] Verify the presentation file, public download and README links; retain the existing green code gate.
+- [x] Remove the earlier presentation link; the owner will create the submission deck later.
+- [x] Keep demo placeholders out of the README and preserve existing artifacts as historical files.
+- [ ] Add the final product demonstration link after the submission presentation is created.
+
+The overview and technology requirements are covered. The product demonstration link is
+intentionally deferred by the owner; the older deck is not the selected submission artifact.
