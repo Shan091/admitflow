@@ -15,6 +15,11 @@ production operations remain open. Typed OpenAI decisions and passage reranking
 use the existing API configuration; no model training is planned. See ADR-012 for
 the current channel/provider decision and tasks/todo.md for verified progress.
 
+Current conversation work is **Task 61**, English adaptive course guidance. It
+supersedes language-choice onboarding and the menu-first discovery loop. Interest
+notes are exploratory and separate from academic eligibility; see ADR-013 and
+[the research record](docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md).
+
 - Spec: [SPEC.md](SPEC.md) · Execution: [tasks/plan.md](tasks/plan.md) · Progress: [tasks/todo.md](tasks/todo.md)
 - Decisions: [docs/decisions/](docs/decisions/) (ADRs) · Plan & tasks: [tasks/](tasks/)
 

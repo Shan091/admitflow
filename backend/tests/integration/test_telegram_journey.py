@@ -172,8 +172,8 @@ def test_complete_journey_corrections_faq_human_and_staff(journey: dict[str, Any
             return Reply.model_validate_json(decrypt_pii(reply.payload_enc)), event.lead_id
 
     reply, lead_id = asyncio.run(turn("/start"))
-    assert "synthetic" in reply.text.lower()
-    reply, _ = asyncio.run(turn(reply.buttons[0].data, True))
+    assert "course" in reply.text.lower() and not reply.buttons
+    reply, _ = asyncio.run(turn("/courses"))
     course_button = next(b for b in reply.buttons if b.text == "Synthetic nursing")
     reply, _ = asyncio.run(turn(course_button.data, True))
     reply, _ = asyncio.run(turn(reply.buttons[0].data, True))

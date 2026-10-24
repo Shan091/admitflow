@@ -1,0 +1,49 @@
+{
+  "scope": "Local English adaptive course guidance; no public deployment or psychometric validation",
+  "source_fingerprint": "45dfa879f3e27427e87541fd9c3eaa45c301ceb0e612023f6d23ccc979a1380a",
+  "backend": {
+    "default_tests_passed": 280,
+    "strict_source_files": 120,
+    "lint_and_format_passed": true,
+    "postgresql_tests_passed": 99,
+    "redis_tests_passed": 2
+  },
+  "openai": {
+    "independent_scenarios_passed": 13,
+    "multi_turn_dialogues_passed": 3,
+    "no_database_writes_or_telegram_sends_by_evaluation": true
+  },
+  "frontend": {
+    "lint_and_build_passed": true,
+    "fixture_backed_browser_scenarios_passed": 10,
+    "real_local_browser_scenarios_passed": 4,
+    "guidance_profile_viewports": [
+      1440,
+      390
+    ],
+    "visual_review_completed": true,
+    "mechanical_design_findings": 0
+  },
+  "review": {
+    "scope": [
+      "fresh tenant/catalog ownership",
+      "literal profile evidence and corrections",
+      "stale eligibility and reply-generation failure",
+      "concurrent course closure",
+      "explicit text/signed selection",
+      "confirmation wording and stale pending-choice failure recovery",
+      "unsupported outcomes and source grounding",
+      "submitted-application and handoff boundaries",
+      "privacy and source publication"
+    ],
+    "open_critical_or_important_findings": 0
+  },
+  "limitations": [
+    "Exploratory guidance, not a validated psychometric/aptitude instrument",
+    "No real-student outcome or general counseling-validity claim",
+    "No new handset receipt claimed for adaptive guidance",
+    "Running Compose containers retain their previous baseline; a new build uses this source",
+    "Real Razorpay provider acceptance and event submission remain open"
+  ],
+  "deployment": "Deferred until explicitly authorized by the owner"
+}

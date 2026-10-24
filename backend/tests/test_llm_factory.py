@@ -32,6 +32,26 @@ async def test_generate_completion_success(mock_settings: None) -> None:
         assert mock_acompletion.call_args[1]["model"] == "openai/gpt-4.1-mini"
 
 
+async def test_guidance_can_request_a_larger_bounded_structured_reply(mock_settings: None) -> None:
+    with patch("src.engine.llm_factory.acompletion", new_callable=AsyncMock) as call:
+        call.return_value = {"choices": []}
+        await generate_completion(
+            [{"role": "user", "content": "Synthetic guidance"}], max_tokens=1800
+        )
+        assert call.call_args.kwargs["max_tokens"] == 1800
+        assert call.call_args.kwargs["store"] is False
+
+
+@pytest.mark.parametrize("limit", [0, 199, 2001])
+async def test_invalid_response_budget_never_calls_a_provider(
+    mock_settings: None, limit: int
+) -> None:
+    with patch("src.engine.llm_factory.acompletion", new_callable=AsyncMock) as call:
+        with pytest.raises(ValueError):
+            await generate_completion([], max_tokens=limit)
+        call.assert_not_called()
+
+
 @pytest.mark.asyncio
 async def test_generate_completion_fallback(mock_settings: None) -> None:
     """Test that it falls back to OpenAI if primary OpenAI model fails."""

@@ -21,12 +21,16 @@ async def generate_completion(
     messages: list[dict[str, Any]],
     response_format: Any = None,
     temperature: float = 0.0,
+    *,
+    max_tokens: int = 800,
 ) -> Any:
     """Generate a completion with automatic provider fallback.
 
     Tries the fast model, then the fallback model, then the nuance model.
     """
     settings = get_settings()
+    if not 200 <= max_tokens <= 2000:
+        raise ValueError("Response token limit must be between 200 and 2000")
 
     models = [settings.llm_fast_model]
     if settings.llm_fallback_model:
@@ -48,7 +52,7 @@ async def generate_completion(
                 "num_retries": 1,  # let litellm retry transient errors once per model
                 "timeout": settings.llm_timeout_seconds,
                 "api_key": settings.openai_api_key.get_secret_value(),
-                "max_tokens": 800,
+                "max_tokens": max_tokens,
                 "store": False,
             }
             if response_format:
