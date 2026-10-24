@@ -1,5 +1,28 @@
 # AdmitFlow project handoff
 
+## Current work: Task 62 conversation continuity
+
+The owner clarified that their pasted messages were separate examples, not conflicting
+replies. They requested natural personalised collection, less repeated technical copy,
+fresh testing memory, typing feedback and lower latency. Implementation is on
+`codex/conversation-readiness` in [PR #16](https://github.com/Shan091/admitflow/pull/16);
+see ADR-014, the existing plan/todo, and
+`docs/event/CONVERSATION_RELEASE_RESULTS.json` for evidence/publication state.
+
+Confirmed course/intake plus eligibility now starts a draft; explicit details are reused
+and the student still reviews before submission. `/pause` keeps a draft, `/apply` resumes,
+and confirmed `/reset` excludes earlier context while preserving institutional records,
+consent and staff ownership. Reset before submission is the fresh testing path; it does
+not reopen submitted applications. Telegram typing is ephemeral and failure-tolerant.
+Discovery no longer repeats an outer classifier; plain eligibility numbers need no model.
+The final synthetic guidance check passes 13 scenarios and three multi-turn conversations;
+collection timing evidence covers five synthetic cases. No new handset receipt or public
+deployment is claimed. Existing Razorpay/provider and submission follow-ups remain open.
+Both CI checks pass on implementation head `61d4f58`; PR #16 records final-head checks
+and merge status for this documentation closeout. The native API/default worker were
+reloaded on the tested source, API readiness and dashboard HTTP checks pass, and the
+worker is listening. Receiver/serial knowledge worker/scheduler remain in place.
+
 ## Current conversation work: Task 61
 
 The user asked to replace the fixed follow-up/menu path with adaptive guidance based

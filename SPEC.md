@@ -105,11 +105,35 @@ flowchart LR
 
 ### Onboarding and language
 
-`/start` introduces the institution and purpose, explains that the event uses synthetic
-data, and offers language preference and course exploration. Persist preferences.
+`/start` introduces the institution and purpose in English, labels synthetic demo use,
+and opens course exploration or resumes an active application draft. Language selection
+is deferred under the current owner decision; no compulsory language menu is shown.
 English, Hindi, Hinglish and Malayalam remain intended languages. Verify each supported
 language before advertising it; fluent-speaker review is required for language-quality
 claims. Preference storage alone is not proof of a localized or fluent experience.
+
+### Conversation continuity and collection (Task 62)
+
+A confirmed course/intake and verified entry rules start an application draft without
+an extra application menu. Reuse explicit validated details, ask only for missing fields,
+and accept multiple details/corrections in a message. Do not turn greetings, questions,
+refusals or acknowledgments into form values. A birthdate is never inferred from age.
+Submission always requires a final review and explicit confirmation.
+
+Students can pause with `/pause`, resume with `/apply`, and explicitly discard an
+unfinished draft with `/cancel`. Questions and further course exploration can interrupt
+collection. Repeated prompts omit storage implementation details and cancellation menus.
+
+`/reset` requires a signed one-use confirmation, clears chat profile/facts/draft, and
+excludes earlier history from future model context. It preserves submitted applications,
+payments, institution contact records, reminder preferences and staff/safety ownership.
+It is not application deletion or a way around submitted-case review controls.
+
+While a reply is generated, Telegram shows best-effort typing with bounded attempts and
+cleanup on completion/failure. Simple greetings/form answers and a number answering the
+displayed eligibility field use code directly. Free-form guidance retains typed OpenAI
+interpretation and refreshed code-owned catalog checks. Model history is bounded and
+loaded in bulk, with tenant-scoped callback labels rather than raw signed payloads.
 
 ### Discovery and selection
 

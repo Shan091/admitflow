@@ -113,6 +113,7 @@ async def process_event(event_id: uuid.UUID) -> None:
     import json
 
     from src.engine.journey import build_reply, load_memory
+    from src.engine.session_controls import is_reset_event
     from src.outreach.consent import note_inbound, preference_reply
 
     async with get_sessionmaker()() as db:
@@ -154,7 +155,7 @@ async def process_event(event_id: uuid.UUID) -> None:
         await note_inbound(db, lead, memory, now)
         preference = await preference_reply(db, lead, bot, payload, memory, now)
         memory_row.payload_enc = encrypt_pii(json.dumps(memory, ensure_ascii=False))
-        if lead.copilot_mode and preference is None:
+        if lead.copilot_mode and preference is None and not is_reset_event(payload):
             # Consent/opt-out commands still apply while staff owns normal replies.
             event.status = "done"
             await db.commit()
@@ -165,7 +166,8 @@ async def process_event(event_id: uuid.UUID) -> None:
             else:
                 await consume_limit(f"telegram-chat:{lead.id}", 30)
                 await consume_limit(f"telegram-tenant:{lead.tenant_id}", 300)
-                reply = await build_reply(db, lead, bot, payload)
+                async with TelegramClient(decrypt_pii(bot.token_enc)).typing(payload.chat_id):
+                    reply = await build_reply(db, lead, bot, payload)
         except HTTPException:
             reply = Reply(
                 text="Please pause and try again in a few minutes. "

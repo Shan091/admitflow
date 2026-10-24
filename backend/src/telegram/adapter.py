@@ -3,6 +3,8 @@
 import asyncio
 import logging
 import re
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any
 
 import httpx2 as httpx
@@ -67,6 +69,29 @@ def normalize_update(raw: dict[str, Any], bot_id: int) -> Event | None:
 class TelegramClient:
     def __init__(self, token: str) -> None:
         self._token = token
+
+    @asynccontextmanager
+    async def typing(
+        self, chat_id: int, *, delay: float = 0.35, interval: float = 4.0
+    ) -> AsyncIterator[None]:
+        """Ephemeral feedback never delays, retries or fails the durable conversation."""
+
+        async def pulse() -> None:
+            await asyncio.sleep(delay)
+            while True:
+                try:
+                    async with asyncio.timeout(1.5):
+                        await self.call("sendChatAction", {"chat_id": chat_id, "action": "typing"})
+                except (TelegramAPIError, TimeoutError):
+                    return
+                await asyncio.sleep(interval)
+
+        task = asyncio.create_task(pulse())
+        try:
+            yield
+        finally:
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
 
     async def call(self, method: str, payload: dict[str, Any]) -> Any:
         protect_logs()

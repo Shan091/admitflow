@@ -5,6 +5,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from src.engine.application_profile import Detail
+
 Topic = Literal[
     "background", "interest", "strength", "value", "constraint", "goal", "avoid", "decision"
 ]
@@ -46,6 +48,7 @@ class GuidanceInterpretation(StrictModel):
     intent: Literal["guidance", "faq", "qualification", "handoff", "browse"]
     updates: list[ProfileUpdate] = Field(default_factory=list, max_length=6)
     facts: list[StudyFact] = Field(default_factory=list, max_length=12)
+    details: list[Detail] = Field(default_factory=list, max_length=5)
 
 
 class CourseMatch(StrictModel):
