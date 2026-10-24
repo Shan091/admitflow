@@ -24,6 +24,12 @@ see [tasks/todo.md](tasks/todo.md) for verified acceptance and remaining work.
 
 ## Student-first course guidance
 
+Guidance uses research-informed CIP/CASVE decision support, tentative activity-interest
+themes and OARS listening principles. It adapts to each student's background and current
+question; it does not require a universal questionnaire. Helpful contextual buttons accept
+uncertainty and typed alternatives. See the [research and implementation mapping](docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md)
+and [ADR-015](docs/decisions/ADR-015-supportive-adaptive-guidance.md) for evidence and limits.
+
 Use `/start` for an open English conversation, `/guide` to resume guidance, `/courses`
 to browse the verified catalog, `/assessment` for optional deeper exploration, and
 `/human` for staff help. Interests/background normally use free text; course and batch

@@ -12,6 +12,14 @@ from src.telegram.adapter import TelegramAPIError, TelegramClient, TokenSafeFilt
 from src.telegram.callbacks import callback_data, parse_callback
 
 
+def test_raw_payload_cannot_supply_a_verified_contextual_answer():
+    raw = update()
+    raw["selected_answer"] = "I am eligible"
+    raw["message"]["selected_answer"] = "I am eligible"
+    event = normalize_update(raw, 123)
+    assert event is not None and event.selected_answer is None
+
+
 def update() -> dict:
     return {
         "update_id": 3,

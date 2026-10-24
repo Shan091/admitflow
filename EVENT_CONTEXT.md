@@ -1,5 +1,21 @@
 # AdmitFlow project handoff
 
+## Current work: Task 63 supportive adaptive guidance
+
+The owner clarified that background/eligibility examples are not a mandated sequence.
+Use research-informed adaptive guidance: CIP/CASVE decision purposes, tentative
+RIASEC activity themes and OARS listening, with the evidence-to-behavior mapping in
+[ADAPTIVE_GUIDANCE_RESEARCH.md](docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md).
+See ADR-015 for contextual answers, literal encrypted evidence, stale-control expiry,
+no implicit course selection, schooling-only fit rejection and stall recovery.
+
+The updated local API/common worker run on workspace source; readiness and dashboard
+HTTP checks pass. Existing receiver, knowledge worker and scheduler continue. No new
+Telegram test message or public deployment was performed. This is exploratory guidance;
+external research does not validate generated dialogue or establish student outcomes.
+Final evidence is recorded in `docs/event/SUPPORTIVE_GUIDANCE_RELEASE.json` and Task 63.
+
+
 ## Current work: Task 62 conversation continuity
 
 The owner clarified that their pasted messages were separate examples, not conflicting

@@ -15,6 +15,8 @@ async def event_text(db: AsyncSession, row: ConversationEvent, event: Event) -> 
         return event.text or "Unsupported media received"
     try:
         kind, target = parse_callback(event.text, row.lead_id, row.bot_id)
+        if kind == "answer" and event.selected_answer:
+            return f"Answered: {event.selected_answer}"
         if kind == "language":
             return f"Language preference: {target}"
         if kind == "course":

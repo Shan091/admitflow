@@ -1,0 +1,57 @@
+{
+  "scope": "Task 63 supportive research-informed English guidance and contextual answers",
+  "source_fingerprint": "3106e3c9e05b9dfd008c72dfca0c7d5630ee2b3878bf5c902e451cc6df9588cb",
+  "research": {
+    "document": "docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md",
+    "decision": "docs/decisions/ADR-015-supportive-adaptive-guidance.md",
+    "techniques": [
+      "CIP/CASVE flexible decision support",
+      "RIASEC activity interests, unscored",
+      "OARS listening and summaries",
+      "distinct interests, strengths, values and prerequisites"
+    ],
+    "mandatory_question_sequence": false,
+    "psychometric_or_student_outcome_validation": false
+  },
+  "verification": {
+    "lint_format_and_strict_types": true,
+    "strict_source_files": 126,
+    "default_tests_passed": 305,
+    "postgresql_cases_passed": 115,
+    "redis_cases_passed": 2,
+    "redis_detail": "The full database run skipped the two Redis cases; both passed separately on dedicated Redis database 15.",
+    "baseline_openai_scenarios_passed": 13,
+    "baseline_openai_dialogues_passed": 3,
+    "supportive_openai_dialogues_passed": 3,
+    "warnings": "Two existing AsyncMock warnings in RAG unit fixtures; no failing gate.",
+    "final_focused_postgresql_cases_passed": 20
+  },
+  "adversarial_review": {
+    "findings_resolved": [
+      "Expire answer offers when other signed controls change context",
+      "Never treat a clicked course-named answer as direct course selection",
+      "Ignore external attempts to set internal selected-answer evidence",
+      "Require preference/goal/strength evidence rather than schooling-only interest fit",
+      "Recover from repeated unanswered prerequisite questions"
+    ],
+    "critical_or_important_findings_open": 0
+  },
+  "runtime": {
+    "workspace_api_reloaded": true,
+    "workspace_common_worker_reloaded": true,
+    "api_readiness": "database_and_redis ready",
+    "dashboard_http_status": 200,
+    "receiver_knowledge_worker_scheduler_retained": true,
+    "telegram_test_messages_sent": 0,
+    "public_deployment_performed": false
+  },
+  "limits": [
+    "Synthetic provider scenarios do not establish real-student outcomes or psychometric validity.",
+    "Pattern-based interview recovery does not detect every possible poor question.",
+    "Literal quotes and evidence categories do not prove every generated semantic fit explanation.",
+    "The separate Compose application images remain at their earlier baseline."
+  ],
+  "publication": {
+    "state": "Local verification complete; reviewed protected-main PR publication pending"
+  }
+}

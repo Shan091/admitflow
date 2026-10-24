@@ -88,6 +88,8 @@ async def model_history(
                         "reset": "Conversation reset control",
                         "courses": "Explored course catalogue",
                     }.get(kind, "Used a chat control")
+                    if kind == "answer" and event.selected_answer:
+                        text = event.selected_answer
                     if kind in {"course", "batch"}:
                         lookups.append((len(messages), kind, uuid.UUID(target)))
                 except ValueError:

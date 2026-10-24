@@ -1304,3 +1304,30 @@ staff ownership/consent, one/two-query context loading and typing cancellation/f
 See ADR-014, `CONVERSATION_EVALUATION_RESULTS.json` and
 `CONVERSATION_RELEASE_RESULTS.json`. No new handset observation or public deployment
 is claimed; submitted applications keep their existing review controls.
+
+### Task 63: Guidance should feel supportive, not like an interview
+
+- [x] Document primary-source techniques and their implementation mapping in
+  `docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md` and ADR-015; adapt to each student
+  without turning background, interests and prerequisites into a universal sequence.
+The owner tested tech → web development → some experience → one project → no technologies.
+The assistant kept demanding details instead of helping, and showed no answer choices.
+
+- [x] Accept short/uncertain answers without technical project or portfolio demands.
+- [x] Offer contextual optional choices when they reduce effort, with free text always available.
+- [x] Prevent repeated open-ended discovery loops and preserve honest course availability.
+- [x] Validate signed/one-use options, replay and reset boundaries, and no implicit course selection.
+- [x] Verify unit/database/live short-answer journeys and quality gate; document evidence.
+- [ ] Publish through the reviewed protected-main PR/CI gate.
+
+Task 63 local evidence: **305 default tests**, strict typing across **126 source files**,
+**115 PostgreSQL cases** and **two separate Redis checks** pass. Live OpenAI: the existing
+**13 scenarios / three dialogues**, plus **three supportive dialogues** using the production
+composer (interest-first, background-first with an actual contextual tap, and an absent
+specific field) pass. Eight focused interaction cases cover literal tapped evidence,
+replay/stale context, reset, no implicit course selection, appropriate prerequisite
+answers and progress-sensitive discovery. See `SUPPORTIVE_GUIDANCE_RESULTS.json`,
+`SUPPORTIVE_GUIDANCE_RELEASE.json`, the research document and ADR-015. Research does
+not establish psychometric validity or real-student outcomes. Local API/common worker
+were reloaded; readiness and UI HTTP checks pass. No public deployment or Telegram
+message was sent for this change.

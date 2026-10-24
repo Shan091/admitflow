@@ -294,6 +294,23 @@ deadline updates. These are tracked tasks, not reasons to add unnecessary servic
 
 ## Adaptive course guidance (Task 61)
 
+### Supportive interaction (Task 63)
+
+Use the primary-source techniques and limits in
+[the guidance research](docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md) and ADR-015.
+CIP/CASVE provides flexible decision purposes; RIASEC informs tentative activity
+themes; OARS informs listening and summaries. These do not prescribe a mandatory
+question order or validate the assistant as a psychometric assessment.
+
+Learn consequential background, interests, goals and actual prerequisites adaptively.
+Do not treat short answers or lack of exposure as inability. Do not demand technical
+project proof. Offer contextual answer buttons when useful, uncertainty and free text;
+use text for precise academic facts. Only a verified tap becomes evidence, never an
+implicit course selection. Expire stale options across conversation/context resets.
+Prevent repetitive discovery and unanswered-prerequisite loops. Do not recommend a
+course on schooling alone or infer specific curriculum from a generic description.
+No extra provider request is needed to render controls or recover from a stalled turn.
+
 English is the active conversation language for this slice; onboarding does not require
 language selection. Guide applicants toward relevant institution courses by exploring
 explicit background, interests, experience, goals, values and practical constraints.

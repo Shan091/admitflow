@@ -175,6 +175,11 @@ async def process_event(event_id: uuid.UUID) -> None:
             )
         # Every branch, including canned replies, crosses the same validation boundary.
         reply = Reply.model_validate(reply.model_dump())
+        if payload.selected_answer is not None:
+            # Only the verified, consumed offer in route() sets this internal label.
+            event.payload_enc = encrypt_pii(
+                Event.model_validate(payload.model_dump()).model_dump_json()
+            )
         db.add(
             ConversationReply(
                 tenant_id=event.tenant_id,
