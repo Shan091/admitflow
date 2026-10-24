@@ -24,6 +24,8 @@ type Course = {
   application_fee: number;
   is_active: boolean;
   batches: Batch[];
+  is_reference?: boolean;
+  reference_url?: string | null;
   rules: Rule[];
 };
 type Settings = {
@@ -118,6 +120,8 @@ export default function Management({
     try {
       if (tab === "catalog" && course) {
         const { id, ...body } = course;
+        delete body.is_reference;
+        delete body.reference_url;
         const saved = (await request(`/staff/catalog${id ? `/${id}` : ""}`, {
           method: id ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -289,7 +293,16 @@ export default function Management({
             ) : (
               <form className="management-form" onSubmit={save}>
                 <h2>{course.id ? "Course details" : "New course"}</h2>
-                <fieldset disabled={!admin || saving}>
+                {course.is_reference && (
+                  <p className="notice">
+                    Published programme for exploration. Fees and intakes are unverified;
+                    applications and payments are unavailable here.
+                    {course.reference_url && (
+                      <> <a href={course.reference_url} target="_blank" rel="noreferrer">University programme page</a></>
+                    )}
+                  </p>
+                )}
+                <fieldset disabled={!admin || saving || course.is_reference}>
                   <label>
                     Course name
                     <input
@@ -320,7 +333,8 @@ export default function Management({
                       max="10000000"
                       step="0.01"
                       required
-                      value={course.application_fee / 100}
+                      value={course.is_reference ? "" : course.application_fee / 100}
+                      placeholder={course.is_reference ? "Unverified" : undefined}
                       onChange={(e) =>
                         setCourse({
                           ...course,

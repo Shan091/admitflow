@@ -131,6 +131,8 @@ async def course_view(db: Db, course: Course) -> dict[str, Any]:
         "description": course.description or "",
         "application_fee": course.application_fee,
         "is_active": course.is_active,
+        "is_reference": course.is_reference,
+        "reference_url": course.reference_url,
         "batches": [
             {
                 "id": str(batch.id),
@@ -167,6 +169,10 @@ async def catalog_detail(course_id: uuid.UUID, staff: Staff, db: Db) -> dict[str
 
 
 async def save_course(db: Db, staff: Staff, course: Course, body: CourseInput) -> dict[str, Any]:
+    if course.is_reference:
+        raise HTTPException(
+            409, "Published reference programmes cannot become admissions offerings here."
+        )
     # Check every supplied batch ID before mutating anything. Never re-parent a batch.
     existing = {
         batch.id: batch

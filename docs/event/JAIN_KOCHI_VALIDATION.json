@@ -1,0 +1,29 @@
+{
+  "scope": "Synthetic engine calls over the imported local reference catalogue; all temporary leads rolled back; no Telegram sends",
+  "cases": [
+    {
+      "case": "postgraduate-tech",
+      "passed": true,
+      "response": "You have completed your BCA degree with mathematics and want to study artificial intelligence and machine learning further. There is a postgraduate programme in MCA — Artificial Intelligence (AI) and Machine Learning (ML) that matches your goal.\n\nMCA — Artificial Intelligence (AI) and Machine Learning (ML)\nYou want to study artificial intelligence and machine learning further, and the MCA — Artificial Intelligence (AI) and Machine Learning (ML) is a postgraduate programme specializing in these areas.\nPublished programme; entry requirements, fees and intake availability need confirmation.",
+      "programmes": [
+        "MCA — Artificial Intelligence (AI) and Machine Learning (ML)"
+      ]
+    },
+    {
+      "case": "school-leaver-tech",
+      "passed": true,
+      "response": "Based on your background and interest in creating websites with no prior coding experience, a Bachelor of Computer Application (BCA) program would suit you well.\n\nBCA — BCA - Electives\nYou enjoy creating websites and are new to coding, so the BCA — BCA - Electives program is a good fit as it emphasizes computer applications and practical skills suitable for beginners.\nPublished programme; entry requirements, fees and intake availability need confirmation.",
+      "programmes": [
+        "BCA — BCA - Electives"
+      ]
+    },
+    {
+      "case": "indexed-campus-answer",
+      "passed": true,
+      "response": "JAIN (Deemed-to-be University), Kochi\nOfficial campus contact information:\naddress: Knowledge Park, Nirmal Infopark, Kakkanad, Kochi - 682042, Kerala",
+      "internal_evidence_count": 1
+    }
+  ],
+  "passed": 3,
+  "total": 3
+}

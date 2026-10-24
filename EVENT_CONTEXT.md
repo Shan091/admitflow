@@ -1,5 +1,21 @@
 # AdmitFlow project handoff
 
+## Current work: Task 65 JAIN Kochi data replacement
+
+The owner selected JAIN (Deemed-to-be University), Kochi and authorized removal of
+all existing dummy records. The active local database now has one public-information
+demo, 64 programme references and 65 indexed official-source documents; old student
+activity, fake courses/intakes, staff requests and old documents are gone. Existing
+login/bot configuration is retained. Reference programmes support exploration without
+invented seats, fees, eligibility approval, university applications or payments.
+
+SerpAPI was used for discovery and its key is private in ignored backend/.env.
+Razorpay API placeholders are blank for the owner to fill; the webhook secret is
+prepared. Do not claim payment setup validated: credential provisioning, public test
+webhook and actual test-card receipt remain open. No public deployment was authorized.
+See ADR-016, the existing Task 65 checklists and JAIN_KOCHI_RELEASE.json.
+
+
 ## Current work: Task 64 assistant-led routine inquiries
 
 Routine uncertainty, browsing and successful eligibility no longer offer staff buttons.

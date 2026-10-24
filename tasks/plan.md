@@ -320,3 +320,22 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
 - [x] Remove routine guidance/catalogue staff buttons; retain necessary review and explicit help.
 - [x] Show unavailable online payments honestly without creating a payable quote or staff handoff.
 - [x] Verify uncertainty, eligibility, explicit handoff and payment regressions; document results.
+
+## Task 65: Razorpay placeholders and JAIN Kochi reference reset
+
+- [x] Confirm deletion of current dummy data and the Kochi campus; preserve admin/bot access.
+- [x] Store SerpAPI privately; add blank Razorpay API fields and prepare the webhook secret.
+- [x] Discover and review official sources; prepare 64 published programme options.
+- [x] Add reference-only guidance, fee and application boundaries without fictitious intakes.
+- [x] Transactionally replace dummy activity/catalogue/documents; index 65 source records.
+- [x] Verify rollback, tenant scope, reseed protection, real database, live guidance and UI.
+- [ ] Verify/provision Razorpay test credentials after the owner fills the prepared values.
+- [ ] Validate a provider webhook and actual test-card journey after authorized test ingress.
+
+Current requested reset/import and environment preparation are complete locally.
+The two payment checks remain deferred by the owner; live payments stay disabled.
+
+Task 65 final regression record: 13 distinct synthetic guidance cases pass across the
+11/13 sweep and a successful two-case follow-up; all three multi-turn dialogues pass.
+The original two provider/typed-decision failure outcomes remain recorded in
+`docs/event/GUIDANCE_EVALUATION_RESULTS.json`; this is not a single all-pass sweep.

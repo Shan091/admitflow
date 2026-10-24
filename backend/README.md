@@ -167,6 +167,9 @@ for staff review. A fee waiver is separate from a captured payment.
 
 For a Razorpay **test** account, save `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and
 `RAZORPAY_WEBHOOK_SECRET` in ignored `backend/.env`, with `PAYMENTS_LIVE_ENABLED=false`.
+The API key ID/secret placeholders are prepared locally for the owner to fill; a
+webhook signing secret is already prepared. Empty placeholders do not configure
+payments. Never commit `.env` or paste keys into documentation.
 Provision the institution's encrypted configuration with:
 
 ```bash

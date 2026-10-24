@@ -73,6 +73,7 @@ async def fee_details(
             Course.tenant_id == lead.tenant_id,
             Course.id == application.course_id,
             Course.is_active.is_(True),
+            Course.is_reference.is_(False),
         )
     )
     batch = await db.scalar(

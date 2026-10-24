@@ -1350,3 +1350,37 @@ finding the prior processes stopped; readiness, listener and UI HTTP checks pass
 Existing staff requests were preserved. Resolve the test request and use **Resume
 automation → Confirm resume**, then `/reset` for a fresh test. No charge or public
 deployment was performed. See `docs/event/NECESSARY_HANDOFF_RELEASE.json`.
+
+### Task 65: Razorpay placeholders and JAIN Kochi reference reset
+
+- [x] Owner selected Kochi and requested removal of all current dummy data.
+- [x] Private SerpAPI key saved and used for discovery; official source pages fetched.
+- [x] Razorpay key ID/secret placeholders added, webhook secret prepared, live mode disabled.
+- [x] Publish 64 programme options as references, with sources and unverified admissions details.
+- [x] Remove both institutions' old dummy activity, fake catalogue and documents; retain one
+  clearly labelled JAIN Kochi public-information demo with existing admin/bot configuration.
+- [x] Index 65 tenant/course-scoped knowledge documents and preserve internal source evidence.
+- [x] Block reference applications/payments and unknown-fee-as-zero displays; prevent fake reseeding.
+- [x] Verify code, real PostgreSQL reset/rollback, official-reference guidance and desktop/mobile UI.
+- [ ] Razorpay API credential verification/provisioning awaits the owner's values.
+- [ ] Actual test payment/card/webhook receipt awaits credentials and authorized public test ingress.
+
+Local evidence: **313 default tests**, strict typing across **127 source files**, lint/format;
+**121 PostgreSQL cases** pass (two Redis-specific checks skipped in that run). Six final focused
+reset/reference/application/payment cases pass. Frontend lint/build and a real authenticated
+reference-catalogue test pass at 1440 and 390 px; the mechanical UI scan reports no findings.
+Three synthetic OpenAI checks pass: graduate AI guidance, beginner undergraduate computing and
+an indexed campus answer. Temporary leads were rolled back, with no Telegram test send.
+
+Reset verification: **one institution, 64 reference options, 65 ready uploads/chunks, zero leads,
+applications, staff requests, payments, batches and old synthetic campus-text matches**. Bot
+polling position and admin access survive; tenant budget counters are zero. API/worker/receiver,
+knowledge worker, scheduler and dashboard run as hidden local processes. No public deployment
+or payment was performed. Programme fees, current intake, availability and admission approval
+are not verified by public listing. See ADR-016, `JAIN_KOCHI_VALIDATION.json` and
+`JAIN_KOCHI_RELEASE.json`. The separate Compose database was not reset.
+
+Task 65 final regression record: 13 distinct synthetic guidance cases pass across the
+11/13 sweep and a successful two-case follow-up; all three multi-turn dialogues pass.
+The original two provider/typed-decision failure outcomes remain recorded in
+`docs/event/GUIDANCE_EVALUATION_RESULTS.json`; this is not a single all-pass sweep.

@@ -24,6 +24,12 @@ see [tasks/todo.md](tasks/todo.md) for verified acceptance and remaining work.
 
 ## Student-first course guidance
 
+The local workspace contains 64 published JAIN Kochi programme options and indexed
+official-source summaries. They support exploration with unverified admissions details;
+this independent demo does not collect university applications or payments. Dummy
+student records and fake courses were replaced; admin access and the bot connection
+were preserved. See [ADR-016](docs/decisions/ADR-016-public-reference-catalogue.md).
+
 Guidance uses research-informed CIP/CASVE decision support, tentative activity-interest
 themes and OARS listening principles. It adapts to each student's background and current
 question; it does not require a universal questionnaire. Helpful contextual buttons accept
