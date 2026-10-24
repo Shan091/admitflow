@@ -312,4 +312,5 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
 - [x] Bound repeated exploration questions and offer a useful next step without an extra model call.
 - [x] Verify the reported short-answer journey with relevant and absent course offerings;
   run quality/database/provider checks and document evidence.
-- [ ] Publish through the reviewed protected-main PR/CI gate.
+- [x] Publish through the reviewed protected-main PR/CI gate
+  ([PR #17](https://github.com/Shan091/admitflow/pull/17)).

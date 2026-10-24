@@ -52,6 +52,12 @@
     "The separate Compose application images remain at their earlier baseline."
   ],
   "publication": {
-    "state": "Local verification complete; reviewed protected-main PR publication pending"
+    "pull_request": "https://github.com/Shan091/admitflow/pull/17",
+    "reviewed_implementation_head": "cac325a4c45dfa3496d5b890d79a29339c678f9b",
+    "implementation_ci": {
+      "backend quality gate": "success",
+      "frontend checks": "success"
+    },
+    "closeout": "Documentation-only closeout retains the tested source fingerprint; final-head checks and squash merge are recorded on the pull request"
   }
 }

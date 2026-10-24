@@ -1318,7 +1318,8 @@ The assistant kept demanding details instead of helping, and showed no answer ch
 - [x] Prevent repeated open-ended discovery loops and preserve honest course availability.
 - [x] Validate signed/one-use options, replay and reset boundaries, and no implicit course selection.
 - [x] Verify unit/database/live short-answer journeys and quality gate; document evidence.
-- [ ] Publish through the reviewed protected-main PR/CI gate.
+- [x] Publish through the reviewed protected-main PR/CI gate
+  ([PR #17](https://github.com/Shan091/admitflow/pull/17)).
 
 Task 63 local evidence: **305 default tests**, strict typing across **126 source files**,
 **115 PostgreSQL cases** and **two separate Redis checks** pass. Live OpenAI: the existing
