@@ -14,7 +14,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 
 from src.core.settings import get_settings
-from src.tasks.broker import broker
+from src.tasks.broker import broker, knowledge_broker
 
 
 @asynccontextmanager
@@ -27,6 +27,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     if not broker.is_worker_process:
         await broker.startup()
+    if not knowledge_broker.is_worker_process:
+        await knowledge_broker.startup()
     recovery = None
     integration_recovery = None
     if get_settings().database_url and get_settings().integration_recovery_enabled:
@@ -48,6 +50,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             await asyncio.gather(recovery, return_exceptions=True)
         if not broker.is_worker_process:
             await broker.shutdown()
+        if not knowledge_broker.is_worker_process:
+            await knowledge_broker.shutdown()
 
 
 def create_app() -> FastAPI:

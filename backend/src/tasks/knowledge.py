@@ -3,7 +3,7 @@
 import uuid
 
 from src.knowledge.processing import process_upload
-from src.tasks.broker import broker
+from src.tasks.broker import knowledge_broker as broker
 
 
 @broker.task

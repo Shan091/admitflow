@@ -20,7 +20,8 @@ def main() -> None:
         paths.update(
             path
             for path in (root / folder).rglob("*")
-            if path.is_file() and path.suffix in {".py", ".ts", ".tsx", ".mjs", ".css", ".json"}
+            if path.is_file()
+            and path.suffix in {".py", ".ts", ".tsx", ".mjs", ".css", ".json", ".pdf"}
         )
     for name in (
         "backend/pyproject.toml",

@@ -16,6 +16,12 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-dev
 
+# Download public pretrained layout/table weights at build time, never during an upload.
+# Keep this layer independent of ordinary application changes.
+ENV DOCUMENT_MODELS_PATH=/opt/admitflow/document-models
+COPY src/scripts/prepare_document_models.py /tmp/prepare_document_models.py
+RUN .venv/bin/python /tmp/prepare_document_models.py --assets /opt/admitflow/document-models
+
 # Copy the application source.
 COPY src ./src
 COPY migrations ./migrations

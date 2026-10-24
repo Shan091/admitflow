@@ -47,7 +47,8 @@ staff-search selection, preserving relevance thresholds and safe baseline fallba
 | API/domain logic | Existing Python >=3.12, FastAPI, Pydantic and uv project |
 | Conversation engine | Hand-rolled async dispatcher; persistent state reloaded each turn |
 | Database | PostgreSQL, SQLAlchemy async, Alembic; pgvector in the same database |
-| Queue/coordination | Existing TaskIQ + Redis for background work, scoped dedup and locks |
+| Queue/coordination | TaskIQ + Redis; interactive jobs and a separate serial knowledge worker, scoped dedup and locks |
+| Document parsing | Offline CPU Docling layout/tables for digital PDFs, ordered DOCX blocks and Markdown section/table-aware chunks; no OCR |
 | AI | OpenAI for interpretation, typed extraction, grounded replies and embeddings |
 | AI wrapper | Retain the existing wrapper initially, configure OpenAI only; SDK migration is unnecessary for this milestone |
 | Staff UI | Next.js and TypeScript; plain CSS for the initial knowledge workspace; business rules and authorization stay in Python |
@@ -55,7 +56,7 @@ staff-search selection, preserving relevance thresholds and safe baseline fallba
 | Monitoring | Correlated sanitized logs, model/usage/latency/error evidence; external vendors optional |
 | Hosting | Select during release planning; earlier Fly.io/Vercel/Neon choices are candidates, not deployed facts |
 
-No Neysa, SerpAPI, Gemini, Anthropic, self-hosted models, LangGraph or separate vector
+No Neysa, SerpAPI, Gemini, Anthropic, self-hosted decision models, LangGraph or separate vector
 database is required. No extra service is added merely to use sponsor credits.
 Model identifiers live in configuration; selecting OpenAI does not establish access,
 output-schema compatibility, quota, language quality or latency for a particular model.

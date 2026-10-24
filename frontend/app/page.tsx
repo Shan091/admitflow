@@ -54,6 +54,10 @@ const errors: Record<string, string> = {
   no_text: "This document has no readable text.",
   invalid_text: "Save this text file as UTF-8 and try again.",
   processing_timeout: "Indexing took too long. Retry or split the file.",
+  parser_not_ready: "PDF processing is unavailable. Ask your administrator to finish setup.",
+  processing_limit: "This PDF exceeds processing limits. Split it into smaller files.",
+  layout_incomplete: "The PDF layout could not be fully read. Export a new copy and retry.",
+  structure_limit: "A table or section is too wide. Split it into smaller sections and retry.",
   indexing_failed: "Indexing failed. Check the embedding service and retry.",
 };
 

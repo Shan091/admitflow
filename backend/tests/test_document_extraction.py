@@ -34,7 +34,7 @@ def test_invalid_documents_are_not_silently_indexed(filename: str, data: bytes, 
         extract_file(filename, data)
 
 
-def test_pdf_text_is_extracted_and_scans_need_ocr() -> None:
+def test_pdf_text_is_extracted_and_scans_need_ocr(monkeypatch) -> None:
     from pypdf import PdfWriter
     from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
@@ -59,6 +59,17 @@ def test_pdf_text_is_extracted_and_scans_need_ocr() -> None:
     page[NameObject("/Contents")] = writer._add_object(stream)
     output = io.BytesIO()
     writer.write(output)
+
+    async def layout_parser(data):
+        from pypdf import PdfReader
+
+        from src.knowledge.pdf_worker import preflight_pdf
+
+        preflight_pdf(data)
+        return PdfReader(io.BytesIO(data)).pages[0].extract_text()
+
+    # The real offline layout/table model is exercised by the complex-PDF integration test.
+    monkeypatch.setattr("src.knowledge.pdf_parser.parse_pdf", layout_parser)
     assert "Hostel fee is 5000 INR." in extract_file("prospectus.pdf", output.getvalue())
 
 

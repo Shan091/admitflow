@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.settings import get_settings
 from src.db.models.knowledge import Document, DocumentChunk
+from src.knowledge.chunking import semantic_chunks
 
 
 async def embed_text(text: str) -> list[float]:
@@ -33,17 +34,8 @@ async def embed_text(text: str) -> list[float]:
 
 
 def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[str]:
-    """Simple sliding window chunker."""
-    chunks = []
-    start = 0
-    text_len = len(text)
-    while start < text_len:
-        end = min(start + chunk_size, text_len)
-        chunks.append(text[start:end])
-        if end == text_len:
-            break
-        start += chunk_size - overlap
-    return chunks
+    """Section-aware chunks; table rows retain their column and section headers."""
+    return semantic_chunks(text, chunk_size, overlap)
 
 
 async def ingest_document(

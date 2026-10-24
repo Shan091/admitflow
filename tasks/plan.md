@@ -41,14 +41,15 @@ Basic safe telemetry is required; extra monitoring services remain optional.
 ## Current execution: institution documents (Tasks 30, 52 and 54)
 
 The user prioritized institution file/folder ingestion within this existing plan.
-Accepted formats are digital PDF, DOCX and UTF-8 text (TXT/Markdown/CSV). OCR and
-advanced layout/semantic parsing remain later work. Reuse the current RAG tables;
+Accepted formats are digital PDF, DOCX and UTF-8 text (TXT/Markdown/CSV). OCR remains excluded. Task 42.1 now adds offline Docling layout/table parsing
+and section-aware chunks for digital PDFs; DOCX preserves headings and table order. Reuse the current RAG tables;
 use OpenAI embeddings with the schema's 1536 dimensions. Administrator uploads
 authorize the reference material for indexing; extracted text remains untrusted data.
 
 - [x] Implement institution-code/email/password login and tenant-bound staff sessions.
 - [x] Build file and nested-folder selection, batch upload and per-document status UI.
 - [x] Parse supported files with size/page/archive/text limits and actionable failures.
+- [x] Task 42.1: Preserve digital PDF layout/tables and section ancestry; isolate parsing in a bounded child and dedicated worker.
 - [x] Persist encrypted originals and recoverable, deduplicated ingestion jobs.
 - [x] Publish source-linked chunks atomically; support failed-job retry and deletion.
 - [x] Search ready documents by meaning within the authenticated institution.
@@ -231,7 +232,7 @@ CRM, exports/integrations and the remaining institutional product milestones.
 | Institution administration | 28 course/batch/rule CRUD; 30 reviewed document uploads; 34 settings/business hours |
 | Reporting and integrations | 26 analytics; 32 export/outbound webhooks; 33 notifications |
 | Reliability and operations | 22 channel-specific rate/send queue; 23 optional Langfuse; 35 optional Sentry; 36 deletion; 37 retention; 38 full Compose; 39 production topology |
-| Evidence-driven AI improvements | 40 typed OpenAI decisions (implemented); 42.3 required OpenAI reranking (implemented); 42.2 contextual resolution/course scopes (implemented); 42.1 complex parsing remains |
+| Evidence-driven AI improvements | 40 typed OpenAI decisions (implemented); 42.3 required OpenAI reranking (implemented); 42.2 contextual resolution/course scopes (implemented); 42.1 offline layout/table parsing and semantic chunks (implemented) |
 
 Security, auditability, tenant isolation and safe handling remain requirements of the
 first milestone that touches them. Real applicant pilots additionally require verified

@@ -2,6 +2,44 @@
 
 ## Current direction
 
+**User review first:** The user wants to see and personally test the app before
+owner/team/license or submission packaging work continues. The native app is running
+at http://127.0.0.1:3000, with API on 8000 and the dedicated knowledge worker active.
+Use the existing private backend/.demo-credentials.json for login; never paste its
+password or provider keys into chat. A browser-panel open was queued for this chat.
+Keep submission details deferred while the user tests. Record and fix their findings.
+
+
+**Current structured-document slice:** `codex/document-structure` continues from
+merged PR #11 (`b120461`). Task 42.1 now uses offline CPU Docling layout/table parsing
+for digital PDFs, heading-aware chunks and ordered DOCX blocks. Parsing runs in a
+bounded child process and a separate serial TaskIQ knowledge worker, so folder jobs
+do not occupy the Telegram worker. OCR and fine-tuning remain excluded; OpenAI owns
+decisions, embeddings and required reranking.
+
+The backend gate passes 251 default tests/117 strictly typed source files. Full
+PostgreSQL passes 87 tests, including real complex-PDF upload and atomic publication;
+two actual Redis tests pass separately. Frontend lint/build pass. The live native
+PDF -> dedicated Redis worker -> Docling -> OpenAI -> source-search check passes all
+four checks and removes its own temporary synthetic upload. No Telegram message was
+sent. Windows process-tree termination was confirmed against real child processes.
+The final Linux nonroot image passes the bounded parser with networking disabled;
+nine current Compose checks pass, including both real worker queues. The preceding
+stop/start check also confirmed credential persistence. PR #12 is open; CI found a
+Linux typing issue in a Windows-only process flag, fixed with an explicit platform
+guard. The corrected final local gate passes again (including explicit Linux typing).
+CI rerun and exact-head merge remain before publication. Native API runs as PID 3552
+and the dedicated knowledge worker as main PID 17580; recheck process identity before
+restarting. Existing common worker/receiver/scheduler and data remain intact.
+
+See docs/engineering/DOCUMENT_INGESTION.md and
+[document results](docs/event/DOCUMENT_PIPELINE_RESULTS.json). Next: finish the
+PR gate, then the active completion audit. Actual Razorpay test credentials,
+explicit handset checks, production hosting (deferred by user), and final event
+owner/team/license/portal/recording details remain unverified. Earlier slices below
+are historical evidence, not instructions to rebuild completed Tasks 42.1/42.2.
+
+
 **Current contextual-retrieval slice:** Task 42.2 is implemented on
 `codex/contextual-retrieval`, after full-stack runtime PR #10 merged as `0d5b122`.
 Bounded OpenAI reference resolution asks for clarification when uncertain, preserves
@@ -42,8 +80,7 @@ race was fixed by building one shared backend image. No open critical/important
 findings remain for this group.
 
 The user says to finish remaining build tasks before choosing production hosting.
-Continue Task 42.1 document structure/semantic chunking and Task 42.2 contextual
-query rewriting next. Actual payment-account and handset-only checks, event identity/
+Tasks 42.1/42.2 are now implemented; use the latest slice above for remaining checks. Actual payment-account and handset-only checks, event identity/
 license/portal confirmation and public hosting remain separately unverified.
 
 

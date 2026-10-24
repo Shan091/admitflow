@@ -24,6 +24,11 @@ dependencies = [
     "python-docx>=1.2",
     "tzdata>=2026.5",
     "openpyxl>=3.1.5",
+    "docling-slim[convert-core,format-pdf,models-local]>=2.142.1,<3",
+    "torch>=2.14.1,<3",
+    "torchvision>=0.29.1,<1",
+    "psutil>=7.2",
+    "opencv-python-headless>=4.12",
 ]
 
 [dependency-groups]
@@ -35,6 +40,7 @@ dev = [
     "mypy>=1.13",
     "testcontainers[postgres]>=4.0",
     "types-openpyxl>=3.1.5.20261017",
+    "types-psutil>=7.2.2.20260906",
 ]
 
 [tool.pytest.ini_options]
@@ -64,3 +70,12 @@ files = ["src"]
 # AdmitFlow backend is a deployable application, not a published library —
 # treat it as a virtual project (no build step, no editable self-install).
 package = false
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

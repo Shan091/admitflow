@@ -23,7 +23,7 @@ docker compose up --build -d --wait
 ```
 
 The default stack includes PostgreSQL/pgvector, persistent Redis, an idempotent
-migration/seed job, API, TaskIQ worker, scheduler and standalone Next.js dashboard.
+migration/seed job, API, interactive TaskIQ worker, serial knowledge worker, scheduler and standalone Next.js dashboard.
 Only the API image builds the shared backend tag; other Python services reuse it.
 Startup waits for healthy data services and successful migrations/seed. Data services
 have no host ports. The dashboard is at http://127.0.0.1:13000; API readiness is at
@@ -46,6 +46,12 @@ until configured; health/readiness does not claim a provider or handset journey.
 The frontend's internal backend URL is baked into its rewrite during image build.
 `BACKEND_URL` defaults to http://api:8000 in its Dockerfile; a different network target
 requires rebuilding with the appropriate build argument. No API keys enter that image.
+
+The backend image prepares CPU-only Docling layout/table assets at build time.
+PDF parsing runs offline in a bounded child process with OCR disabled; no document
+is sent to a model-download service. The dedicated knowledge queue processes one
+upload at a time, keeping parsing out of the interactive admissions worker.
+See [DOCUMENT_INGESTION.md](DOCUMENT_INGESTION.md) for native setup and limits.
 The production server runs as the unprivileged node user. Python services run as uid
 10001. No source tree, developer credential file or Docker socket is mounted.
 
@@ -61,7 +67,7 @@ uv run python scripts/verify_compose.py --restart
 
 This reads the isolated seed credential privately and checks the dashboard, authenticated
 same-origin API proxy, session-protected WebSocket, database/Redis readiness, a real
-TaskIQ ping/result roundtrip and a scheduler sweep. It does not call OpenAI, poll
+TaskIQ ping/result roundtrip, a separate knowledge-worker no-op roundtrip and a scheduler sweep. It does not call OpenAI, poll
 Telegram, send a message or configure external webhooks. Unit/database/browser evidence
 for the product remains separate from this packaging check.
 

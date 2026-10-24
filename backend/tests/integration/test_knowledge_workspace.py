@@ -6,6 +6,7 @@ import json
 import uuid
 from collections.abc import AsyncIterator, Iterator
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -35,6 +36,9 @@ from src.db.models import (
 )
 from src.db.session import get_session
 from src.knowledge import processing
+from src.knowledge.extraction import ExtractionError
+from src.knowledge.pdf_parser import parse_pdf as real_parse_pdf
+from src.knowledge.pdf_worker import preflight_pdf
 from src.staff.auth import hash_password
 
 pytestmark = pytest.mark.integration
@@ -78,6 +82,21 @@ def workspace() -> Iterator[dict[str, Any]]:
             sessions = async_sessionmaker(engine, expire_on_commit=False)
             mp.setattr(processing, "get_sessionmaker", lambda: sessions)
             mp.setattr(processing, "embed_chunks", fake_embeddings)
+
+            async def basic_pdf(data: bytes) -> str:
+                from pypdf import PdfReader
+
+                try:
+                    preflight_pdf(data)
+                except ExtractionError:
+                    raise
+                except Exception:
+                    raise ExtractionError("invalid_document") from None
+                return "\n\n".join(
+                    p.extract_text() or "" for p in PdfReader(io.BytesIO(data)).pages
+                )
+
+            mp.setattr(processing, "parse_pdf", basic_pdf)
             mp.setattr("src.knowledge.api.embed_chunks", fake_embeddings)
 
             ranking_inputs: list[list[str]] = []
@@ -209,6 +228,71 @@ def readable_pdf() -> bytes:
     output = io.BytesIO()
     writer.write(output)
     return output.getvalue()
+
+
+@pytest.mark.skipif(
+    not Path(".runtime/document-models/.ready.json").is_file(),
+    reason="Prepare offline document models for the real layout acceptance check",
+)
+def test_complex_pdf_upload_preserves_table_and_programme_context(workspace, monkeypatch):
+    client = workspace["client"]
+    signin(client)
+    data = Path("tests/fixtures/structured-prospectus.pdf").read_bytes()
+    row = send(client, [("structured/prospectus.pdf", data)])["accepted"][0]
+    upload_id = uuid.UUID(row["id"])
+    tenant = workspace["tenants"][0]
+    monkeypatch.setattr(processing, "parse_pdf", real_parse_pdf)
+
+    async def index_and_read():
+        await processing.process_upload(tenant, upload_id)
+        async with workspace["sessions"]() as db:
+            upload = await db.get(KnowledgeUpload, upload_id)
+            assert upload.status == "ready", upload.error_code
+            return list(
+                await db.scalars(
+                    select(DocumentChunk.content)
+                    .where(
+                        DocumentChunk.document_id == upload.document_id,
+                        DocumentChunk.tenant_id == tenant,
+                    )
+                    .order_by(DocumentChunk.chunk_index)
+                )
+            )
+
+    chunks = asyncio.run(index_and_read())
+    nursing = [text for text in chunks if "### Nursing Programme" in text]
+    commerce = [text for text in chunks if "### Commerce Programme" in text]
+    assert nursing and commerce
+    for section, programme, tuition, hostel in (
+        (nursing, "Nursing Programme", "45000", "11000"),
+        (commerce, "Commerce Programme", "35000", "9000"),
+    ):
+        table = next(text for text in section if "| Tuition" in text)
+        rows = [
+            [cell.strip() for cell in line.strip("|").split("|")]
+            for line in table.splitlines()
+            if line.startswith("|")
+        ]
+        assert [programme, "Tuition", f"INR {tuition}"] in rows
+        assert [programme, "Hostel", f"INR {hostel}"] in rows
+        assert "Printed tuition examples do not set the application or registration fee." in table
+        assert any("Eligibility" in text for text in section)
+        assert any("Facilities" in text for text in section)
+    assert all("Commerce Programme" not in text for text in nursing)
+    assert all("Nursing Programme" not in text for text in commerce)
+    joined = "\n".join(chunks)
+    assert "School marks must be at least 60 percent." in joined
+    assert "The library is open from 9 AM to 5 PM." in joined
+    assert joined.index("Applicants must be at least 18") < joined.index("School marks")
+    assert joined.index("Hostel accommodation") < joined.index("The library")
+    assert "No real institution or applicant data." in joined
+
+    # Remove this fixture's published evidence so other workspace tests remain independent.
+    response = client.delete(
+        f"/api/knowledge/documents/{upload_id}", headers={"X-AdmitFlow-Request": "1"}
+    )
+    assert response.status_code in (200, 204)
+    client.cookies.clear()
 
 
 def test_upload_formats_search_duplicates_and_tenant_isolation(workspace: dict[str, Any]) -> None:

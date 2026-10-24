@@ -45,3 +45,4 @@ graphify-out/.graphify_*
 /backend/graphify-out/
 
 .demo-compose-credentials.json
+.runtime/

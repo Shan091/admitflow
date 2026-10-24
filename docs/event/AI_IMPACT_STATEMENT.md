@@ -1,22 +1,23 @@
 # AI Impact Statement
 
 AdmitFlow uses OpenAI to interpret admissions messages, extract explicitly supplied
-eligibility facts, translate retrieval queries and select supporting document passages.
-OpenAI embeddings support search over institution-approved PDF, DOCX and text
-references. Model identifiers and credentials remain server configuration.
+facts, resolve conversational references, embed approved documents, rerank evidence
+and select supporting quotations. Digital PDFs use offline pretrained Docling layout
+and table models; DOCX/text extraction preserves source structure. No decision-model
+fine-tuning or OCR is used. Credentials and model configuration remain server-side.
 
-Code evaluates institution-defined eligibility rules, validates course and batch choices,
-and controls staff-request states. Eligibility does not grant admission or reserve a seat.
-The assistant returns source quotations and abstains when it cannot support an answer.
-Human requests pause automated qualification until staff explicitly resume it.
+Code owns eligibility rules, prices, course/batch choices, authorization and consequential
+changes. Eligibility grants neither admission nor a seat. Unsupported questions receive
+abstention; staff requests pause automation until an explicit resume.
 
-The demonstration uses synthetic institution material and student test answers.
-Routing identifiers, conversation content and eligibility memory are encrypted in
-application storage. Tenant-scoped access, expiring staff sessions and adversarial tests
-protect institutional boundaries. Live OpenAI checks and a user-confirmed Telegram
-roundtrip have passed. Language fluency and real-applicant outcomes remain unvalidated.
+The demonstration uses synthetic institution material and student answers. Identifiers,
+conversation content and eligibility memory are encrypted in application storage.
+Tenant-scoped access, expiring staff sessions, bounded workers, deletion/retention controls
+and adversarial checks protect institutional boundaries. Live OpenAI, document-search
+and user-confirmed Telegram checks have passed. Language fluency and real-applicant
+outcomes remain unvalidated.
 
-Our intended impact is less repeated information collection and clearer staff review
-of admissions inquiries. We have not measured conversion improvements, revenue or
-staff time savings. Institution material requires approval and appropriate rights before
-ingestion. A real pilot requires additional privacy and operational review.
+The intended impact is less repeated information collection and clearer staff review.
+Conversion gains, revenue and time savings have not been measured. Institutions must
+authorize reference material and its use. A real pilot requires operational and privacy
+review; final source-code licensing remains an owner decision.

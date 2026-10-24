@@ -13,7 +13,7 @@ The user has assigned **all remaining tasks to the primary agent**. The previous
 proposal to reserve Task 26 for another agent is superseded; nothing is waiting for
 an external analytics handoff. Tasks 21/22/26/27/32/33 and staff/privacy/OpenAI work
 were published through merged PRs #4-9. Task 38 now has verified local full-stack
-packaging. Continue document structure/contextual retrieval and remaining release work.
+packaging. Tasks 42.1/42.2 now have document-structure and contextual-retrieval evidence. Continue remaining release checks.
 Group related implementation work, use focused tests during development, and run the
 full applicable gate once each feature group is ready. Keep the repository's review,
 privacy, tenant-isolation and release requirements intact.
@@ -603,6 +603,10 @@ See [EVENT_CONTEXT.md](../EVENT_CONTEXT.md) and the
 
 ### Task 17: Wire webhook → TaskIQ → engine dispatcher → WhatsApp
 
+**Disposition:** Historical WhatsApp acceptance is superseded by ADR-012 and verified
+Telegram Tasks 44-58. The unchecked device criteria below are retained history, not
+a request to implement another channel.
+
 **Description:** Connect all the pieces: TaskIQ worker picks up the message, runs it through the full `handle_turn()` dispatcher (decide → dispatch → generate → guard), and sends the response.
 **Acceptance criteria:**
 
@@ -1042,7 +1046,7 @@ below is optional future work; unredacted full applicant context is not permitte
 - [x] Actual container login/proxy, authenticated WebSocket, data readiness, Redis/TaskIQ result and scheduler checks pass
 - [x] Stop/start preserves the synthetic credential and successful access; seed reruns preserve existing accounts
 - [x] Receiver profile validates and its image CLI loads; live container polling remains deliberately unclaimed because the existing native receiver owns the demo bot
-  **Verification:** Nine live checks in `backend/scripts/verify_compose.py --restart` pass; `docs/event/COMPOSE_RESULTS.json` records results. Backend gate passes 234 tests/111 strictly typed source files; nine affected PostgreSQL journey/account cases pass. Linux image builds and migrations succeed; the existing native data/bot runtime is untouched.
+  **Verification:** The original nine-check restart pass is extended by a real dedicated knowledge-worker roundtrip. The document slice passes ten restart checks before its platform-only typing correction and nine current smoke checks afterward; `docs/event/COMPOSE_RESULTS.json` records results. Backend gate passes 234 tests/111 strictly typed source files; nine affected PostgreSQL journey/account cases pass. Linux image builds and migrations succeed; the existing native data/bot runtime is untouched.
   **Runbook:** `docs/engineering/COMPOSE_RUNTIME.md`; bootstrap config from `src.scripts.configure_compose` first.
   **Dependencies:** Platform/application migrations and Task 25
 
@@ -1086,11 +1090,22 @@ This epic is broken down into sub-tasks for focused implementation.
 **Description:** Integrate `docling` (or `unstructured`) to parse uploaded PDFs into Markdown, preserving tables and structure. Replace the naive sliding window chunker in `rag.py` with a semantic, Markdown-header-aware chunker.
 **Acceptance criteria:**
 
-- [ ] Document ingestion pipeline uses `docling`/`unstructured` for PDFs
-- [ ] Tables and multi-column layouts are preserved in Markdown
-- [ ] Semantic chunking implemented (retains parent-child headers)
+- [x] Document ingestion pipeline uses `docling`/`unstructured` for PDFs
+- [x] Tables and multi-column layouts are preserved in Markdown
+- [x] Semantic chunking implemented (retains parent-child headers)
   **Verification:**
-- [ ] Unit tests uploading a complex PDF and verifying structural chunks
+- [x] Unit tests uploading a complex PDF and verifying structural chunks
+
+**Evidence:** The real two-page digital PDF passes authenticated upload, offline Docling
+layout/table parsing and atomic PostgreSQL chunk publication. Both programmes retain
+row/amount associations, heading ancestry, column text and the fee caveat. DOCX block
+order, table-row chunking and child-process timeout/cancellation/memory boundaries pass.
+The live dedicated Redis worker -> Docling -> OpenAI embeddings -> authenticated search
+check passes all four checks and removes its own temporary upload; see
+[DOCUMENT_PIPELINE_RESULTS.json](../docs/event/DOCUMENT_PIPELINE_RESULTS.json).
+No Telegram message or OCR was used. Native setup, the serial ingestion worker and
+limits are documented in [DOCUMENT_INGESTION.md](../docs/engineering/DOCUMENT_INGESTION.md).
+
   **Dependencies:** Task 13
   **Files likely touched:** `backend/pyproject.toml`, `backend/src/core/rag.py`
   **Estimated scope:** Medium
@@ -1138,9 +1153,9 @@ This epic is broken down into sub-tasks for focused implementation.
 - [ ] AGENTS.md links the handoff and local links/content have been checked.
 - [ ] Follow the existing completion/commit workflow before marking this milestone complete.
 
-Start at [../EVENT_CONTEXT.md](../EVENT_CONTEXT.md). Next implementation step proposed: bounded real WhatsApp readiness check, after the user resumes.
+Start at [../EVENT_CONTEXT.md](../EVENT_CONTEXT.md). The proposed WhatsApp check below was superseded by the Telegram decision.
 
-## WhatsApp readiness check (in progress)
+## Historical WhatsApp readiness check (superseded by ADR-012)
 
 **Scope:** One-hour evidence check in the renamed admitflow repository; preserve the dirty baseline. Local configuration authorized by the user. No broad implementation.
 **Evidence:** [../docs/event/READINESS_CHECK.md](../docs/event/READINESS_CHECK.md).

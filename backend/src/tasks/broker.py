@@ -19,7 +19,7 @@ import taskiq
 from src.core.settings import get_settings
 
 
-def _build_broker() -> taskiq.AsyncBroker:
+def _build_broker(queue_name: str = "taskiq") -> taskiq.AsyncBroker:
     """Construct the right broker based on the current settings.
 
     This is a plain factory called once at import time. Tests that override
@@ -33,7 +33,9 @@ def _build_broker() -> taskiq.AsyncBroker:
 
         # BRPOP waits indefinitely for work; redis-py's default read deadline
         # otherwise kills an idle worker. Keep this scoped to the queue pool.
-        return ListQueueBroker(url=settings.redis_url, socket_timeout=None).with_result_backend(
+        return ListQueueBroker(
+            url=settings.redis_url, queue_name=queue_name, socket_timeout=None
+        ).with_result_backend(
             RedisAsyncResultBackend(redis_url=settings.redis_url),
         )
 
@@ -43,3 +45,5 @@ def _build_broker() -> taskiq.AsyncBroker:
 
 
 broker = _build_broker()
+# CPU-heavy parsing is consumed by a dedicated, serial worker.
+knowledge_broker = _build_broker("admitflow-knowledge")
