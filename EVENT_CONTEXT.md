@@ -6,9 +6,11 @@
 worked. Owner name is **shan**. The user delegated licensing to the event handbook;
 FAQ 17 offers MIT/Apache-2.0, so the root MIT license and provenance are now prepared.
 An explicitly authorized staff reply and an uploaded-PDF Lotus Hall answer both have
-user-confirmed handset receipt and saved sent status. The latest UX request is to
-hide source filenames/footers from student messages while retaining internal evidence
-and staff search sources (Task 29.1). See LIVE_HANDSET_RESULTS.json.
+user-confirmed handset receipt and saved sent status. Task 29.1 now hides source filenames/footers from student messages while retaining
+internal evidence and staff search sources. The backend gate passes 252 tests/117
+strict source files; 16 affected PostgreSQL cases, two Redis checks and 24/24 live
+FAQ cases pass. Native API and Telegram worker run this change. See
+LIVE_HANDSET_RESULTS.json. Existing messages keep their original text.
 
 **Do not deploy** until the user explicitly says. Git publication remains authorized
 through the protected-main PR workflow. Native app: http://127.0.0.1:3000; API: 8000.
@@ -299,8 +301,9 @@ Do not treat the earlier credential failure as the latest state. Current slice: 
 and settings APIs pass three scoped management/translation database checks; the new
 management frontend builds, with real-browser verification/full final gate still pending.
 No subsequent all-roadmap completion is claimed by this checkpoint.
-The event deck, AI statement and demonstration script are drafts; final owner/team,
-license, portal and public-link details remain open. The user explicitly
+The earlier event assets were drafts. They are now refreshed: owner shan, MIT license,
+editable six-slide PowerPoint, AI statement and provenance are recorded. Portal,
+organizer permission, final recording and public judge access remain open. The user explicitly
 previously requested no Git push; the latest explicit authorization supersedes that hold.
 
 ## Resume prompt
@@ -312,8 +315,8 @@ owns decisions, embeddings and required reranking. Fine-tuning and OCR are exclu
 
 The user finished testing and reported everything tested worked. Preserve runtime
 and data. Owner is shan; MIT was selected from the handbook's examples. Staff reply
-and uploaded-PDF handset checks are confirmed. Continue Task 29.1 (hide student source
-footers with internal evidence retained), then the remaining current-plan acceptance.
+and uploaded-PDF handset checks are confirmed. Task 29.1 (hide student source footers with internal evidence retained) is implemented
+and verified. Continue the remaining current-plan acceptance; do not rebuild it.
 Never deploy until explicitly instructed. Do not ask again for completed user checks.
 
 Product implementation through offline structured-document ingestion is merged
