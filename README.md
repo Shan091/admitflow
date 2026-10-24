@@ -388,7 +388,6 @@ admitflow/
 | [Backend guide](backend/README.md) | Configuration, endpoints and provisioning |
 | [Document ingestion](docs/engineering/DOCUMENT_INGESTION.md) | Parsing, indexing and worker operations |
 | [Guidance research](docs/engineering/ADAPTIVE_GUIDANCE_RESEARCH.md) | Research-to-behavior mapping and assessment limits |
-| [Pitch deck](docs/event/artifacts/admitflow-pitch-final.pptx) | Editable six-slide product presentation |
 | [AI Impact Statement](docs/event/AI_IMPACT_STATEMENT.md) | AI use, safeguards and intended impact |
 | [Data/model provenance](docs/event/DATA_PROVENANCE.md) | Source material and upstream terms |
 | [Prior-work disclosure](docs/event/PRIOR_WORK_DISCLOSURE.md) | Existing foundation and subsequent implementation |

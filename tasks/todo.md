@@ -1401,3 +1401,13 @@ Task 66 verification: 34 relative links/anchors resolve, both Mermaid blocks and
 fences are checked, setup commands match the runtime/configuration sources, and the
 backend gate passes (313 tests, strict typing across 127 files, lint/format). No application
 code changed. Protected-main publication and its final-head CI are recorded on the PR.
+
+## Task 67: Explicit submission README requirements
+
+- [x] Confirm the root README explains the project, problem, idea and stack/tools.
+- [x] Remove the earlier presentation link; the owner will create the submission deck later.
+- [x] Keep demo placeholders out of the README and preserve existing artifacts as historical files.
+- [ ] Add the final product demonstration link after the submission presentation is created.
+
+The overview and technology requirements are covered. The product demonstration link is
+intentionally deferred by the owner; the older deck is not the selected submission artifact.
