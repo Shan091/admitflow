@@ -7,7 +7,7 @@ This checklist supports execution; it is not an additional product roadmap.
 
 ## Build and verify
 
-- [ ] Complete the selected task with acceptance evidence and update tasks/todo.md.
+- [x] Complete Task 42.1 with actual parser/upload/search evidence and update tasks/todo.md; PR #12 is reviewed, green and merged.
 - [x] Demonstrate real Telegram intake/worker/reply with handset confirmation.
 - [x] Verify course/batch callbacks, memory/corrections and code-owned eligibility in database journey tests.
 - [x] Verify grounded/unsupported FAQs and source references in synthetic journey/provider checks.

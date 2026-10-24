@@ -10,8 +10,8 @@ password or provider keys into chat. A browser-panel open was queued for this ch
 Keep submission details deferred while the user tests. Record and fix their findings.
 
 
-**Current structured-document slice:** `codex/document-structure` continues from
-merged PR #11 (`b120461`). Task 42.1 now uses offline CPU Docling layout/table parsing
+**Current structured-document slice:** [PR #12](https://github.com/Shan091/admitflow/pull/12)
+is squash-merged to `origin/main` as `f532f1c`. Task 42.1 now uses offline CPU Docling layout/table parsing
 for digital PDFs, heading-aware chunks and ordered DOCX blocks. Parsing runs in a
 bounded child process and a separate serial TaskIQ knowledge worker, so folder jobs
 do not occupy the Telegram worker. OCR and fine-tuning remain excluded; OpenAI owns
@@ -25,16 +25,16 @@ four checks and removes its own temporary synthetic upload. No Telegram message 
 sent. Windows process-tree termination was confirmed against real child processes.
 The final Linux nonroot image passes the bounded parser with networking disabled;
 nine current Compose checks pass, including both real worker queues. The preceding
-stop/start check also confirmed credential persistence. PR #12 is open; CI found a
+stop/start check also confirmed credential persistence. CI found a
 Linux typing issue in a Windows-only process flag, fixed with an explicit platform
 guard. The corrected final local gate passes again (including explicit Linux typing).
-CI rerun and exact-head merge remain before publication. Native API runs as PID 3552
+Both final exact-head CI checks pass, and the reviewed slice is merged. Native API runs as PID 3552
 and the dedicated knowledge worker as main PID 17580; recheck process identity before
 restarting. Existing common worker/receiver/scheduler and data remain intact.
 
 See docs/engineering/DOCUMENT_INGESTION.md and
-[document results](docs/event/DOCUMENT_PIPELINE_RESULTS.json). Next: finish the
-PR gate, then the active completion audit. Actual Razorpay test credentials,
+[document results](docs/event/DOCUMENT_PIPELINE_RESULTS.json). The code/configuration
+fingerprint matches the merged source. The user is now personally reviewing the app. Actual Razorpay test credentials,
 explicit handset checks, production hosting (deferred by user), and final event
 owner/team/license/portal/recording details remain unverified. Earlier slices below
 are historical evidence, not instructions to rebuild completed Tasks 42.1/42.2.
@@ -297,34 +297,37 @@ previously requested no Git push; the latest explicit authorization supersedes t
 
 ## Resume prompt
 
-Latest override: the user explicitly authorized pushing to the new Shan091/admitflow
-repository. Existing main history (`96b5c75`) and feature checkpoint (`a4212cb`) are
-published. [Draft PR #1](https://github.com/Shan091/admitflow/pull/1) is open from
-`codex/telegram-admissions-checkpoint`; CI and review/merge remain separate gates.
-The current backend gate passes 163 tests and strict typing across 83 source files;
-frontend lint and production build pass. The database integration run passes 32 tests;
-the Redis-only case passes separately, for all 33 integration cases verified.
-The full roadmap remains in progress, including real payment-provider validation and
-staff/product operations. Publication does not establish full-roadmap completion.
+Read AGENTS.md, this handoff, SPEC.md, tasks/plan.md and tasks/todo.md. Use the
+existing repository and preserve local changes, runtime data and bot checkpoints.
+Do not create another plan or repository. Telegram is the active channel; OpenAI
+owns decisions, embeddings and required reranking. Fine-tuning and OCR are excluded.
 
-Latest direction: implement every later product milestone. Catalog/settings/discount
-management and application collection/review are now implemented with scoped database
-and browser evidence in tasks/todo.md. New migration d82c0a75b912 adds encrypted form
-payloads. The local database is now at f129a064c5e8, including durable payment/outbound
-storage, without deleting existing rows. API/worker/receiver/frontend were restarted;
-health/readiness and the real staff upload/search/saved-conversation browser check pass.
-The user has also authorized Git publication to the new Shan091/admitflow repository;
-this supersedes all earlier no-push notes above. Git Credential Manager provides API
-access without exposing or persisting its token. Publish the existing main baseline,
-then the checked feature branch and a draft PR. Test-local login-throttle isolation
-retains enforcement within each case. Payment creation, fee confirmation, signed
-webhooks and durable outbound delivery have automated tests. Staff monitoring,
-read-only reconciliation, safe bounded retry, bidirectional send ordering and unified
-cursor-paginated transcript now have database and browser evidence. No lookup alone
-marks an invoice paid. The user needs to create a Razorpay test account before live
-test-card/webhook validation. Next: staff takeover/co-pilot and the remaining roadmap.
-Never publish local secrets; do not mark the whole goal complete at this checkpoint.
+The user wants to personally test the app before owner/team/license or submission
+work continues. The native staff app is http://127.0.0.1:3000; API readiness is
+http://127.0.0.1:8000/ready. Private demo login details are in ignored
+backend/.demo-credentials.json. Keep the running app stable while they test and
+prioritize their findings. Do not request final submission details again now.
 
-Read AGENTS.md, this handoff, SPEC.md, tasks/plan.md and tasks/todo.md. Execute the
-current task, preserve existing changes, use Telegram and OpenAI, and report actual
-verification. Do not start another planning cycle or assume live readiness.
+Product implementation through offline structured-document ingestion is merged
+in PR #12 (`f532f1c`). The verified source/configuration fingerprint is in
+BUILD_MANIFEST.json under docs/event/. Latest evidence: 251 default tests, 117
+strictly typed source files, 87 PostgreSQL tests, two separate Redis checks,
+frontend lint/build, real PDF queue/OpenAI/search and offline Linux container parsing.
+Both backend/frontend exact-head CI checks passed before merge. Do not rebuild
+completed staff/co-pilot/follow-up/institution-management or Task 42 work just
+because a historical entry above calls it pending.
+
+Keep remaining acceptance open: actual Razorpay test-card/link/webhook/Telegram
+validation needs test-account credentials; staff reply and uploaded-PDF answer need
+authorized handset checks. Public hosting remains deferred by the user. Final owner/
+team/license, organizer prior-work permission, portal fields, final recording/public
+links and submission remain unverified and must wait for the user's app review.
+Optional sponsor credits, Langfuse and Sentry are not selected release dependencies;
+historical WhatsApp acceptance is superseded by ADR-012. Never invent credentials,
+permissions, payment/handset receipt, public deployment or submission completion.
+
+Git publication is authorized. Use feature branches from current origin/main, the
+full applicable gate, adversarial review, PR, green exact-head CI and squash merge.
+Never push the obsolete original local main/history or secrets. Keep completed tasks
+ticked with evidence and leave the overall goal incomplete until remaining acceptance
+is actually satisfied. When the user returns, continue from their testing feedback.
