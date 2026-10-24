@@ -1,40 +1,40 @@
 # Graph Report - admitflow  (2026-10-24)
 
 ## Corpus Check
-- 350 files · ~199,119 words
+- 351 files · ~201,923 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: (none) 7, .example 2, .css 2)
 
 ## Summary
-- 3012 nodes · 8889 edges · 164 communities (143 shown, 21 thin omitted)
+- 3033 nodes · 8905 edges · 179 communities (166 shown, 13 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 562 edges (avg confidence: 0.91)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `27cf9dca`
+- Built from commit: `69492e8d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - ADR-008: System-1 Decision Layer (Laya / Jev)
 - Conversation Engine (hand-rolled dispatcher)
-- README.md
+- AdmitFlow Complete Specification
 - Finalized Production Stack
-- journey.py
+- answer_question
 - analytics
 - payments/conversation.py
 - test_workspace_limits.py
 - RedisMutex
 - parse_callback
-- ExtractionError
-- transport.py
+- pdf_parser.py
+- staff/integrations.py
 - WhatsAppSender
-- DocumentChunk
+- test_rag.py
 - PII Encryption & Audit Log
 - Razorpay Payment Integration
 - get_settings
 - admissions.tsx
-- contextual_query
+- retrieval.py
 - GuidanceMemory
 - AIBoomi Startup Weekend Kochi: fresh-session context
 - test_telegram_contracts.py
@@ -43,38 +43,38 @@
 - LeadStatus
 - Stages
 - outreach/followups.py
-- TestClient
+- fixture
 - run_postman_check.cjs
 - Task List
-- workspace
+- Reply
 - leads.py
-- retrieval.py
+- test_crm_search.py
 - management.py
 - Code Standards
 - Local Telegram/OpenAI runtime
 - Event preparation and execution plan
 - 7. Core Feature Specifications
-- knowledge/processing.py
+- get_engine
 - main.py
 - route
-- answer_question
+- budget.py
 - Hackathon resources for AdmitFlow
 - manifest.json
-- text
+- accounts.py
 - AdmitFlow: current state and planning baseline
 - AdmitFlow: AIBoomi submission plan
 - AdmitFlow — Complete Specification
 - normalize_e164
-- evaluate_supportive_guidance.py
+- QualificationRule
 - ADR-011: Required OpenAI passage reranking
 - Testing
 - check_input_safety
 - AdmitFlow project handoff
-- detect_intent
-- tests/test_telegram_identity.py
+- unittest_mock
+- EncryptionKeyNotConfiguredError
 - GuidanceInterpretation
 - Cursor
-- test_rag_node.py
+- EngineState
 - ADR-010: Triage Fallback Routing (Anti-Spam)
 - ADR-012: Telegram and OpenAI for the first complete admissions MVP
 - alembic
@@ -83,10 +83,10 @@
 - change_password
 - age
 - ADR-016: Public programme references and an explicit local demo reset
-- write_audit_log
+- api.py
 - evaluate_conversation.py
 - generate_completion
-- guidance.py
+- journey.py
 - Official source snapshots
 - 13. Dashboard Features
 - integration/conftest.py
@@ -94,7 +94,7 @@
 - process_followup
 - management.tsx
 - ADR-015: Supportive guidance and contextual answer controls
-- GuidanceDecision
+- guidance_interaction.py
 - PublicCatalogue
 - verify.sh
 - db/__init__.py
@@ -104,69 +104,89 @@
 - whatsapp/__init__.py
 - integration/__init__.py
 - admitflow-backend
-- session.py
+- auth.py
 - AdmitFlow
 - pathlib
+- GuidanceDecision
 - test_decision_reranking.py
-- AllProvidersFailedError
+- signin
+- pydantic
 - Git & GitHub Workflow
 - package.json
 - InputGuardrailResult
 - @playwright/test
 - AGENTS.md
 - Security & Production Readiness
-- signin
+- process_upload
 - next-env.d.ts
 - encrypt_pii
+- broker.py
 - layout.tsx
 - frontend/AGENTS.md
 - scripts
 - backend/README.md
-- generate
-- TelegramBot
+- copilot.py
+- ExtractionError
+- test_knowledge_workspace.py
 - models/__init__.py
-- AGENTS.md
+- Quality Gates — Definition of Done
+- PaymentProviderError
 - devDependencies
 - applications.tsx
 - dependencies
 - dispatcher.py
-- Settings
+- decrypt_pii
 - Lead
 - tests/test_conversation_readiness.py
+- pdf_worker.py
 - WhatsApp readiness check — October 22, 2026
-- Reply
+- test_faq_evaluation.py
 - test_handle_turn_basic_flow
-- hash_phone
+- payment_webhook
 - payments.tsx
+- test_local_runtime.py
 - Adaptive course guidance: evidence and implementation
 - Knowledge
-- test_shared_budget_preserves_queues_and_settings_wake_deliveries
-- env.py
-- Course
 - process_event
+- env.py
+- ._post
+- TelegramBot
+- prepare
 - page.tsx
-- reindex_batch
-- 20260929_initial_schema_64cfce85009d.py
+- test_structured_documents.py
+- BaseModel
 - RuleOperator
-- identity_database
+- pg_url
+- exports.py
 - add_institution_knowledge_workspace_b627da2f7e11.py
-- log_delivery_status
-- test_staff_lookup_is_scoped_read_only_and_cannot_confirm_payment
-- get_sessionmaker
+- test_redis_client.py
+- seed
+- TelegramAPIError
 - notifications.tsx
+- ingest_document
+- send_message
+- crm.py
+- reconcile
+- AdmitFlow — Task List
 - record-demo.mjs
-- add_conversation_runtime_714f092da3b8.py
+- verify_compose.py
+- .__call__
+- Phase 4: Advanced Bot Features
 - sqlalchemy
-- durable_payments_outbound_f129a064c5e8.py
-- AdmitFlow pitch deck
-- Language review packet
+- download
+- Phase 3–4 addition (see ADR-008)
+- Phase 6: Production Hardening
+- index_known_name
+- Code Owns the Money
+- WhatsApp readiness check (2026-10-22, in progress)
+- docs/event/SUBMISSION_PLAN.md
+- Workspace colour theme
 - 11. Human-in-the-Loop (Full Workflow)
 - Phase 5: Dashboard Frontend (Next.js)
-- AdmitFlow submission requirements
+- test_payment_and_webhook_claims_wait_for_erasure_lock
 - RazorpayClient
 - Q: What you need to do is i need to present the this project before the jury. First explain the overall structure the stack what things used where used . From A to Z things. that i can answer anything if they question.
-- 20261008_add_knowledge_models_for_rag_c470f1ebc811.py
-- record_stage_changes
+- write_audit_log
 - ADR-014: Natural collection, context reset and responsive replies
 - 2. Boundaries & Invariants
 - 3. Tech Stack & Commands
@@ -188,14 +208,14 @@
 10. `Course` - 80 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Task 42.3: Pluggable Reranker (Cohere API vs Local)` --references--> `search_chunks()`  [INFERRED]
-  docs/planning/archive/2026-10-23-before-telegram-alignment/tasks/todo.md → backend/src/core/rag.py
 - `Task 4: PII encryption utilities and audit log infrastructure` --references--> `write_audit_log()`  [INFERRED]
   docs/planning/archive/2026-10-23-before-telegram-alignment/tasks/todo.md → backend/src/db/audit.py
 - `17.1 Conversation engine — DECIDED: hand-rolled dispatcher` --references--> `handle_turn()`  [INFERRED]
   docs/planning/archive/2026-10-23-before-telegram-alignment/SPEC.md → backend/src/engine/dispatcher.py
 - `Missing-reply investigation (approximately 22:59 IST)` --references--> `process_inbound_message()`  [INFERRED]
   docs/event/READINESS_CHECK.md → backend/src/tasks/processing.py
+- `Task 42.3: Pluggable Reranker (Cohere API vs Local)` --references--> `search_chunks()`  [INFERRED]
+  docs/planning/archive/2026-10-23-before-telegram-alignment/tasks/todo.md → backend/src/core/rag.py
 - `Consequences` --references--> `encrypt_pii()`  [INFERRED]
   docs/decisions/ADR-009-pii-encryption-and-audit.md → backend/src/core/security.py
 
@@ -209,39 +229,39 @@
 - **AdmitFlow AI Core Architecture** — tasks_plan_conversation_engine, tasks_plan_decide_decision_layer, tasks_plan_three_layer_guardrails, tasks_plan_rag_pipeline [INFERRED 0.85]
 - **WhatsApp Ingress → Worker → Engine Flow** — tasks_plan_fastapi_webhook, tasks_plan_redis, tasks_plan_taskiq, tasks_plan_conversation_engine [INFERRED 0.85]
 
-## Communities (164 total, 21 thin omitted)
+## Communities (179 total, 13 thin omitted)
 
 ### Community 0 - "ADR-008: System-1 Decision Layer (Laya / Jev)"
-Cohesion: 0.13
-Nodes (22): ADR-001: Hybrid Architecture, ADR-004: Dual Memory Architecture, Episodic Memory (messages table), Semantic Memory (lead_facts table), ADR-005: Three-Layer Guardrails and RAG, Three-Layer Guardrails, ADR-006: Code-Owned Qualification and Payments, ADR-007: Finalized Production Stack (+14 more)
+Cohesion: 0.16
+Nodes (17): ADR-001: Hybrid Architecture, ADR-004: Dual Memory Architecture, Episodic Memory (messages table), Semantic Memory (lead_facts table), ADR-005: Three-Layer Guardrails and RAG, Three-Layer Guardrails, ADR-007: Finalized Production Stack, ADR-008: System-1 Decision Layer (Laya / Jev) (+9 more)
 
 ### Community 1 - "Conversation Engine (hand-rolled dispatcher)"
 Cohesion: 0.25
 Nodes (8): Conversation Engine (hand-rolled dispatcher), System-1 decide() Decision Layer, FastAPI WhatsApp Webhook, Langfuse LLM Tracing, pgvector RAG Pipeline, Redis (mutex / dedup / rate-limit), TaskIQ Background Worker, Three-Layer Guardrails
 
-### Community 2 - "README.md"
-Cohesion: 0.15
-Nodes (12): AI Impact Statement, Data, model and asset provenance, Student-to-staff demonstration, Executed final check, One final WhatsApp check with Postman, Prior-work disclosure, AdmitFlow necessary resources, Planning baseline before Telegram alignment (+4 more)
+### Community 2 - "AdmitFlow Complete Specification"
+Cohesion: 0.25
+Nodes (8): Executed final check, One final WhatsApp check with Postman, AdmitFlow necessary resources, Planning baseline before Telegram alignment, AdmitFlow Complete Specification, AdmitFlow Platform, AdmitFlow Implementation Plan, AdmitFlow Task List
 
 ### Community 3 - "Finalized Production Stack"
 Cohesion: 0.18
 Nodes (11): ADR-002: Webhook Concurrency and Deduplication, Per-Phone Redis Mutex, Webhook Deduplication (Redis SETNX), ADR-003: Multi-Tenancy Strategy, Multi-Tenancy (Row-Level Isolation), Finalized Production Stack, Fly.io (Backend + Worker + Scheduler), Langfuse Cloud (LLM Tracing) (+3 more)
 
-### Community 4 - "journey.py"
+### Community 4 - "answer_question"
 Cohesion: 0.19
-Nodes (28): Button, advance_application(), build_reply(), button(), copy(), courses(), ExtractedFact, Extraction (+20 more)
+Nodes (23): answer_question(), build_reply(), copy(), courses(), fee_information(), held_reply(), load_memory(), Any (+15 more)
 
 ### Community 5 - "analytics"
 Cohesion: 0.14
 Nodes (21): alias, analytics(), bucket_dates(), count(), percent(), Period, period_window(), Any (+13 more)
 
 ### Community 6 - "payments/conversation.py"
-Cohesion: 0.27
-Nodes (18): button(), discount_action(), order_reply(), payment_action(), preview(), Any, AsyncSession, UUID (+10 more)
+Cohesion: 0.29
+Nodes (17): discount_action(), order_reply(), payment_action(), preview(), Any, AsyncSession, UUID, Code-owned fee previews and explicit, conversation-bound payment requests. (+9 more)
 
 ### Community 7 - "test_workspace_limits.py"
-Cohesion: 0.12
-Nodes (15): ASGIApp, Reject oversized multipart streams before they can fill temporary storage., UploadBodyLimit, check_login_limit(), Request, MonkeyPatch, Bound resource use and reject browser cross-origin mutations before database…, test_custom_header_and_origin_required() (+7 more)
+Cohesion: 0.09
+Nodes (22): ASGIApp, Reject oversized multipart streams before they can fill temporary storage., UploadBodyLimit, embed_chunks(), Use the configured OpenAI model with the database's explicit 1536 dimensions., main(), Probe, BaseModel (+14 more)
 
 ### Community 8 - "RedisMutex"
 Cohesion: 0.07
@@ -249,71 +269,71 @@ Nodes (28): MutexAcquireError, Redis, RuntimeError, Redis distributed mutex with
 
 ### Community 9 - "parse_callback"
 Cohesion: 0.18
-Nodes (12): model_history(), Any, AsyncSession, Any, AsyncSession, reset_reply(), parse_callback(), test_model_history_excludes_pre_reset_context_in_one_scoped_query() (+4 more)
+Nodes (15): is_reset_event(), Any, AsyncSession, reset_reply(), cancel_queued(), note_inbound(), preference_reply(), Any (+7 more)
 
-### Community 10 - "ExtractionError"
+### Community 10 - "pdf_parser.py"
+Cohesion: 0.14
+Nodes (15): kill_descendants(), parse_pdf(), Offline PDF child process with per-loop backpressure, memory and time limits., Include Windows venv redirector children and any parser subprocesses., resident_memory(), watch_memory(), Process, parametrize (+7 more)
+
+### Community 11 - "staff/integrations.py"
 Cohesion: 0.05
-Nodes (62): compose(), Verify the isolated local Compose stack without external API calls or sends., seed_credentials(), verify(), blocks(), Markdown sections and table rows stay together within bounded evidence chunks., Keep section ancestry; repeat table headers instead of breaking row…, semantic_chunks() (+54 more)
-
-### Community 11 - "transport.py"
-Cohesion: 0.09
-Nodes (33): Durable, minimal institution events and signed outbound integrations., destination(), post_event(), PrivateTransportLogs, protect_logs(), public_ip(), LogRecord, HTTPS delivery pins a public resolved address while retaining TLS host… (+25 more)
+Nodes (51): deliver(), UUID, Durable, minimal institution events and signed outbound integrations., destination(), post_event(), PrivateTransportLogs, protect_logs(), public_ip() (+43 more)
 
 ### Community 12 - "WhatsAppSender"
-Cohesion: 0.09
-Nodes (22): Any, Send an interactive list message. `sections` is a list of section dicts…, Send a pre-approved template message., Service for sending messages via Meta WhatsApp Cloud API., Post the payload to Meta and extract the created message ID., Meta API expects the phone number without the leading '+'., Send a simple text message. Returns the Meta message ID., Send an interactive message with up to 3 buttons. `buttons` should be a list of… (+14 more)
+Cohesion: 0.10
+Nodes (21): Discovery Node (Task 12). Presents available courses as WhatsApp interactive…, ExtractionResponse, BaseModel, Qualification Node (Task 15). Extracts rule fields using the LLM and runs…, Structured output expected from the LLM when extracting fields., RuntimeError, WhatsApp message sending service (Task 6). Uses httpx2 to call the Meta Graph…, Raised when the Meta Cloud API returns an error response. (+13 more)
 
-### Community 13 - "DocumentChunk"
-Cohesion: 0.09
-Nodes (28): chunk_text(), embed_text(), ingest_document(), Any, AsyncSession, UUID, RAG pipeline core logic (Task 13). Handles ingestion (chunking, embedding),…, Generate embedding for text using configured model. (+20 more)
+### Community 13 - "test_rag.py"
+Cohesion: 0.19
+Nodes (11): chunk_text(), Sanitizer to prevent RAG poisoning. Blocks chunks that contain obvious prompt…, Section-aware chunks; table rows retain their column and section headers., sanitize_chunks(), asyncio, patch, Unit tests for the RAG pipeline., test_chunk_text() (+3 more)
 
 ### Community 16 - "get_settings"
-Cohesion: 0.05
-Nodes (49): AsyncBroker, get_redis(), Redis, RuntimeError, Shared async Redis client for application code. Carry-over prerequisite #1: the…, Raised when Redis is needed but ``REDIS_URL`` is unset in settings., Return the process-wide async Redis client singleton. The client is created…, RedisNotConfiguredError (+41 more)
+Cohesion: 0.08
+Nodes (30): Shared async Redis client for application code. Carry-over prerequisite #1: the…, get_settings(), Application settings singleton. Loads configuration from the environment (and…, Return the process-wide :class:`Settings` singleton., Bounded login throttling; shared Redis when configured, development fallback., process_inbound_message(), Any, Background tasks for message processing. For now this module holds only the… (+22 more)
 
 ### Community 17 - "admissions.tsx"
 Cohesion: 0.10
 Nodes (19): Admissions(), Detail, Human, Inquiry, labels, Request, RuleEvidence, statusLabel() (+11 more)
 
-### Community 18 - "contextual_query"
-Cohesion: 0.13
-Nodes (17): contextual_query(), Resolve pronouns/slang using bounded recent turns; uncertainty asks the…, retrieval_query(), evaluate(), main(), Bounded synthetic OpenAI reference resolution; no database writes or sends., MonkeyPatch, parametrize (+9 more)
+### Community 18 - "retrieval.py"
+Cohesion: 0.11
+Nodes (23): contextual_query(), numeric_values(), BaseModel, Bounded query resolution for approved evidence; never turn queries into facts., Resolve pronouns/slang using bounded recent turns; uncertainty asks the…, ResolvedQuestion, retrieval_query(), RetrievalQuery (+15 more)
 
 ### Community 19 - "GuidanceMemory"
-Cohesion: 0.20
-Nodes (31): GuidanceMemory, Note, merge_evidence(), render_decision(), test_optional_exploration_and_failure_do_not_erase_profile(), exercise(), turn(), exercise() (+23 more)
+Cohesion: 0.17
+Nodes (35): GuidanceMemory, InterestTheme, Note, ProfileUpdate, BaseModel, Bounded exploratory guidance; evidence notes are not psychometric measurements., StrictModel, StudyFact (+27 more)
 
 ### Community 20 - "AIBoomi Startup Weekend Kochi: fresh-session context"
 Cohesion: 0.11
 Nodes (19): AIBoomi Startup Weekend Kochi: fresh-session context, Assessment and next decision, Current readiness session (October 22), Event sources and local copies, Existing prototype rule and surprise element, Existing working-tree changes, Fresh-message prompt, Handoff status (+11 more)
 
 ### Community 21 - "test_telegram_contracts.py"
-Cohesion: 0.06
-Nodes (35): private_send(), Acknowledge, current(), live(), Any, AsyncSession, BaseModel, Db (+27 more)
+Cohesion: 0.05
+Nodes (43): dispatch_pending(), recovery_loop(), dispatch_due(), Local operational commands with secrets entered through protected prompts., main(), Produce due reminder jobs and recover queued deliveries; safe to run after…, run(), erase() (+35 more)
 
 ### Community 22 - "office_open"
 Cohesion: 0.23
 Nodes (10): escalation_reason(), office_open(), datetime, Reason, Deterministic clear support signals and institution-local office hours., parametrize, Clear support signals escalate; office hours never promise an immediate reply., test_clear_escalation_signals() (+2 more)
 
 ### Community 23 - "AdmitFlow Backend"
-Cohesion: 0.18
-Nodes (11): Admissions analytics, AdmitFlow Backend, Application payments, Configuration, Consented follow-up reminders, Current implementation and verification, Institution knowledge workspace, Local development (+3 more)
+Cohesion: 0.12
+Nodes (16): Admissions analytics, AdmitFlow Backend, Application payments, Configuration, Consented follow-up reminders, Current implementation and verification, Institution knowledge workspace, Local development (+8 more)
 
 ### Community 24 - "LeadStatus"
-Cohesion: 0.11
-Nodes (33): LeadStatus, Lead lifecycle states (SPEC §7.3). Where a lead *stands*, not a fixed track —…, AsyncSession, Run the qualification loop., run_qualification(), EngineState, InvalidTransitionError, BaseModel (+25 more)
+Cohesion: 0.20
+Nodes (17): LeadStatus, Lead lifecycle states (SPEC §7.3). Where a lead *stands*, not a fixed track —…, AsyncSession, Run the qualification loop., run_qualification(), parametrize, test_reset_needs_confirmation_and_preserves_business_ownership(), base_state() (+9 more)
 
 ### Community 25 - "Stages"
 Cohesion: 0.13
 Nodes (15): 10. Reflect & learn, 1. Understand & spec  (`/spec`), 2. Plan & pick a task  (`/plan`), 3. Branch, 4. Build with TDD  (`/build`, `/test`), 5. Verify (the quality gate), 6. Self-review, then adversarial review  (`/review`), 7. Commit & open the PR (+7 more)
 
 ### Community 26 - "outreach/followups.py"
-Cohesion: 0.24
-Nodes (8): Check, Hook, BaseModel, Lease-backed, consented reminders with fresh-state checks before generation and…, safe_hook(), Explicitly consented, bounded student outreach., Only consented inactive inquiries may receive bounded outreach., test_hook_rejects_urgency_prices_and_external_actions()
+Cohesion: 0.15
+Nodes (13): OutboundMessage, Bounded chronological transcript across inbound, replies and standalone…, Check, Hook, BaseModel, Lease-backed, consented reminders with fresh-state checks before generation and…, Any, test_payment_and_delivery_ownership_dedup_and_safe_downgrade() (+5 more)
 
-### Community 27 - "TestClient"
-Cohesion: 0.16
-Nodes (8): Any, TestClient, Statuses (read/delivered) have no 'messages' array., GET /api/webhook challenge verification., POST /api/webhook payload processing., sign_payload(), TestWebhookProcessing, TestWebhookVerification
+### Community 27 - "fixture"
+Cohesion: 0.08
+Nodes (24): fixture(), Course, crm_data(), event_dependencies(), privacy_dependencies(), settings(), parametrize, test_delivery_status_logs_are_authenticated_and_exclude_pii() (+16 more)
 
 ### Community 28 - "run_postman_check.cjs"
 Cohesion: 0.20
@@ -323,21 +343,21 @@ Nodes (8): collection, config, crypto, fs, keys, newman, path, root
 Cohesion: 0.15
 Nodes (13): Checkpoint: Advanced Features, Checkpoint: AI Core, Checkpoint: Dashboard Complete, Checkpoint: Foundation, Checkpoint: Production Ready, Checkpoint: WhatsApp Ingress, Phase 1: Foundation, Phase 2: WhatsApp Ingress (+5 more)
 
-### Community 30 - "workspace"
-Cohesion: 0.08
-Nodes (29): DiscountType, How a discount code reduces the fee., PaymentOrder, A Razorpay order for an application fee (SPEC §7.10). Amount is DB-sourced…, OutboundMessage, Code-owned application fees and authenticated Razorpay payment processing., workspace(), A student must confirm a fresh code-owned fee quote; retries cannot create… (+21 more)
+### Community 30 - "Reply"
+Cohesion: 0.10
+Nodes (18): field_validator, Reply, model_history(), Any, AsyncSession, field_validator, test_greeting_question_pause_and_resume_do_not_become_form_values(), faq() (+10 more)
 
 ### Community 31 - "leads.py"
-Cohesion: 0.05
-Nodes (70): Core cross-cutting concerns: settings, security, schemas, guardrails, tracing., name_tokens(), normalized_phone(), UUID, query_tokens(), Tenant-keyed blind name prefixes; plaintext remains in encrypted columns only., token(), words() (+62 more)
+Cohesion: 0.25
+Nodes (17): lead_summary(), Any, course_options(), get_lead(), human_requests(), lead_detail(), leads(), Any (+9 more)
 
-### Community 32 - "retrieval.py"
-Cohesion: 0.32
-Nodes (7): numeric_values(), BaseModel, Bounded query resolution for approved evidence; never turn queries into facts., ResolvedQuestion, RetrievalQuery, Decimal, unicodedata
+### Community 32 - "test_crm_search.py"
+Cohesion: 0.20
+Nodes (15): Core cross-cutting concerns: settings, security, schemas, guardrails, tracing., name_tokens(), normalized_phone(), UUID, query_tokens(), Tenant-keyed blind name prefixes; plaintext remains in encrypted columns only., token(), words() (+7 more)
 
 ### Community 33 - "management.py"
-Cohesion: 0.05
-Nodes (88): admin_scope(), create_user(), CreateUser, edit_user(), EditUser, Any, BaseModel, Db (+80 more)
+Cohesion: 0.22
+Nodes (29): archive_course(), archive_discount(), catalog(), catalog_detail(), course_view(), CourseInput, create_course(), create_discount() (+21 more)
 
 ### Community 34 - "Code Standards"
 Cohesion: 0.18
@@ -355,21 +375,21 @@ Nodes (11): Business and mentor preparation, Evaluation and demo evidence, Event
 Cohesion: 0.20
 Nodes (10): 7.10 Payment Integration & Discounts (Razorpay), 7.1 WhatsApp Number Architecture, 7.2 Multi-Tenancy (Row-Level Isolation), 7.3 Lead Lifecycle States, 7.5 Batch & Intake Management, 7.6 Cold Lead Re-engagement, 7.7 Language Support, 7.8 Lead Sources & Outbound (+2 more)
 
-### Community 38 - "knowledge/processing.py"
-Cohesion: 0.08
-Nodes (30): encrypt_bytes(), Encrypt uploaded source bytes before persistence, without lossy text decoding., dispatch_pending(), embed_chunks(), process_upload(), UUID, Durable upload claims, bounded embedding and atomic publication of ready…, A database-backed inbox survives enqueue failures and lost worker leases. (+22 more)
+### Community 38 - "get_engine"
+Cohesion: 0.15
+Nodes (15): AsyncEngine, DatabaseNotConfiguredError, get_engine(), RuntimeError, Raised when a DB session is requested but ``DATABASE_URL`` is unset., Return the process-wide async engine (one pool for the app)., main(), execute() (+7 more)
 
 ### Community 39 - "main.py"
-Cohesion: 0.07
-Nodes (28): argparse, create_app(), lifespan(), FastAPI, FastAPI application entry point. Boots the API, manages the TaskIQ broker…, Start / stop the TaskIQ broker alongside the FastAPI process. The…, Application factory — builds and configures the FastAPI instance., configure() (+20 more)
+Cohesion: 0.08
+Nodes (23): log_delivery_status(), Request, Response, Expose only the existing Meta webhook through the temporary demo tunnel., Observe only authenticated status events, without recipient or error text., recovery_loop(), create_app(), lifespan() (+15 more)
 
 ### Community 40 - "route"
-Cohesion: 0.08
-Nodes (58): QualificationRule, A structured eligibility rule evaluated in code, not by the LLM (ADR-006).…, Event, route(), submitted_reply(), callback_data(), UUID, test_english_start_has_no_language_or_forced_course_menu() (+50 more)
+Cohesion: 0.11
+Nodes (42): Event, advance_application(), A confirmed choice may start a draft; submission remains explicitly confirmed., route(), callback_data(), test_english_start_has_no_language_or_forced_course_menu(), exercise(), test_foreign_or_changed_availability_cannot_be_selected() (+34 more)
 
-### Community 41 - "answer_question"
-Cohesion: 0.12
-Nodes (19): answer_question(), AmbiguousCourseReference, AsyncSession, Course, UUID, ValueError, question_courses(), More than one active course has the requested name without a selected owner. (+11 more)
+### Community 41 - "budget.py"
+Cohesion: 0.14
+Nodes (26): get_redis(), Redis, Return the process-wide async Redis client singleton. The client is created…, day_window(), local_counts(), Any, datetime, UUID (+18 more)
 
 ### Community 42 - "Hackathon resources for AdmitFlow"
 Cohesion: 0.20
@@ -379,9 +399,9 @@ Nodes (10): Acceptance before using a resource, Event and release boundaries, Go
 Cohesion: 0.20
 Nodes (9): SPEC.md, bytes, sha256, tasks/plan.md, bytes, sha256, tasks/todo.md, bytes (+1 more)
 
-### Community 44 - "text"
-Cohesion: 0.29
-Nodes (6): Staff takeover and reviewed co-pilot, ready(), text(), old(), test_budget_migration_preserves_existing_institution(), before()
+### Community 44 - "accounts.py"
+Cohesion: 0.15
+Nodes (24): admin_scope(), create_user(), CreateUser, edit_user(), EditUser, Any, BaseModel, Db (+16 more)
 
 ### Community 45 - "AdmitFlow: current state and planning baseline"
 Cohesion: 0.22
@@ -399,9 +419,9 @@ Nodes (20): 10.1 LLM Tracing (Langfuse), 10.2 Structured Logging, 10.3 Error Mon
 Cohesion: 0.14
 Nodes (10): InvalidPhoneError, normalize_e164(), ValueError, E.164 phone-number normalization. Carry-over prerequisite #3: un-normalized…, Raised when a phone string cannot be normalized to E.164., Normalize *raw* into canonical E.164 (``+<digits>``). Strips whitespace,…, Tests for E.164 phone normalization (carry-over prerequisite #3). The…, normalize_e164 → canonical E.164 string. (+2 more)
 
-### Community 49 - "evaluate_supportive_guidance.py"
-Cohesion: 0.20
-Nodes (12): catalog_status(), Course, evaluate(), main(), Any, Synthetic adaptive guidance through the real composer; no database or Telegram…, Published programmes can support exploration without inventing admissions…, test_reference_programme_cannot_grant_eligibility_even_with_a_batch() (+4 more)
+### Community 49 - "QualificationRule"
+Cohesion: 0.15
+Nodes (25): QualificationRule, A structured eligibility rule evaluated in code, not by the LLM (ADR-006).…, catalog_status(), interpret_turn(), Course, Interpret first; planning must see corrected facts and recomputed eligibility., request_decision(), evaluate() (+17 more)
 
 ### Community 50 - "ADR-011: Required OpenAI passage reranking"
 Cohesion: 0.40
@@ -412,32 +432,32 @@ Cohesion: 0.22
 Nodes (9): Browser announcement regions, Coverage, LLM and decision-layer tests, Philosophy — pragmatic TDD, Running tests, Test layout, Testing, The two patterns (+1 more)
 
 ### Community 52 - "check_input_safety"
-Cohesion: 0.18
-Nodes (16): check_input_safety(), Check if the user input is safe to process. 1. Deterministic checks…, asyncio, Test output guardrail with safe content., Test output guardrail blocks hallucinated fee., Test that a clean message passes through., Test that profanity is blocked deterministically without calling the LLM., Test that simple injection heuristics are blocked deterministically. (+8 more)
+Cohesion: 0.14
+Nodes (22): apply_whatsapp_formatting(), check_input_safety(), check_output_safety(), Convert common markdown formatting to WhatsApp formatting., Check if the AI output is safe to send to the user. 1. Applies WhatsApp…, Check if the user input is safe to process. 1. Deterministic checks…, asyncio, Test output guardrail with safe content. (+14 more)
 
 ### Community 53 - "AdmitFlow project handoff"
 Cohesion: 0.15
 Nodes (13): AdmitFlow project handoff, Current conversation work: Task 61, Current direction, Current work: Task 62 conversation continuity, Current work: Task 63 supportive adaptive guidance, Current work: Task 64 assistant-led routine inquiries, Current work: Task 65 JAIN Kochi data replacement, Development rules (+5 more)
 
-### Community 54 - "detect_intent"
-Cohesion: 0.20
-Nodes (15): detect_intent(), Classify the user's intent to route to the correct node. Design Decision: If a…, asyncio, Test routing for course discovery., Test routing for knowledge questions., Test routing for qualification answers., Test routing for human handoff., Test routing for empty messages without calling LLM defaults to discovery. (+7 more)
+### Community 54 - "unittest_mock"
+Cohesion: 0.18
+Nodes (16): detect_intent(), Classify the user's intent to route to the correct node. Design Decision: If a…, asyncio, Test routing for course discovery., Test routing for knowledge questions., Test routing for qualification answers., Test routing for human handoff., Test routing for empty messages without calling LLM defaults to discovery. (+8 more)
 
-### Community 55 - "tests/test_telegram_identity.py"
-Cohesion: 0.19
-Nodes (10): hash_telegram_identifier(), UUID, Private Telegram identity lookup without storing raw identifiers in indexes., Hash an identifier in its tenant/bot/type domain using the lookup secret. This…, MonkeyPatch, parametrize, Telegram identities must be independent of phone numbers and tenant-bound., test_lookup_hash_is_stable_scoped_and_does_not_reveal_identifiers() (+2 more)
+### Community 55 - "EncryptionKeyNotConfiguredError"
+Cohesion: 0.10
+Nodes (22): EncryptionKeyNotConfiguredError, RuntimeError, Raised when a PII helper is used but its key is unset in settings., hash_telegram_identifier(), UUID, Private Telegram identity lookup without storing raw identifiers in indexes., Hash an identifier in its tenant/bot/type domain using the lookup secret. This…, MonkeyPatch (+14 more)
 
 ### Community 56 - "GuidanceInterpretation"
-Cohesion: 0.14
-Nodes (22): CourseMatch, GuidanceInterpretation, InterestTheme, ProfileUpdate, BaseModel, Bounded exploratory guidance; evidence notes are not psychometric measurements., StrictModel, StudyFact (+14 more)
+Cohesion: 0.21
+Nodes (13): GuidanceInterpretation, Any, AsyncSession, UUID, timeline(), interpreted(), test_new_background_information_keeps_useful_discovery_open(), exercise() (+5 more)
 
 ### Community 57 - "Cursor"
 Cohesion: 0.40
 Nodes (4): Cursor, BaseModel, datetime, field_validator
 
-### Community 58 - "test_rag_node.py"
-Cohesion: 0.11
-Nodes (19): Sanitizer to prevent RAG poisoning. Blocks chunks that contain obvious prompt…, sanitize_chunks(), Discovery Node (Task 12). Presents available courses as WhatsApp interactive…, process_rag_node(), AsyncSession, RAG Node (Task 14). Graph node that retrieves from the knowledge base and…, Retrieve context and answer knowledge questions., RuntimeError (+11 more)
+### Community 58 - "EngineState"
+Cohesion: 0.10
+Nodes (27): process_rag_node(), AsyncSession, RAG Node (Task 14). Graph node that retrieves from the knowledge base and…, Retrieve context and answer knowledge questions., EngineState, InvalidTransitionError, BaseModel, ValueError (+19 more)
 
 ### Community 59 - "ADR-010: Triage Fallback Routing (Anti-Spam)"
 Cohesion: 0.33
@@ -446,6 +466,10 @@ Nodes (5): ADR-010: Triage Fallback Routing (Anti-Spam), Consequences, Context, 
 ### Community 60 - "ADR-012: Telegram and OpenAI for the first complete admissions MVP"
 Cohesion: 0.29
 Nodes (7): ADR-012: Telegram and OpenAI for the first complete admissions MVP, Consequences, Context, Decision, Implemented runtime boundaries, References and verification, Supersession and preserved decisions
+
+### Community 61 - "alembic"
+Cohesion: 0.05
+Nodes (9): alembic, columns(), Column, upgrade(), common(), Column, upgrade(), pgvector_sqlalchemy (+1 more)
 
 ### Community 62 - "2026-10-23-before-telegram-alignment/docs/event/RESOURCE_PLAN.md"
 Cohesion: 0.25
@@ -456,32 +480,32 @@ Cohesion: 0.11
 Nodes (17): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+9 more)
 
 ### Community 64 - "change_password"
-Cohesion: 0.06
-Nodes (45): change_password(), issue_session(), Login, logout(), me(), PasswordChange, AsyncSession, BaseModel (+37 more)
+Cohesion: 0.08
+Nodes (37): change_password(), issue_session(), Login, logout(), me(), PasswordChange, AsyncSession, BaseModel (+29 more)
 
 ### Community 65 - "age"
-Cohesion: 0.09
-Nodes (25): task, send_followup(), age(), outreach(), parametrize, seed(), test_budget_pause_does_not_spend_a_reminder_and_stop_cancels_it(), exercise() (+17 more)
+Cohesion: 0.13
+Nodes (18): age(), parametrize, seed(), test_exactly_two_reminders_then_cold_without_duplicate_delivery(), exercise(), test_existing_inquiries_upgrade_without_invented_consent(), in_flight(), old() (+10 more)
 
 ### Community 66 - "ADR-016: Public programme references and an explicit local demo reset"
 Cohesion: 0.40
 Nodes (4): ADR-016: Public programme references and an explicit local demo reset, Context, Decision, Evidence and limits
 
-### Community 67 - "write_audit_log"
-Cohesion: 0.12
-Nodes (32): AsyncSession, UUID, Append one entry to ``audit_logs`` on ``session``; return it flushed, not…, write_audit_log(), assign_scope(), documents(), get_upload(), Any (+24 more)
+### Community 67 - "api.py"
+Cohesion: 0.13
+Nodes (31): encrypt_bytes(), Encrypt uploaded source bytes before persistence, without lossy text decoding., assign_scope(), documents(), get_upload(), Any, BaseModel, Db (+23 more)
 
 ### Community 68 - "evaluate_conversation.py"
 Cohesion: 0.50
 Nodes (3): Synthetic collection latency evidence; no database writes or Telegram…, src_engine, statistics
 
 ### Community 69 - "generate_completion"
-Cohesion: 0.16
+Cohesion: 0.20
 Nodes (15): generate_completion(), Any, Generate a completion with automatic provider fallback. Tries the fast model,…, asyncio, parametrize, Test that it returns successfully on the primary model., Test that it falls back to OpenAI if primary OpenAI model fails., Test that AllProvidersFailedError is raised if everything fails. (+7 more)
 
-### Community 70 - "guidance.py"
-Cohesion: 0.13
-Nodes (30): catalog(), commit_guidance(), guide(), interpret_turn(), load_guidance(), Any, AsyncSession, UUID (+22 more)
+### Community 70 - "journey.py"
+Cohesion: 0.15
+Nodes (26): RAG pipeline core logic (Task 13). Handles ingestion (chunking, embedding),…, Only explicitly supplied application details may be reused in an encrypted…, catalog(), commit_guidance(), guide(), load_guidance(), Any, AsyncSession (+18 more)
 
 ### Community 71 - "Official source snapshots"
 Cohesion: 0.50
@@ -496,52 +520,60 @@ Cohesion: 0.50
 Nodes (3): isolated_local_login_windows(), MonkeyPatch, Keep development-only throttle state independent across database test cases.
 
 ### Community 74 - "ADR-013: Adaptive, student-first course guidance"
-Cohesion: 0.50
+Cohesion: 0.40
 Nodes (4): ADR-013: Adaptive, student-first course guidance, Consequences, Context, Decision
 
 ### Community 75 - "process_followup"
-Cohesion: 0.20
-Nodes (16): activity(), after_send(), before_send(), course_available(), eligible(), generate_hook(), pending(), process_followup() (+8 more)
+Cohesion: 0.15
+Nodes (20): activity(), after_send(), before_send(), course_available(), eligible(), generate_hook(), pending(), process_followup() (+12 more)
 
 ### Community 76 - "management.tsx"
 Cohesion: 0.09
 Nodes (16): blank, Discount, Discounts(), Batch, Course, empty, Management(), operators (+8 more)
 
 ### Community 77 - "ADR-015: Supportive guidance and contextual answer controls"
-Cohesion: 0.50
+Cohesion: 0.40
 Nodes (4): ADR-015: Supportive guidance and contextual answer controls, Consequences and limits, Context, Decision
 
-### Community 78 - "GuidanceDecision"
-Cohesion: 0.16
-Nodes (25): checked_text(), GuidanceDecision, add_response_controls(), answer_labels(), compose_reply(), consume_answer(), needs_progress(), Any (+17 more)
+### Community 78 - "guidance_interaction.py"
+Cohesion: 0.12
+Nodes (28): checked_text(), CourseMatch, add_response_controls(), answer_labels(), compose_reply(), consume_answer(), needs_progress(), Any (+20 more)
 
 ### Community 79 - "PublicCatalogue"
-Cohesion: 0.11
-Nodes (22): CRM search and institution downloads, Programme, PublicCatalogue, BaseModel, field_validator, model_validator, Self, applications() (+14 more)
+Cohesion: 0.16
+Nodes (12): Programme, PublicCatalogue, BaseModel, field_validator, model_validator, Self, dataset(), parametrize (+4 more)
 
 ### Community 84 - "analytics.tsx"
 Cohesion: 0.28
 Nodes (7): Analytics(), Conversion, labels, frontend_app_analytics_module, rate(), Report, shortDate()
 
-### Community 89 - "session.py"
-Cohesion: 0.06
-Nodes (52): alembic_config, AsyncEngine, Dashboard access role (SPEC — admin vs agent)., StaffRole, DatabaseNotConfiguredError, get_engine(), RuntimeError, Async engine and session factory. Built lazily from ``settings.database_url``… (+44 more)
+### Community 89 - "auth.py"
+Cohesion: 0.08
+Nodes (40): alembic_config, async_sessionmaker, Dashboard access role (SPEC — admin vs agent)., StaffRole, Institution, Institution (the tenant root) and its staff users., An institution, optionally connected to a legacy WhatsApp number. The tenant…, A dashboard user (admin or agent) belonging to one institution. (+32 more)
 
 ### Community 90 - "AdmitFlow"
-Cohesion: 0.29
-Nodes (7): AdmitFlow, Current status, Demonstration and submission, Development, Product scope, Stack, Student-first course guidance
+Cohesion: 0.08
+Nodes (24): AdmitFlow, Architecture, Configuration, Contributing, Current reference catalogue, Documentation, Features, For institutions (+16 more)
 
 ### Community 91 - "pathlib"
-Cohesion: 0.06
-Nodes (29): Expose only the existing Meta webhook through the temporary demo tunnel., Bounded synthetic PDF upload/queue/OpenAI/search check; removes its own upload., Five bounded live embedding searches through the real authenticated staff API., Local operational commands with secrets entered through protected prompts., main(), prepare(), Path, Download only local PDF layout/table assets; no OCR, generation or document… (+21 more)
+Cohesion: 0.20
+Nodes (4): Bounded synthetic PDF upload/queue/OpenAI/search check; removes its own upload., Five bounded live embedding searches through the real authenticated staff API., Hash the tested code/configuration without reading secrets or runtime data., pathlib
+
+### Community 92 - "GuidanceDecision"
+Cohesion: 0.13
+Nodes (24): GuidanceDecision, test_profile_and_facts_survive_encryption_without_selecting_a_course(), exercise(), plan(), test_recommend_confirm_text_then_batch_and_eligibility(), plan(), parametrize, test_interview_probe_is_replaced_without_an_extra_model_request() (+16 more)
 
 ### Community 93 - "test_decision_reranking.py"
-Cohesion: 0.21
-Nodes (18): UUID, Reorder only original, safe tenant candidates; never invent text or sources.…, rerank(), chunks(), Intent, asyncio, BaseModel, MonkeyPatch (+10 more)
+Cohesion: 0.16
+Nodes (21): PassageRanking, BaseModel, UUID, Bounded OpenAI evidence reranking with a validated baseline fallback., Reorder only original, safe tenant candidates; never invent text or sources.…, rerank(), chunks(), Intent (+13 more)
 
-### Community 95 - "AllProvidersFailedError"
-Cohesion: 0.11
-Nodes (24): decide(), Any, Typed decisions through the existing OpenAI-only provider boundary., Validate structured model output; refusal/malformed output is never a decision.…, AllProvidersFailedError, Exception, Raised when the entire LLM fallback chain is exhausted., apply_whatsapp_formatting() (+16 more)
+### Community 94 - "signin"
+Cohesion: 0.10
+Nodes (18): test_local_cohort_counts_conversions_and_observed_stages(), test_tenant_is_derived_from_session_and_period_is_bounded(), test_zero_filled_weekly_buckets_and_empty_rates(), Any, test_concurrent_reviews_allocate_one_seat_and_repeated_approval_is_idempotent(), test_downloads_roles_datasets_limits_and_tenants(), test_search_scope_validation_and_audit(), Any (+10 more)
+
+### Community 95 - "pydantic"
+Cohesion: 0.12
+Nodes (20): decide(), Any, Typed decisions through the existing OpenAI-only provider boundary., Validate structured model output; refusal/malformed output is never a decision.…, AllProvidersFailedError, Exception, Bounded OpenAI-only model roles; provider details never escape in errors., Raised when the entire LLM fallback chain is exhausted. (+12 more)
 
 ### Community 96 - "Git & GitHub Workflow"
 Cohesion: 0.12
@@ -552,8 +584,8 @@ Cohesion: 0.22
 Nodes (8): name, private, version, react-dom, @types/node, @types/react, @types/react-dom, typescript
 
 ### Community 98 - "InputGuardrailResult"
-Cohesion: 0.22
-Nodes (9): _deterministic_check(), InputGuardrailResult, LLMGuardrailResponse, LLMOutputGuardrailResponse, BaseModel, Result of the input guardrail check., Structured output expected from the LLM output classifier., Structured output expected from the LLM classifier. (+1 more)
+Cohesion: 0.18
+Nodes (11): _deterministic_check(), InputGuardrailResult, LLMGuardrailResponse, LLMOutputGuardrailResponse, OutputGuardrailResult, BaseModel, Result of the input guardrail check., Result of the output guardrail check. (+3 more)
 
 ### Community 99 - "@playwright/test"
 Cohesion: 0.18
@@ -567,17 +599,21 @@ Nodes (7): AIBoomi Startup Weekend handoff, How we build — read the handbook, 
 Cohesion: 0.18
 Nodes (11): Dependency & secret scanning, Deploy & rollback, External surfaces, Guardrails & money, Local full-stack (docker-compose), Multi-tenancy — isolation is a correctness bug if wrong, Observability, PII & data protection (DPDPA) (+3 more)
 
-### Community 102 - "signin"
+### Community 102 - "process_upload"
 Cohesion: 0.06
-Nodes (37): decrypt_bytes(), _fernet(), Authenticate and decrypt source bytes for an authorized ingestion task., test_local_cohort_counts_conversions_and_observed_stages(), test_tenant_is_derived_from_session_and_period_is_bounded(), test_zero_filled_weekly_buckets_and_empty_rates(), Any, test_concurrent_reviews_allocate_one_seat_and_repeated_approval_is_idempotent() (+29 more)
+Nodes (35): decrypt_bytes(), _fernet(), Authenticate and decrypt source bytes for an authorized ingestion task., process_upload(), UUID, Claim once, process outside the transaction, then publish only the current…, ingest_upload(), task (+27 more)
 
 ### Community 103 - "next-env.d.ts"
 Cohesion: 0.50
 Nodes (3): NOTE: This file should not be edited, frontend_next_types_root_params_d, frontend_next_types_routes_d
 
 ### Community 104 - "encrypt_pii"
-Cohesion: 0.07
-Nodes (43): decrypt_pii(), encrypt_pii(), Encrypt a PII string, returning a url-safe base64 Fernet token. Fernet is…, Decrypt a token produced by :func:`encrypt_pii`. Raises…, test_profile_and_facts_survive_encryption_without_selecting_a_course(), exercise(), test_all_aggregates_share_a_snapshot_during_concurrent_arrivals(), interleave() (+35 more)
+Cohesion: 0.09
+Nodes (30): encrypt_pii(), Encrypt a PII string, returning a url-safe base64 Fernet token. Fernet is…, AsyncSession, UUID, reindex_batch(), test_all_aggregates_share_a_snapshot_during_concurrent_arrivals(), interleave(), test_index_rename_clear_and_legacy_backfill() (+22 more)
+
+### Community 105 - "broker.py"
+Cohesion: 0.12
+Nodes (17): AsyncBroker, _build_broker(), TaskIQ broker singleton. In production (and local dev with Redis running) the…, Construct the right broker based on the current settings. This is a plain…, task, Follow-up jobs carry only tenant and lead identifiers, never student content., send_followup(), task (+9 more)
 
 ### Community 106 - "layout.tsx"
 Cohesion: 0.25
@@ -591,21 +627,29 @@ Nodes (8): scripts, build, dev, lint, record:demo, start, test:e2e:live, typeche
 Cohesion: 0.13
 Nodes (14): Contextual retrieval and reference scope, Isolated full-stack Compose, Outbound integrations and live notifications, Staff access and privacy operations, Typed OpenAI decisions and required reranking, Explicit Telegram receiver, Isolated local full-stack runtime, Stop and recover (+6 more)
 
-### Community 110 - "generate"
-Cohesion: 0.19
-Nodes (14): content(), decide(), DraftContent, DraftDecision, DraftRequest, generate(), latest(), Any (+6 more)
+### Community 110 - "copilot.py"
+Cohesion: 0.15
+Nodes (21): event_text(), AsyncSession, content(), decide(), DraftContent, DraftDecision, DraftRequest, generate() (+13 more)
 
-### Community 112 - "TelegramBot"
-Cohesion: 0.09
-Nodes (52): asyncio, Application-layer PII protection: symmetric encryption + deterministic hashing.…, ConversationEvent, ConversationReply, Trusted bot-to-institution mapping; token is application-encrypted., TelegramBot, Bounded bulk model context; reset boundaries preserve the staff audit trail., Institution document extraction, durable ingestion and retrieval. (+44 more)
+### Community 111 - "ExtractionError"
+Cohesion: 0.22
+Nodes (18): extract_file(), ExtractionError, ValueError, Bounded extraction of institution reference documents; never execute uploads., A safe, public error code rather than parser output containing document text., validate_path(), preflight_pdf(), basic_pdf() (+10 more)
+
+### Community 112 - "test_knowledge_workspace.py"
+Cohesion: 0.10
+Nodes (41): asyncio, ConversationEvent, ConversationReply, Institution document extraction, durable ingestion and retrieval., Durable upload claims, bounded embedding and atomic publication of ready…, Bounded live FAQ evaluation on the fictional demo tenant; no messages or writes., Strict private-chat normalization and token-safe Telegram HTTP transport., TelegramClient (+33 more)
 
 ### Community 113 - "models/__init__.py"
 Cohesion: 0.07
-Nodes (66): Base, IdMixin, Declarative base, metadata naming convention, and shared column mixins. Every…, Declarative base shared by every AdmitFlow model., UUID primary key with an application-side default. UUIDs avoid cross-tenant…, Server-side created/updated timestamps., Row-level tenant scoping (ADR-003). Mixed into every tenant-scoped table., TenantMixin (+58 more)
+Nodes (68): Base, IdMixin, Declarative base, metadata naming convention, and shared column mixins. Every…, Declarative base shared by every AdmitFlow model., UUID primary key with an application-side default. UUIDs avoid cross-tenant…, Server-side created/updated timestamps., Row-level tenant scoping (ADR-003). Mixed into every tenant-scoped table., TenantMixin (+60 more)
 
-### Community 114 - "AGENTS.md"
-Cohesion: 0.27
+### Community 114 - "Quality Gates — Definition of Done"
+Cohesion: 0.33
 Nodes (6): CI mirrors this exactly, Fast iteration vs the gate, Quality Gates — Definition of Done, The baseline gate (every change), The enforced-numbers ledger, The tiers — add gates by what the change touches
+
+### Community 115 - "PaymentProviderError"
+Cohesion: 0.15
+Nodes (15): PaymentLink, PaymentProviderError, BaseModel, Exception, field_validator, Read an existing exact reference; absence never authorizes another creation., Any, MonkeyPatch (+7 more)
 
 ### Community 116 - "devDependencies"
 Cohesion: 0.33
@@ -620,40 +664,48 @@ Cohesion: 0.40
 Nodes (5): dependencies, @fontsource-variable/dm-sans, next, react, react-dom
 
 ### Community 119 - "dispatcher.py"
-Cohesion: 0.08
-Nodes (27): _flush_engine_state(), handle_turn(), _load_engine_state(), Any, AsyncSession, Engine Dispatcher (Task 8 & 17). This module contains the main entry point for…, Load EngineState from DB records., Flush mutations back to DB records. (+19 more)
+Cohesion: 0.09
+Nodes (26): _flush_engine_state(), handle_turn(), _load_engine_state(), Any, AsyncSession, Engine Dispatcher (Task 8 & 17). This module contains the main entry point for…, Load EngineState from DB records., Flush mutations back to DB records. (+18 more)
 
-### Community 120 - "Settings"
-Cohesion: 0.17
-Nodes (15): Environment-backed application configuration., Settings, configured_keys(), MonkeyPatch, Point ``security.get_settings`` at settings with the crypto keys set., Point ``security.get_settings`` at settings with no crypto keys., test_hash_phone_differs_per_pepper_key(), unset_keys() (+7 more)
+### Community 120 - "decrypt_pii"
+Cohesion: 0.13
+Nodes (29): decrypt_pii(), hash_phone(), Decrypt a token produced by :func:`encrypt_pii`. Raises…, Return a deterministic keyed hash of a phone number for lookup/dedup. Keyed…, Environment-backed application configuration., Settings, seed(), test_configuration_roles_encryption_and_tenant_ownership() (+21 more)
 
 ### Community 121 - "Lead"
-Cohesion: 0.17
-Nodes (20): Lead, A prospective applicant with optional phone contact and channel identities.…, action(), application_action(), collect_application(), prompt(), Any, AsyncSession (+12 more)
+Cohesion: 0.21
+Nodes (16): Lead, A prospective applicant with optional phone contact and channel identities.…, action(), application_action(), collect_application(), prompt(), Any, AsyncSession (+8 more)
 
 ### Community 122 - "tests/test_conversation_readiness.py"
+Cohesion: 0.18
+Nodes (16): Detail, BaseModel, validated_details(), ApplicationTurn, BaseModel, academic_number_supported(), An interest score, phone number or unrelated number is not an academic fact., test_multiple_details_and_corrections_fill_only_evidenced_fields() (+8 more)
+
+### Community 123 - "pdf_worker.py"
 Cohesion: 0.14
-Nodes (20): Detail, BaseModel, Only explicitly supplied application details may be reused in an encrypted…, validated_details(), ApplicationTurn, BaseModel, academic_number_supported(), An interest score, phone number or unrelated number is not an academic fact. (+12 more)
+Nodes (15): argparse, convert_pdf(), main(), Path, Single-use PDF parser. Reads stdin; emits bounded JSON, never raw diagnostics., main(), prepare(), Path (+7 more)
 
 ### Community 124 - "WhatsApp readiness check — October 22, 2026"
 Cohesion: 0.15
 Nodes (13): Decision so far, Delivery diagnosis and configuration repair (October 23, approximately 00:16 IST), Evidence collected before configuration, Final Postman retry (October 23), Live checkpoint (approximately 22:54 IST), Missing-reply investigation (approximately 22:59 IST), New test account configuration (October 23, approximately 09:45 IST), Next live checks and evidence required (+5 more)
 
-### Community 125 - "Reply"
-Cohesion: 0.12
-Nodes (21): GroundingSource, BaseModel, field_validator, Channel-neutral input and validated plain-text reply boundary., Internal evidence persisted in encrypted replies, excluded from channel…, Reply, Case, BaseModel (+13 more)
+### Community 125 - "test_faq_evaluation.py"
+Cohesion: 0.20
+Nodes (14): GroundingSource, BaseModel, Channel-neutral input and validated plain-text reply boundary., Internal evidence persisted in encrypted replies, excluded from channel…, Case, cases(), evaluate(), main() (+6 more)
 
 ### Community 126 - "test_handle_turn_basic_flow"
 Cohesion: 0.33
 Nodes (5): Any, asyncio, patch, sample_whatsapp_payload(), test_handle_turn_basic_flow()
 
-### Community 127 - "hash_phone"
-Cohesion: 0.09
-Nodes (25): EncryptionKeyNotConfiguredError, hash_phone(), RuntimeError, Raised when a PII helper is used but its key is unset in settings., Return a deterministic keyed hash of a phone number for lookup/dedup. Keyed…, payment_webhook(), Db, post (+17 more)
+### Community 127 - "payment_webhook"
+Cohesion: 0.40
+Nodes (5): payment_webhook(), Db, post, Request, UUID
 
 ### Community 128 - "payments.tsx"
 Cohesion: 0.32
 Nodes (6): label(), money(), outcomes, Payment, Payments(), statuses
+
+### Community 129 - "test_local_runtime.py"
+Cohesion: 0.15
+Nodes (14): configure(), main(), Path, Create private isolated local Compose configuration without copying live…, Tests use explicit configuration and never implicitly load developer…, asyncio, MonkeyPatch, Path (+6 more)
 
 ### Community 130 - "Adaptive course guidance: evidence and implementation"
 Cohesion: 0.29
@@ -663,101 +715,161 @@ Nodes (7): Adaptive course guidance: evidence and implementation, Adaptive metho
 Cohesion: 0.44
 Nodes (9): refresh(), api(), Knowledge(), action(), assignScope(), login(), search(), upload() (+1 more)
 
+### Community 132 - "process_event"
+Cohesion: 0.11
+Nodes (13): process_telegram_event(), task, Telegram inbox and outbox jobs contain only internal identifiers., send_telegram_reply(), process_event(), UUID, Serialize by locked lead, then atomically commit memory, result and one reply., send_reply() (+5 more)
+
 ### Community 133 - "env.py"
-Cohesion: 0.22
-Nodes (9): do_run_migrations(), Connection, Alembic migration environment (async). Reads the database URL from application…, Emit SQL to stdout without a live DB connection., Run migrations against a live database via an async engine., run_migrations_offline(), run_migrations_online(), logging_config (+1 more)
+Cohesion: 0.25
+Nodes (8): do_run_migrations(), Connection, Alembic migration environment (async). Reads the database URL from application…, Emit SQL to stdout without a live DB connection., Run migrations against a live database via an async engine., run_migrations_offline(), run_migrations_online(), logging_config
 
-### Community 135 - "Course"
-Cohesion: 0.09
-Nodes (20): Batch, Course, A program a lead can be qualified for and pay to apply to., A dated intake of a course with finite seats (SPEC §7.5)., Bounded chronological transcript across inbound, replies and standalone…, event_text(), AsyncSession, Human-readable callback summaries without exposing routing or signature details. (+12 more)
+### Community 134 - "._post"
+Cohesion: 0.17
+Nodes (11): Any, Send an interactive list message. `sections` is a list of section dicts…, Send a pre-approved template message., Post the payload to Meta and extract the created message ID., Meta API expects the phone number without the leading '+'., Send a simple text message. Returns the Meta message ID., Send an interactive message with up to 3 buttons. `buttons` should be a list of…, Phase 2: WhatsApp Ingress (+3 more)
 
-### Community 136 - "process_event"
+### Community 135 - "TelegramBot"
 Cohesion: 0.10
-Nodes (23): is_reset_event(), process_event(), Serialize by locked lead, then atomically commit memory, result and one reply., callback(), test_explicit_consent_and_stop_during_staff_takeover(), exercise(), inbound(), prepare() (+15 more)
+Nodes (28): Batch, Course, A program a lead can be qualified for and pay to apply to., A dated intake of a course with finite seats (SPEC §7.5)., Trusted bot-to-institution mapping; token is application-encrypted., TelegramBot, Human-readable callback summaries without exposing routing or signature details., Code-owned course scopes for approved institution references. (+20 more)
+
+### Community 136 - "prepare"
+Cohesion: 0.12
+Nodes (20): test_budget_pause_does_not_spend_a_reminder_and_stop_cancels_it(), exercise(), inbound(), prepare(), Any, MonkeyPatch, parametrize, UUID (+12 more)
 
 ### Community 137 - "page.tsx"
 Cohesion: 0.12
 Nodes (13): DeliveryBudget(), Usage, Exports(), Configuration, Integrations(), Request, Doc, errors (+5 more)
 
-### Community 138 - "reindex_batch"
-Cohesion: 0.40
-Nodes (6): main(), AsyncSession, UUID, reindex_batch(), test_index_rename_clear_and_legacy_backfill(), exercise()
+### Community 138 - "test_structured_documents.py"
+Cohesion: 0.19
+Nodes (14): blocks(), Markdown sections and table rows stay together within bounded evidence chunks., Keep section ancestry; repeat table headers instead of breaking row…, semantic_chunks(), table_parts(), table_start(), text_parts(), parametrize (+6 more)
+
+### Community 139 - "BaseModel"
+Cohesion: 0.23
+Nodes (7): BatchInput, Hours, BaseModel, model_validator, Self, RuleInput, SettingsInput
 
 ### Community 140 - "RuleOperator"
-Cohesion: 0.18
-Nodes (17): Qualification-rule comparison operators (SPEC §7.4). Evaluated…, RuleOperator, ExtractionResponse, BaseModel, Qualification Node (Task 15). Extracts rule fields using the LLM and runs…, Structured output expected from the LLM when extracting fields., _coerce_values(), evaluate_rule() (+9 more)
+Cohesion: 0.30
+Nodes (12): Qualification-rule comparison operators (SPEC §7.4). Evaluated…, RuleOperator, _coerce_values(), evaluate_rule(), Any, Evaluate a qualification rule deterministically. Args: operator: The…, test_evaluate_rule_in_list(), test_evaluate_rule_missing_extracted_value() (+4 more)
 
-### Community 141 - "identity_database"
-Cohesion: 0.43
-Nodes (7): identity_database(), Use a disposable pgvector database; never mutate the demo database., test_downgrade_preserves_legacy_rows_and_refuses_to_destroy_telegram_data(), insert_rows(), inspect_and_clean(), remove_test_bot(), verify_legacy()
+### Community 141 - "pg_url"
+Cohesion: 0.19
+Nodes (13): _alembic_config(), monkeypatch_session(), pg_url(), MonkeyPatch, Start Postgres, point settings at it, yield the asyncpg URL., The tier requirement: alembic upgrade head then downgrade base, both clean., test_migration_applies_up_and_down(), _tables() (+5 more)
+
+### Community 142 - "exports.py"
+Cohesion: 0.30
+Nodes (10): clean(), Audited institution exports, with explicit limits and spreadsheet-safe text., render_csv(), render_xlsx(), Download encoding prevents formulas while preserving international phone…, test_downloads_never_treat_user_text_as_formulas(), csv, io (+2 more)
 
 ### Community 143 - "add_institution_knowledge_workspace_b627da2f7e11.py"
 Cohesion: 0.40
 Nodes (4): Column, DateTime, _timestamps(), upgrade()
 
-### Community 144 - "log_delivery_status"
-Cohesion: 0.40
-Nodes (5): log_delivery_status(), Request, Response, Observe only authenticated status events, without recipient or error text., middleware
+### Community 144 - "test_redis_client.py"
+Cohesion: 0.20
+Nodes (8): RuntimeError, Raised when Redis is needed but ``REDIS_URL`` is unset in settings., RedisNotConfiguredError, Tests for the shared async Redis client helper (carry-over prerequisite #1).…, get_redis() singleton behaviour., Calling get_redis() with no REDIS_URL must fail loud., When REDIS_URL is set, get_redis() returns a Redis client., TestGetRedis
 
-### Community 145 - "test_staff_lookup_is_scoped_read_only_and_cannot_confirm_payment"
-Cohesion: 0.19
-Nodes (10): payments(), Any, get, Any, MonkeyPatch, test_absent_link_does_not_clear_uncertainty_or_authorize_retry(), test_known_configuration_failure_can_only_requeue_same_bounded_invoice(), test_staff_lookup_is_scoped_read_only_and_cannot_confirm_payment() (+2 more)
+### Community 145 - "seed"
+Cohesion: 0.13
+Nodes (18): payments(), Any, get, test_unconfigured_payments_do_not_offer_a_payment_request_or_staff_handoff(), exercise(), UUID, seed(), exercise() (+10 more)
 
-### Community 146 - "get_sessionmaker"
-Cohesion: 0.06
-Nodes (50): async_sessionmaker, get_session(), get_sessionmaker(), AsyncSession, Return the process-wide async session factory., FastAPI dependency yielding a session that closes after the request., deliver(), dispatch_pending() (+42 more)
+### Community 146 - "TelegramAPIError"
+Cohesion: 0.10
+Nodes (24): recover_payments(), RuntimeError, TelegramAPIError, main(), provision_bot(), UUID, One advisory-locked long poller per bot, with durable offsets and queue…, recovery() (+16 more)
 
 ### Community 147 - "notifications.tsx"
 Cohesion: 0.33
 Nodes (4): labels, Notice, Notifications(), Snapshot
 
+### Community 148 - "ingest_document"
+Cohesion: 0.22
+Nodes (10): embed_text(), ingest_document(), Any, AsyncSession, UUID, Generate embedding for text using configured model., Chunk, embed, and store a document in pgvector., Hybrid search (dense + lexical with RRF). (+2 more)
+
+### Community 149 - "send_message"
+Cohesion: 0.33
+Nodes (10): active_request(), finish_takeover(), Any, AsyncSession, Db, post, UUID, resume() (+2 more)
+
+### Community 150 - "crm.py"
+Cohesion: 0.36
+Nodes (7): lead_statement(), LeadFilters, LeadSearch, BaseModel, Select, UUID, Shared bounded CRM filters; search values never belong in URLs or audit details.
+
+### Community 151 - "reconcile"
+Cohesion: 0.61
+Nodes (8): locked(), owned(), provider(), Db, post, UUID, reconcile(), retry()
+
+### Community 152 - "AdmitFlow — Task List"
+Cohesion: 0.25
+Nodes (8): AdmitFlow — Task List, AIBoomi Startup Weekend session handoff (2026-10-22), Current direction and hackathon resources (2026-10-23), Phase 1: Foundation, Task 1: Initialize Python project, FastAPI, settings, and Docker, Task 2: PostgreSQL schema (SQLAlchemy + Alembic), Task 3: TaskIQ + Redis broker setup, Task 4: PII encryption utilities and audit log infrastructure
+
 ### Community 153 - "record-demo.mjs"
 Cohesion: 0.40
 Nodes (4): credentials, headers, journey, target
 
-### Community 155 - "add_conversation_runtime_714f092da3b8.py"
-Cohesion: 0.50
-Nodes (3): columns(), Column, upgrade()
+### Community 154 - "verify_compose.py"
+Cohesion: 0.43
+Nodes (6): compose(), Verify the isolated local Compose stack without external API calls or sends., seed_credentials(), verify(), subprocess, websockets_asyncio_client
+
+### Community 155 - ".__call__"
+Cohesion: 0.29
+Nodes (4): private_send(), Receive, Scope, Send
+
+### Community 156 - "Phase 4: Advanced Bot Features"
+Cohesion: 0.29
+Nodes (7): Phase 4: Advanced Bot Features, Task 18: Application form collection node, Task 19: Razorpay integration, Task 20: Human handoff + co-pilot mode, Task 21: Cold lead re-engagement worker, Task 22: WhatsApp rate-limit tracking, Task 23: Langfuse tracing integration
 
 ### Community 157 - "sqlalchemy"
-Cohesion: 0.09
-Nodes (51): Audit-log write helper. :func:`write_audit_log` is the one path significant…, ApplicationStatus, PaymentStatus, Enumerated types used across the schema. These are Python ``str`` enums mapped…, Payment order lifecycle (SPEC §7.10)., Application review status (SPEC §7.9 / lifecycle)., Application form submissions and their payment orders., Lead, its semantic facts (lead_facts), and episodic messages (ADR-004). (+43 more)
+Cohesion: 0.08
+Nodes (54): Application-layer PII protection: symmetric encryption + deterministic hashing.…, Audit-log write helper. :func:`write_audit_log` is the one path significant…, ApplicationStatus, DiscountType, PaymentStatus, Enumerated types used across the schema. These are Python ``str`` enums mapped…, How a discount code reduces the fee., Payment order lifecycle (SPEC §7.10). (+46 more)
 
-### Community 158 - "durable_payments_outbound_f129a064c5e8.py"
-Cohesion: 0.50
-Nodes (3): common(), Column, upgrade()
+### Community 158 - "download"
+Cohesion: 0.47
+Nodes (6): download(), export_rows(), ExportRequest, Db, post, Response
 
-### Community 164 - "AdmitFlow pitch deck"
-Cohesion: 0.29
-Nodes (7): AdmitFlow pitch deck, Slide 1: AdmitFlow, Slide 2: The admissions handoff, Slide 3: A working institution workspace, Slide 4: Answers from approved documents, Slide 5: AI with institution control, Slide 6: An institution pilot
+### Community 159 - "Phase 3–4 addition (see ADR-008)"
+Cohesion: 0.33
+Nodes (6): Phase 3–4 addition (see ADR-008), Task 40: `decide()` System-1 decision-layer abstraction, Task 41: Distill decisions into self-hosted Laya (post-demo), Task 42.1: Complex Document Parsing & Semantic Chunking, Task 42.2: Contextual Query Rewriting, Task 42: Advanced RAG Strategy (ADR-011)
 
-### Community 165 - "Language review packet"
+### Community 160 - "Phase 6: Production Hardening"
+Cohesion: 0.33
+Nodes (6): Phase 6: Production Hardening, Task 35: Sentry error monitoring, Task 36: Delete My Data endpoint, Task 37: Data retention auto-cleanup, Task 38: Docker Compose for local development, Task 39: Production deployment
+
+### Community 161 - "index_known_name"
 Cohesion: 0.40
-Nodes (5): Current templates, Language review packet, Live exercise, Reference clarification, Reminder consent and outreach copy
+Nodes (5): index_known_name(), Connection, Mapper, Keep index updates atomic with encrypted names, including name removal., listens_for
+
+### Community 162 - "Code Owns the Money"
+Cohesion: 0.50
+Nodes (5): ADR-006: Code-Owned Qualification and Payments, Intent: Admissions Flow and Discounts, Discount Codes, Code Owns Eligibility, Code Owns the Money
+
+### Community 163 - "WhatsApp readiness check (2026-10-22, in progress)"
+Cohesion: 0.40
+Nodes (5): Final Postman diagnostic (October 23, executed; delivery blocked), Readiness blocker: idle Redis worker restart (in progress), Readiness tunnel setup (in progress), Test-number delivery diagnosis (October 23, blocked on Meta account restriction), WhatsApp readiness check (2026-10-22, in progress)
+
+### Community 164 - "docs/event/SUBMISSION_PLAN.md"
+Cohesion: 0.08
+Nodes (20): AI Impact Statement, Data, model and asset provenance, Student-to-staff demonstration, Current templates, Language review packet, Live exercise, Reference clarification, Reminder consent and outreach copy (+12 more)
+
+### Community 165 - "Workspace colour theme"
+Cohesion: 0.50
+Nodes (3): Roles, Verification, Workspace colour theme
 
 ### Community 166 - "11. Human-in-the-Loop (Full Workflow)"
 Cohesion: 0.40
 Nodes (5): 11.1 Auto-Escalation Triggers, 11.2 Co-pilot Mode, 11.3 Business Hours, 11.4 Never Escalate, 11. Human-in-the-Loop (Full Workflow)
 
 ### Community 167 - "Phase 5: Dashboard Frontend (Next.js)"
-Cohesion: 0.04
-Nodes (45): AdmitFlow — Task List, AIBoomi Startup Weekend session handoff (2026-10-22), Current direction and hackathon resources (2026-10-23), Final Postman diagnostic (October 23, executed; delivery blocked), Phase 1: Foundation, Phase 3–4 addition (see ADR-008), Phase 4: Advanced Bot Features, Phase 5: Dashboard Frontend (Next.js) (+37 more)
-
-### Community 168 - "AdmitFlow submission requirements"
-Cohesion: 0.50
-Nodes (4): AdmitFlow submission requirements, Demonstration, Required artifacts, Truthful claims
+Cohesion: 0.17
+Nodes (12): Phase 5: Dashboard Frontend (Next.js), Task 24: Initialize Next.js + dark mode + glassmorphism, Task 25: Authentication (email + password), Task 26: Dashboard home (funnel analytics), Task 27: Leads CRM page, Task 28: Course & batch management, Task 29: Chat takeover + co-pilot UI, Task 30: Document management (RAG) (+4 more)
 
 ### Community 173 - "RazorpayClient"
-Cohesion: 0.09
-Nodes (32): AsyncBaseTransport, Credentials, PaymentLink, PaymentProviderError, BaseModel, Exception, field_validator, Bounded Razorpay requests; ambiguous link creation is never blindly retried. (+24 more)
+Cohesion: 0.12
+Nodes (22): AsyncBaseTransport, Credentials, Bounded Razorpay requests; ambiguous link creation is never blindly retried., RazorpayClient, discounted_amount(), verify_webhook(), process_payment(), main() (+14 more)
 
 ### Community 175 - "Q: What you need to do is i need to present the this project before the jury. First explain the overall structure the stack what things used where used . From A to Z things. that i can answer anything if they question."
 Cohesion: 0.40
 Nodes (4): Answer, Outcome, Q: What you need to do is i need to present the this project before the jury. First explain the overall structure the stack what things used where used . From A to Z things. that i can answer anything if they question., Source Nodes
 
-### Community 177 - "record_stage_changes"
-Cohesion: 0.50
-Nodes (4): Any, Record persisted ORM transitions atomically; never infer an earlier stage., record_stage_changes(), Session
+### Community 177 - "write_audit_log"
+Cohesion: 0.13
+Nodes (21): CRM search and institution downloads, Any, AsyncSession, UUID, Record persisted ORM transitions atomically; never infer an earlier stage., Append one entry to ``audit_logs`` on ``session``; return it flushed, not…, record_stage_changes(), write_audit_log() (+13 more)
 
 ### Community 178 - "ADR-014: Natural collection, context reset and responsive replies"
 Cohesion: 0.50
@@ -776,27 +888,27 @@ Cohesion: 0.50
 Nodes (4): 8.1 Per-Institution Knowledge Base, 8.2 Retrieval Pipeline, 8.3 RAG Guardrail, 8. RAG (Retrieval-Augmented Generation)
 
 ### Community 183 - "test_worker_broker.py"
-Cohesion: 0.25
-Nodes (7): Tests for the TaskIQ broker setup and task execution (Task 3). All tests run…, When REDIS_URL is unset the factory should yield an InMemoryBroker., The ping task should run and return the expected payload., Ping without an explicit payload should default to 'pong'., test_broker_is_in_memory_without_redis_url(), test_ping_task_default_payload(), test_ping_task_returns_result()
+Cohesion: 0.18
+Nodes (10): ping(), task, Smoke-test task: returns ``{"result": payload}``. Enqueued from the…, Tests for the TaskIQ broker setup and task execution (Task 3). All tests run…, When REDIS_URL is unset the factory should yield an InMemoryBroker., The ping task should run and return the expected payload., Ping without an explicit payload should default to 'pong'., test_broker_is_in_memory_without_redis_url() (+2 more)
 
 ### Community 185 - "AdmitFlow execution and demonstration checklist"
 Cohesion: 0.67
 Nodes (3): AdmitFlow execution and demonstration checklist, Build and verify, Demonstrate and submit
 
 ## Knowledge Gaps
-- **447 isolated node(s):** `admitflow-backend`, `fs`, `path`, `crypto`, `root` (+442 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1252 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **462 isolated node(s):** `admitflow-backend`, `fs`, `path`, `crypto`, `root` (+457 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1269 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `CRM search and institution downloads` connect `PublicCatalogue` to `test_staff_lookup_is_scoped_read_only_and_cannot_confirm_payment`, `backend/README.md`, `leads.py`?**
-  _High betweenness centrality (0.145) - this node is a cross-community bridge._
-- **Why does `write_audit_log()` connect `write_audit_log` to `journey.py`, `analytics`, `payments/conversation.py`, `parse_callback`, `transport.py`, `test_staff_lookup_is_scoped_read_only_and_cannot_confirm_payment`, `get_sessionmaker`, `test_telegram_contracts.py`, `outreach/followups.py`, `sqlalchemy`, `leads.py`, `management.py`, `knowledge/processing.py`, `Phase 5: Dashboard Frontend (Next.js)`, `RazorpayClient`, `record_stage_changes`, `change_password`, `guidance.py`, `process_followup`, `PublicCatalogue`, `session.py`, `generate`, `TelegramBot`, `models/__init__.py`, `Lead`, `hash_phone`?**
-  _High betweenness centrality (0.098) - this node is a cross-community bridge._
-- **Why does `AdmitFlow — Task List` connect `Phase 5: Dashboard Frontend (Next.js)` to `WhatsAppSender`, `2026-10-23-before-telegram-alignment/docs/event/RESOURCE_PLAN.md`, `dispatcher.py`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
+- **Why does `CRM search and institution downloads` connect `write_audit_log` to `seed`, `backend/README.md`, `PublicCatalogue`, `leads.py`?**
+  _High betweenness centrality (0.116) - this node is a cross-community bridge._
+- **Why does `write_audit_log()` connect `write_audit_log` to `process_event`, `analytics`, `payments/conversation.py`, `TelegramBot`, `parse_callback`, `staff/integrations.py`, `exports.py`, `seed`, `TelegramAPIError`, `send_message`, `test_telegram_contracts.py`, `reconcile`, `AdmitFlow — Task List`, `outreach/followups.py`, `sqlalchemy`, `download`, `leads.py`, `management.py`, `budget.py`, `accounts.py`, `RazorpayClient`, `change_password`, `api.py`, `journey.py`, `process_followup`, `auth.py`, `process_upload`, `copilot.py`, `test_knowledge_workspace.py`, `models/__init__.py`, `Lead`, `payment_webhook`?**
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
+- **Why does `get_settings()` connect `get_settings` to `test_local_runtime.py`, `answer_question`, `env.py`, `test_workspace_limits.py`, `TelegramBot`, `pdf_parser.py`, `WhatsAppSender`, `exports.py`, `TelegramAPIError`, `ingest_document`, `test_telegram_contracts.py`, `reconcile`, `outreach/followups.py`, `.__call__`, `sqlalchemy`, `download`, `get_engine`, `main.py`, `route`, `budget.py`, `accounts.py`, `RazorpayClient`, `EncryptionKeyNotConfiguredError`, `change_password`, `api.py`, `generate_completion`, `journey.py`, `process_followup`, `auth.py`, `test_decision_reranking.py`, `pydantic`, `process_upload`, `broker.py`, `test_knowledge_workspace.py`, `decrypt_pii`, `test_faq_evaluation.py`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `encrypt_pii()` (e.g. with `Consequences` and `Decision`) actually correct?**
   _`encrypt_pii()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 23 inferred relationships involving `Reply` (e.g. with `advance_application()` and `request_staff()`) actually correct?**
@@ -804,4 +916,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 60 inferred relationships involving `LeadStatus` (e.g. with `record_stage_changes()` and `Lead`) actually correct?**
   _`LeadStatus` has 60 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `admitflow-backend`, `fs`, `path` to the rest of the system?**
-  _447 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _462 weakly-connected nodes found - possible documentation gaps or missing edges._

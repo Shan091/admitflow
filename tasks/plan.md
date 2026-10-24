@@ -378,3 +378,17 @@ intentionally deferred by the owner; the older deck is not the selected submissi
 No custom training, validated psychometric assessment, measured conversion gain or completed
 submission is claimed. Only statement/provenance/artifact records and these checklists changed;
 application source and the existing green code gate are unchanged.
+
+## Task 69: Warm neutral UI and wordmark cleanup
+
+- [x] Replace green brand accents and surfaces with Claude-inspired ivory, charcoal and terracotta roles.
+- [x] Remove the trailing logo dot from login and workspace navigation.
+- [x] Keep controls, charts, focus, selection and status colors consistent and accessible.
+- [x] Verify desktop/mobile login and workspace views, frontend checks and the repository gate.
+- [x] Correct the reference-catalogue list's unknown fee label; prove the regression before/after.
+
+Task 69 evidence: eight desktop/mobile browser checks pass, contrast and overflow checks
+pass, frontend lint/build pass, the backend gate passes 313 tests with 127 strictly typed
+source files, and the extended reference-catalogue UI test passes. Mechanical scans report
+zero findings. Local frontend refreshed; no public deployment or Telegram send. See
+`docs/engineering/UI_THEME.md` for palette and verification scope.

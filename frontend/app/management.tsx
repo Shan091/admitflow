@@ -276,7 +276,9 @@ export default function Management({
                   batches
                 </span>
                 <span>
-                  Application fee: INR {(item.application_fee / 100).toFixed(2)}
+                  Application fee: {item.is_reference
+                    ? "Unverified"
+                    : `INR ${(item.application_fee / 100).toFixed(2)}`}
                 </span>
               </button>
             ))}

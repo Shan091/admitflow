@@ -369,7 +369,6 @@ export default function Knowledge() {
         <div className="login-story">
           <a className="brand" href="/">
             Admit<span>Flow</span>
-            <span className="brand-dot" />
           </a>
           <div>
             <h1>
@@ -472,7 +471,6 @@ export default function Knowledge() {
       <aside className="sidebar">
         <a className="brand" href="/">
           Admit<span>Flow</span>
-          <span className="brand-dot" />
         </a>
         <div className="institution">
           <span className="institution-avatar">

@@ -18,13 +18,13 @@
   color: var(--ink);
   background: var(--paper);
   padding: 8px 10px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-line);
   border-radius: 6px;
 }
 .filters input:focus-visible,
 .filters select:focus-visible,
 .counts summary:focus-visible {
-  outline: 2px solid var(--green);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 .period,
@@ -87,7 +87,7 @@
 }
 .counts summary {
   cursor: pointer;
-  color: var(--green);
+  color: var(--accent);
   padding: 8px 0;
 }
 .counts table,
@@ -143,7 +143,7 @@
 .bar > span {
   display: block;
   height: 100%;
-  background: var(--green);
+  background: var(--accent);
 }
 .fees {
   border-top: 1px solid var(--line);
