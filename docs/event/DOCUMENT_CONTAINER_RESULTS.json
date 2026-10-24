@@ -1,0 +1,7 @@
+{
+  "scope": "final Linux nonroot image; network disabled; synthetic fixture",
+  "image": "sha256:a0a5c4f1c63760164ae23b05520b6a3bbf52a9ae195fc5be3565f877adb2b476",
+  "checks": {
+    "offline_bounded_pdf_parse": true
+  }
+}

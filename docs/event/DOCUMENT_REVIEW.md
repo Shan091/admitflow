@@ -28,5 +28,9 @@ No open Critical or Important finding remains for the reviewed code. Default gat
 model fixture. Redis: 2 passed. Frontend lint/build pass. Live OpenAI structured output,
 1536-dimensional embeddings and read-only Telegram bot identity checks pass. Live
 PDF queue/index/search checks pass and remove their temporary synthetic upload.
-Container/PR gates are recorded separately; this review does not establish a public
+The final Linux image passes bounded parsing with networking disabled; nine current
+Compose smoke checks pass, including the dedicated worker. The preceding ten-check
+restart run confirmed credential persistence. CI exposed a platform-specific typing
+issue in the Windows process flag; an explicit guard fixes Linux typing without
+changing execution behavior. The final PR gate remains separate; this review does not establish a public
 release, payment-card journey, handset receipt or general PDF extraction accuracy.

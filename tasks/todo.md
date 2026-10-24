@@ -1046,7 +1046,7 @@ below is optional future work; unredacted full applicant context is not permitte
 - [x] Actual container login/proxy, authenticated WebSocket, data readiness, Redis/TaskIQ result and scheduler checks pass
 - [x] Stop/start preserves the synthetic credential and successful access; seed reruns preserve existing accounts
 - [x] Receiver profile validates and its image CLI loads; live container polling remains deliberately unclaimed because the existing native receiver owns the demo bot
-  **Verification:** Nine live checks in `backend/scripts/verify_compose.py --restart` pass; `docs/event/COMPOSE_RESULTS.json` records results. Backend gate passes 234 tests/111 strictly typed source files; nine affected PostgreSQL journey/account cases pass. Linux image builds and migrations succeed; the existing native data/bot runtime is untouched.
+  **Verification:** The original nine-check restart pass is extended by a real dedicated knowledge-worker roundtrip. The document slice passes ten restart checks before its platform-only typing correction and nine current smoke checks afterward; `docs/event/COMPOSE_RESULTS.json` records results. Backend gate passes 234 tests/111 strictly typed source files; nine affected PostgreSQL journey/account cases pass. Linux image builds and migrations succeed; the existing native data/bot runtime is untouched.
   **Runbook:** `docs/engineering/COMPOSE_RUNTIME.md`; bootstrap config from `src.scripts.configure_compose` first.
   **Dependencies:** Platform/application migrations and Task 25
 

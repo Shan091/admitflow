@@ -11,11 +11,11 @@ Confirm portal fields and current organizer instructions before uploading.
 
 | Artifact | Required content | Status |
 | --- | --- | --- |
-| GitHub URL | Judge-accessible source, license/attribution, setup and prior-work disclosure | Pending |
+| GitHub URL | Judge-accessible source, license/attribution, setup and prior-work disclosure | Source published at Shan091/admitflow; judge access, owner licensing and organizer acceptance pending |
 | Root README | Problem/users, actual features, stack, setup, demo link, team and limitations | Updated locally; owner/team/license and public links pending |
 | Product demo link | Recording or hosted product showing the final working build | Local 33-second staff and 58-second saved-journey recordings ready; final owner approval/public link pending |
 | Pitch deck | At most six slides: problem, insight, solution, technology, value/GTM, next steps | Six-slide editable draft and repository copy prepared |
-| AI Impact Statement | At most 200 words: actual AI/models, data/licenses, guardrails and expected impact | 178-word draft prepared |
+| AI Impact Statement | At most 200 words: actual AI/models, data/licenses, guardrails and expected impact | Updated draft under 200 words; includes OpenAI reranking and offline document models |
 
 A separate hosted demo is optional but favored. Prepare a recording even if hosted.
 
@@ -25,8 +25,9 @@ The [33-second staff walkthrough](artifacts/staff-walkthrough.webm) shows actual
 staff behavior; it is silent and does not replace the final student-to-staff event video.
 The [58-second saved-journey walkthrough](artifacts/student-to-staff-walkthrough.webm)
 adds the actual stored student choices, corrections, source/abstention and staff request.
-Both are staff views, not handset recordings. Current OpenAI credentials need replacement
-before a fresh AI demonstration; the saved recording documents prior verified behavior.
+Both are staff views, not handset recordings. Current OpenAI structured output,
+embeddings and the real PDF ingestion/search check pass; the saved recordings document
+their original verified staff behavior.
 The deck is editable in this Codex conversation. The local runtime and recovery
 instructions are in [LOCAL_RUNTIME.md](../engineering/LOCAL_RUNTIME.md).
 Technical evidence belongs to the current tasks/todo.md; draft artifacts do not

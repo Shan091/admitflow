@@ -1,6 +1,6 @@
 {
   "scope": "code/configuration only; no credentials or runtime data",
-  "sha256": "7af8283521851d5c9a909681142911468d6e69b2d42640969c94d1561fdf4b05",
+  "sha256": "0c97c80d4335bf92a917edd88ba84b77bd9f01b9ea328f73fed1d4dffc7b32da",
   "files": {
     ".github/workflows/ci.yml": "416710533fae58c338471bfa5ca59251d0670a5e0d8b9cf7876bcc2ab6c5ada9",
     "backend/.dockerignore": "ecdae291cf16a4ff01aa824f3fc820e710262959d0d3a2591facdba629b50c4c",
@@ -75,7 +75,7 @@
     "backend/src/knowledge/chunking.py": "25726c52cb8262046ec2113c23be3851fb6910294be03ce477ffe8fa48d2a079",
     "backend/src/knowledge/extraction.py": "d2ec5f5f16e1dc02e86f31db628353926a90e56338a96a2268c4d1147ea9c8fc",
     "backend/src/knowledge/limits.py": "c6de772c0d91c0bb2627bb3cd21be63965df9d2d140362701c102dd096d61359",
-    "backend/src/knowledge/pdf_parser.py": "1a3d707750c3b2c929f7157f9860ba1dcc290ebbc811b67d256ff61956a6c714",
+    "backend/src/knowledge/pdf_parser.py": "8739151e34c5d34918acba4c9639a572d0fb2f387852888138253d159038f6ce",
     "backend/src/knowledge/pdf_worker.py": "9c426d435a415780fbb309b18c4b5a8a1e0318809428f190ff58fa6f7324c9a3",
     "backend/src/knowledge/processing.py": "a6d4503145430f063450a68a8a005ee112d0ef675c60ee48c50d57f44c778fb7",
     "backend/src/knowledge/reranking.py": "75bd2a0665bee70f08886a042732d98dcf7f4d7f7af053a361a61185d434fd51",

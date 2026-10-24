@@ -103,7 +103,9 @@ async def parse_pdf(data: bytes) -> str:
             "TOKENIZERS_PARALLELISM": "false",
         }
     )
-    flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    flags = 0
+    if sys.platform == "win32":
+        flags = subprocess.CREATE_NO_WINDOW
     assets = await asyncio.to_thread(settings.document_models_path.resolve)
     async with gate:
         try:
