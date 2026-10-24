@@ -102,9 +102,19 @@
     ]
   },
   "deferred": [
-    "Owner fills Razorpay API values, then read-only verification and encrypted provisioning",
     "Authorized public test ingress and actual provider test-card/webhook validation"
   ],
   "public_deployment_performed": false,
-  "publication_evidence": "The reviewed pull request and exact-head CI are recorded by GitHub; this file records local verification."
+  "publication_evidence": "The reviewed pull request and exact-head CI are recorded by GitHub; this file records local verification.",
+  "verified_database_note": "Database snapshot immediately after reset, before the owner supplied payment API values.",
+  "payment_configuration": {
+    "test_credentials_verified_read_only": true,
+    "encrypted_institution_configuration_present": true,
+    "saved_values_match_local_env": true,
+    "test_mode": true,
+    "live_payments_enabled": false,
+    "payment_orders": 0,
+    "payment_link_created": false,
+    "actual_card_and_webhook_validation": false
+  }
 }

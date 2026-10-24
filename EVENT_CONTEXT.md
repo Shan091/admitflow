@@ -10,9 +10,10 @@ login/bot configuration is retained. Reference programmes support exploration wi
 invented seats, fees, eligibility approval, university applications or payments.
 
 SerpAPI was used for discovery and its key is private in ignored backend/.env.
-Razorpay API placeholders are blank for the owner to fill; the webhook secret is
-prepared. Do not claim payment setup validated: credential provisioning, public test
-webhook and actual test-card receipt remain open. No public deployment was authorized.
+The owner supplied Razorpay test API values. A read-only provider probe passed and
+matching credentials are saved encrypted for the institution. Live payments remain
+disabled; no link or charge was created. Public test webhook and actual test-card
+receipt remain open. No public deployment was authorized.
 See ADR-016, the existing Task 65 checklists and JAIN_KOCHI_RELEASE.json.
 
 

@@ -1362,8 +1362,8 @@ deployment was performed. See `docs/event/NECESSARY_HANDOFF_RELEASE.json`.
 - [x] Index 65 tenant/course-scoped knowledge documents and preserve internal source evidence.
 - [x] Block reference applications/payments and unknown-fee-as-zero displays; prevent fake reseeding.
 - [x] Verify code, real PostgreSQL reset/rollback, official-reference guidance and desktop/mobile UI.
-- [ ] Razorpay API credential verification/provisioning awaits the owner's values.
-- [ ] Actual test payment/card/webhook receipt awaits credentials and authorized public test ingress.
+- [x] Owner-supplied Razorpay test credentials verified read-only and saved encrypted.
+- [ ] Actual test payment/card/webhook receipt awaits authorized public test ingress.
 
 Local evidence: **313 default tests**, strict typing across **127 source files**, lint/format;
 **121 PostgreSQL cases** pass (two Redis-specific checks skipped in that run). Six final focused
@@ -1384,3 +1384,7 @@ Task 65 final regression record: 13 distinct synthetic guidance cases pass acros
 11/13 sweep and a successful two-case follow-up; all three multi-turn dialogues pass.
 The original two provider/typed-decision failure outcomes remain recorded in
 `docs/event/GUIDANCE_EVALUATION_RESULTS.json`; this is not a single all-pass sweep.
+
+Task 65 payment follow-up: the read-only Razorpay test API probe passed; encrypted
+institution configuration matches the private environment. Zero payment orders or
+links were created. Actual card/webhook receipt is unverified; live mode is disabled.

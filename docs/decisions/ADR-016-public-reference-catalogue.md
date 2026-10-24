@@ -47,7 +47,9 @@ to collect university applications or money.
 - Quiesce writers first: an operator requirement, not automatic process shutdown.
   Reject incomplete embedding sets and nonofficial URLs. Skip synthetic seeding when
   a reference catalogue exists. Keep SerpAPI and webhook secrets in ignored `.env`,
-  leave Razorpay API placeholders empty and live payments disabled.
+  initially leave Razorpay API placeholders empty. After the owner supplies test values,
+  verify them with a read-only provider probe and save institution credentials encrypted.
+  Live payments remain disabled.
 
 ## Evidence and limits
 
@@ -60,7 +62,7 @@ with no Telegram test send. Evidence: `JAIN_KOCHI_VALIDATION.json` and
 Summaries are not official admissions decisions. Public pages may be outdated or
 inconsistent. Regulatory, ranking, earnings and outcome claims were not independently
 verified. Model guidance remains probabilistic and exploratory. Razorpay credential
-verification, a public test webhook and actual test-card validation await the owner's
-API values and authorized test ingress. No public deployment occurred. The separate
+verification and encrypted provisioning passed after the owner supplied test values.
+A public test webhook and actual test-card validation await authorized test ingress. No public deployment occurred. The separate
 Compose application database is outside this reset; the target is local dashboard
 port 3000 / API port 8000.

@@ -329,13 +329,18 @@ Execution checks are in [PREPARATION_PLAN.md](../docs/event/PREPARATION_PLAN.md)
 - [x] Add reference-only guidance, fee and application boundaries without fictitious intakes.
 - [x] Transactionally replace dummy activity/catalogue/documents; index 65 source records.
 - [x] Verify rollback, tenant scope, reseed protection, real database, live guidance and UI.
-- [ ] Verify/provision Razorpay test credentials after the owner fills the prepared values.
+- [x] Verify/provision owner-supplied Razorpay test credentials with a read-only API probe.
 - [ ] Validate a provider webhook and actual test-card journey after authorized test ingress.
 
 Current requested reset/import and environment preparation are complete locally.
-The two payment checks remain deferred by the owner; live payments stay disabled.
+Razorpay test credentials are verified and encrypted for the institution. Actual test-card
+and public webhook validation remain pending; live payments stay disabled.
 
 Task 65 final regression record: 13 distinct synthetic guidance cases pass across the
 11/13 sweep and a successful two-case follow-up; all three multi-turn dialogues pass.
 The original two provider/typed-decision failure outcomes remain recorded in
 `docs/event/GUIDANCE_EVALUATION_RESULTS.json`; this is not a single all-pass sweep.
+
+Task 65 payment follow-up: the read-only Razorpay test API probe passed; encrypted
+institution configuration matches the private environment. Zero payment orders or
+links were created. Actual card/webhook receipt is unverified; live mode is disabled.
