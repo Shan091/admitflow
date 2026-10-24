@@ -1,25 +1,11 @@
 # AI Impact Statement
 
-AdmitFlow uses the configured OpenAI gpt-4.1-mini model for interpreting admissions
-messages, extracting explicit facts, resolving references, reranking evidence and
-selecting exact quotations. text-embedding-3-small supplies document embeddings.
-Digital PDFs use offline pretrained Docling layout/TableFormer models; DOCX/text
-extraction preserves structure. No fine-tuning or OCR is used.
+AdmitFlow uses AI to turn student enquiries into personalised course guidance and supported institutional answers. It connects explicit interests, educational background and goals to catalogue options, helping students discover suitable alternatives while preserving context for admissions staff.
 
-Code controls eligibility, fees, authorization and consequential changes. Eligibility
-confers neither admission nor a reserved seat. Tenant-scoped retrieval, relevance
-checks and exact-quote validation prevent unsupported answers; missing evidence
-produces abstention. Source references remain internal, while staff search displays
-them. Staff requests pause automation until explicit resume.
+OpenAI gpt-4.1-mini interprets messages, extracts explicit facts, plans guidance and reranks evidence. text-embedding-3-small supports semantic retrieval. These models provide structured decisions and search without custom model training. Offline pretrained Docling models extract digital PDF structure.
 
-The demonstration uses authored synthetic institution material and student answers,
-without a public training dataset or real applicant records. Owner shan licenses
-project source under MIT. Third-party code/models retain upstream terms; Docling
-model cards identify Apache-2.0 and CDLA-Permissive-2.0. OpenAI is accessed as a
-hosted API. See DATA_PROVENANCE.md for sources and limits.
+Reference material includes sourced public JAIN Kochi programme summaries; evaluation uses synthetic student messages. Public listings do not establish current availability or admissions authority. Project code uses MIT; third-party material and models retain upstream terms. No fine-tuning is performed.
 
-Encrypted identifiers/conversations, scoped staff sessions, bounded workers and
-deletion/retention controls protect institutional data. Live OpenAI, uploaded-PDF
-and handset checks pass. General language fluency and real-applicant outcomes
-remain unvalidated. Reduced repetition and clearer staff review are intended
-benefits; revenue, conversion gains and time savings have not been measured.
+Tenant-scoped retrieval, supporting-quotation checks and abstention reduce unsupported answers. Code governs eligibility checks, fees, permissions and application state; institutions retain admissions authority. Sensitive conversation data is encrypted. Exploration is not a validated psychometric assessment.
+
+Existing checks cover corrections, unavailable courses, retrieval and staff continuity. A pilot will evaluate answer usefulness, course relevance, response time and enquiry-to-application conversion. Expected benefits are clearer student decisions and less repeated information collection; conversion gains and real-student outcomes remain unmeasured.
